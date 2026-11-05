@@ -34,6 +34,7 @@ export function Slides() {
     }
   };
   const remove = async (id: string) => {
+    if (!confirm("Xoá bộ slide này?")) return;
     await api(`/api/slides/${id}`, { method: "DELETE" }).catch((e: unknown) => setError(errText(e)));
     load();
   };

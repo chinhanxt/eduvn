@@ -108,6 +108,11 @@ export function ClassDetailPage() {
     }
   };
   const upload = async (f: File) => {
+    if (f.size > 2 * 1024 * 1024) {
+      setError("File Excel quá lớn (tối đa 2 MB)");
+      if (file.current) file.current.value = "";
+      return;
+    }
     const buf = new Uint8Array(await f.arrayBuffer());
     let bin = "";
     for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
@@ -119,6 +124,8 @@ export function ClassDetailPage() {
     if (file.current) file.current.value = "";
   };
   const remove = async (sid: string) => {
+    const who = c?.students.find((s) => s.id === sid)?.fullName ?? "học viên này";
+    if (!confirm(`Xoá ${who}? Điểm, điểm danh và nhận xét của học viên cũng sẽ mất.`)) return;
     await api(`/api/classes/${id}/students/${sid}`, { method: "DELETE" }).catch((e: unknown) => setError(errText(e)));
     load();
   };

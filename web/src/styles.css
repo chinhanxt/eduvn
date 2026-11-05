@@ -23,14 +23,15 @@
 
   /* Khung app */
   .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
-  aside { background: var(--side); color: var(--side-ink); padding: 18px 12px; display: flex; flex-direction: column; }
+  aside { background: var(--side); color: var(--side-ink); padding: 18px 12px; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  aside nav { flex: 1; min-height: 0; overflow-y: auto; }
   aside .brand { color: #fff; font-size: 18px; padding: 2px 8px 18px; }
   .grp { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #7c84ab; margin: 16px 10px 6px; }
   nav a { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 10px; color: var(--side-ink); text-decoration: none; }
   nav a:hover { background: rgba(255,255,255,.05); }
   nav a.on { background: var(--side-active); color: var(--side-hi); }
   nav a .soon { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #5b6290; }
-  .me { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,.05); }
+  .me { margin-top: 8px; flex: none; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,.05); }
   .avatar { width: 32px; height: 32px; border-radius: 50%; background: #f4b740; color: #1e2340; display: grid; place-items: center; font-weight: 700; }
   .me small { display: block; color: #8b92b8; }
 

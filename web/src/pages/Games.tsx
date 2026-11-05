@@ -14,6 +14,7 @@ export function Games() {
   }, []);
   useEffect(load, [load]);
   const remove = async (id: string) => {
+    if (!confirm("Xoá trò chơi này?")) return;
     await api(`/api/games/${id}`, { method: "DELETE" }).catch((e: unknown) => setError(errText(e)));
     load();
   };

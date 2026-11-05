@@ -15,6 +15,7 @@ const assert = (cond, msg) => {
 const browser = await chromium.launch({ executablePath: process.env.CHROME ?? "/usr/bin/google-chrome", headless: true });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, acceptDownloads: true });
 const page = await ctx.newPage();
+page.on("dialog", (d) => void d.accept());
 page.on("pageerror", (e) => console.log("pageerror", e.message));
 const shot = async (n) => {
   await page.waitForTimeout(250);
@@ -42,6 +43,12 @@ try {
   await page.waitForSelector(".tools");
   await page.waitForLoadState("networkidle");
   await shot("home-trong");
+  assert((await page.locator(".tools .tool").count()) >= 12, "trang chủ có đủ ô công cụ (12)");
+  for (const href of ["/giao-an", "/tro-choi", "/van-ban", "/so-diem"]) assert((await page.locator(`.tools a[href="${href}"]`).count()) === 1, `ô công cụ ${href}`);
+  const lastNav = page.locator("aside nav a").last();
+  await lastNav.scrollIntoViewIfNeeded();
+  const nb = await lastNav.boundingBox();
+  assert(nb && nb.y + nb.height <= 800, "sidebar: mục cuối nằm trong màn 1280x800");
 
   // Thêm 2 câu hỏi
   await page.goto(`${BASE}/ngan-hang`);
@@ -262,6 +269,12 @@ try {
   await page.getByTestId("sc-1-GK").press("Enter");
   await page.waitForSelector(".err");
   assert(/ngoài thang/.test(await page.locator(".err").innerText()), "điểm 11 bị từ chối");
+  await page.getByTestId("term-HK2").click();
+  await page.waitForFunction(() => document.querySelector("[data-testid=dtb-0]")?.textContent === "");
+  assert(true, "HK2 độc lập với HK1 (ĐTB trống)");
+  await page.getByTestId("term-HK1").click();
+  await page.waitForFunction(() => document.querySelector("[data-testid=dtb-0]")?.textContent === "8,4");
+  assert(true, "quay lại HK1: ĐTB vẫn 8,4");
   await shot("so-diem");
   await page.getByTestId("tab-diem-danh").click();
   await page.waitForSelector("[data-testid=att-table]");
