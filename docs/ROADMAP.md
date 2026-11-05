@@ -4,7 +4,7 @@ Mỗi đợt = **một plan riêng** trong `docs/superpowers/plans/`, viết nga
 
 | Đợt | Plan | Kết quả bàn giao | Module | Trạng thái |
 |---|---|---|---|---|
-| P1 | `2026-11-05-p1-core-question-bank-mcp.md` | Lõi + SSO (dev) + ngân hàng câu hỏi + ra đề/đáp án/.docx + chấm + MCP | 01, 02, 03, 05 | ✅ Plan sẵn sàng |
+| P1 | `2026-11-05-p1-core-question-bank-mcp.md` | Lõi + SSO (dev) + ngân hàng câu hỏi + ra đề/đáp án/.docx + chấm + MCP | 01, 02, 03, 05 | Code xong 2026-11-05 (nhánh `p1-core`, 87 test, smoke OK) — chờ chinhan duyệt .docx |
 | P2 | `p2-zalo-demo.md` | Bot Zalo demo: GV nhắn "tạo đề…" trong Zalo → nhận file .docx | 08 | Chờ P1 |
 | P3 | `p3-public-mcp-connectors.md` | Deploy HTTPS, Keycloak đăng ký client động, connector Claude.ai + ChatGPT | 05 | Chờ P1 |
 | P4 | `p4-classroom.md` | Lớp, học viên, import Excel, điểm danh, sổ điểm, nhận xét TT22/27, web app tối thiểu | 04 | |
