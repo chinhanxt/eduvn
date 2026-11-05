@@ -117,3 +117,32 @@ td { padding: 11px 10px; border-top: 1px solid var(--line); vertical-align: top;
 .login .sso { color: var(--ink); }
 .login .sso.main { color: #fff; }
 .center { min-height: 100vh; display: grid; place-items: center; color: var(--muted); }
+
+/* Lớp học & sổ điểm */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.cls { background: var(--card); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); text-decoration: none; color: inherit; display: block; transition: box-shadow .15s, transform .15s; }
+.cls:hover { box-shadow: var(--shadow-hi); transform: translateY(-2px); }
+.cls .big { font-size: 24px; font-weight: 700; }
+.cls .meta { color: var(--muted); font-size: 13px; margin: 2px 0 12px; }
+.cls .cnt { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); text-decoration: none; margin-bottom: 4px; }
+textarea.inp { width: 100%; min-height: 120px; resize: vertical; font-family: inherit; }
+.warn { background: var(--amber-bg); color: #8a5300; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; white-space: pre-line; }
+.err { white-space: pre-line; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 500; padding: 8px 10px; }
+td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middle; }
+.tabs { display: inline-flex; gap: 4px; background: var(--card); padding: 4px; border-radius: 12px; box-shadow: var(--shadow); }
+.tabs button { border: 0; background: transparent; padding: 7px 16px; border-radius: 9px; color: var(--muted); font-weight: 500; }
+.tabs button.on { background: var(--brand); color: #fff; }
+.sgrid { overflow-x: auto; }
+.sgrid th, .sgrid td { text-align: center; white-space: nowrap; }
+.sgrid th:nth-child(2), .sgrid td:nth-child(2) { text-align: left; }
+.sgrid input { width: 62px; text-align: center; border: 1px solid transparent; background: var(--bg); border-radius: 8px; padding: 6px 4px; font: inherit; color: var(--ink); }
+.sgrid input:focus { outline: 2px solid var(--blue-bg); border-color: var(--brand); background: #fff; }
+.sgrid input.bad { border-color: #b42318; }
+.dtb { font-weight: 700; color: var(--brand); }
+.cm { width: 100%; min-width: 320px; min-height: 58px; font: inherit; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; resize: vertical; }
+.cm-row td { vertical-align: top; }
+.xbtn { border: 0; background: transparent; color: var(--muted); padding: 4px; border-radius: 8px; display: grid; place-items: center; }
+.xbtn:hover { color: #b42318; background: #fdecec; }

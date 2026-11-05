@@ -60,3 +60,33 @@ export async function downloadFirst(examId: string) {
   const first = links.exams[0];
   if (first) window.location.assign(first.url);
 }
+
+export type ClassSummary = { id: string; name: string; schoolYear: string; subject: string | null; scale: "TT22" | "TT27"; studentCount: number };
+export type StudentRow = { id: string; code: string | null; fullName: string; dob: string | null; gender: string | null; note: string };
+export type ClassDetail = Omit<ClassSummary, "studentCount"> & { columns: { name: string; weight: number }[]; students: StudentRow[] };
+export type AttStatus = "present" | "excused" | "unexcused";
+export type GbStudent = StudentRow & {
+  scores: Record<string, number>;
+  dtb: number | null;
+  attendance: Record<AttStatus, number>;
+  comments: Partial<Record<"HK1" | "HK2", { text: string; level: string }>>;
+};
+export type Gradebook = { class: Omit<ClassSummary, "studentCount">; columns: { name: string; weight: number }[]; dates: string[]; students: GbStudent[] };
+export const LEVELS = { TT22: ["Tốt", "Khá", "Đạt", "Chưa đạt"], TT27: ["Hoàn thành tốt", "Hoàn thành", "Chưa hoàn thành"] } as const;
+
+/** Lỗi nhập liệu có danh sách → nhiều dòng. */
+export const errText = (e: unknown): string => {
+  if (e instanceof ApiError) {
+    const issues = (e.body as { issues?: unknown[] } | null)?.issues;
+    if (issues?.length && typeof issues[0] === "string") return issues.join("\n");
+    return e.message;
+  }
+  return "Lỗi";
+};
+export const vn = (n: number | null | undefined): string => (n === null || n === undefined ? "" : String(n).replace(".", ","));
+export const dobVi = (iso: string | null): string => (iso ? iso.split("-").reverse().join("/") : "");
+
+export async function exportClass(id: string, kind: "class_list" | "gradebook") {
+  const link = await api<{ url: string }>(`/api/classes/${id}/export`, { method: "POST", body: { kind } });
+  window.location.assign(link.url);
+}

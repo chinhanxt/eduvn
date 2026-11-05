@@ -6,6 +6,8 @@ import { Home } from "./pages/Home";
 import { Bank } from "./pages/Bank";
 import { Exams } from "./pages/Exams";
 import { Grade } from "./pages/Grade";
+import { Classes, ClassDetailPage } from "./pages/Classes";
+import { Gradebook } from "./pages/Gradebook";
 import { Connect } from "./pages/Connect";
 import { Placeholder } from "./pages/Placeholder";
 import { TOOLS } from "./tools";
@@ -25,6 +27,9 @@ export function App() {
           <Route path="ngan-hang" element={<Bank />} />
           <Route path="de-thi" element={<Exams />} />
           <Route path="cham-bai" element={<Grade />} />
+          <Route path="lop-hoc" element={<Classes />} />
+          <Route path="lop-hoc/:id" element={<ClassDetailPage />} />
+          <Route path="so-diem" element={<Gradebook />} />
           <Route path="ket-noi" element={<Connect />} />
           {TOOLS.filter((t) => t.pill).map((t) => (
             <Route key={t.to} path={t.to.slice(1)} element={<Placeholder tool={t} />} />

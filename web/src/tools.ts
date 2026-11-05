@@ -9,5 +9,5 @@ export const TOOLS: Tool[] = [
   { to: "/video", name: "Video bài giảng", icon: "video", color: "violet", pill: "Thử" },
   { to: "/giao-trinh", name: "Giáo trình", icon: "book", color: "violet", pill: "Thử" },
   { to: "/gia-su", name: "Gia sư AI", icon: "cap", color: "amber", pill: "Thử" },
-  { to: "/hoc-vien", name: "Học viên", icon: "users", color: "amber", pill: "Sắp có" },
+  { to: "/lop-hoc", name: "Lớp học", icon: "users", color: "amber" },
 ];
