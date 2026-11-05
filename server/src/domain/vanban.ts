@@ -38,6 +38,7 @@ const Raw = z.strictObject({
   thanh_phan: strList,
   chu_tri: str,
   thu_ky: str,
+  vai_tro_chu_tri: z.enum(["CHỦ TRÌ", "CHỦ TỌA"]).nullish(),
   noi_dung: z.array(z.unknown()).default([]),
   noi_nhan: strList,
   chuc_vu_ky: str,
@@ -48,7 +49,8 @@ const Raw = z.strictObject({
 
 export type Block = { kind: "doan"; text: string } | { kind: "muc"; cap: 1 | 2 | 3; text: string } | { kind: "ds"; items: string[] };
 
-export type VanBan = Omit<z.infer<typeof Raw>, "so" | "ngay" | "quyen_han" | "noi_dung"> & {
+export type VanBan = Omit<z.infer<typeof Raw>, "so" | "ngay" | "quyen_han" | "noi_dung" | "vai_tro_chu_tri"> & {
+  vai_tro_chu_tri: "CHỦ TRÌ" | "CHỦ TỌA";
   so: string;
   ngay: string;
   quyen_han: (typeof QUYEN_HAN)[number] | "";
@@ -63,13 +65,13 @@ export const VANBAN_SHAPE_HELP = `JSON văn bản hành chính (NĐ 30/2020). Kh
 - trich_yeu (bắt buộc): trích yếu nội dung; công văn viết không kèm "V/v" (hệ thống tự thêm); thông báo/quyết định/tờ trình nên bắt đầu bằng "Về việc …"
 - kinh_gui (danh sách; bắt buộc với cong_van và to_trinh)
 - can_cu (danh sách "Căn cứ …", bắt buộc với quyet_dinh, nên có với ke_hoach)
-- thoi_gian, dia_diem (bắt buộc với bien_ban và giay_moi), thanh_phan (danh sách; bắt buộc với bien_ban), chu_tri, thu_ky (tuỳ chọn, biên bản)
+- thoi_gian, dia_diem (bắt buộc với bien_ban và giay_moi), thanh_phan (danh sách; bắt buộc với bien_ban), chu_tri + thu_ky (họ tên; bắt buộc với bien_ban), vai_tro_chu_tri ("CHỦ TRÌ" mặc định | "CHỦ TỌA")
 - noi_dung (bắt buộc): danh sách khối, mỗi khối là một trong:
     "Đoạn văn thường" (chuỗi) | {"doan": "..."} | {"cap": 1|2|3, "tieu_de": "..."} (tự đánh số I. / 1. / a) , KHÔNG tự gõ số) | {"danh_sach": ["gạch đầu dòng", ...]}
   Quyết định: viết từng điều thành đoạn "Điều 1. …"; hệ thống tự thêm dòng "QUYẾT ĐỊNH:" sau các căn cứ.
-- noi_nhan (bắt buộc, danh sách; hệ thống tự thêm "- Lưu: VT." ở cuối)
-- chuc_vu_ky (bắt buộc, vd "HIỆU TRƯỞNG"); quyen_han (tuỳ chọn: "KT." | "TM." | "Q." | "TL." | "TUQ."); chuc_vu_cap_tren (bắt buộc khi quyen_han là KT., TM., TL., TUQ.; vd "HIỆU TRƯỞNG" khi chuc_vu_ky là "PHÓ HIỆU TRƯỞNG")
-- nguoi_ky (bắt buộc, họ tên)`;
+- noi_nhan (bắt buộc, danh sách; hệ thống tự thêm "- Lưu: VT." ở cuối; biên bản thì tuỳ chọn)
+- chuc_vu_ky (bắt buộc trừ bien_ban, vd "HIỆU TRƯỞNG"); quyen_han (tuỳ chọn: "KT." | "TM." | "Q." | "TL." | "TUQ."); chuc_vu_cap_tren (bắt buộc khi quyen_han là KT., TM., TL., TUQ.; vd "HIỆU TRƯỞNG" khi chuc_vu_ky là "PHÓ HIỆU TRƯỞNG")
+- nguoi_ky (bắt buộc trừ bien_ban, họ tên). Biên bản ký bằng hai khối THƯ KÝ (thu_ky) và CHỦ TRÌ/CHỦ TỌA (chu_tri), không dùng chuc_vu_ky/nguoi_ky`;
 
 const FIELD_VI: Record<string, string> = {
   loai: "loại văn bản",
@@ -138,8 +140,11 @@ export function validateVanBan(input: unknown): VanBanResult {
   need(r.ky_hieu_co_quan, "ky_hieu_co_quan");
   need(r.dia_danh, "dia_danh");
   need(r.trich_yeu, "trich_yeu");
-  need(r.chuc_vu_ky, "chuc_vu_ky");
-  need(r.nguoi_ky, "nguoi_ky");
+  const bb = r.loai === "bien_ban";
+  if (!bb) {
+    need(r.chuc_vu_ky, "chuc_vu_ky");
+    need(r.nguoi_ky, "nguoi_ky");
+  }
   if (/\s/.test(r.ky_hieu_co_quan)) issues.push("ky_hieu_co_quan không được chứa khoảng trắng (vd \"THPTND\")");
 
   let so = "";
@@ -156,7 +161,7 @@ export function validateVanBan(input: unknown): VanBanResult {
 
   const noi_dung = parseBlocks(r.noi_dung, issues);
   if (r.noi_dung.length === 0) issues.push("Thiếu nội dung văn bản (noi_dung)");
-  if (r.noi_nhan.length === 0) issues.push("Thiếu nơi nhận (noi_nhan)");
+  if (r.noi_nhan.length === 0 && !bb) issues.push("Thiếu nơi nhận (noi_nhan)");
   else r.noi_nhan.forEach((x, i) => x === "" && issues.push(`noi_nhan: dòng ${i + 1} đang để trống`));
   r.can_cu.forEach((x, i) => x === "" && issues.push(`can_cu: dòng ${i + 1} đang để trống`));
   r.kinh_gui.forEach((x, i) => x === "" && issues.push(`kinh_gui: dòng ${i + 1} đang để trống`));
@@ -166,6 +171,8 @@ export function validateVanBan(input: unknown): VanBanResult {
     if (r.thoi_gian === "") issues.push("Biên bản thiếu thời gian (thoi_gian)");
     if (r.dia_diem === "") issues.push("Biên bản thiếu địa điểm (dia_diem)");
     if (r.thanh_phan.length === 0) issues.push("Biên bản thiếu thành phần tham dự (thanh_phan)");
+    if (r.thu_ky === "") issues.push("Biên bản thiếu họ tên thư ký (thu_ky)");
+    if (r.chu_tri === "") issues.push("Biên bản thiếu họ tên chủ trì/chủ tọa (chu_tri)");
   }
   if (r.loai === "giay_moi") {
     if (r.thoi_gian === "") issues.push("Giấy mời thiếu thời gian (thoi_gian)");
@@ -178,9 +185,9 @@ export function validateVanBan(input: unknown): VanBanResult {
   if ((qh === "KT." || qh === "TM." || qh === "TL." || qh === "TUQ.") && r.chuc_vu_cap_tren === "") issues.push(`quyen_han "${qh}" cần chuc_vu_cap_tren (chức vụ của cấp trên, vd "HIỆU TRƯỞNG")`);
 
   if (issues.length) return { ok: false, issues };
-  const { so: _s, ngay: _n, quyen_han: _q, noi_dung: _d, ...rest } = r;
+  const { so: _s, ngay: _n, quyen_han: _q, noi_dung: _d, vai_tro_chu_tri: _v, ...rest } = r;
   const trich_yeu = r.loai === "cong_van" ? r.trich_yeu.replace(/^v\/v[:.]?\s*/i, "") : r.trich_yeu;
-  return { ok: true, doc: { ...rest, trich_yeu, so, ngay, quyen_han: qh, noi_dung } };
+  return { ok: true, doc: { ...rest, vai_tro_chu_tri: r.vai_tro_chu_tri ?? "CHỦ TRÌ", trich_yeu, so, ngay, quyen_han: qh, noi_dung } };
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");

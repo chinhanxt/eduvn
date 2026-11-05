@@ -48,6 +48,9 @@ describe("văn bản NĐ30: kiểm tra", () => {
   it("biên bản thiếu thời gian, địa điểm, thành phần", () => {
     const i = issues(bienBan({ thoi_gian: "", dia_diem: undefined, thanh_phan: [] }));
     expect(i).toEqual(expect.arrayContaining(["Biên bản thiếu thời gian (thoi_gian)", "Biên bản thiếu địa điểm (dia_diem)", "Biên bản thiếu thành phần tham dự (thanh_phan)"]));
+    expect(issues(bienBan({ thu_ky: "", chu_tri: undefined }))).toEqual(["Biên bản thiếu họ tên thư ký (thu_ky)", "Biên bản thiếu họ tên chủ trì/chủ tọa (chu_tri)"]);
+    expect(ok(bienBan()).vai_tro_chu_tri).toBe("CHỦ TRÌ");
+    expect(ok(bienBan({ vai_tro_chu_tri: "CHỦ TỌA" })).vai_tro_chu_tri).toBe("CHỦ TỌA");
   });
 
   it("công văn cần trích yếu và kính gửi; quyết định cần căn cứ", () => {

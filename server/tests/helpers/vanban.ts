@@ -51,6 +51,11 @@ export const congVan = (over: Obj = {}): Obj => ({
 
 export const bienBan = (over: Obj = {}): Obj => ({
   ...base,
+  noi_nhan: undefined,
+  chuc_vu_ky: undefined,
+  nguoi_ky: undefined,
+  chu_tri: "Nguyễn Văn An",
+  thu_ky: "Trần Thị Lan",
   loai: "bien_ban",
   trich_yeu: "Họp Hội đồng sư phạm tháng 11 năm 2026",
   thoi_gian: "14 giờ 00 phút, ngày 05 tháng 11 năm 2026",

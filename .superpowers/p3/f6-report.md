@@ -23,3 +23,8 @@
 - `loai` dùng snake_case không dấu; thêm khoá phụ ngoài đề: ky_hieu_don_vi, kinh_gui, chu_tri, thu_ky.
 - Web chỉ có danh sách + tải (minimal), không có trang chi tiết; biên bản chỉ một khối ký.
 - Mới xem bằng mắt trang 1 của kế hoạch và công văn; số trang từ trang 2 chưa kiểm.
+
+## Sửa chữ ký biên bản (follow-up)
+- Biên bản: khối cuối là bảng 2 cột không viền: trái "THƯ KÝ" + chỗ ký + `thu_ky`, phải "CHỦ TRÌ" (hoặc "CHỦ TỌA" khi `vai_tro_chu_tri: "CHỦ TỌA"`) + chỗ ký + `chu_tri` (đậm). Không có "Nơi nhận" trừ khi `noi_nhan` được gửi (khi đó hiện bên dưới).
+- Validator: biên bản bắt buộc `thu_ky`, `chu_tri` ("Biên bản thiếu họ tên thư ký (thu_ky)" / "…chủ trì/chủ tọa (chu_tri)"); `chuc_vu_ky`, `nguoi_ky`, `noi_nhan` tuỳ chọn riêng với biên bản. Khoá mới: `vai_tro_chu_tri`. Mô tả MCP đã cập nhật.
+- Test: `pnpm -C server test` 137/137 xanh (focused 11/11), typecheck sạch. Ảnh /tmp/eduvn-vb-bien_ban-1.png đã xem: THƯ KÝ | CHỦ TỌA đúng, không có Nơi nhận.

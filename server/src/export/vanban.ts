@@ -54,16 +54,30 @@ function topBlock(v: VanBan): Table {
   return table([new TableRow({ children: [cell(LEFT_W, left), cell(RIGHT_W, right)] }), new TableRow({ children: [cell(LEFT_W, left2), cell(RIGHT_W, right2)] })]);
 }
 
+function bienBanSign(v: VanBan): Table {
+  const col = (role: string, name: string) => [
+    centered([run(role, { bold: true })]),
+    ...[0, 1, 2, 3].map(() => centered([run("")])),
+    centered([run(name, { bold: true })]),
+  ];
+  return new Table({
+    width: { size: CONTENT_W, type: WidthType.DXA },
+    columnWidths: [CONTENT_W / 2, CONTENT_W / 2],
+    borders: { ...NO_BORDERS, insideHorizontal: NONE, insideVertical: NONE },
+    rows: [new TableRow({ cantSplit: true, children: [cell(CONTENT_W / 2, col("THƯ KÝ", v.thu_ky)), cell(CONTENT_W / 2, col(v.vai_tro_chu_tri, v.chu_tri))] })],
+  });
+}
+
 function bottomBlock(v: VanBan): Table {
   const left = [
     new Paragraph({ spacing: { after: 20 }, children: [run("Nơi nhận:", { size: 24, bold: true, italics: true })] }),
     ...noiNhanLines(v).map((l) => new Paragraph({ spacing: { after: 0 }, children: [run(l, { size: 22 })] })),
   ];
-  const lines = chucVuLines(v);
+  const lines = v.chuc_vu_ky ? chucVuLines(v) : [];
   const right = [
     ...lines.map((l) => centered([run(l, { size: BODY, bold: true })])),
-    ...[0, 1, 2, 3].map(() => centered([run("", { size: BODY })])),
-    centered([run(v.nguoi_ky, { size: BODY, bold: true })]),
+    ...(v.nguoi_ky ? [0, 1, 2, 3].map(() => centered([run("", { size: BODY })])) : []),
+    ...(v.nguoi_ky ? [centered([run(v.nguoi_ky, { size: BODY, bold: true })])] : []),
   ];
   return new Table({
     width: { size: CONTENT_W, type: WidthType.DXA },
@@ -84,8 +98,8 @@ function details(v: VanBan): Paragraph[] {
   const kv = (k: string, val: string) => out.push(new Paragraph({ spacing: { before: 60, line: 276 }, indent: { firstLine: 567 }, children: [run(`${k}: `, { bold: true }), run(val)] }));
   if (v.thoi_gian) kv("Thời gian", v.thoi_gian);
   if (v.dia_diem) kv("Địa điểm", v.dia_diem);
-  if (v.chu_tri) kv("Chủ trì", v.chu_tri);
-  if (v.thu_ky) kv("Thư ký", v.thu_ky);
+  if (v.chu_tri && v.loai !== "bien_ban") kv("Chủ trì", v.chu_tri);
+  if (v.thu_ky && v.loai !== "bien_ban") kv("Thư ký", v.thu_ky);
   if (v.thanh_phan.length) {
     out.push(new Paragraph({ spacing: { before: 60 }, indent: { firstLine: 567 }, children: [run("Thành phần tham dự:", { bold: true })] }));
     for (const t of v.thanh_phan) out.push(new Paragraph({ alignment: AlignmentType.JUSTIFIED, spacing: { before: 20, line: 276 }, indent: { left: 567, firstLine: 0 }, children: [run(`- ${t.replace(/^[-–•]\s*/, "").replace(/[;,.\s]+$/, "")};`)] }));
@@ -115,7 +129,10 @@ export async function renderVanBanDocx(v: VanBan): Promise<Buffer> {
     else kids.push(body(`${nums[i]} ${b.text}`, { italics: true, keepNext: true }));
   });
   kids.push(new Paragraph({ spacing: { before: 120 }, children: [] }));
-  kids.push(bottomBlock(v));
+  if (v.loai === "bien_ban") {
+    kids.push(bienBanSign(v));
+    if (v.noi_nhan.length) kids.push(bottomBlock({ ...v, chuc_vu_ky: "", nguoi_ky: "" }));
+  } else kids.push(bottomBlock(v));
 
   const doc = new Document({
     styles: { default: { document: { run: { font: FONT, size: BODY } } } },
