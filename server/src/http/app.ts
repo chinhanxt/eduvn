@@ -40,10 +40,11 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   async function authenticate(req: FastifyRequest): Promise<Actor> {
     const header = req.headers.authorization;
-    if (!header?.startsWith("Bearer ")) throw new UnauthorizedError("Thiếu access token");
+    const m = /^Bearer\s+(.+)$/i.exec(header ?? "");
+    if (!m?.[1]) throw new UnauthorizedError("Thiếu access token");
     let identity: Identity;
     try {
-      identity = await deps.verify(header.slice("Bearer ".length));
+      identity = await deps.verify(m[1]);
     } catch {
       throw new UnauthorizedError("Access token không hợp lệ hoặc đã hết hạn");
     }
@@ -80,7 +81,10 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     return reply.code(result.ok ? 201 : 422).send(result);
   });
 
-  app.get<{ Params: { id: string } }>("/api/exams/:id/key", async (req) => service.getAnswerKeys(await authenticate(req), req.params.id));
+  app.get<{ Params: { id: string } }>("/api/exams/:id/key", async (req, reply) => {
+    const keys = await service.getAnswerKeys(await authenticate(req), req.params.id);
+    return reply.header("cache-control", "no-store").send(keys);
+  });
 
   app.post<{ Params: { id: string } }>("/api/exams/:id/grade", async (req) => {
     const actor = await authenticate(req);
@@ -111,7 +115,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
       buffer = await renderExamDocx(meta, v);
       filename = `de-${v.code}-${shortId}.docx`;
     }
-    return reply.header("content-type", DOCX).header("content-disposition", `attachment; filename="${filename}"`).send(buffer);
+    return reply.header("content-type", DOCX).header("cache-control", "no-store").header("content-disposition", `attachment; filename="${filename}"`).send(buffer);
   });
 
   app.post("/mcp", async (req, reply) => {
@@ -119,12 +123,19 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId) });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     reply.raw.on("close", () => {
-      void transport.close();
-      void server.close();
+      server.close().catch((err) => console.error("mcp close", err));
     });
     await server.connect(transport);
     reply.hijack();
-    await transport.handleRequest(req.raw, reply.raw, req.body);
+    try {
+      await transport.handleRequest(req.raw, reply.raw, req.body);
+    } catch (err) {
+      console.error("mcp handleRequest", err);
+      if (!reply.raw.headersSent) {
+        reply.raw.writeHead(500, { "content-type": "application/json" });
+        reply.raw.end(JSON.stringify({ jsonrpc: "2.0", error: { code: -32603, message: "Lỗi máy chủ" }, id: null }));
+      } else reply.raw.end();
+    }
   });
 
   const methodNotAllowed = async (_req: FastifyRequest, reply: FastifyReply) =>

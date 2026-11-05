@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { createDownloadSigner } from "../../src/auth/download";
+import { membershipsOf, ensureUser } from "../../src/db/repo";
 import { PUBLIC_URL, testApp } from "../helpers/app";
 import { mcq, responsesFromKey, tf } from "../helpers/fixtures";
 import { ISSUER, makeIssuer } from "../helpers/tokens";
@@ -113,5 +115,60 @@ describe("ngân hàng câu hỏi + đề", () => {
     for (const id of ["00000000-0000-4000-8000-000000000000", "abc"]) {
       expect((await t.app.inject({ method: "GET", url: `/api/exams/${id}/key`, headers: auth })).statusCode).toBe(404);
     }
+  });
+});
+
+describe("cách ly tổ chức", () => {
+  it("người dùng khác không đụng được đề/ngân hàng của tổ chức khác", async () => {
+    await seedBank();
+    const created = await t.app.inject({ method: "POST", url: "/api/exams", headers: auth, payload: { title: "KT", matrix, variants: 1, seed: 1 } });
+    const { examId } = created.json();
+    const authB = { authorization: `Bearer ${await t.sign({ sub: "gv-2" })}` };
+    const get = (url: string) => t.app.inject({ method: "GET", url, headers: authB });
+    const post = (url: string, payload?: unknown) => t.app.inject({ method: "POST", url, headers: authB, payload: payload as object });
+    expect((await get(`/api/exams/${examId}/key`)).statusCode).toBe(404);
+    expect((await post(`/api/exams/${examId}/grade`, { code: "101", responses: {} })).statusCode).toBe(404);
+    expect((await post(`/api/exams/${examId}/links`)).statusCode).toBe(404);
+    const list = await get(`/api/questions?subject=${encodeURIComponent("Toán")}&grade=10`);
+    expect(list.json()).toEqual([]);
+    const userA = await ensureUser(t.db, { sub: "gv-1" });
+    const [m] = await membershipsOf(t.db, userA.id);
+    const cross = await t.app.inject({ method: "GET", url: "/api/questions?subject=x&grade=10", headers: { ...authB, "x-org-id": m?.orgId ?? "" } });
+    expect(cross.statusCode).toBe(403);
+  });
+});
+
+describe("/dl âm tính", () => {
+  const SECRET = "test-secret-test-secret-test-secret!";
+  it("404 với token bị sửa, ký sai khoá, mã đề lạ, hết hạn", async () => {
+    await seedBank();
+    const { examId } = (await t.app.inject({ method: "POST", url: "/api/exams", headers: auth, payload: { title: "KT", matrix, variants: 1, seed: 1 } })).json();
+    const userA = await ensureUser(t.db, { sub: "gv-1" });
+    const [m] = await membershipsOf(t.db, userA.id);
+    const claims = { orgId: m?.orgId ?? "", examId, kind: "key" as const };
+    const good = await createDownloadSigner(SECRET).sign(claims);
+    expect((await t.app.inject({ method: "GET", url: `/dl/${good}` })).statusCode).toBe(200);
+    const [h, p, sig] = good.split(".");
+    const flipped = `${p?.slice(0, 5)}${p?.[5] === "A" ? "B" : "A"}${p?.slice(6)}`;
+    const urls = [
+      `${h}.${flipped}.${sig}`,
+      await createDownloadSigner("other-secret-other-secret-other-secret!").sign(claims),
+      await createDownloadSigner(SECRET).sign({ ...claims, kind: "exam", code: "999" }),
+      await createDownloadSigner(SECRET, Math.floor(Date.now() / 1000) - 10).sign(claims),
+    ];
+    for (const tok of urls) expect((await t.app.inject({ method: "GET", url: `/dl/${tok}` })).statusCode).toBe(404);
+  });
+});
+
+describe("tiêu đề & cache", () => {
+  it("scheme bearer không phân biệt hoa thường; key/dl no-store", async () => {
+    const lower = { authorization: auth.authorization?.replace("Bearer", "bearer") ?? "" };
+    expect((await t.app.inject({ method: "POST", url: "/api/questions", headers: lower, payload: mcq() })).statusCode).toBe(201);
+    await seedBank();
+    const { examId } = (await t.app.inject({ method: "POST", url: "/api/exams", headers: auth, payload: { title: "KT", matrix, variants: 1, seed: 1 } })).json();
+    expect((await t.app.inject({ method: "GET", url: `/api/exams/${examId}/key`, headers: auth })).headers["cache-control"]).toBe("no-store");
+    const links = (await t.app.inject({ method: "POST", url: `/api/exams/${examId}/links`, headers: auth })).json();
+    const file = await t.app.inject({ method: "GET", url: new URL(links.answerKey).pathname });
+    expect(file.headers["cache-control"]).toBe("no-store");
   });
 });

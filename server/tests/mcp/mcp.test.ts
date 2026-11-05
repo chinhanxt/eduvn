@@ -19,9 +19,9 @@ afterEach(async () => {
   await t.app.close();
 });
 
-async function connect(): Promise<Client> {
+async function connect(tok = token): Promise<Client> {
   const client = new Client({ name: "test", version: "0.0.0" });
-  await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`), { requestInit: { headers: { authorization: `Bearer ${token}` } } }));
+  await client.connect(new StreamableHTTPClientTransport(new URL(`${base}/mcp`), { requestInit: { headers: { authorization: `Bearer ${tok}` } } }));
   return client;
 }
 
@@ -73,6 +73,17 @@ describe("MCP /mcp", () => {
     const r = await client.callTool({ name: "lay_dap_an", arguments: { examId: "00000000-0000-4000-8000-000000000000" } });
     expect((r as ToolResult).isError).toBe(true);
     await client.close();
+  });
+
+  it("người dùng khác (tổ chức khác) không lấy được đáp án", async () => {
+    const a = await connect();
+    await a.callTool({ name: "them_cau_hoi", arguments: { questions: [mcq({ stem: "C1" }), mcq({ stem: "C2" }), tf()] } });
+    const exam = data(await a.callTool({ name: "tao_de", arguments: { title: "KT", subject: "Toán", grade: 10, cells, variants: 1, seed: 3 } }));
+    const b = await connect(await t.sign({ sub: "gv-other" }));
+    const r = await b.callTool({ name: "lay_dap_an", arguments: { examId: exam.examId } });
+    expect((r as ToolResult).isError).toBe(true);
+    await a.close();
+    await b.close();
   });
 
   it("401 + resource_metadata khi không có token; 405 với GET", async () => {
