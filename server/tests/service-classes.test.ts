@@ -100,6 +100,18 @@ describe("sổ điểm", () => {
     await expect(svc.enterScores(teacher, c.id, "XX", { "Nguyễn Văn An": 9 })).rejects.toThrow(/Các cột/);
     await expect(svc.enterScores(student, c.id, "TX1", { "Nguyễn Văn An": 9 })).rejects.toThrow(ForbiddenError);
   });
+  it("lỗi hiện tên + STT, không lộ UUID", async () => {
+    const { c, ids } = await seed();
+    const err = await svc.enterScores(teacher, c.id, "TX1", { [ids[1] as string]: 11 }).catch((e: Error) => e.message);
+    expect(err).toContain("Trần Thị Bình (STT 2): điểm 11 ngoài thang 0–10");
+    expect(err).not.toContain(ids[1] as string);
+  });
+  it("danh sách xếp theo tên Việt, trùng thì theo thứ tự thêm", async () => {
+    const c = await svc.createClass(teacher, { name: "9B", schoolYear: "2026-2027" });
+    await svc.addStudents(teacher, c.id, { text: "Lê Văn Cường\nNguyễn Văn An;01/01/2010\nTrần Thị Bình\nPhạm Thị Dung\nĐỗ Minh An\nNguyễn Văn An;02/02/2010" });
+    const got = (await svc.getClass(teacher, c.id)).students.map((s) => `${s.fullName}${s.dob ?? ""}`);
+    expect(got).toEqual(["Đỗ Minh An", "Nguyễn Văn An2010-01-01", "Nguyễn Văn An2010-02-02", "Trần Thị Bình", "Lê Văn Cường", "Phạm Thị Dung"]);
+  });
   it("cột tuỳ chỉnh", async () => {
     const { c } = await seed();
     await svc.updateClass(teacher, c.id, { columns: [{ name: "KT", weight: 1 }, { name: "CK", weight: 2 }] });

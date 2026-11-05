@@ -152,3 +152,16 @@ export function splitDuplicates(existing: Known[], incoming: NewStudent[]): { ac
   }
   return { accept, warnings };
 }
+
+const VI = new Intl.Collator("vi");
+
+/** Thứ tự danh sách lớp VN: theo TÊN (từ cuối), rồi họ đệm; còn lại do `position` quyết định ở nơi gọi. */
+export function compareVietnameseNames(a: string, b: string): number {
+  const split = (n: string) => {
+    const w = n.normalize("NFC").trim().split(/\s+/);
+    return { given: w[w.length - 1] ?? "", rest: w.slice(0, -1).join(" ") };
+  };
+  const x = split(a);
+  const y = split(b);
+  return VI.compare(x.given, y.given) || VI.compare(x.rest, y.rest);
+}

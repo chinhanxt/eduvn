@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateComment } from "../../src/domain/comments";
 import { DEFAULT_COLUMNS, averageScore, parseAttendance, parseScore, validateColumns } from "../../src/domain/gradebook";
-import { parseDob, parseRosterLines, parseRosterSheet, splitDuplicates } from "../../src/domain/roster";
+import { compareVietnameseNames, parseDob, parseRosterLines, parseRosterSheet, splitDuplicates } from "../../src/domain/roster";
 
 describe("roster", () => {
   it("parse dòng dán TAB và ;", () => {
@@ -65,5 +65,16 @@ describe("comments", () => {
     expect(validateComment("TT22", "ngắn", "Tốt")[0]).toContain("ngắn");
     expect(validateComment("TT22", "x".repeat(401), "Tốt")[0]).toContain("dài");
     expect(validateComment("TT22", ok, "Hoàn thành")[0]).toContain("Chưa đạt");
+  });
+});
+
+describe("thứ tự tên Việt", () => {
+  it("tên → họ đệm, Đ sau D", () => {
+    const names = ["Lê Văn Cường", "Nguyễn Văn An", "Trần Thị Bình", "Phạm Thị Dung", "Đỗ Minh An"];
+    const sorted = [...names].sort(compareVietnameseNames);
+    expect(sorted).toEqual(["Đỗ Minh An", "Nguyễn Văn An", "Trần Thị Bình", "Lê Văn Cường", "Phạm Thị Dung"]);
+    expect(sorted.indexOf("Trần Thị Bình")).toBeLessThan(sorted.indexOf("Lê Văn Cường"));
+    expect(sorted.indexOf("Lê Văn Cường")).toBeLessThan(sorted.indexOf("Phạm Thị Dung"));
+    expect(compareVietnameseNames("Nguyễn Văn An", "Nguyễn Văn An")).toBe(0);
   });
 });

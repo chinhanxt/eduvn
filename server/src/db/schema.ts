@@ -103,6 +103,7 @@ export const students = pgTable(
     dob: text("dob"),
     gender: text("gender"),
     note: text("note").notNull().default(""),
+    position: integer("position").notNull().default(0),
     createdAt: createdAt(),
   },
   (t) => [index("students_class_idx").on(t.classId)],

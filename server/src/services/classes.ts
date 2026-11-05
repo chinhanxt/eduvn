@@ -5,7 +5,7 @@ import { attendance, classes, comments, scores, students } from "../db/schema";
 import { type Role, assertCan } from "../domain/authz";
 import { SCALES, type Scale, TERMS, type Term, validateComment } from "../domain/comments";
 import { type AttendanceStatus, DEFAULT_COLUMNS, GradeColumn, averageScore, isoDate, parseAttendance, parseScore, validateColumns } from "../domain/gradebook";
-import { type NewStudent, StudentItem, normName, normalizeStudentItems, parseRosterLines, parseRosterSheet, splitDuplicates } from "../domain/roster";
+import { type NewStudent, compareVietnameseNames, StudentItem, normName, normalizeStudentItems, parseRosterLines, parseRosterSheet, splitDuplicates } from "../domain/roster";
 import { NotFoundError, ValidationError } from "../errors";
 
 type Actor = { userId: string; orgId: string; role: Role };
@@ -69,9 +69,17 @@ export function createClassService(db: Db) {
     return hits[0] as ClassRow;
   }
 
-  const studentsOf = (classId: string) => db.select().from(students).where(eq(students.classId, classId)).orderBy(asc(students.createdAt), asc(students.fullName));
+  /** Thứ tự VN: tên → họ đệm → position (thứ tự thêm vào). STT = vị trí trong danh sách này. */
+  const studentsOf = async (classId: string) =>
+    (await db.select().from(students).where(eq(students.classId, classId))).sort(
+      (a, b) => compareVietnameseNames(a.fullName, b.fullName) || a.position - b.position || a.createdAt.getTime() - b.createdAt.getTime(),
+    );
 
-  function resolveStudents(rows: StudentRow[], refs: string[]): { map: Map<string, StudentRow>; errors: string[] } {
+  function resolveStudents(rows: StudentRow[], refs: string[]): { map: Map<string, StudentRow>; errors: string[]; label: (ref: string) => string } {
+    const label = (ref: string) => {
+      const i = rows.findIndex((r) => r === map.get(ref));
+      return i < 0 ? ref : `${(rows[i] as StudentRow).fullName} (STT ${i + 1})`;
+    };
     const map = new Map<string, StudentRow>();
     const errors: string[] = [];
     for (const ref of refs) {
@@ -85,7 +93,7 @@ export function createClassService(db: Db) {
       else if (hits.length === 0) errors.push(`Không có học viên "${ref}" trong lớp`);
       else errors.push(`Có ${hits.length} học viên tên "${ref}" — dùng id: ${hits.map((h) => h.id).join(", ")}`);
     }
-    return { map, errors };
+    return { map, errors, label };
   }
 
   async function createClass(actor: Actor, input: unknown): Promise<ClassRow> {
@@ -148,8 +156,9 @@ export function createClassService(db: Db) {
     if (parsed.rows.length > 500) throw new ValidationError(["Tối đa 500 học viên mỗi lần thêm"]);
     const existing = await studentsOf(classId);
     const { accept, warnings } = splitDuplicates(existing, parsed.rows);
+    const start = existing.reduce((m, r) => Math.max(m, r.position), 0);
     const inserted = accept.length
-      ? await db.insert(students).values(accept.map((s) => ({ classId, ...s }))).returning({ id: students.id })
+      ? await db.insert(students).values(accept.map((s, i) => ({ classId, ...s, position: start + i + 1 }))).returning({ id: students.id })
       : [];
     return { added: inserted.length, ids: inserted.map((r) => r.id), warnings };
   }
@@ -196,11 +205,11 @@ export function createClassService(db: Db) {
     const rows = await studentsOf(c.id);
     const refs = Object.keys(entries);
     if (refs.length === 0) throw new ValidationError(["Chưa có điểm nào để nhập"]);
-    const { map, errors } = resolveStudents(rows, refs);
+    const { map, errors, label } = resolveStudents(rows, refs);
     const todo: { studentId: string; value: number | null }[] = [];
     for (const ref of refs) {
       const r = parseScore(entries[ref]);
-      if (!r.ok) errors.push(`${ref}: ${r.error}`);
+      if (!r.ok) errors.push(`${label(ref)}: ${r.error}`);
       else {
         const st = map.get(ref);
         if (st) todo.push({ studentId: st.id, value: r.value });
@@ -225,7 +234,7 @@ export function createClassService(db: Db) {
     const c = await resolveClass(actor.orgId, classRef);
     if (!isoDate(date)) throw new ValidationError([`Ngày "${date}" sai, dùng yyyy-mm-dd`]);
     const rows = await studentsOf(c.id);
-    const { map, errors } = resolveStudents(rows, Object.keys(records));
+    const { map, errors, label } = resolveStudents(rows, Object.keys(records));
     const final = new Map<string, AttendanceStatus>();
     if (defaultStatus !== undefined) {
       const d = parseAttendance(defaultStatus);
@@ -234,7 +243,7 @@ export function createClassService(db: Db) {
     }
     for (const [ref, v] of Object.entries(records)) {
       const st = parseAttendance(v);
-      if (!st) errors.push(`${ref}: trạng thái "${String(v)}" sai, dùng present (có mặt) / excused (vắng có phép) / unexcused (vắng không phép)`);
+      if (!st) errors.push(`${label(ref)}: trạng thái "${String(v)}" sai, dùng present (có mặt) / excused (vắng có phép) / unexcused (vắng không phép)`);
       else if (map.get(ref)) final.set((map.get(ref) as StudentRow).id, st);
     }
     if (errors.length) throw new ValidationError(errors);
@@ -264,11 +273,11 @@ export function createClassService(db: Db) {
     if (!(TERMS as readonly string[]).includes(term)) throw new ValidationError([`Học kỳ "${term}" sai, dùng HK1 hoặc HK2`]);
     if (items.length === 0) throw new ValidationError(["Chưa có nhận xét nào"]);
     const rows = await studentsOf(c.id);
-    const { map, errors } = resolveStudents(rows, items.map((i) => i.student));
+    const { map, errors, label } = resolveStudents(rows, items.map((i) => i.student));
     for (const it of items) {
       const st = map.get(it.student);
       if (!st) continue;
-      for (const e of validateComment(c.scale, it.text, it.level)) errors.push(`${st.fullName}: ${e}`);
+      for (const e of validateComment(c.scale, it.text, it.level)) errors.push(`${label(it.student)}: ${e}`);
     }
     if (errors.length) throw new ValidationError(errors);
     await db.transaction(async (tx) => {
