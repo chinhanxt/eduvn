@@ -11,3 +11,11 @@ export class UnauthorizedError extends Error {
     this.name = "UnauthorizedError";
   }
 }
+
+/** Lỗi nhập liệu có danh sách (tiếng Việt) để AI tự sửa và gửi lại. */
+export class ValidationError extends Error {
+  constructor(public issues: string[]) {
+    super(`Dữ liệu chưa hợp lệ:\n${issues.map((i) => `- ${i}`).join("\n")}`);
+    this.name = "ValidationError";
+  }
+}

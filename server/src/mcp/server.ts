@@ -4,8 +4,13 @@ import { MatrixCell } from "../domain/matrix";
 import { QuestionFilter, QuestionInput } from "../domain/question";
 import { ResponseValue } from "../domain/scoring";
 import type { Actor, ExamLinks, Service } from "../service";
+import type { ClassService } from "../services/classes";
+import { registerClassTools } from "./classes";
 
-export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks> };
+export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks>;
+  classes: ClassService;
+  makeClassLink: (classRef: string, kind: "class_list" | "gradebook") => Promise<{ url: string; expiresInMinutes: number }>;
+};
 
 function json(data: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
@@ -15,7 +20,7 @@ function fail(message: string) {
   return { content: [{ type: "text" as const, text: message }], isError: true };
 }
 
-export function buildMcpServer({ service, actor, makeLinks }: McpDeps): McpServer {
+export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink }: McpDeps): McpServer {
   const server = new McpServer({ name: "eduvn", version: "0.1.0" });
 
   server.registerTool(
@@ -91,6 +96,8 @@ export function buildMcpServer({ service, actor, makeLinks }: McpDeps): McpServe
     { title: "Xuất file Word", description: "Tạo link tải .docx cho từng mã đề và file đáp án (hết hạn sau 15 phút).", inputSchema: { examId: z.string() } },
     async ({ examId }) => json(await makeLinks(examId)),
   );
+
+  registerClassTools(server, { classes, actor, makeClassLink });
 
   return server;
 }

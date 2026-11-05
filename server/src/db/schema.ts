@@ -1,5 +1,7 @@
-import { index, integer, jsonb, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgTable, primaryKey, real, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { ROLES } from "../domain/authz";
+import type { Scale } from "../domain/comments";
+import type { GradeColumn } from "../domain/gradebook";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionInput } from "../domain/question";
 import type { Variant } from "../domain/variants";
@@ -71,3 +73,75 @@ export const exams = pgTable("exams", {
   variants: jsonb("variants").$type<Variant[]>().notNull(),
   createdAt: createdAt(),
 });
+
+export const classes = pgTable(
+  "classes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    schoolYear: text("school_year").notNull(),
+    subject: text("subject"),
+    scale: text("scale").$type<Scale>().notNull().default("TT22"),
+    columns: jsonb("columns").$type<GradeColumn[]>().notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("classes_org_idx").on(t.orgId)],
+);
+
+export const students = pgTable(
+  "students",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    classId: uuid("class_id")
+      .notNull()
+      .references(() => classes.id, { onDelete: "cascade" }),
+    code: text("code"),
+    fullName: text("full_name").notNull(),
+    dob: text("dob"),
+    gender: text("gender"),
+    note: text("note").notNull().default(""),
+    createdAt: createdAt(),
+  },
+  (t) => [index("students_class_idx").on(t.classId)],
+);
+
+export const scores = pgTable(
+  "scores",
+  {
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    column: text("column").notNull(),
+    value: real("value").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.studentId, t.column] })],
+);
+
+export const attendance = pgTable(
+  "attendance",
+  {
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    date: text("date").notNull(),
+    status: text("status").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.studentId, t.date] })],
+);
+
+export const comments = pgTable(
+  "comments",
+  {
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    term: text("term").notNull(),
+    text: text("text").notNull(),
+    level: text("level").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.studentId, t.term] })],
+);
