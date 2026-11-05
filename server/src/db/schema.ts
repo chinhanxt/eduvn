@@ -119,10 +119,11 @@ export const scores = pgTable(
     studentId: uuid("student_id")
       .notNull()
       .references(() => students.id, { onDelete: "cascade" }),
+    term: text("term").notNull().default("HK1"),
     column: text("column").notNull(),
     value: real("value").notNull(),
   },
-  (t) => [primaryKey({ columns: [t.studentId, t.column] })],
+  (t) => [primaryKey({ columns: [t.studentId, t.term, t.column] })],
 );
 
 export const attendance = pgTable(

@@ -30,14 +30,15 @@ describe("MCP lớp học", () => {
     expect(data(await call("danh_sach_lop", {}))[0]).toMatchObject({ name: "6A", studentCount: 2 });
     expect(data(await call("danh_sach_lop", { class: "6A" })).students).toHaveLength(2);
 
-    expect(data(await call("nhap_diem", { class: "6A", column: "TX1", scores: { "Nguyễn Văn An": "8,5" } })).updated).toBe(1);
-    const badScore = await call("nhap_diem", { class: "6A", column: "TX1", scores: { "Nguyễn Văn An": 11 } });
+    expect(data(await call("nhap_diem", { class: "6A", column: "GKI", term: "HK2", scores: { "Nguyễn Văn An": "8" } })).updated).toBe(1);
+    const badScore = await call("nhap_diem", { class: "6A", column: "GKI", scores: { "Nguyễn Văn An": 8.5 } });
     expect(badScore.isError).toBe(true);
-    expect(badScore.content[0]?.text).toContain("ngoài thang");
+    expect(badScore.content[0]?.text).toContain("số nguyên");
     expect(data(await call("diem_danh", { class: "6A", date: "2026-09-05", records: { "Trần Thị Bình": "excused" }, defaultStatus: "present" })).updated).toBe(2);
 
-    const hs = data(await call("xem_ho_so_hs", { class: "6A", student: "Nguyễn Văn An" }));
-    expect(hs.students[0].scores.TX1).toBe(8.5);
+    const hs = data(await call("xem_ho_so_hs", { class: "6A", student: "Nguyễn Văn An", term: "HK2" }));
+    expect(hs.students[0].scores.GKI).toBe(8);
+    expect(hs.students[0].dtb).toBeNull();
     expect(hs.levels).toContain("Hoàn thành tốt");
 
     const bad = await call("luu_nhan_xet", { class: "6A", term: "HK1", items: [{ student: "Nguyễn Văn An", text: "ngắn", level: "Tốt" }] });
@@ -46,7 +47,7 @@ describe("MCP lớp học", () => {
     const okText = "Em ngoan, học tập tích cực, cần rèn thêm chữ viết cho đẹp.";
     expect(data(await call("luu_nhan_xet", { class: "6A", term: "HK1", items: [{ student: "Nguyễn Văn An", text: okText, level: "Hoàn thành tốt" }] })).saved).toBe(1);
 
-    const link = data(await call("xuat_so_diem", { class: "6A" }));
+    const link = data(await call("xuat_so_diem", { class: "6A", term: "HK2" }));
     expect(link.url.startsWith(`${PUBLIC_URL}/dl/`)).toBe(true);
     const dl = await t.app.inject({ method: "GET", url: new URL(link.url).pathname });
     expect(dl.statusCode).toBe(200);

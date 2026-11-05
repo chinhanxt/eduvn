@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { validateComment } from "../../src/domain/comments";
-import { DEFAULT_COLUMNS, averageScore, parseAttendance, parseScore, validateColumns } from "../../src/domain/gradebook";
+import { DEFAULT_COLUMNS, averageScore, parseAttendance, parseScore, validateColumns, yearAverage } from "../../src/domain/gradebook";
 import { compareVietnameseNames, parseDob, parseRosterLines, parseRosterSheet, splitDuplicates } from "../../src/domain/roster";
 
 describe("roster", () => {
@@ -76,5 +76,21 @@ describe("thứ tự tên Việt", () => {
     expect(sorted.indexOf("Trần Thị Bình")).toBeLessThan(sorted.indexOf("Lê Văn Cường"));
     expect(sorted.indexOf("Lê Văn Cường")).toBeLessThan(sorted.indexOf("Phạm Thị Dung"));
     expect(compareVietnameseNames("Nguyễn Văn An", "Nguyễn Văn An")).toBe(0);
+  });
+});
+
+describe("TT27 + ĐTB cả năm", () => {
+  it("parseScore TT27 chỉ nhận số nguyên 1–10", () => {
+    expect(parseScore("8", "TT27")).toEqual({ ok: true, value: 8 });
+    expect(parseScore("8,5", "TT27").ok).toBe(false);
+    expect(parseScore(0, "TT27").ok).toBe(false);
+    expect(parseScore(11, "TT27").ok).toBe(false);
+    expect(parseScore("", "TT27")).toEqual({ ok: true, value: null });
+  });
+  it("yearAverage = (HK1 + 2×HK2)/3", () => {
+    expect(yearAverage(8, 9.5)).toBe(9);
+    expect(yearAverage(7, 8)).toBe(7.7);
+    expect(yearAverage(8, null)).toBeNull();
+    expect(yearAverage(null, 8)).toBeNull();
   });
 });

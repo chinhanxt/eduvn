@@ -36,7 +36,7 @@ const PPTX = "application/vnd.openxmlformats-officedocument.presentationml.prese
 const LINK_TTL_MINUTES = 15;
 
 export function buildApp(deps: AppDeps): FastifyInstance {
-  const app = Fastify({ logger: false, bodyLimit: 8 * 1024 * 1024, routerOptions: { maxParamLength: 2048 } });
+  const app = Fastify({ logger: false, bodyLimit: 1024 * 1024, routerOptions: { maxParamLength: 2048 } });
   const service = createService(deps.db);
   const classes = createClassService(deps.db);
   const lessons = createLessonService(deps.db);
@@ -86,9 +86,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     };
   }
 
-  async function makeClassLink(actor: Actor, classRef: string, kind: "class_list" | "gradebook") {
+  async function makeClassLink(actor: Actor, classRef: string, kind: "class_list" | "gradebook", term?: "HK1" | "HK2") {
     const classId = await classes.classIdFor(actor, classRef, "class:read");
-    return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, classId, kind })}`, expiresInMinutes: LINK_TTL_MINUTES };
+    return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, classId, kind, ...(term && { term }) })}`, expiresInMinutes: LINK_TTL_MINUTES };
   }
 
   async function makeMatrixLink(actor: Actor, examId: string) {
@@ -239,9 +239,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
       return reply.header("content-type", DOCX).header("cache-control", "no-store").header("content-disposition", `attachment; filename="${file}"`).send(await renderLessonDocx(l.plan));
     }
     if (claims.classId !== undefined) {
-      const gb = await classes.loadForExport(claims.orgId, claims.classId);
+      const gb = await classes.loadForExport(claims.orgId, claims.classId, claims.term);
       const isList = claims.kind === "class_list";
-      const file = `${isList ? "danh-sach" : "so-diem"}-${gb.class.name.replace(/[^\w-]+/g, "")}-${gb.class.schoolYear}.xlsx`;
+      const file = `${isList ? "danh-sach" : "so-diem"}-${gb.class.name.replace(/[^\w-]+/g, "")}-${gb.class.schoolYear}${isList ? "" : `-${gb.term.toLowerCase()}`}.xlsx`;
       return reply.header("content-type", XLSX).header("cache-control", "no-store").header("content-disposition", `attachment; filename="${file}"`).send(isList ? await renderClassListXlsx(gb) : await renderGradebookXlsx(gb));
     }
     const exam = await service.loadExamForExport(claims.orgId, claims.examId);
@@ -268,7 +268,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const Cid = (req: FastifyRequest) => (req.params as { id: string }).id;
   const StudentsBody = z.object({ text: z.string().optional(), students: z.array(StudentItem).optional() });
   const XlsxBody = z.object({ contentBase64: z.string().min(1) });
-  const ScoresBody = z.object({ column: z.string().min(1), scores: z.record(z.string(), z.union([z.string(), z.number(), z.null()])) });
+  const ScoresBody = z.object({ term: z.enum(["HK1", "HK2"]).default("HK1"), column: z.string().min(1), scores: z.record(z.string(), z.union([z.string(), z.number(), z.null()])) });
   const AttBody = z.object({ date: z.string(), records: z.record(z.string(), z.string()).default({}), defaultStatus: z.string().optional() });
   const CommentsBody = z.object({ term: z.string(), items: z.array(z.object({ student: z.string(), text: z.string(), level: z.string() })) });
 
@@ -277,21 +277,24 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   app.get("/api/classes/:id", async (req) => classes.getClass(await authenticate(req), Cid(req)));
   app.patch("/api/classes/:id", async (req) => classes.updateClass(await authenticate(req), Cid(req), req.body));
   app.post("/api/classes/:id/students", async (req, reply) => reply.code(201).send(await classes.addStudents(await authenticate(req), Cid(req), StudentsBody.parse(req.body))));
-  app.post("/api/classes/:id/students/xlsx", async (req, reply) => {
+  app.post("/api/classes/:id/students/xlsx", { bodyLimit: 4 * 1024 * 1024 }, async (req, reply) => {
     const actor = await authenticate(req);
     const body = XlsxBody.parse(req.body);
-    return reply.code(201).send(await classes.addStudentsFromXlsx(actor, Cid(req), Buffer.from(body.contentBase64, "base64")));
+    if (body.contentBase64.length > Math.ceil((2 * 1024 * 1024) / 3) * 4 + 4) throw new ValidationError(["File Excel quá lớn (tối đa 2 MB)"]);
+    const buf = Buffer.from(body.contentBase64, "base64");
+    if (buf.length > 2 * 1024 * 1024) throw new ValidationError(["File Excel quá lớn (tối đa 2 MB)"]);
+    return reply.code(201).send(await classes.addStudentsFromXlsx(actor, Cid(req), buf));
   });
   app.delete<{ Params: { id: string; sid: string } }>("/api/classes/:id/students/:sid", async (req, reply) => {
     await classes.removeStudent(await authenticate(req), req.params.id, req.params.sid);
     return reply.code(204).send();
   });
-  app.get("/api/classes/:id/gradebook", async (req) => classes.gradebook(await authenticate(req), Cid(req)));
-  app.get<{ Params: { id: string }; Querystring: { student?: string } }>("/api/classes/:id/profile", async (req) => classes.gradebook(await authenticate(req), req.params.id, req.query.student));
+  app.get<{ Params: { id: string }; Querystring: { term?: string } }>("/api/classes/:id/gradebook", async (req) => classes.gradebook(await authenticate(req), req.params.id, undefined, req.query.term ?? "HK1"));
+  app.get<{ Params: { id: string }; Querystring: { student?: string; term?: string } }>("/api/classes/:id/profile", async (req) => classes.gradebook(await authenticate(req), req.params.id, req.query.student, req.query.term ?? "HK1"));
   app.put("/api/classes/:id/scores", async (req) => {
     const actor = await authenticate(req);
     const b = ScoresBody.parse(req.body);
-    return classes.enterScores(actor, Cid(req), b.column, b.scores);
+    return classes.enterScores(actor, Cid(req), b.column, b.scores, b.term);
   });
   app.get<{ Params: { id: string }; Querystring: { date: string } }>("/api/classes/:id/attendance", async (req) => classes.attendanceOn(await authenticate(req), req.params.id, req.query.date ?? ""));
   app.put("/api/classes/:id/attendance", async (req) => {
@@ -306,13 +309,13 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   });
   app.post("/api/classes/:id/export", async (req) => {
     const actor = await authenticate(req);
-    const { kind } = z.object({ kind: z.enum(["class_list", "gradebook"]) }).parse(req.body);
-    return makeClassLink(actor, Cid(req), kind);
+    const { kind, term } = z.object({ kind: z.enum(["class_list", "gradebook"]), term: z.enum(["HK1", "HK2"]).optional() }).parse(req.body);
+    return makeClassLink(actor, Cid(req), kind, term);
   });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
-    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind) => makeClassLink(actor, ref, kind), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), vanBan, makeVanBanLink: (id) => makeVanBanLink(actor, id), slides, games, makeSlideLink: (id) => makeSlideLink(actor, id), makeGameLink: (id) => makeGameLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
+    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind, term) => makeClassLink(actor, ref, kind, term), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), vanBan, makeVanBanLink: (id) => makeVanBanLink(actor, id), slides, games, makeSlideLink: (id) => makeSlideLink(actor, id), makeGameLink: (id) => makeGameLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     reply.raw.on("close", () => {
       server.close().catch((err) => console.error("mcp close", err));

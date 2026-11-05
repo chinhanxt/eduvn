@@ -4,7 +4,7 @@ import type { Db } from "../db/client";
 import { attendance, classes, comments, scores, students } from "../db/schema";
 import { type Role, assertCan } from "../domain/authz";
 import { SCALES, type Scale, TERMS, type Term, validateComment } from "../domain/comments";
-import { type AttendanceStatus, DEFAULT_COLUMNS, GradeColumn, averageScore, isoDate, parseAttendance, parseScore, validateColumns } from "../domain/gradebook";
+import { type AttendanceStatus, DEFAULT_COLUMNS, GradeColumn, TT27_COLUMNS, averageScore, columnsFor, isoDate, parseAttendance, parseScore, validateColumns, yearAverage } from "../domain/gradebook";
 import { type NewStudent, compareVietnameseNames, StudentItem, normName, normalizeStudentItems, parseRosterLines, parseRosterSheet, splitDuplicates } from "../domain/roster";
 import { NotFoundError, ValidationError } from "../errors";
 
@@ -40,12 +40,14 @@ export type ProfileStudent = {
   note: string;
   scores: Record<string, number>;
   dtb: number | null;
+  dtbYear: number | null;
   attendance: { present: number; excused: number; unexcused: number };
   days: Record<string, AttendanceStatus>;
   comments: Partial<Record<Term, { text: string; level: string }>>;
 };
 export type Gradebook = {
   class: { id: string; name: string; schoolYear: string; subject: string | null; scale: Scale };
+  term: Term;
   columns: GradeColumn[];
   dates: string[];
   students: ProfileStudent[];
@@ -101,7 +103,7 @@ export function createClassService(db: Db) {
     const p = CreateClassInput.parse(input);
     const [row] = await db
       .insert(classes)
-      .values({ orgId: actor.orgId, name: p.name, schoolYear: p.schoolYear, subject: p.subject || null, scale: p.scale, columns: DEFAULT_COLUMNS })
+      .values({ orgId: actor.orgId, name: p.name, schoolYear: p.schoolYear, subject: p.subject || null, scale: p.scale, columns: columnsFor(p.scale) })
       .returning();
     if (!row) throw new Error("createClass: no row");
     return row;
@@ -110,7 +112,11 @@ export function createClassService(db: Db) {
   async function updateClass(actor: Actor, classId: string, input: unknown): Promise<ClassRow> {
     assertCan(actor.role, "class:manage");
     const p = UpdateClassInput.parse(input);
-    await loadClass(actor.orgId, classId);
+    const cur = await loadClass(actor.orgId, classId);
+    if (p.scale && p.scale !== cur.scale && !p.columns) {
+      const isDefault = (cols: GradeColumn[], d: GradeColumn[]) => cols.length === d.length && cols.every((c, i) => c.name === d[i]?.name && c.weight === d[i]?.weight);
+      if (isDefault(cur.columns, DEFAULT_COLUMNS) || isDefault(cur.columns, TT27_COLUMNS)) p.columns = columnsFor(p.scale);
+    }
     if (p.columns) {
       const errs = validateColumns(p.columns);
       if (errs.length) throw new ValidationError(errs);
@@ -154,13 +160,19 @@ export function createClassService(db: Db) {
     if (parsed.errors.length) throw new ValidationError(parsed.errors);
     if (parsed.rows.length === 0) throw new ValidationError(["Không có học viên nào để thêm"]);
     if (parsed.rows.length > 500) throw new ValidationError(["Tối đa 500 học viên mỗi lần thêm"]);
-    const existing = await studentsOf(classId);
-    const { accept, warnings } = splitDuplicates(existing, parsed.rows);
-    const start = existing.reduce((m, r) => Math.max(m, r.position), 0);
-    const inserted = accept.length
-      ? await db.insert(students).values(accept.map((s, i) => ({ classId, ...s, position: start + i + 1 }))).returning({ id: students.id })
-      : [];
-    return { added: inserted.length, ids: inserted.map((r) => r.id), warnings };
+    return db.transaction(async (tx) => {
+      // khoá dòng lớp để hai lần thêm đồng thời không trùng position / thêm đôi
+      await tx.execute(sql`select id from classes where id = ${classId} for update`);
+      const existing = (await tx.select().from(students).where(eq(students.classId, classId))).sort(
+        (a, b) => compareVietnameseNames(a.fullName, b.fullName) || a.position - b.position || a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+      const { accept, warnings } = splitDuplicates(existing, parsed.rows);
+      const start = existing.reduce((m, r) => Math.max(m, r.position), 0);
+      const inserted = accept.length
+        ? await tx.insert(students).values(accept.map((s, i) => ({ classId, ...s, position: start + i + 1 }))).returning({ id: students.id })
+        : [];
+      return { added: inserted.length, ids: inserted.map((r) => r.id), warnings };
+    });
   }
 
   async function addStudents(actor: Actor, classRef: string, input: { text?: string; students?: StudentItem[] }) {
@@ -197,9 +209,10 @@ export function createClassService(db: Db) {
     if (gone.length === 0) throw new NotFoundError("Không tìm thấy học viên");
   }
 
-  async function enterScores(actor: Actor, classRef: string, column: string, entries: Record<string, unknown>) {
+  async function enterScores(actor: Actor, classRef: string, column: string, entries: Record<string, unknown>, term: string = "HK1") {
     assertCan(actor.role, "grade:write");
     const c = await resolveClass(actor.orgId, classRef);
+    if (!(TERMS as readonly string[]).includes(term)) throw new ValidationError([`Học kỳ "${term}" sai, dùng HK1 hoặc HK2`]);
     const col = c.columns.find((x) => x.name.toLowerCase() === column.trim().toLowerCase());
     if (!col) throw new ValidationError([`Lớp ${c.name} không có cột "${column}". Các cột: ${c.columns.map((x) => x.name).join(", ")}`]);
     const rows = await studentsOf(c.id);
@@ -208,7 +221,7 @@ export function createClassService(db: Db) {
     const { map, errors, label } = resolveStudents(rows, refs);
     const todo: { studentId: string; value: number | null }[] = [];
     for (const ref of refs) {
-      const r = parseScore(entries[ref]);
+      const r = parseScore(entries[ref], c.scale);
       if (!r.ok) errors.push(`${label(ref)}: ${r.error}`);
       else {
         const st = map.get(ref);
@@ -218,15 +231,15 @@ export function createClassService(db: Db) {
     if (errors.length) throw new ValidationError(errors);
     await db.transaction(async (tx) => {
       for (const t of todo) {
-        if (t.value === null) await tx.delete(scores).where(and(eq(scores.studentId, t.studentId), eq(scores.column, col.name)));
+        if (t.value === null) await tx.delete(scores).where(and(eq(scores.studentId, t.studentId), eq(scores.term, term), eq(scores.column, col.name)));
         else
           await tx
             .insert(scores)
-            .values({ studentId: t.studentId, column: col.name, value: t.value })
-            .onConflictDoUpdate({ target: [scores.studentId, scores.column], set: { value: t.value } });
+            .values({ studentId: t.studentId, term, column: col.name, value: t.value })
+            .onConflictDoUpdate({ target: [scores.studentId, scores.term, scores.column], set: { value: t.value } });
       }
     });
-    return { column: col.name, updated: todo.length };
+    return { term, column: col.name, updated: todo.length };
   }
 
   async function markAttendance(actor: Actor, classRef: string, date: string, records: Record<string, unknown>, defaultStatus?: string) {
@@ -292,7 +305,7 @@ export function createClassService(db: Db) {
     return { term, saved: items.length };
   }
 
-  async function buildGradebook(c: ClassRow, only?: string): Promise<Gradebook> {
+  async function buildGradebook(c: ClassRow, only?: string, term: Term = "HK1"): Promise<Gradebook> {
     let rows = await studentsOf(c.id);
     if (only !== undefined) {
       const { map, errors } = resolveStudents(rows, [only]);
@@ -310,11 +323,16 @@ export function createClassService(db: Db) {
     const dates = [...new Set(at.map((a) => a.date))].sort();
     return {
       class: { id: c.id, name: c.name, schoolYear: c.schoolYear, subject: c.subject, scale: c.scale },
+      term,
       columns: c.columns,
       dates,
       students: rows.map((s) => {
-        const mine: Record<string, number> = {};
-        for (const x of sc) if (x.studentId === s.id) mine[x.column] = x.value;
+        const byTerm: Record<string, Record<string, number>> = { HK1: {}, HK2: {} };
+        for (const x of sc) if (x.studentId === s.id) (byTerm[x.term] ??= {})[x.column] = x.value;
+        const mine = byTerm[term] ?? {};
+        const tt27 = c.scale === "TT27";
+        const dtb = tt27 ? null : averageScore(c.columns, mine);
+        const dtbYear = tt27 ? null : yearAverage(averageScore(c.columns, byTerm.HK1 ?? {}), averageScore(c.columns, byTerm.HK2 ?? {}));
         const days: Record<string, AttendanceStatus> = {};
         const tally = { present: 0, excused: 0, unexcused: 0 };
         for (const a of at)
@@ -324,20 +342,25 @@ export function createClassService(db: Db) {
           }
         const cms: ProfileStudent["comments"] = {};
         for (const x of cm) if (x.studentId === s.id) cms[x.term as Term] = { text: x.text, level: x.level };
-        return { id: s.id, code: s.code, fullName: s.fullName, dob: s.dob, gender: s.gender, note: s.note, scores: mine, dtb: averageScore(c.columns, mine), attendance: tally, days, comments: cms };
+        return { id: s.id, code: s.code, fullName: s.fullName, dob: s.dob, gender: s.gender, note: s.note, scores: mine, dtb, dtbYear, attendance: tally, days, comments: cms };
       }),
     };
   }
 
+  const checkTerm = (term: string): Term => {
+    if (!(TERMS as readonly string[]).includes(term)) throw new ValidationError([`Học kỳ "${term}" sai, dùng HK1 hoặc HK2`]);
+    return term as Term;
+  };
+
   /** Sổ điểm đầy đủ hoặc hồ sơ 1 học viên (id/tên) — để AI viết nhận xét. */
-  async function gradebook(actor: Actor, classRef: string, student?: string): Promise<Gradebook> {
+  async function gradebook(actor: Actor, classRef: string, student?: string, term: string = "HK1"): Promise<Gradebook> {
     assertCan(actor.role, "class:read");
-    return buildGradebook(await resolveClass(actor.orgId, classRef), student);
+    return buildGradebook(await resolveClass(actor.orgId, classRef), student, checkTerm(term));
   }
 
   /** Không kiểm vai trò: chỉ gọi sau khi đã xác minh link tải ký HMAC. */
-  async function loadForExport(orgId: string, classId: string): Promise<Gradebook> {
-    return buildGradebook(await loadClass(orgId, classId));
+  async function loadForExport(orgId: string, classId: string, term: Term = "HK1"): Promise<Gradebook> {
+    return buildGradebook(await loadClass(orgId, classId), undefined, term);
   }
 
   async function classIdFor(actor: Actor, classRef: string, action: "class:read"): Promise<string> {

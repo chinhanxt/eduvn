@@ -17,7 +17,7 @@ import { registerSlideTools } from "./slides";
 
 export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks>;
   classes: ClassService;
-  makeClassLink: (classRef: string, kind: "class_list" | "gradebook") => Promise<{ url: string; expiresInMinutes: number }>;
+  makeClassLink: (classRef: string, kind: "class_list" | "gradebook", term?: "HK1" | "HK2") => Promise<{ url: string; expiresInMinutes: number }>;
   lessons: LessonService;
   vanBan: VanBanService;
   slides: SlideService;

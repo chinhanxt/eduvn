@@ -1,3 +1,4 @@
+import { Readable } from "node:stream";
 import ExcelJS from "exceljs";
 import { ATTENDANCE_VI } from "../domain/gradebook";
 import { dobVi } from "../domain/roster";
@@ -49,16 +50,19 @@ export async function renderClassListXlsx(gb: Gradebook): Promise<Buffer> {
 export async function renderGradebookXlsx(gb: Gradebook): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   const cols = gb.columns;
-  const header = ["STT", "Mã", "Họ và tên", ...cols.map((c) => `${c.name} (hệ số ${c.weight})`), "ĐTB", "Vắng có phép", "Vắng không phép", "Nhận xét HK1", "Mức HK1", "Nhận xét HK2", "Mức HK2"];
-  const widths = [6, 12, 28, ...cols.map(() => 11), 9, 10, 12, 50, 16, 50, 16];
-  const ws = sheet(wb, "Sổ điểm", `SỔ ĐIỂM LỚP ${gb.class.name}`, `Năm học ${gb.class.schoolYear}${gb.class.subject ? ` · ${gb.class.subject}` : ""} · Đánh giá nhận xét theo ${gb.class.scale === "TT27" ? "TT27" : "TT22"}`, header, widths);
+  const tt27 = gb.class.scale === "TT27";
+  const hk = gb.term;
+  const dtbHead = tt27 ? [] : hk === "HK2" ? ["ĐTB HK2", "ĐTB cả năm"] : ["ĐTB HK1"];
+  const header = ["STT", "Mã", "Họ và tên", ...cols.map((c) => `${c.name}${tt27 ? "" : ` (hệ số ${c.weight})`}`), ...dtbHead, "Vắng có phép", "Vắng không phép", "Nhận xét HK1", "Mức HK1", "Nhận xét HK2", "Mức HK2"];
+  const widths = [6, 12, 28, ...cols.map(() => 11), ...dtbHead.map(() => 11), 10, 12, 50, 16, 50, 16];
+  const ws = sheet(wb, "Sổ điểm", `SỔ ĐIỂM LỚP ${gb.class.name} — ${hk === "HK1" ? "HỌC KỲ 1" : "HỌC KỲ 2"}`, `Năm học ${gb.class.schoolYear}${gb.class.subject ? ` · ${gb.class.subject}` : ""} · Đánh giá nhận xét theo ${gb.class.scale === "TT27" ? "TT27" : "TT22"}`, header, widths);
   gb.students.forEach((s, i) => {
     const r = addRow(
       ws,
-      [i + 1, s.code ?? "", s.fullName, ...cols.map((c) => (s.scores[c.name] !== undefined ? num(s.scores[c.name] as number) : null)), s.dtb, s.attendance.excused, s.attendance.unexcused, s.comments.HK1?.text ?? "", s.comments.HK1?.level ?? "", s.comments.HK2?.text ?? "", s.comments.HK2?.level ?? ""],
-      [1, ...cols.map((_, k) => 4 + k), 4 + cols.length, 5 + cols.length, 6 + cols.length],
+      [i + 1, s.code ?? "", s.fullName, ...cols.map((c) => (s.scores[c.name] !== undefined ? num(s.scores[c.name] as number) : null)), ...(tt27 ? [] : hk === "HK2" ? [s.dtb, s.dtbYear] : [s.dtb]), s.attendance.excused, s.attendance.unexcused, s.comments.HK1?.text ?? "", s.comments.HK1?.level ?? "", s.comments.HK2?.text ?? "", s.comments.HK2?.level ?? ""],
+      [1, ...cols.map((_, k) => 4 + k), ...dtbHead.map((_, k) => 4 + cols.length + k), 4 + cols.length + dtbHead.length, 5 + cols.length + dtbHead.length, 6 + cols.length + dtbHead.length],
     );
-    for (let k = 0; k <= cols.length; k++) r.getCell(4 + k).numFmt = "0.0";
+    for (let k = 0; k < cols.length + dtbHead.length; k++) r.getCell(4 + k).numFmt = tt27 ? "0" : "0.0";
   });
 
   if (gb.dates.length) {
@@ -69,22 +73,27 @@ export async function renderGradebookXlsx(gb: Gradebook): Promise<Buffer> {
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
 
-/** Sheet đầu tiên → lưới chuỗi (ngày → dd/mm/yyyy). */
+export const XLSX_MAX_BYTES = 2 * 1024 * 1024;
+const MAX_ROWS = 600;
+const MAX_COLS = 30;
+
+/** Sheet đầu tiên → lưới chuỗi (ngày → dd/mm/yyyy). Chỉ đọc tối đa 600 dòng × 30 cột. */
 export async function readFirstSheet(buffer: Buffer): Promise<string[][]> {
-  const wb = new ExcelJS.Workbook();
-  await wb.xlsx.load(buffer as unknown as ExcelJS.Buffer);
-  const ws = wb.worksheets[0];
-  if (!ws) return [];
+  if (buffer.length > XLSX_MAX_BYTES) throw new Error("file quá lớn");
+  const reader = new ExcelJS.stream.xlsx.WorkbookReader(Readable.from([buffer]), { sharedStrings: "cache", hyperlinks: "ignore", styles: "cache", worksheets: "emit" });
   const grid: string[][] = [];
-  ws.eachRow({ includeEmpty: true }, (row, n) => {
-    const cells: string[] = [];
-    for (let i = 1; i <= row.cellCount; i++) {
-      const v = row.getCell(i).value;
-      if (v instanceof Date) cells.push(`${v.getUTCDate()}/${v.getUTCMonth() + 1}/${v.getUTCFullYear()}`);
-      else if (v && typeof v === "object") cells.push(String((v as { text?: string; result?: unknown }).text ?? (v as { result?: unknown }).result ?? ""));
-      else cells.push(v === null || v === undefined ? "" : String(v));
+  for await (const ws of reader) {
+    for await (const row of ws as AsyncIterable<ExcelJS.Row>) {
+      if (row.number > MAX_ROWS) break;
+      const cells: string[] = [];
+      for (let i = 1; i <= Math.min(row.cellCount, MAX_COLS); i++) {
+        const c = row.getCell(i);
+        const v = c.value;
+        cells.push(v instanceof Date ? `${v.getUTCDate()}/${v.getUTCMonth() + 1}/${v.getUTCFullYear()}` : v === null || v === undefined ? "" : c.text);
+      }
+      grid[row.number - 1] = cells;
     }
-    grid[n - 1] = cells;
-  });
+    break; // chỉ sheet đầu tiên
+  }
   return Array.from(grid, (r) => r ?? []);
 }

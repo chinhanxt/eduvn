@@ -61,4 +61,19 @@ describe("HTTP lớp học", () => {
     const other = { authorization: `Bearer ${await t.sign({ sub: "gv-2" })}` };
     expect((await call("GET", `/api/classes/${id}`, undefined, other)).statusCode).toBe(404);
   });
+
+  it("điểm theo học kỳ qua REST + giới hạn upload", async () => {
+    const id = (await call("POST", "/api/classes", { name: "9C", schoolYear: "2026-2027" })).json().id as string;
+    await call("POST", `/api/classes/${id}/students`, { text: "Đỗ Văn G" });
+    expect((await call("PUT", `/api/classes/${id}/scores`, { term: "HK2", column: "GK", scores: { "Đỗ Văn G": "7" } })).statusCode).toBe(200);
+    expect((await call("GET", `/api/classes/${id}/gradebook?term=HK1`)).json().students[0].scores.GK).toBeUndefined();
+    expect((await call("GET", `/api/classes/${id}/gradebook?term=HK2`)).json().students[0].scores.GK).toBe(7);
+    expect((await call("GET", `/api/classes/${id}/gradebook?term=HK9`)).statusCode).toBe(400);
+    const huge = Buffer.alloc(2.5 * 1024 * 1024, 1).toString("base64"); // 2,5 MB giải mã, ~3,3 MB base64
+    const r = await call("POST", `/api/classes/${id}/students/xlsx`, { contentBase64: huge });
+    expect(r.statusCode).toBe(400);
+    expect(r.json().issues[0]).toContain("2 MB");
+    const over = await call("POST", `/api/classes/${id}/students`, { text: "x".repeat(1024 * 1024 + 10) });
+    expect(over.statusCode).toBeGreaterThanOrEqual(400);
+  });
 });

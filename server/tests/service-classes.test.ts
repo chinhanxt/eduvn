@@ -8,6 +8,8 @@ import type { Actor } from "../src/service";
 import { createClassService } from "../src/services/classes";
 import { testDb } from "./helpers/db";
 import ExcelJS from "exceljs";
+import { eq } from "drizzle-orm";
+import { students } from "../src/db/schema";
 
 let db: Db;
 let svc: ReturnType<typeof createClassService>;
@@ -161,5 +163,72 @@ describe("nhận xét", () => {
     await expect(svc.saveComments(teacher, a.c.id, "HK3", [{ student: "Nguyễn Văn An", text, level: "Hoàn thành" }])).rejects.toThrow(/HK1/);
     await expect(svc.saveComments(assistant, a.c.id, "HK1", [{ student: "Nguyễn Văn An", text, level: "Hoàn thành" }])).rejects.toThrow(ForbiddenError);
     await svc.saveComments(teacher, a.c.id, "HK2", [{ student: "Nguyễn Văn An", text, level: "Hoàn thành tốt" }]);
+  });
+  it("điểm theo học kỳ: HK2 không ghi đè HK1; ĐTB cả năm = (HK1 + 2×HK2)/3", async () => {
+    const { c, ids } = await seed();
+    const full = async (term: "HK1" | "HK2", v: number) => {
+      for (const col of ["TX1", "TX2", "TX3", "GK", "CK"]) await svc.enterScores(teacher, c.id, col, { [ids[0] as string]: v }, term);
+    };
+    await full("HK1", 8);
+    let an = (await svc.gradebook(teacher, c.id, ids[0])).students[0];
+    expect(an?.dtb).toBe(8);
+    expect(an?.dtbYear).toBeNull();
+    await full("HK2", 9.5);
+    an = (await svc.gradebook(teacher, c.id, ids[0], "HK1")).students[0];
+    expect(an?.scores.GK).toBe(8);
+    expect(an?.dtb).toBe(8);
+    expect(an?.dtbYear).toBe(9); // (8 + 19)/3
+    an = (await svc.gradebook(teacher, c.id, ids[0], "HK2")).students[0];
+    expect(an?.scores.GK).toBe(9.5);
+    expect(an?.dtb).toBe(9.5);
+    await expect(svc.enterScores(teacher, c.id, "GK", { [ids[0] as string]: 5 }, "HK3")).rejects.toThrow(/HK1/);
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load((await renderGradebookXlsx(await svc.loadForExport(teacher.orgId, c.id, "HK2"))) as unknown as ExcelJS.Buffer);
+    const hdr = (wb.worksheets[0]?.getRow(4).values as unknown[]).map(String);
+    expect(hdr).toContain("ĐTB cả năm");
+  });
+  it("TT27: cột GKI/CKI/GKII/CN, chỉ số nguyên 1–10, không có ĐTB", async () => {
+    const { c, ids } = await seed("TT27");
+    const cls = await svc.getClass(teacher, c.id);
+    expect(cls.columns.map((x) => x.name)).toEqual(["GKI", "CKI", "GKII", "CN"]);
+    expect(cls.columns.every((x) => x.weight === 1)).toBe(true);
+    await expect(svc.enterScores(teacher, c.id, "GKI", { [ids[0] as string]: "8,5" })).rejects.toThrow(/số nguyên/);
+    await expect(svc.enterScores(teacher, c.id, "GKI", { [ids[0] as string]: 0 })).rejects.toThrow(/1 đến 10/);
+    for (const col of ["GKI", "CKI", "GKII", "CN"]) await svc.enterScores(teacher, c.id, col, { [ids[0] as string]: 9 });
+    const an = (await svc.gradebook(teacher, c.id, ids[0])).students[0];
+    expect(an?.scores.CN).toBe(9);
+    expect(an?.dtb).toBeNull();
+    expect(an?.dtbYear).toBeNull();
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load((await renderGradebookXlsx(await svc.loadForExport(teacher.orgId, c.id))) as unknown as ExcelJS.Buffer);
+    expect((wb.worksheets[0]?.getRow(4).values as unknown[]).map(String).some((h) => h.includes("ĐTB"))).toBe(false);
+  });
+  it("thêm HS hàng loạt đồng thời: position không trùng", async () => {
+    const c = await svc.createClass(teacher, { name: "7A", schoolYear: "2026-2027" });
+    const roster = (p: string) => Array.from({ length: 30 }, (_, i) => `${p} ${i}`).join("\n");
+    const [a, b] = await Promise.all([svc.addStudents(teacher, c.id, { text: roster("Nguyễn Văn") }), svc.addStudents(teacher, c.id, { text: roster("Trần Thị") })]);
+    expect(a.added + b.added).toBe(60);
+    const pos = (await db.select().from(students).where(eq(students.classId, c.id))).map((r) => r.position);
+    expect(new Set(pos).size).toBe(pos.length);
+    expect(pos).toHaveLength(60);
+  });
+  it("xlsx: ô rich text đọc được; chỉ đọc tối đa 600 dòng; từ chối file > 2 MB", async () => {
+    const { c } = await seed();
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet("DS");
+    ws.addRow(["Họ và tên"]);
+    ws.addRow([{ richText: [{ text: "Lê " }, { text: "Văn Rich", font: { bold: true } }] }]);
+    const r = await svc.addStudentsFromXlsx(teacher, c.id, Buffer.from(await wb.xlsx.writeBuffer()));
+    expect(r.added).toBe(1);
+    expect((await svc.getClass(teacher, c.id)).students.some((x) => x.fullName === "Lê Văn Rich")).toBe(true);
+
+    const { readFirstSheet } = await import("../src/export/xlsx");
+    const big = new ExcelJS.Workbook();
+    const bs = big.addWorksheet("X");
+    for (let i = 1; i <= 700; i++) bs.addRow([`r${i}`, ...Array.from({ length: 40 }, (_, k) => k)]);
+    const grid = await readFirstSheet(Buffer.from(await big.xlsx.writeBuffer()));
+    expect(grid.length).toBeLessThanOrEqual(600);
+    expect(Math.max(...grid.map((row) => row.length))).toBeLessThanOrEqual(30);
+    await expect(readFirstSheet(Buffer.alloc(2 * 1024 * 1024 + 1))).rejects.toThrow();
   });
 });

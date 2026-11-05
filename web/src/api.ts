@@ -68,10 +68,11 @@ export type AttStatus = "present" | "excused" | "unexcused";
 export type GbStudent = StudentRow & {
   scores: Record<string, number>;
   dtb: number | null;
+  dtbYear: number | null;
   attendance: Record<AttStatus, number>;
   comments: Partial<Record<"HK1" | "HK2", { text: string; level: string }>>;
 };
-export type Gradebook = { class: Omit<ClassSummary, "studentCount">; columns: { name: string; weight: number }[]; dates: string[]; students: GbStudent[] };
+export type Gradebook = { term: "HK1" | "HK2"; class: Omit<ClassSummary, "studentCount">; columns: { name: string; weight: number }[]; dates: string[]; students: GbStudent[] };
 export const LEVELS = { TT22: ["Tốt", "Khá", "Đạt", "Chưa đạt"], TT27: ["Hoàn thành tốt", "Hoàn thành", "Chưa hoàn thành"] } as const;
 
 /** Lỗi nhập liệu có danh sách → nhiều dòng. */
@@ -86,8 +87,8 @@ export const errText = (e: unknown): string => {
 export const vn = (n: number | null | undefined): string => (n === null || n === undefined ? "" : String(n).replace(".", ","));
 export const dobVi = (iso: string | null): string => (iso ? iso.split("-").reverse().join("/") : "");
 
-export async function exportClass(id: string, kind: "class_list" | "gradebook") {
-  const link = await api<{ url: string }>(`/api/classes/${id}/export`, { method: "POST", body: { kind } });
+export async function exportClass(id: string, kind: "class_list" | "gradebook", term?: "HK1" | "HK2") {
+  const link = await api<{ url: string }>(`/api/classes/${id}/export`, { method: "POST", body: { kind, term } });
   window.location.assign(link.url);
 }
 

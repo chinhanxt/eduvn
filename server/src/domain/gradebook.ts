@@ -15,6 +15,16 @@ export const DEFAULT_COLUMNS: GradeColumn[] = [
   { name: "CK", weight: 3 },
 ];
 
+/** TT27/2020 (tiểu học): đánh giá định kỳ GKI, CKI, GKII, CN — điểm nguyên 1–10, không có ĐTB. */
+export const TT27_COLUMNS: GradeColumn[] = [
+  { name: "GKI", weight: 1 },
+  { name: "CKI", weight: 1 },
+  { name: "GKII", weight: 1 },
+  { name: "CN", weight: 1 },
+];
+
+export const columnsFor = (scale: string): GradeColumn[] => (scale === "TT27" ? TT27_COLUMNS : DEFAULT_COLUMNS);
+
 export function validateColumns(cols: GradeColumn[]): string[] {
   const errors: string[] = [];
   if (cols.length === 0) errors.push("Cần ít nhất 1 cột điểm");
@@ -29,11 +39,15 @@ export function validateColumns(cols: GradeColumn[]): string[] {
 }
 
 /** Điểm 0–10, tối đa 1 chữ số thập phân, nhận "8,5". Rỗng/null → null (xoá điểm). Sai → chuỗi lỗi. */
-export function parseScore(v: unknown): { ok: true; value: number | null } | { ok: false; error: string } {
+export function parseScore(v: unknown, scale: string = "TT22"): { ok: true; value: number | null } | { ok: false; error: string } {
   if (v === null || v === undefined || (typeof v === "string" && v.trim() === "")) return { ok: true, value: null };
   const s = typeof v === "number" ? String(v) : typeof v === "string" ? v.trim().replace(",", ".") : "";
   if (!/^\d+(\.\d+)?$/.test(s)) return { ok: false, error: `điểm "${String(v)}" không phải số` };
   const n = Number(s);
+  if (scale === "TT27") {
+    if (!/^\d+$/.test(s) || n < 1 || n > 10) return { ok: false, error: `điểm ${s.replace(".", ",")} không hợp lệ: lớp TT27 chỉ nhận số nguyên từ 1 đến 10` };
+    return { ok: true, value: n };
+  }
   if (n < 0 || n > 10) return { ok: false, error: `điểm ${s.replace(".", ",")} ngoài thang 0–10` };
   if (Math.abs(n * 10 - Math.round(n * 10)) > 1e-9) return { ok: false, error: `điểm ${s.replace(".", ",")} chỉ được tối đa 1 chữ số thập phân` };
   return { ok: true, value: Math.round(n * 10) / 10 };
@@ -51,6 +65,12 @@ export function averageScore(cols: GradeColumn[], scores: Record<string, number 
   }
   if (w === 0) return null;
   return Math.floor((2 * sum10 + w) / (2 * w)) / 10;
+}
+
+/** ĐTB cả năm = (ĐTB HK1 + 2×ĐTB HK2)/3, làm tròn 1 chữ số; chỉ có khi đủ cả hai học kỳ. */
+export function yearAverage(hk1: number | null, hk2: number | null): number | null {
+  if (hk1 === null || hk2 === null) return null;
+  return Math.floor((2 * (Math.round(hk1 * 10) + 2 * Math.round(hk2 * 10)) + 3) / 6) / 10;
 }
 
 export const ATTENDANCE = ["present", "excused", "unexcused"] as const;
