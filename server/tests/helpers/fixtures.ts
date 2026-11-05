@@ -1,4 +1,6 @@
 import type { QuestionInput } from "../../src/domain/question";
+import type { ResponseValue } from "../../src/domain/scoring";
+import type { KeyEntry } from "../../src/domain/variants";
 
 type Of<T extends QuestionInput["type"]> = Extract<QuestionInput, { type: T }>;
 
@@ -44,4 +46,14 @@ export function essay(p: Partial<Of<"essay">> = {}): Of<"essay"> {
 let counter = 0;
 export function stored<T extends QuestionInput>(q: T, id = `q${++counter}`): T & { id: string } {
   return { ...q, id };
+}
+
+/** Dựng bài làm đúng hoàn toàn từ đáp án (dùng cho test chấm). */
+export function responsesFromKey(entries: KeyEntry[]): Record<string, ResponseValue> {
+  return Object.fromEntries(
+    entries.map((e) => [
+      String(e.no),
+      e.section === "mcq" ? "ABCD".indexOf(e.answer) : e.section === "true_false" ? [...e.answer].map((c) => c === "Đ") : e.answer,
+    ]),
+  );
 }
