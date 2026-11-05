@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDUVN — Mockup khung hệ thống</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #fff; --ink: #1d2433; --muted: #6b7385; --line: #e4e7ec;
+    --brand: #1f6feb; --brand-ink: #fff; --soft: #eef4ff; --ok: #1a7f37; --warn: #9a6700;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+  .switch { position: fixed; right: 12px; bottom: 12px; display: flex; gap: 6px; z-index: 9; }
+  .switch button { border: 1px solid var(--line); background: var(--panel); padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+  .switch button.on { background: var(--ink); color: #fff; }
+  .view { display: none; } .view.on { display: block; }
+
+  /* Login */
+  .login { min-height: 100vh; display: grid; place-items: center; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+  .login .card { width: 380px; text-align: center; }
+  .logo { font-weight: 800; font-size: 22px; letter-spacing: .5px; }
+  .logo span { color: var(--brand); }
+  .btn { display: block; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); margin-top: 10px; cursor: pointer; font-size: 14px; }
+  .btn.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+  .muted { color: var(--muted); }
+
+  /* App shell */
+  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  aside { background: var(--panel); border-right: 1px solid var(--line); padding: 16px 12px; }
+  aside .logo { padding: 4px 10px 16px; }
+  nav a { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 8px; color: var(--ink); text-decoration: none; margin-bottom: 2px; }
+  nav a.on { background: var(--soft); color: var(--brand); font-weight: 600; }
+  nav .group { font-size: 11px; text-transform: uppercase; color: var(--muted); margin: 14px 10px 6px; letter-spacing: .6px; }
+  .tag { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: #f1f2f4; color: var(--muted); }
+  .tag.ok { background: #dafbe1; color: var(--ok); } .tag.warn { background: #fff8c5; color: var(--warn); }
+  header { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .org { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--panel); }
+  main { padding: 24px; }
+  h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 0 0 12px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); margin-top: 18px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .tile .t { font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .tile p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  .row { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-top: 14px; }
+  table { width: 100%; border-collapse: collapse; } td, th { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  th { color: var(--muted); font-weight: 500; }
+  code { background: #f1f2f4; padding: 2px 6px; border-radius: 6px; font-size: 12px; }
+  .chan { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .chan:last-child { border-bottom: 0; }
+</style>
+</head>
+<body>
+
+<div class="switch">
+  <button data-v="login">1 · Đăng nhập</button>
+  <button data-v="home" class="on">2 · Trang chủ</button>
+  <button data-v="connect">3 · Kết nối</button>
+</div>
+
+<!-- 1. Đăng nhập -->
+<section class="view" id="login">
+  <div class="login">
+    <div class="card">
+      <div class="logo">EDU<span>VN</span></div>
+      <p class="muted">Trợ lý cho giáo viên &amp; sinh viên</p>
+      <button class="btn primary">Đăng nhập bằng Google</button>
+      <button class="btn">Đăng nhập bằng Microsoft</button>
+      <button class="btn">Email &amp; mật khẩu</button>
+      <p class="muted" style="font-size:12px;margin-top:16px">Lần đầu đăng nhập sẽ tự có "Không gian cá nhân".<br>Trường/trung tâm mời bạn vào tổ chức sau.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Trang chủ -->
+<section class="view on" id="home">
+  <div class="app">
+    <aside>
+      <div class="logo">EDU<span>VN</span></div>
+      <nav>
+        <a class="on" href="#">Trang chủ</a>
+        <div class="group">Ra đề &amp; chấm</div>
+        <a href="#">Ngân hàng câu hỏi <span class="tag ok">Có</span></a>
+        <a href="#">Đề thi &amp; đáp án <span class="tag ok">Có</span></a>
+        <a href="#">Chấm bài <span class="tag ok">Có</span></a>
+        <div class="group">Bài giảng</div>
+        <a href="#">Slide bài giảng <span class="tag warn">Thử</span></a>
+        <a href="#">Video bài giảng <span class="tag warn">Thử</span></a>
+        <a href="#">Giáo trình <span class="tag warn">Thử</span></a>
+        <div class="group">Lớp học</div>
+        <a href="#">Học viên &amp; lớp <span class="tag">Sắp có</span></a>
+        <a href="#">Gia sư sinh viên <span class="tag warn">Thử</span></a>
+        <div class="group">Hệ thống</div>
+        <a href="#">Kết nối AI &amp; Zalo</a>
+        <a href="#">Tổ chức &amp; thành viên <span class="tag">Sắp có</span></a>
+      </nav>
+    </aside>
+    <div>
+      <header>
+        <select class="org"><option>Không gian của Cô Lan</option><option>THPT Nguyễn Du</option></select>
+        <div class="muted">Cô Lan · Giáo viên ▾</div>
+      </header>
+      <main>
+        <h1>Chào Cô Lan 👋</h1>
+        <div class="muted">Bạn muốn làm gì hôm nay? Có thể làm ở đây, hoặc nhắn trong Claude/ChatGPT/Zalo.</div>
+        <div class="grid">
+          <div class="tile"><div class="t">Tạo đề từ ma trận <span class="tag ok">Có</span></div><p>Chọn môn, lớp, ma trận CV 7991 → nhiều mã đề + đáp án Word.</p></div>
+          <div class="tile"><div class="t">Thêm câu hỏi <span class="tag ok">Có</span></div><p>Nhập tay hoặc để AI soạn: 4 dạng câu, mức NB/TH/VD.</p></div>
+          <div class="tile"><div class="t">Chấm trắc nghiệm <span class="tag ok">Có</span></div><p>Nhập bài làm theo mã đề → điểm từng câu.</p></div>
+          <div class="tile"><div class="t">Làm slide bài giảng <span class="tag warn">Thử</span></div><p>Chủ đề/giáo án → slide PPTX (qua OpenMAIC).</p></div>
+          <div class="tile"><div class="t">Video bài giảng <span class="tag warn">Thử</span></div><p>Slide → video MP4 có giọng đọc tiếng Việt.</p></div>
+          <div class="tile"><div class="t">Viết giáo trình <span class="tag warn">Thử</span></div><p>Tài liệu môn học → giáo trình nhiều chương (qua DeepTutor).</p></div>
+        </div>
+        <div class="row">
+          <div class="tile">
+            <h2>Đề gần đây</h2>
+            <table>
+              <tr><th>Tên đề</th><th>Môn · Lớp</th><th>Mã đề</th><th></th></tr>
+              <tr><td>Kiểm tra 15 phút</td><td>Toán · 10</td><td>101–104</td><td><a href="#">Tải Word</a></td></tr>
+              <tr><td>Giữa kì I</td><td>Toán · 10</td><td>101–108</td><td><a href="#">Tải Word</a></td></tr>
+            </table>
+          </div>
+          <div class="tile">
+            <h2>Kênh đang dùng</h2>
+            <div class="chan"><span>Claude.ai</span><span class="tag ok">Đã kết nối</span></div>
+            <div class="chan"><span>ChatGPT</span><span class="tag">Chưa</span></div>
+            <div class="chan"><span>Zalo (bot)</span><span class="tag ok">Đang chạy</span></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Kết nối -->
+<section class="view" id="connect">
+  <div class="app">
+    <aside>
+      <div class="logo">EDU<span>VN</span></div>
+      <nav>
+        <a href="#">Trang chủ</a>
+        <div class="group">Hệ thống</div>
+        <a class="on" href="#">Kết nối AI &amp; Zalo</a>
+      </nav>
+    </aside>
+    <div>
+      <header>
+        <select class="org"><option>Không gian của Cô Lan</option></select>
+        <div class="muted">Cô Lan · Giáo viên ▾</div>
+      </header>
+      <main>
+        <h1>Kết nối AI &amp; Zalo</h1>
+        <div class="muted">Ra lệnh bằng lời ở nơi bạn quen dùng — hệ thống làm phần còn lại.</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div class="tile">
+            <div class="t">Claude.ai / ChatGPT (MCP)</div>
+            <p>Thêm connector với địa chỉ:</p>
+            <p><code>https://eduvn.example.vn/mcp</code> <a href="#">Sao chép</a></p>
+            <p>Khi thêm, bạn đăng nhập bằng tài khoản EDUVN — AI chỉ thấy dữ liệu tổ chức của bạn.</p>
+            <p>Thử nói: <i>"Tạo đề 15 phút Toán 10 chương Mệnh đề, 4 mã, xuất Word"</i></p>
+          </div>
+          <div class="tile">
+            <div class="t">Zalo</div>
+            <p>1. Kết bạn Zalo với bot <b>EDUVN Trợ lý</b> hoặc thêm bot vào nhóm lớp.</p>
+            <p>2. Nhắn cho bot mã liên kết: <code>/lienket 482913</code> (hết hạn sau 10 phút)</p>
+            <p>3. Trong nhóm, @EDUVN Trợ lý kèm yêu cầu.</p>
+            <p><span class="tag ok">Đã liên kết: Zalo của Cô Lan</span></p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll(".switch button").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".switch button").forEach((x) => x.classList.toggle("on", x === b));
+    document.querySelectorAll(".view").forEach((v) => v.classList.toggle("on", v.id === b.dataset.v));
+  }));
+</script>
+</body>
+</html>
