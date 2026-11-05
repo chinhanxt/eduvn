@@ -1,4 +1,5 @@
-import Fastify, { type FastifyInstance, type FastifyRequest } from "fastify";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { ZodError, z } from "zod";
 import { resolveActor } from "../auth/actor";
 import { type DownloadClaims, createDownloadSigner } from "../auth/download";
@@ -9,6 +10,7 @@ import { ResponseValue } from "../domain/scoring";
 import { answerKey } from "../domain/variants";
 import { NotFoundError, UnauthorizedError } from "../errors";
 import { renderAnswerKeyDocx, renderExamDocx } from "../export/docx";
+import { buildMcpServer } from "../mcp/server";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string };
@@ -111,6 +113,24 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     }
     return reply.header("content-type", DOCX).header("content-disposition", `attachment; filename="${filename}"`).send(buffer);
   });
+
+  app.post("/mcp", async (req, reply) => {
+    const actor = await authenticate(req);
+    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId) });
+    const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+    reply.raw.on("close", () => {
+      void transport.close();
+      void server.close();
+    });
+    await server.connect(transport);
+    reply.hijack();
+    await transport.handleRequest(req.raw, reply.raw, req.body);
+  });
+
+  const methodNotAllowed = async (_req: FastifyRequest, reply: FastifyReply) =>
+    reply.code(405).header("allow", "POST").send({ error: "MCP endpoint chỉ nhận POST" });
+  app.get("/mcp", methodNotAllowed);
+  app.delete("/mcp", methodNotAllowed);
 
   return app;
 }
