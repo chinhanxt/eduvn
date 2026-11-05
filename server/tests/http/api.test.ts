@@ -1,0 +1,117 @@
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { PUBLIC_URL, testApp } from "../helpers/app";
+import { mcq, responsesFromKey, tf } from "../helpers/fixtures";
+import { ISSUER, makeIssuer } from "../helpers/tokens";
+
+const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+let t: Awaited<ReturnType<typeof testApp>>;
+let auth: Record<string, string>;
+
+beforeEach(async () => {
+  t = await testApp();
+  auth = { authorization: `Bearer ${await t.sign({ sub: "gv-1", email: "gv1@example.test", name: "Cô Lan" })}` };
+});
+afterEach(async () => {
+  await t.app.close();
+});
+
+const matrix = {
+  subject: "Toán",
+  grade: 10,
+  cells: [
+    { topic: "Mệnh đề", level: "NB", type: "mcq", count: 2 },
+    { topic: "Mệnh đề", level: "NB", type: "true_false", count: 1 },
+  ],
+};
+
+async function seedBank() {
+  for (const q of [mcq({ stem: "C1" }), mcq({ stem: "C2" }), tf()]) {
+    const res = await t.app.inject({ method: "POST", url: "/api/questions", headers: auth, payload: q });
+    expect(res.statusCode).toBe(201);
+  }
+}
+
+describe("public", () => {
+  it("GET /health", async () => {
+    const res = await t.app.inject({ method: "GET", url: "/health" });
+    expect(res.json()).toEqual({ ok: true });
+  });
+
+  it("GET /.well-known/oauth-protected-resource", async () => {
+    const res = await t.app.inject({ method: "GET", url: "/.well-known/oauth-protected-resource" });
+    expect(res.json()).toEqual({ resource: `${PUBLIC_URL}/mcp`, authorization_servers: [ISSUER], bearer_methods_supported: ["header"] });
+  });
+});
+
+describe("auth", () => {
+  it("401 + resource_metadata khi thiếu token", async () => {
+    const res = await t.app.inject({ method: "POST", url: "/api/questions", payload: mcq() });
+    expect(res.statusCode).toBe(401);
+    expect(res.headers["www-authenticate"]).toBe(`Bearer resource_metadata="${PUBLIC_URL}/.well-known/oauth-protected-resource"`);
+  });
+
+  it("401 khi token ký bằng khoá lạ", async () => {
+    const evil = await makeIssuer();
+    const res = await t.app.inject({ method: "GET", url: "/api/questions?subject=x&grade=10", headers: { authorization: `Bearer ${await evil.sign({ sub: "x" })}` } });
+    expect(res.statusCode).toBe(401);
+  });
+
+  it("403 khi chọn tổ chức không phải thành viên", async () => {
+    for (const orgId of ["00000000-0000-4000-8000-000000000000", "khong-phai-uuid"]) {
+      const res = await t.app.inject({ method: "GET", url: "/api/questions?subject=x&grade=10", headers: { ...auth, "x-org-id": orgId } });
+      expect(res.statusCode).toBe(403);
+    }
+  });
+});
+
+describe("ngân hàng câu hỏi + đề", () => {
+  it("lần đầu đăng nhập tự có không gian cá nhân; thêm và tìm câu hỏi", async () => {
+    await seedBank();
+    const res = await t.app.inject({ method: "GET", url: `/api/questions?subject=${encodeURIComponent("Toán")}&grade=10`, headers: auth });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toHaveLength(3);
+  });
+
+  it("400 khi câu hỏi sai cấu trúc", async () => {
+    const res = await t.app.inject({ method: "POST", url: "/api/questions", headers: auth, payload: mcq({ options: ["a", "b", "c"] }) });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("ra đề → đáp án → chấm → tải .docx", async () => {
+    await seedBank();
+    const created = await t.app.inject({ method: "POST", url: "/api/exams", headers: auth, payload: { title: "Kiểm tra 15 phút", matrix, variants: 2, seed: 7, durationMinutes: 15 } });
+    expect(created.statusCode).toBe(201);
+    const { examId, codes } = created.json();
+    expect(codes).toEqual(["101", "102"]);
+
+    const keys = (await t.app.inject({ method: "GET", url: `/api/exams/${examId}/key`, headers: auth })).json();
+    expect(keys).toHaveLength(2);
+
+    const graded = await t.app.inject({ method: "POST", url: `/api/exams/${examId}/grade`, headers: auth, payload: { code: "101", responses: responsesFromKey(keys[0].entries) } });
+    expect(graded.json()).toMatchObject({ total: 1.5, autoMax: 1.5 });
+
+    const links = (await t.app.inject({ method: "POST", url: `/api/exams/${examId}/links`, headers: auth })).json();
+    expect(links.exams).toHaveLength(2);
+    expect(links.expiresInMinutes).toBe(15);
+    for (const url of [links.exams[0].url, links.answerKey]) {
+      expect(url.startsWith(`${PUBLIC_URL}/dl/`)).toBe(true);
+      const file = await t.app.inject({ method: "GET", url: new URL(url).pathname });
+      expect(file.statusCode).toBe(200);
+      expect(file.headers["content-type"]).toBe(DOCX);
+      expect(file.rawPayload.subarray(0, 2).toString()).toBe("PK");
+    }
+    expect((await t.app.inject({ method: "GET", url: "/dl/khong-hop-le" })).statusCode).toBe(404);
+  });
+
+  it("422 kèm ô thiếu khi ngân hàng chưa đủ câu", async () => {
+    const res = await t.app.inject({ method: "POST", url: "/api/exams", headers: auth, payload: { title: "KT", matrix } });
+    expect(res.statusCode).toBe(422);
+    expect(res.json().shortages).toHaveLength(2);
+  });
+
+  it("404 với đề không tồn tại", async () => {
+    for (const id of ["00000000-0000-4000-8000-000000000000", "abc"]) {
+      expect((await t.app.inject({ method: "GET", url: `/api/exams/${id}/key`, headers: auth })).statusCode).toBe(404);
+    }
+  });
+});
