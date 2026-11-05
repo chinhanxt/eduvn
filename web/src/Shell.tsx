@@ -18,6 +18,7 @@ const NAV: ({ group: string } | { to: string; label: string; icon: string; soon?
   { group: "Soạn bài" },
   { to: "/giao-an", label: "Giáo án", icon: "pen" },
   { to: "/slide", label: "Slide", icon: "slide" },
+  { to: "/tro-choi", label: "Trò chơi", icon: "spark" },
   { to: "/video", label: "Video bài giảng", icon: "video" },
   { to: "/giao-trinh", label: "Giáo trình", icon: "book" },
   { group: "Lớp học" },

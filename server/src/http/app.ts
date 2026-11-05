@@ -17,6 +17,10 @@ import { rulesForSubject } from "../domain/scoring";
 import { createLessonService } from "../services/lessons";
 import { createVanBanService } from "../services/vanban";
 import { renderVanBanDocx } from "../export/vanban";
+import { renderGameHtml } from "../export/game";
+import { renderSlidesPptx } from "../export/slides";
+import { createGameService } from "../services/games";
+import { createSlideService } from "../services/slides";
 import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
@@ -28,6 +32,7 @@ export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: 
 const GradeBody = z.object({ code: z.string().min(1), responses: z.record(z.string(), ResponseValue) });
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+const PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
 const LINK_TTL_MINUTES = 15;
 
 export function buildApp(deps: AppDeps): FastifyInstance {
@@ -36,6 +41,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const classes = createClassService(deps.db);
   const lessons = createLessonService(deps.db);
   const vanBan = createVanBanService(deps.db);
+  const slides = createSlideService(deps.db);
+  const games = createGameService(deps.db);
   const signer = createDownloadSigner(deps.downloadSecret, `${LINK_TTL_MINUTES}m`);
   const metadataUrl = `${deps.publicUrl}/.well-known/oauth-protected-resource`;
 
@@ -101,6 +108,18 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, vanBanId: id, kind: "van_ban" })}`, expiresInMinutes: LINK_TTL_MINUTES };
   }
 
+  async function makeSlideLink(actor: Actor, slideId: string) {
+    const id = await slides.idFor(actor, slideId);
+    return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, slideId: id, kind: "slide" })}`, expiresInMinutes: LINK_TTL_MINUTES };
+  }
+
+  async function makeGameLink(actor: Actor, gameId: string) {
+    const id = await games.idFor(actor, gameId);
+    return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, gameId: id, kind: "game" })}`, expiresInMinutes: LINK_TTL_MINUTES };
+  }
+
+  const slug = (s: string, fallback: string) => s.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/gi, "d").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase().slice(0, 50) || fallback;
+
   app.get("/health", async () => ({ ok: true }));
 
   app.get("/.well-known/oauth-protected-resource", async () => ({
@@ -164,12 +183,49 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   });
   app.post("/api/van-ban/:id/export", async (req) => makeVanBanLink(await authenticate(req), Cid(req)));
 
-  app.get<{ Params: { token: string } }>("/dl/:token", async (req, reply) => {
+  app.get("/api/slides", async (req) => slides.list(await authenticate(req)));
+  app.get("/api/slides/:id", async (req) => slides.get(await authenticate(req), Cid(req)));
+  app.post("/api/slides", async (req, reply) => {
+    const actor = await authenticate(req);
+    const b = (req.body ?? {}) as { lessonPlanId?: unknown; deck?: unknown };
+    if (typeof b.lessonPlanId === "string") return reply.code(201).send(await slides.fromLesson(actor, b.lessonPlanId));
+    return reply.code(201).send(await slides.save(actor, { deck: b.deck ?? req.body }));
+  });
+  app.put("/api/slides/:id", async (req) => slides.save(await authenticate(req), { id: Cid(req), deck: req.body }));
+  app.delete("/api/slides/:id", async (req, reply) => {
+    await slides.remove(await authenticate(req), Cid(req));
+    return reply.code(204).send();
+  });
+  app.post("/api/slides/:id/export", async (req) => makeSlideLink(await authenticate(req), Cid(req)));
+
+  app.get("/api/games", async (req) => games.list(await authenticate(req)));
+  app.post("/api/games", async (req, reply) => reply.code(201).send(await games.create(await authenticate(req), req.body)));
+  app.delete("/api/games/:id", async (req, reply) => {
+    await games.remove(await authenticate(req), Cid(req));
+    return reply.code(204).send();
+  });
+  app.post("/api/games/:id/export", async (req) => makeGameLink(await authenticate(req), Cid(req)));
+
+  app.get<{ Params: { token: string }; Querystring: { mo?: string } }>("/dl/:token", async (req, reply) => {
     let claims: DownloadClaims;
     try {
       claims = await signer.verify(req.params.token);
     } catch {
       throw new NotFoundError("Link tải đã hết hạn hoặc không hợp lệ");
+    }
+    if (claims.slideId !== undefined) {
+      const d = await slides.loadForExport(claims.orgId, claims.slideId);
+      return reply.header("content-type", PPTX).header("cache-control", "no-store").header("content-disposition", `attachment; filename="slide-${slug(d.title, "bai-giang")}.pptx"`).send(await renderSlidesPptx(d.deck));
+    }
+    if (claims.gameId !== undefined) {
+      const g = await games.loadForExport(claims.orgId, claims.gameId);
+      const disp = req.query.mo === "1" ? "inline" : "attachment";
+      return reply
+        .header("content-type", "text/html; charset=utf-8")
+        .header("cache-control", "no-store")
+        .header("content-security-policy", "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; sandbox allow-scripts")
+        .header("content-disposition", `${disp}; filename="${g.body.kind === "quiz" ? "do-vui" : "the-lat"}-${slug(g.title, "tro-choi")}.html"`)
+        .send(renderGameHtml(g.title, g.body));
     }
     if (claims.vanBanId !== undefined) {
       const d = await vanBan.loadForExport(claims.orgId, claims.vanBanId);
@@ -256,7 +312,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
-    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind) => makeClassLink(actor, ref, kind), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), vanBan, makeVanBanLink: (id) => makeVanBanLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
+    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind) => makeClassLink(actor, ref, kind), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), vanBan, makeVanBanLink: (id) => makeVanBanLink(actor, id), slides, games, makeSlideLink: (id) => makeSlideLink(actor, id), makeGameLink: (id) => makeGameLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     reply.raw.on("close", () => {
       server.close().catch((err) => console.error("mcp close", err));

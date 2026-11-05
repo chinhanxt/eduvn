@@ -115,3 +115,18 @@ export async function exportVanBan(id: string) {
   const link = await api<{ url: string }>(`/api/van-ban/${id}/export`, { method: "POST", body: {} });
   window.location.assign(link.url);
 }
+
+export type DeckSummary = { id: string; title: string; subject: string | null; grade: number | null; slideCount: number; sourceLessonPlanId: string | null; updatedAt: string };
+export type GameSummary = { id: string; title: string; kind: "quiz" | "flashcards"; questionCount: number; timerSeconds: number; source: string; updatedAt: string };
+
+export async function exportSlide(id: string) {
+  const link = await api<{ url: string }>(`/api/slides/${id}/export`, { method: "POST", body: {} });
+  window.location.assign(link.url);
+}
+
+/** open=true mở trò chơi ở tab mới (chơi ngay); ngược lại tải file .html. */
+export async function exportGame(id: string, open = false) {
+  const link = await api<{ url: string }>(`/api/games/${id}/export`, { method: "POST", body: {} });
+  if (open) window.open(`${link.url}?mo=1`, "_blank", "noopener");
+  else window.location.assign(link.url);
+}

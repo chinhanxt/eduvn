@@ -4,6 +4,8 @@ import type { Scale } from "../domain/comments";
 import type { GradeColumn } from "../domain/gradebook";
 import type { LessonPlan } from "../domain/lesson";
 import type { VanBan } from "../domain/vanban";
+import type { GameBody } from "../domain/games";
+import type { SlideDeck } from "../domain/slides";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionInput } from "../domain/question";
 import type { Variant } from "../domain/variants";
@@ -186,4 +188,42 @@ export const vanBan = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("van_ban_org_idx").on(t.orgId)],
+);
+
+export const decks = pgTable(
+  "decks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    title: text("title").notNull(),
+    sourceLessonPlanId: uuid("source_lesson_plan_id").references(() => lessonPlans.id, { onDelete: "set null" }),
+    body: jsonb("body").$type<SlideDeck>().notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("decks_org_idx").on(t.orgId)],
+);
+
+export const games = pgTable(
+  "games",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    title: text("title").notNull(),
+    kind: text("kind").notNull(),
+    body: jsonb("body").$type<GameBody>().notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("games_org_idx").on(t.orgId)],
 );

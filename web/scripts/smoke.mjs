@@ -149,6 +149,51 @@ try {
   await dlv.saveAs("/tmp/eduvn-van-ban.docx");
   assert((await readFile("/tmp/eduvn-van-ban.docx")).subarray(0, 2).toString() === "PK", `tải văn bản ${dlv.suggestedFilename()}`);
 
+  // Slide (F7): từ giáo án → tải .pptx
+  await page.goto(`${BASE}/slide`);
+  await page.waitForSelector("h1");
+  await page.getByTestId("slide-from-lesson").click();
+  await page.waitForSelector("[data-testid=slide-lesson]");
+  await page.getByTestId("slide-lesson").selectOption({ label: `${lessonTitle} · Toán 10` });
+  await page.getByTestId("slide-create").click();
+  await page.waitForSelector("[data-testid=slide-row]");
+  await shot("slide");
+  const [dls] = await Promise.all([page.waitForEvent("download"), page.locator("[data-testid=slide-row]").first().getByTestId("slide-download").click()]);
+  await dls.saveAs("/tmp/eduvn-slide.pptx");
+  assert((await readFile("/tmp/eduvn-slide.pptx")).subarray(0, 2).toString() === "PK" && dls.suggestedFilename().endsWith(".pptx"), `tải slide ${dls.suggestedFilename()}`);
+
+  // Trò chơi (F8): < 4 câu bị từ chối, thêm câu → tạo, mở chơi, tải .html
+  const gTopic = `Game ${Date.now() % 100000}`;
+  const api = (path, body) => page.evaluate(async ([path, body]) => {
+    const k = Object.keys(localStorage).find((x) => x.startsWith("oidc.user:"));
+    const token = JSON.parse(localStorage.getItem(k)).access_token;
+    const r = await fetch(path, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) });
+    return r.status;
+  }, [path, body]);
+  await page.goto(`${BASE}/tro-choi`);
+  await page.waitForSelector("h1");
+  await page.getByTestId("new-game").click();
+  await page.getByTestId("g-title").fill("Ôn smoke");
+  await page.getByTestId("g-subject").fill("Toán");
+  await page.getByTestId("g-topic").fill(gTopic);
+  await page.getByTestId("g-create").click();
+  await page.waitForSelector("[data-testid=game-error]");
+  assert(/Cần ít nhất 4 câu/.test(await page.getByTestId("game-error").innerText()), "trò chơi < 4 câu bị từ chối");
+  for (let i = 0; i < 4; i++) await api("/api/questions", { subject: "Toán", grade: 10, topic: gTopic, level: "NB", type: "mcq", stem: `Câu ${i + 1}: 1 + ${i} = ?`, options: ["1", "2", "3", "4"], answer: i % 4, explanation: "Cộng đơn giản." });
+  await page.getByTestId("g-create").click();
+  await page.waitForSelector("[data-testid=game-row]");
+  await shot("tro-choi");
+  const [popup] = await Promise.all([ctx.waitForEvent("page"), page.getByTestId("game-open").first().click()]);
+  await popup.waitForSelector(".opt");
+  await popup.locator(".opt").first().click();
+  await popup.waitForSelector(".fb");
+  assert(true, "mở trò chơi và trả lời một câu");
+  await popup.screenshot({ path: SHOT("tro-choi-choi") });
+  await popup.close();
+  const [dlg] = await Promise.all([page.waitForEvent("download"), page.getByTestId("game-download").first().click()]);
+  await dlg.saveAs("/tmp/eduvn-tro-choi.html");
+  assert((await readFile("/tmp/eduvn-tro-choi.html", "utf8")).startsWith("<!doctype html>") && dlg.suggestedFilename().endsWith(".html"), `tải trò chơi ${dlg.suggestedFilename()}`);
+
   // Chấm bài
   await page.goto(`${BASE}/cham-bai`);
   await page.waitForSelector("[data-testid=g-row]");

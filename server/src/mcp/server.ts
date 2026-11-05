@@ -10,12 +10,20 @@ import { registerClassTools } from "./classes";
 import { registerLessonTools } from "./lessons";
 import type { VanBanService } from "../services/vanban";
 import { registerVanBanTools } from "./vanban";
+import type { GameService } from "../services/games";
+import type { SlideService } from "../services/slides";
+import { registerGameTools } from "./games";
+import { registerSlideTools } from "./slides";
 
 export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks>;
   classes: ClassService;
   makeClassLink: (classRef: string, kind: "class_list" | "gradebook") => Promise<{ url: string; expiresInMinutes: number }>;
   lessons: LessonService;
   vanBan: VanBanService;
+  slides: SlideService;
+  games: GameService;
+  makeSlideLink: (id: string) => Promise<{ url: string; expiresInMinutes: number }>;
+  makeGameLink: (id: string) => Promise<{ url: string; expiresInMinutes: number }>;
   makeVanBanLink: (id: string) => Promise<{ url: string; expiresInMinutes: number }>;
   makeLessonLink: (id: string) => Promise<{ url: string; expiresInMinutes: number }>;
   makeMatrixLink: (examId: string) => Promise<Record<string, unknown>>;
@@ -29,7 +37,7 @@ function fail(message: string) {
   return { content: [{ type: "text" as const, text: message }], isError: true };
 }
 
-export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink, lessons, makeLessonLink, vanBan, makeVanBanLink, makeMatrixLink }: McpDeps): McpServer {
+export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink, lessons, makeLessonLink, vanBan, makeVanBanLink, slides, games, makeSlideLink, makeGameLink, makeMatrixLink }: McpDeps): McpServer {
   const server = new McpServer({ name: "eduvn", version: "0.1.0" });
 
   server.registerTool(
@@ -119,6 +127,8 @@ export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLi
 
   registerLessonTools(server, { lessons, actor, makeLessonLink });
   registerVanBanTools(server, { vanBan, actor, makeVanBanLink });
+  registerSlideTools(server, { slides, actor, makeSlideLink });
+  registerGameTools(server, { games, actor, makeGameLink });
   registerClassTools(server, { classes, actor, makeClassLink });
 
   return server;

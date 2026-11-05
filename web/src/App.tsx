@@ -10,6 +10,8 @@ import { Classes, ClassDetailPage } from "./pages/Classes";
 import { Gradebook } from "./pages/Gradebook";
 import { LessonDetailPage, Lessons } from "./pages/Lessons";
 import { VanBan } from "./pages/VanBan";
+import { Slides } from "./pages/Slides";
+import { Games } from "./pages/Games";
 import { Connect } from "./pages/Connect";
 import { Placeholder } from "./pages/Placeholder";
 import { TOOLS } from "./tools";
@@ -34,6 +36,8 @@ export function App() {
           <Route path="so-diem" element={<Gradebook />} />
           <Route path="giao-an" element={<Lessons />} />
           <Route path="giao-an/:id" element={<LessonDetailPage />} />
+          <Route path="slide" element={<Slides />} />
+          <Route path="tro-choi" element={<Games />} />
           <Route path="van-ban" element={<VanBan />} />
           <Route path="ket-noi" element={<Connect />} />
           {TOOLS.filter((t) => t.pill).map((t) => (
