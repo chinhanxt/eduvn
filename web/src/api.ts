@@ -108,3 +108,10 @@ export async function exportLesson(id: string) {
   const link = await api<{ url: string }>(`/api/lessons/${id}/export`, { method: "POST", body: {} });
   window.location.assign(link.url);
 }
+
+export type VanBanSummary = { id: string; loai: string; trichYeu: string; soKyHieu: string; ngay: string; updatedAt: string };
+
+export async function exportVanBan(id: string) {
+  const link = await api<{ url: string }>(`/api/van-ban/${id}/export`, { method: "POST", body: {} });
+  window.location.assign(link.url);
+}

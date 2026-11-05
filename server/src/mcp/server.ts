@@ -8,11 +8,15 @@ import type { ClassService } from "../services/classes";
 import type { LessonService } from "../services/lessons";
 import { registerClassTools } from "./classes";
 import { registerLessonTools } from "./lessons";
+import type { VanBanService } from "../services/vanban";
+import { registerVanBanTools } from "./vanban";
 
 export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks>;
   classes: ClassService;
   makeClassLink: (classRef: string, kind: "class_list" | "gradebook") => Promise<{ url: string; expiresInMinutes: number }>;
   lessons: LessonService;
+  vanBan: VanBanService;
+  makeVanBanLink: (id: string) => Promise<{ url: string; expiresInMinutes: number }>;
   makeLessonLink: (id: string) => Promise<{ url: string; expiresInMinutes: number }>;
   makeMatrixLink: (examId: string) => Promise<Record<string, unknown>>;
 };
@@ -25,7 +29,7 @@ function fail(message: string) {
   return { content: [{ type: "text" as const, text: message }], isError: true };
 }
 
-export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink, lessons, makeLessonLink, makeMatrixLink }: McpDeps): McpServer {
+export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink, lessons, makeLessonLink, vanBan, makeVanBanLink, makeMatrixLink }: McpDeps): McpServer {
   const server = new McpServer({ name: "eduvn", version: "0.1.0" });
 
   server.registerTool(
@@ -114,6 +118,7 @@ export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLi
   );
 
   registerLessonTools(server, { lessons, actor, makeLessonLink });
+  registerVanBanTools(server, { vanBan, actor, makeVanBanLink });
   registerClassTools(server, { classes, actor, makeClassLink });
 
   return server;

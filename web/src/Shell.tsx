@@ -24,6 +24,8 @@ const NAV: ({ group: string } | { to: string; label: string; icon: string; soon?
   { to: "/lop-hoc", label: "Lớp & học viên", icon: "users" },
   { to: "/so-diem", label: "Sổ điểm", icon: "clip" },
   { to: "/gia-su", label: "Gia sư AI", icon: "cap" },
+  { group: "Văn bản" },
+  { to: "/van-ban", label: "Văn bản hành chính", icon: "exam" },
   { group: "Hệ thống" },
   { to: "/ket-noi", label: "Kết nối", icon: "plug" },
   { to: "/to-chuc", label: "Tổ chức", icon: "org", soon: true },

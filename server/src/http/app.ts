@@ -15,6 +15,8 @@ import { renderMatrixDocx } from "../export/matrix";
 import { buildMatrixReport } from "../domain/matrixReport";
 import { rulesForSubject } from "../domain/scoring";
 import { createLessonService } from "../services/lessons";
+import { createVanBanService } from "../services/vanban";
+import { renderVanBanDocx } from "../export/vanban";
 import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
@@ -33,6 +35,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const service = createService(deps.db);
   const classes = createClassService(deps.db);
   const lessons = createLessonService(deps.db);
+  const vanBan = createVanBanService(deps.db);
   const signer = createDownloadSigner(deps.downloadSecret, `${LINK_TTL_MINUTES}m`);
   const metadataUrl = `${deps.publicUrl}/.well-known/oauth-protected-resource`;
 
@@ -93,6 +96,11 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, lessonId: id, kind: "lesson" })}`, expiresInMinutes: LINK_TTL_MINUTES };
   }
 
+  async function makeVanBanLink(actor: Actor, vanBanId: string) {
+    const id = await vanBan.idFor(actor, vanBanId);
+    return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, vanBanId: id, kind: "van_ban" })}`, expiresInMinutes: LINK_TTL_MINUTES };
+  }
+
   app.get("/health", async () => ({ ok: true }));
 
   app.get("/.well-known/oauth-protected-resource", async () => ({
@@ -143,12 +151,31 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   });
   app.post("/api/lessons/:id/export", async (req) => makeLessonLink(await authenticate(req), Cid(req)));
 
+  app.get("/api/van-ban", async (req) => vanBan.list(await authenticate(req)));
+  app.get("/api/van-ban/:id", async (req) => vanBan.get(await authenticate(req), Cid(req)));
+  app.post("/api/van-ban", async (req, reply) => {
+    const r = await vanBan.save(await authenticate(req), { vanBan: req.body });
+    return reply.code(201).send(r);
+  });
+  app.put("/api/van-ban/:id", async (req) => vanBan.save(await authenticate(req), { id: Cid(req), vanBan: req.body }));
+  app.delete("/api/van-ban/:id", async (req, reply) => {
+    await vanBan.remove(await authenticate(req), Cid(req));
+    return reply.code(204).send();
+  });
+  app.post("/api/van-ban/:id/export", async (req) => makeVanBanLink(await authenticate(req), Cid(req)));
+
   app.get<{ Params: { token: string } }>("/dl/:token", async (req, reply) => {
     let claims: DownloadClaims;
     try {
       claims = await signer.verify(req.params.token);
     } catch {
       throw new NotFoundError("Link tải đã hết hạn hoặc không hợp lệ");
+    }
+    if (claims.vanBanId !== undefined) {
+      const d = await vanBan.loadForExport(claims.orgId, claims.vanBanId);
+      const slug = d.trichYeu.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/gi, "d").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase().slice(0, 40) || "van-ban";
+      const file = `${d.loai.replace(/_/g, "-")}-${slug}.docx`;
+      return reply.header("content-type", DOCX).header("cache-control", "no-store").header("content-disposition", `attachment; filename="${file}"`).send(await renderVanBanDocx(d.doc));
     }
     if (claims.lessonId !== undefined) {
       const l = await lessons.loadForExport(claims.orgId, claims.lessonId);
@@ -229,7 +256,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
-    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind) => makeClassLink(actor, ref, kind), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
+    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind) => makeClassLink(actor, ref, kind), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), vanBan, makeVanBanLink: (id) => makeVanBanLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     reply.raw.on("close", () => {
       server.close().catch((err) => console.error("mcp close", err));

@@ -3,6 +3,7 @@ import { ROLES } from "../domain/authz";
 import type { Scale } from "../domain/comments";
 import type { GradeColumn } from "../domain/gradebook";
 import type { LessonPlan } from "../domain/lesson";
+import type { VanBan } from "../domain/vanban";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionInput } from "../domain/question";
 import type { Variant } from "../domain/variants";
@@ -166,4 +167,23 @@ export const lessonPlans = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("lesson_plans_org_idx").on(t.orgId)],
+);
+
+export const vanBan = pgTable(
+  "van_ban",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    loai: text("loai").notNull(),
+    trichYeu: text("trich_yeu").notNull(),
+    body: jsonb("body").$type<VanBan>().notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("van_ban_org_idx").on(t.orgId)],
 );

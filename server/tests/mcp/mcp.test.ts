@@ -38,7 +38,7 @@ describe("MCP /mcp", () => {
   it("liệt kê đủ tool", async () => {
     const client = await connect();
     const { tools } = await client.listTools();
-    expect(tools.map((x) => x.name).sort()).toEqual(["cham_bai", "danh_sach_giao_an", "danh_sach_lop", "diem_danh", "lay_dap_an", "luu_giao_an", "luu_nhan_xet", "nhap_diem", "tao_de", "tao_lop", "them_cau_hoi", "them_hoc_vien", "tim_cau_hoi", "xem_ho_so_hs", "xuat_giao_an", "xuat_ma_tran", "xuat_so_diem", "xuat_word"]);
+    expect(tools.map((x) => x.name).sort()).toEqual(["cham_bai", "danh_sach_giao_an", "danh_sach_lop", "danh_sach_van_ban", "diem_danh", "lay_dap_an", "luu_giao_an", "luu_nhan_xet", "nhap_diem", "tao_de", "tao_lop", "tao_van_ban", "them_cau_hoi", "them_hoc_vien", "tim_cau_hoi", "xem_ho_so_hs", "xuat_giao_an", "xuat_ma_tran", "xuat_so_diem", "xuat_word"]);
     await client.close();
   });
 

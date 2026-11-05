@@ -125,6 +125,30 @@ try {
   await dll.saveAs("/tmp/eduvn-giao-an.docx");
   assert((await readFile("/tmp/eduvn-giao-an.docx")).subarray(0, 2).toString() === "PK", `tải giáo án ${dll.suggestedFilename()}`);
 
+  // Văn bản hành chính (F6)
+  const vb = {
+    loai: "ke_hoach", co_quan_chu_quan: "SỞ GD&ĐT TP. HỒ CHÍ MINH", co_quan_ban_hanh: "TRƯỜNG THPT NGUYỄN DU", ky_hieu_co_quan: "THPTND", so: 45, dia_danh: "TP. Hồ Chí Minh", ngay: "2026-11-05",
+    trich_yeu: `Tổ chức Hội thi Olympic Toán học ${Date.now() % 1000}`,
+    can_cu: ["Căn cứ Kế hoạch giáo dục nhà trường năm học 2026–2027"],
+    noi_dung: ["Trường THPT Nguyễn Du xây dựng kế hoạch như sau:", { cap: 1, tieu_de: "Mục đích, yêu cầu" }, { danh_sach: ["Tổ chức nghiêm túc", "An toàn, tiết kiệm"] }],
+    noi_nhan: ["Sở GD&ĐT (để báo cáo)", "Các tổ chuyên môn"], chuc_vu_ky: "HIỆU TRƯỞNG", nguoi_ky: "Nguyễn Văn An",
+  };
+  const postVb = (body) => page.evaluate(async (body) => {
+    const k = Object.keys(localStorage).find((x) => x.startsWith("oidc.user:"));
+    const token = JSON.parse(localStorage.getItem(k)).access_token;
+    const r = await fetch("/api/van-ban", { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) });
+    return { status: r.status, body: await r.json() };
+  }, body);
+  const badVb = await postVb({ ...vb, noi_nhan: [] });
+  assert(badVb.status === 400 && badVb.body.issues.some((i) => i.includes("nơi nhận")), "văn bản thiếu nơi nhận bị từ chối");
+  assert((await postVb(vb)).status === 201, "lưu văn bản");
+  await page.goto(`${BASE}/van-ban`);
+  await page.waitForSelector("[data-testid=vb-row]");
+  await shot("van-ban");
+  const [dlv] = await Promise.all([page.waitForEvent("download"), page.locator("[data-testid=vb-row]", { hasText: vb.trich_yeu }).getByTestId("vb-download").click()]);
+  await dlv.saveAs("/tmp/eduvn-van-ban.docx");
+  assert((await readFile("/tmp/eduvn-van-ban.docx")).subarray(0, 2).toString() === "PK", `tải văn bản ${dlv.suggestedFilename()}`);
+
   // Chấm bài
   await page.goto(`${BASE}/cham-bai`);
   await page.waitForSelector("[data-testid=g-row]");
