@@ -4,6 +4,8 @@ import { ApiError, api, getOrgId, setOrgId, type Me } from "./api";
 import { useAuth } from "./auth";
 import { Icon } from "./Icon";
 
+const ROLE_VI: Record<string, string> = { owner: "Chủ sở hữu", admin: "Quản trị", teacher: "Giáo viên", assistant: "Trợ giảng", student: "Học viên" };
+
 const MeCtx = createContext<Me | null>(null);
 export const useMe = () => useContext(MeCtx);
 
@@ -68,7 +70,7 @@ export function Shell() {
           <div className="avatar">{initial}</div>
           <div>
             {me.user.name ?? me.user.email}
-            <small>{me.role}</small>
+            <small>{ROLE_VI[me.role] ?? me.role}</small>
           </div>
           <button className="out" onClick={logout} aria-label="Đăng xuất"><Icon name="logout" size={18} /></button>
         </div>

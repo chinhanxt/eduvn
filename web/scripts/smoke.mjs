@@ -108,7 +108,7 @@ try {
   await page.getByTestId("g-submit").click();
   await page.waitForSelector("[data-testid=g-total]");
   const total = await page.getByTestId("g-total").innerText();
-  const [t, max] = total.split("/").map((x) => parseFloat(x.replace(",", ".")));
+  const [t, max] = total.split("/").map((x) => parseFloat(x.trim().replace(",", ".")));
   assert(t > 0 && t === max, `chấm đúng hết: ${total.replace(/\s+/g, " ")}`);
   await shot("cham-bai");
 

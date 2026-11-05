@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { api, type ExamSummary, type KeyEntry } from "../api";
 import { Icon } from "../Icon";
 
+const num = (n: number) => new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 }).format(n);
+
 type Resp = number | boolean[] | string;
 type Result = { total: number; autoMax: number; pendingEssay: number[] };
 
@@ -69,7 +71,7 @@ export function Grade() {
               <button className="btn" onClick={() => void submit()} data-testid="g-submit"><Icon name="grade" size={18} />Chấm</button>
               {result && (
                 <span className="score" data-testid="g-total">
-                  {result.total}<small style={{ fontSize: 16, color: "var(--muted)" }}> / {result.autoMax}</small>
+                  {num(result.total)}<small style={{ fontSize: 16, color: "var(--muted)" }}> / {num(result.autoMax)}</small>
                 </span>
               )}
             </div>

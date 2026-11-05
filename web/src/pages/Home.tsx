@@ -6,7 +6,7 @@ import { useMe } from "../Shell";
 import { TOOLS } from "../tools";
 
 const CHANNELS = [
-  { icon: "spark", name: "Claude", on: true },
+  { icon: "spark", name: "Claude", on: false },
   { icon: "chat", name: "ChatGPT", on: false },
   { icon: "bot", name: "Zalo", on: false },
 ];

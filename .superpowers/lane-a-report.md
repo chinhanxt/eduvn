@@ -24,3 +24,7 @@ web/{package.json,tsconfig.json,vite.config.ts,index.html,scripts/smoke.mjs}, we
 - Chấm bài bỏ qua tự luận; nút tải ở "Gần đây" tải mã đề đầu tiên.
 - Font Be Vietnam Pro tải từ Google Fonts (offline dùng font hệ thống).
 - Dữ liệu smoke còn trong Postgres dev. Web chưa có unit test ngoài smoke.
+
+## Polish (coordinator review)
+- Vai trò tiếng Việt ở thẻ người dùng (Chủ sở hữu/Quản trị/Giáo viên/Trợ giảng/Học viên); Kênh: cả 3 kênh xám; điểm dùng Intl vi-VN ("0,5 / 0,5").
+- pnpm -C web build sạch; smoke PASS lại; ảnh home và cham-bai đã làm mới.
