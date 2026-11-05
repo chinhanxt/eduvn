@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Db } from "../db/client";
-import { createOrg, ensureUser, getRole, membershipsOf } from "../db/repo";
+import { ensurePersonalOrg, ensureUser, getRole, membershipsOf } from "../db/repo";
 import { ForbiddenError } from "../domain/authz";
 import type { Actor } from "../service";
 import type { Identity } from "./verify";
@@ -17,6 +17,6 @@ export async function resolveActor(db: Db, identity: Identity, orgId?: string): 
   }
   const [first] = await membershipsOf(db, user.id);
   if (first) return { userId: user.id, orgId: first.orgId, role: first.role };
-  const org = await createOrg(db, `Không gian của ${identity.name ?? identity.email ?? "tôi"}`, user.id);
-  return { userId: user.id, orgId: org.id, role: "owner" };
+  const m = await ensurePersonalOrg(db, user.id, `Không gian của ${identity.name ?? identity.email ?? "tôi"}`);
+  return { userId: user.id, ...m };
 }

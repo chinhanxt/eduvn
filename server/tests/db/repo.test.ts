@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "../../src/db/client";
-import { addMember, createOrg, ensureUser, findExam, getRole, insertExam, insertQuestion, listQuestions, membershipsOf } from "../../src/db/repo";
+import { addMember, createOrg, ensurePersonalOrg, ensureUser, findExam, getRole, insertExam, insertQuestion, listQuestions, membershipsOf } from "../../src/db/repo";
 import { testDb } from "../helpers/db";
 import { mcq, tf } from "../helpers/fixtures";
 
@@ -16,6 +16,20 @@ describe("users & orgs", () => {
     expect(b.id).toBe(a.id);
     expect(b.email).toBe("b@x.test");
     expect(b.name).toBe("B");
+  });
+
+  it("ensureUser không ghi đè email/tên bằng null", async () => {
+    await ensureUser(db, { sub: "s1", email: "a@x.test", name: "A" });
+    const b = await ensureUser(db, { sub: "s1" });
+    expect(b.email).toBe("a@x.test");
+    expect(b.name).toBe("A");
+  });
+
+  it("ensurePersonalOrg đồng thời chỉ tạo một tổ chức", async () => {
+    const u = await ensureUser(db, { sub: "s1" });
+    const [a, b] = await Promise.all([ensurePersonalOrg(db, u.id, "A"), ensurePersonalOrg(db, u.id, "B")]);
+    expect(a).toEqual(b);
+    expect(await membershipsOf(db, u.id)).toHaveLength(1);
   });
 
   it("createOrg gán owner; người ngoài không có vai trò", async () => {

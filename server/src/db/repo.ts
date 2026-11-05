@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import type { Role } from "../domain/authz";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionFilter, QuestionInput, StoredQuestion } from "../domain/question";
@@ -8,23 +8,40 @@ import { exams, memberships, organizations, questions, users } from "./schema";
 
 export type UserRow = typeof users.$inferSelect;
 export type ExamRow = typeof exams.$inferSelect;
+type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
+type DbOrTx = Db | Tx;
 
 export async function ensureUser(db: Db, p: { sub: string; email?: string; name?: string }): Promise<UserRow> {
   const values = { sub: p.sub, email: p.email ?? null, name: p.name ?? null };
   const [row] = await db
     .insert(users)
     .values(values)
-    .onConflictDoUpdate({ target: users.sub, set: { email: values.email, name: values.name } })
+    .onConflictDoUpdate({ target: users.sub, set: { email: sql`coalesce(excluded.email, ${users.email})`, name: sql`coalesce(excluded.name, ${users.name})` } })
     .returning();
   if (!row) throw new Error("ensureUser: no row returned");
   return row;
 }
 
 export async function createOrg(db: Db, name: string, ownerId: string): Promise<{ id: string; name: string }> {
+  return db.transaction((tx) => createOrgIn(tx, name, ownerId));
+}
+
+async function createOrgIn(db: DbOrTx, name: string, ownerId: string): Promise<{ id: string; name: string }> {
   const [org] = await db.insert(organizations).values({ name }).returning({ id: organizations.id, name: organizations.name });
   if (!org) throw new Error("createOrg: no row returned");
   await db.insert(memberships).values({ orgId: org.id, userId: ownerId, role: "owner" });
   return org;
+}
+
+/** Idempotent, an toàn khi đồng thời: khoá hàng user rồi mới kiểm tra/tạo. */
+export async function ensurePersonalOrg(db: Db, userId: string, name: string): Promise<{ orgId: string; role: Role }> {
+  return db.transaction(async (tx) => {
+    await tx.select({ id: users.id }).from(users).where(eq(users.id, userId)).for("update");
+    const [first] = await membershipsOf(tx, userId);
+    if (first) return first;
+    const org = await createOrgIn(tx, name, userId);
+    return { orgId: org.id, role: "owner" as const };
+  });
 }
 
 export async function addMember(db: Db, orgId: string, userId: string, role: Role): Promise<void> {
@@ -39,7 +56,7 @@ export async function getRole(db: Db, orgId: string, userId: string): Promise<Ro
   return m?.role ?? null;
 }
 
-export async function membershipsOf(db: Db, userId: string): Promise<{ orgId: string; role: Role }[]> {
+export async function membershipsOf(db: DbOrTx, userId: string): Promise<{ orgId: string; role: Role }[]> {
   return db
     .select({ orgId: memberships.orgId, role: memberships.role })
     .from(memberships)
