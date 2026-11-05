@@ -1,0 +1,36 @@
+{
+  "realm": "eduvn",
+  "enabled": true,
+  "displayName": "EDUVN",
+  "clients": [
+    {
+      "clientId": "eduvn-dev",
+      "name": "EDUVN dev client",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:*", "http://127.0.0.1:*"],
+      "webOrigins": ["+"],
+      "attributes": { "pkce.code.challenge.method": "S256" },
+      "protocolMappers": [
+        {
+          "name": "audience-eduvn-api",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": { "included.custom.audience": "eduvn-api", "access.token.claim": "true", "id.token.claim": "false" }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "gv1",
+      "enabled": true,
+      "email": "gv1@example.test",
+      "emailVerified": true,
+      "firstName": "Lan",
+      "lastName": "Nguyễn",
+      "credentials": [{ "type": "password", "value": "gv1-dev-pass", "temporary": false }]
+    }
+  ]
+}
