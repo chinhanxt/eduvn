@@ -60,3 +60,10 @@ describe("helpers", () => {
     expect(rulesForSubject("Ngữ văn")).toBe(DEFAULT_RULES);
   });
 });
+
+describe("normalizeShort unicode", () => {
+  it("NFC và NFD của cùng chuỗi được chấm đúng", () => {
+    const q = short({ answer: "Hà Nội".normalize("NFC") });
+    expect(scoreItem(q, "Hà Nội".normalize("NFD"))).toBe(DEFAULT_RULES.shortAnswer);
+  });
+});

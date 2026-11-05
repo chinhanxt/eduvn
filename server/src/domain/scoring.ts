@@ -24,7 +24,7 @@ export function rulesForSubject(subject: string): PointRules {
 }
 
 export function normalizeShort(s: string): string {
-  return s.trim().toLowerCase().replace(/\s+/g, "").replace(/,/g, ".");
+  return s.normalize("NFC").trim().toLowerCase().replace(/\s+/g, "").replace(/,/g, ".");
 }
 
 export function round2(n: number): number {

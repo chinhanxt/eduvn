@@ -9,10 +9,10 @@ export const QuestionType = z.enum(QUESTION_TYPES);
 export type QuestionType = z.infer<typeof QuestionType>;
 
 const base = {
-  subject: z.string().trim().min(1),
+  subject: z.string().trim().normalize("NFC").min(1),
   /** 1–12: lớp phổ thông; 13–16: năm 1–4 đại học. */
   grade: z.number().int().min(1).max(16),
-  topic: z.string().trim().min(1),
+  topic: z.string().trim().normalize("NFC").min(1),
   level: Level,
   stem: z.string().trim().min(1),
   explanation: z.string().optional(),
@@ -56,9 +56,9 @@ export function parseQuestion(input: unknown): QuestionInput {
 }
 
 export const QuestionFilter = z.object({
-  subject: z.string().trim().min(1),
+  subject: z.string().trim().normalize("NFC").min(1),
   grade: z.coerce.number().int().min(1).max(16),
-  topic: z.string().trim().min(1).optional(),
+  topic: z.string().trim().normalize("NFC").min(1).optional(),
   level: Level.optional(),
   type: QuestionType.optional(),
   limit: z.coerce.number().int().min(1).max(10000).optional(),

@@ -3,7 +3,7 @@ import { Level, QuestionType, type StoredQuestion } from "./question";
 import { type Rng, shuffle } from "./rng";
 
 export const MatrixCell = z.object({
-  topic: z.string().trim().min(1),
+  topic: z.string().trim().normalize("NFC").min(1),
   level: Level,
   type: QuestionType,
   count: z.number().int().positive(),
@@ -11,7 +11,7 @@ export const MatrixCell = z.object({
 export type MatrixCell = z.infer<typeof MatrixCell>;
 
 export const ExamMatrix = z.object({
-  subject: z.string().trim().min(1),
+  subject: z.string().trim().normalize("NFC").min(1),
   grade: z.number().int().min(1).max(16),
   cells: z.array(MatrixCell).min(1),
 });

@@ -93,3 +93,12 @@ describe("service", () => {
     await expect(svc.grade(teacher, res.examId, "999", {})).rejects.toBeInstanceOf(NotFoundError);
   });
 });
+
+describe("unicode chủ đề", () => {
+  it("chủ đề lưu dạng NFD vẫn tìm được bằng NFC", async () => {
+    const svc = createService(db);
+    await svc.addQuestion(teacher, mcq({ topic: "Mệnh đề".normalize("NFD") }));
+    const found = await svc.searchQuestions(teacher, { subject: "Toán", grade: 10, topic: "Mệnh đề".normalize("NFC") });
+    expect(found).toHaveLength(1);
+  });
+});
