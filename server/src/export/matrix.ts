@@ -1,4 +1,4 @@
-import { AlignmentType, Document, Packer, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType } from "docx";
+import { AlignmentType, Document, TableLayoutType, Packer, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType } from "docx";
 import { LEVEL_ORDER, LEVEL_VI, type MatrixReport, TYPE_ORDER, TYPE_VI } from "../domain/matrixReport";
 
 const FONT = "Times New Roman";
@@ -56,14 +56,14 @@ export async function renderMatrixDocx(title: string, r: MatrixReport): Promise<
           new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "MA TRẬN ĐỀ KIỂM TRA", bold: true })] }),
           new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun(`${title} – Môn: ${r.subject} – ${gradeLabel}`)] }),
           new Paragraph({ spacing: { before: 160 }, children: [] }),
-          new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: matrixRows }),
+          new Table({ width: { size: 15138, type: WidthType.DXA }, layout: TableLayoutType.FIXED, columnWidths: [3000, ...Array<number>(12).fill(700), 1246, 1246, 1246], rows: matrixRows }),
           para(`Tỉ lệ mức độ: ${ratio}`, false, 160),
           para(`Tổng: ${r.totalCount} câu, ${vn(r.totalPoints)} điểm.`),
           ...r.warnings.map((w) => para(`Lưu ý: ${w}`, true)),
           new Paragraph({ pageBreakBefore: true, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "BẢN ĐẶC TẢ ĐỀ KIỂM TRA", bold: true })] }),
           new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun(`${title} – Môn: ${r.subject} – ${gradeLabel}`)] }),
           new Paragraph({ spacing: { before: 160 }, children: [] }),
-          new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: specRows }),
+          new Table({ width: { size: 15138, type: WidthType.DXA }, layout: TableLayoutType.FIXED, columnWidths: [2400, 1100, 5038, 1650, 1650, 1650, 1650], rows: specRows }),
         ],
       },
     ],

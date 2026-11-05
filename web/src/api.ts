@@ -41,7 +41,7 @@ export type Me = {
   orgs: { id: string; name: string; role: string }[];
 };
 export type ExamSummary = { id: string; title: string; subject: string; grade: number; codes: string[]; createdAt: string };
-export type Links = { exams: { code: string; url: string }[]; answerKey: string; expiresInMinutes: number };
+export type Links = { exams: { code: string; url: string }[]; answerKey: string; matrix: string; expiresInMinutes: number };
 export type Question = {
   id: string;
   subject: string;
@@ -88,5 +88,23 @@ export const dobVi = (iso: string | null): string => (iso ? iso.split("-").rever
 
 export async function exportClass(id: string, kind: "class_list" | "gradebook") {
   const link = await api<{ url: string }>(`/api/classes/${id}/export`, { method: "POST", body: { kind } });
+  window.location.assign(link.url);
+}
+
+export type LessonSummary = { id: string; title: string; subject: string; grade: number; periods: number; updatedAt: string };
+export type LessonBody = {
+  name: string; goal: string; content: string; product: string;
+  steps: { assign: string; perform: string; report: string; conclude: string };
+};
+export type LessonPlan = {
+  header: { school: string; department: string; teacher: string; subject: string; grade?: number; title: string; periods?: number; date: string };
+  objectives: { knowledge: string[]; competencies: { general: string[]; specific: string[] }; qualities: string[] };
+  materials: string[];
+  activities: (LessonBody & { subs: LessonBody[] })[];
+};
+export type LessonDetail = LessonSummary & { plan: LessonPlan };
+
+export async function exportLesson(id: string) {
+  const link = await api<{ url: string }>(`/api/lessons/${id}/export`, { method: "POST", body: {} });
   window.location.assign(link.url);
 }

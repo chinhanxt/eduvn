@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ApiError, api, getLinks, type ExamSummary, type Links } from "../api";
 import { Icon } from "../Icon";
 
-type Cell = { topic: string; level: string; type: string; count: number };
+type Cell = { topic: string; level: string; type: string; count: number; yccd?: string };
 type Shortage = { cell: Cell; need: number; have: number };
 type Created = { ok: true; examId: string; codes: string[]; questionCount: number } | { ok: false; shortages: Shortage[] };
 
@@ -55,6 +55,7 @@ function LinkList({ links }: { links: Links }) {
     <div className="chips" style={{ marginTop: 8 }}>
       {links.exams.map((l) => <a key={l.code} className="tag" href={l.url} data-testid="dl-exam">{l.code}</a>)}
       <a className="tag green" href={links.answerKey} data-testid="dl-key">Đáp án</a>
+      <a className="tag violet" href={links.matrix} data-testid="dl-matrix">Ma trận</a>
     </div>
   );
 }
@@ -116,6 +117,7 @@ function Create({ onCreated }: { onCreated: () => void }) {
             </select>
           </label>
           <label className="lbl">Số câu<input className="inp w-s" type="number" min={1} value={c.count} onChange={(e) => setCell(i, { count: Number(e.target.value) })} /></label>
+          <label className="lbl">Yêu cầu cần đạt<input className="inp" style={{ width: 240 }} placeholder="tuỳ chọn" value={c.yccd ?? ""} onChange={(e) => setCell(i, { yccd: e.target.value })} data-testid="cell-yccd" /></label>
           <button className="btn ghost sm" disabled={cells.length === 1} onClick={() => setCells(cells.filter((_, j) => j !== i))} aria-label="Xoá dòng"><Icon name="trash" size={16} /></button>
         </div>
       ))}
@@ -137,6 +139,7 @@ function Create({ onCreated }: { onCreated: () => void }) {
           <div className="chips" style={{ marginTop: 8 }}>
             {links.exams.map((l) => <a key={l.code} className="tag" href={l.url} data-testid="dl-exam">{l.code}</a>)}
             <a className="tag green" href={links.answerKey} data-testid="dl-key">Đáp án</a>
+            <a className="tag violet" href={links.matrix} data-testid="dl-matrix">Ma trận</a>
           </div>
         </div>
       )}

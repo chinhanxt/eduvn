@@ -76,6 +76,7 @@ try {
   await shot("de-thi-thieu");
 
   await cell.locator("input[type=number]").fill("2");
+  await cell.getByTestId("cell-yccd").fill("Nhận biết được mệnh đề và mệnh đề phủ định");
   await page.getByTestId("e-create").click();
   await page.waitForSelector("[data-testid=created]");
   await page.waitForLoadState("networkidle");
@@ -88,6 +89,41 @@ try {
   const file = await dl.path();
   const head = (await readFile(file)).subarray(0, 2).toString();
   assert(head === "PK" && dl.suggestedFilename().endsWith(".docx"), `tải Word ${dl.suggestedFilename()}`);
+
+  // Ma trận + đặc tả (F5)
+  const [dlm] = await Promise.all([page.waitForEvent("download"), page.getByTestId("dl-matrix").first().click()]);
+  await dlm.saveAs("/tmp/eduvn-ma-tran.docx");
+  assert((await readFile("/tmp/eduvn-ma-tran.docx")).subarray(0, 2).toString() === "PK" && dlm.suggestedFilename().startsWith("ma-tran-"), `tải ma trận ${dlm.suggestedFilename()}`);
+
+  // Giáo án (F4): AI gửi qua API, GV xem và tải trên web
+  const step = { assign: "GV chiếu tình huống và giao nhiệm vụ.", perform: "HS làm việc theo cặp.", report: "Đại diện cặp trình bày.", conclude: "GV nhận xét và chốt kiến thức." };
+  const act = (name) => ({ name, goal: "HS nêu được khái niệm mệnh đề.", content: "Thảo luận cặp đôi với phiếu học tập.", product: "Phiếu học tập hoàn chỉnh.", steps: step });
+  const lessonTitle = `Mệnh đề ${Date.now() % 1000}`;
+  const plan = {
+    header: { school: "THPT Nguyễn Huệ", teacher: "Cô Lan", subject: "Toán", grade: 10, title: lessonTitle, periods: 2 },
+    objectives: { knowledge: ["Nêu được khái niệm mệnh đề, mệnh đề phủ định."], competencies: { general: ["Tự chủ và tự học"], specific: ["Tư duy và lập luận toán học"] }, qualities: ["Chăm chỉ, trung thực"] },
+    materials: ["Máy chiếu", "Phiếu học tập"],
+    activities: [act("Khởi động"), { subs: [act("Khái niệm"), act("Ví dụ")] }, act("Luyện tập"), act("Vận dụng")],
+  };
+  const post = (body) => page.evaluate(async (body) => {
+    const k = Object.keys(localStorage).find((x) => x.startsWith("oidc.user:"));
+    const token = JSON.parse(localStorage.getItem(k)).access_token;
+    const r = await fetch("/api/lessons", { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) });
+    return { status: r.status, body: await r.json() };
+  }, body);
+  const bad = await post({ ...plan, objectives: { ...plan.objectives, qualities: [] } });
+  assert(bad.status === 400 && bad.body.issues.some((i) => i.includes("Phẩm chất")), "giáo án thiếu phẩm chất bị từ chối");
+  assert((await post(plan)).status === 201, "lưu giáo án");
+  await page.goto(`${BASE}/giao-an`);
+  await page.waitForSelector("[data-testid=lesson-card]");
+  await shot("giao-an");
+  await page.locator("[data-testid=lesson-card]", { hasText: lessonTitle }).click();
+  await page.waitForSelector("[data-testid=lesson-view]");
+  assert((await page.getByTestId("lesson-activity").count()) === 4, "giáo án hiển thị đủ 4 hoạt động");
+  await shot("giao-an-chi-tiet");
+  const [dll] = await Promise.all([page.waitForEvent("download"), page.getByTestId("export-lesson").click()]);
+  await dll.saveAs("/tmp/eduvn-giao-an.docx");
+  assert((await readFile("/tmp/eduvn-giao-an.docx")).subarray(0, 2).toString() === "PK", `tải giáo án ${dll.suggestedFilename()}`);
 
   // Chấm bài
   await page.goto(`${BASE}/cham-bai`);
