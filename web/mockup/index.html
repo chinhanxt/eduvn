@@ -3,129 +3,183 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EDUVN — Mockup khung hệ thống</title>
+<title>EDUVN — Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f6f7f9; --panel: #fff; --ink: #1d2433; --muted: #6b7385; --line: #e4e7ec;
-    --brand: #1f6feb; --brand-ink: #fff; --soft: #eef4ff; --ok: #1a7f37; --warn: #9a6700;
+    --side: #1e2340; --side-ink: #c9cee6; --side-active: #2f3663; --side-hi: #ffffff;
+    --bg: #f4f6fb; --card: #ffffff; --ink: #1b2033; --muted: #7a8199; --line: #eceef4;
+    --brand: #4f6bed;
+    --shadow: 0 1px 2px rgba(20, 28, 60, .06), 0 6px 18px rgba(20, 28, 60, .07);
+    --shadow-hi: 0 2px 4px rgba(20, 28, 60, .08), 0 12px 28px rgba(20, 28, 60, .12);
+    --blue: #4f6bed; --blue-bg: #eaeefe; --violet: #8b5cf6; --violet-bg: #f1ebfe;
+    --amber: #e08a00; --amber-bg: #fff4e0; --green: #16a34a; --green-bg: #e6f6ec;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
-  .switch { position: fixed; right: 12px; bottom: 12px; display: flex; gap: 6px; z-index: 9; }
-  .switch button { border: 1px solid var(--line); background: var(--panel); padding: 6px 10px; border-radius: 8px; cursor: pointer; }
-  .switch button.on { background: var(--ink); color: #fff; }
+  body { margin: 0; font: 14px/1.5 "Be Vietnam Pro", system-ui, sans-serif; color: var(--ink); background: var(--bg); }
+  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
   .view { display: none; } .view.on { display: block; }
+  .switch { position: fixed; right: 14px; bottom: 14px; display: flex; gap: 6px; z-index: 9; }
+  .switch button { font: inherit; font-size: 12px; border: 0; background: var(--card); box-shadow: var(--shadow); padding: 6px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+  .switch button.on { background: var(--side); color: #fff; }
 
-  /* Login */
-  .login { min-height: 100vh; display: grid; place-items: center; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
-  .login .card { width: 380px; text-align: center; }
-  .logo { font-weight: 800; font-size: 22px; letter-spacing: .5px; }
-  .logo span { color: var(--brand); }
-  .btn { display: block; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); margin-top: 10px; cursor: pointer; font-size: 14px; }
-  .btn.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
-  .muted { color: var(--muted); }
+  /* Đăng nhập */
+  .login { min-height: 100vh; display: grid; place-items: center; background: linear-gradient(160deg, #1e2340 0%, #2c3470 55%, #4f6bed 100%); }
+  .login .box { width: 360px; background: var(--card); border-radius: 18px; padding: 32px 28px; box-shadow: var(--shadow-hi); text-align: center; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; }
+  .mark { width: 34px; height: 34px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; }
+  .mark svg.i { width: 20px; height: 20px; }
+  .sso { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 10px; padding: 11px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); font: inherit; cursor: pointer; }
+  .sso.main { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .login .sub { color: var(--muted); margin: 6px 0 22px; }
 
-  /* App shell */
-  .app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-  aside { background: var(--panel); border-right: 1px solid var(--line); padding: 16px 12px; }
-  aside .logo { padding: 4px 10px 16px; }
-  nav a { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 8px; color: var(--ink); text-decoration: none; margin-bottom: 2px; }
-  nav a.on { background: var(--soft); color: var(--brand); font-weight: 600; }
-  nav .group { font-size: 11px; text-transform: uppercase; color: var(--muted); margin: 14px 10px 6px; letter-spacing: .6px; }
-  .tag { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: #f1f2f4; color: var(--muted); }
-  .tag.ok { background: #dafbe1; color: var(--ok); } .tag.warn { background: #fff8c5; color: var(--warn); }
-  header { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: var(--panel); border-bottom: 1px solid var(--line); }
-  .org { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--panel); }
-  main { padding: 24px; }
-  h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 0 0 12px; }
-  .grid { display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); margin-top: 18px; }
-  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-  .tile .t { font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-  .tile p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
-  .row { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-top: 14px; }
-  table { width: 100%; border-collapse: collapse; } td, th { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); font-size: 13px; }
-  th { color: var(--muted); font-weight: 500; }
-  code { background: #f1f2f4; padding: 2px 6px; border-radius: 6px; font-size: 12px; }
-  .chan { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
-  .chan:last-child { border-bottom: 0; }
+  /* Khung app */
+  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+  aside { background: var(--side); color: var(--side-ink); padding: 18px 12px; display: flex; flex-direction: column; }
+  aside .brand { color: #fff; font-size: 18px; padding: 2px 8px 18px; }
+  .grp { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #7c84ab; margin: 16px 10px 6px; }
+  nav a { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 10px; color: var(--side-ink); text-decoration: none; }
+  nav a:hover { background: rgba(255,255,255,.05); }
+  nav a.on { background: var(--side-active); color: var(--side-hi); }
+  nav a .soon { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: #5b6290; }
+  .me { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,.05); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #f4b740; color: #1e2340; display: grid; place-items: center; font-weight: 700; }
+  .me small { display: block; color: #8b92b8; }
+
+  .top { display: flex; align-items: center; gap: 12px; padding: 16px 28px; }
+  .search { flex: 1; max-width: 460px; display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow); color: var(--muted); }
+  .iconbtn { width: 40px; height: 40px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); display: grid; place-items: center; color: var(--muted); margin-left: auto; }
+  .org { display: flex; align-items: center; gap: 8px; background: var(--card); box-shadow: var(--shadow); padding: 9px 14px; border-radius: 12px; font-weight: 500; }
+  main { padding: 6px 28px 28px; }
+  h1 { font-size: 22px; font-weight: 700; margin: 6px 0 18px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 0 0 14px; }
+
+  .tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .tool { background: var(--card); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); transition: box-shadow .15s, transform .15s; cursor: pointer; position: relative; }
+  .tool:hover { box-shadow: var(--shadow-hi); transform: translateY(-2px); }
+  .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 14px; }
+  .ic svg.i { width: 22px; height: 22px; }
+  .blue { background: var(--blue-bg); color: var(--blue); } .violet { background: var(--violet-bg); color: var(--violet); }
+  .amber { background: var(--amber-bg); color: var(--amber); } .green { background: var(--green-bg); color: var(--green); }
+  .tool .name { font-weight: 600; }
+  .tool .pill { position: absolute; top: 16px; right: 16px; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #f2f3f7; color: var(--muted); }
+
+  .row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-top: 22px; }
+  .card { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
+  .item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); }
+  .item:first-of-type { border-top: 0; }
+  .item .grow { flex: 1; } .item small { color: var(--muted); display: block; }
+  .dl { color: var(--brand); display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--blue-bg); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #cfd3e0; } .dot.ok { background: var(--green); }
+
+  .connect { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: flex; align-items: center; gap: 10px; background: var(--bg); border-radius: 12px; padding: 12px 14px; margin-top: 14px; font-family: ui-monospace, monospace; font-size: 13px; }
+  .field .copy { margin-left: auto; color: var(--brand); cursor: pointer; }
+  .code { font-size: 30px; font-weight: 700; letter-spacing: .25em; text-align: center; margin: 18px 0 6px; color: var(--ink); }
+  .hint { color: var(--muted); text-align: center; font-size: 13px; }
 </style>
 </head>
 <body>
 
+<!-- Icon sprite (Lucide, ISC license) -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="bank" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="exam" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="grade" viewBox="0 0 24 24"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="slide" viewBox="0 0 24 24"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></symbol>
+  <symbol id="video" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+  <symbol id="book" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
+  <symbol id="users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="cap" viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/><path d="M22 10v6"/></symbol>
+  <symbol id="plug" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></symbol>
+  <symbol id="org" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/></symbol>
+  <symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="spark" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="bot" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 16h.01M16 16h.01"/></symbol>
+  <symbol id="copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></symbol>
+  <symbol id="key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></symbol>
+</svg>
+
 <div class="switch">
-  <button data-v="login">1 · Đăng nhập</button>
-  <button data-v="home" class="on">2 · Trang chủ</button>
-  <button data-v="connect">3 · Kết nối</button>
+  <button data-v="login">Đăng nhập</button>
+  <button data-v="home" class="on">Trang chủ</button>
+  <button data-v="connect">Kết nối</button>
 </div>
 
-<!-- 1. Đăng nhập -->
+<!-- Đăng nhập -->
 <section class="view" id="login">
   <div class="login">
-    <div class="card">
-      <div class="logo">EDU<span>VN</span></div>
-      <p class="muted">Trợ lý cho giáo viên &amp; sinh viên</p>
-      <button class="btn primary">Đăng nhập bằng Google</button>
-      <button class="btn">Đăng nhập bằng Microsoft</button>
-      <button class="btn">Email &amp; mật khẩu</button>
-      <p class="muted" style="font-size:12px;margin-top:16px">Lần đầu đăng nhập sẽ tự có "Không gian cá nhân".<br>Trường/trung tâm mời bạn vào tổ chức sau.</p>
+    <div class="box">
+      <div class="brand"><span class="mark"><svg class="i"><use href="#cap"/></svg></span>EDUVN</div>
+      <div class="sub">Trợ lý cho giáo viên</div>
+      <button class="sso main"><svg class="i"><use href="#key"/></svg>Đăng nhập với Google</button>
+      <button class="sso"><svg class="i"><use href="#org"/></svg>Microsoft / tài khoản trường</button>
+      <button class="sso"><svg class="i"><use href="#mail"/></svg>Email</button>
     </div>
   </div>
 </section>
 
-<!-- 2. Trang chủ -->
+<!-- Trang chủ -->
 <section class="view on" id="home">
   <div class="app">
     <aside>
-      <div class="logo">EDU<span>VN</span></div>
+      <div class="brand"><span class="mark"><svg class="i"><use href="#cap"/></svg></span>EDUVN</div>
       <nav>
-        <a class="on" href="#">Trang chủ</a>
-        <div class="group">Ra đề &amp; chấm</div>
-        <a href="#">Ngân hàng câu hỏi <span class="tag ok">Có</span></a>
-        <a href="#">Đề thi &amp; đáp án <span class="tag ok">Có</span></a>
-        <a href="#">Chấm bài <span class="tag ok">Có</span></a>
-        <div class="group">Bài giảng</div>
-        <a href="#">Slide bài giảng <span class="tag warn">Thử</span></a>
-        <a href="#">Video bài giảng <span class="tag warn">Thử</span></a>
-        <a href="#">Giáo trình <span class="tag warn">Thử</span></a>
-        <div class="group">Lớp học</div>
-        <a href="#">Học viên &amp; lớp <span class="tag">Sắp có</span></a>
-        <a href="#">Gia sư sinh viên <span class="tag warn">Thử</span></a>
-        <div class="group">Hệ thống</div>
-        <a href="#">Kết nối AI &amp; Zalo</a>
-        <a href="#">Tổ chức &amp; thành viên <span class="tag">Sắp có</span></a>
+        <a class="on" href="#"><svg class="i"><use href="#home"/></svg>Trang chủ</a>
+        <div class="grp">Đánh giá</div>
+        <a href="#"><svg class="i"><use href="#bank"/></svg>Ngân hàng câu hỏi</a>
+        <a href="#"><svg class="i"><use href="#exam"/></svg>Đề thi</a>
+        <a href="#"><svg class="i"><use href="#grade"/></svg>Chấm bài</a>
+        <div class="grp">Soạn bài</div>
+        <a href="#"><svg class="i"><use href="#slide"/></svg>Slide</a>
+        <a href="#"><svg class="i"><use href="#video"/></svg>Video bài giảng</a>
+        <a href="#"><svg class="i"><use href="#book"/></svg>Giáo trình</a>
+        <div class="grp">Lớp học</div>
+        <a href="#"><svg class="i"><use href="#users"/></svg>Học viên<span class="soon"></span></a>
+        <a href="#"><svg class="i"><use href="#cap"/></svg>Gia sư AI</a>
+        <div class="grp">Hệ thống</div>
+        <a href="#"><svg class="i"><use href="#plug"/></svg>Kết nối</a>
+        <a href="#"><svg class="i"><use href="#org"/></svg>Tổ chức<span class="soon"></span></a>
       </nav>
+      <div class="me"><div class="avatar">L</div><div>Cô Lan<small>Giáo viên</small></div></div>
     </aside>
     <div>
-      <header>
-        <select class="org"><option>Không gian của Cô Lan</option><option>THPT Nguyễn Du</option></select>
-        <div class="muted">Cô Lan · Giáo viên ▾</div>
-      </header>
+      <div class="top">
+        <div class="search"><svg class="i"><use href="#search"/></svg>Tìm đề, câu hỏi, lớp…</div>
+        <div class="iconbtn"><svg class="i"><use href="#bell"/></svg></div>
+        <div class="org">THPT Nguyễn Du<svg class="i" style="width:16px;height:16px"><use href="#chev"/></svg></div>
+      </div>
       <main>
-        <h1>Chào Cô Lan 👋</h1>
-        <div class="muted">Bạn muốn làm gì hôm nay? Có thể làm ở đây, hoặc nhắn trong Claude/ChatGPT/Zalo.</div>
-        <div class="grid">
-          <div class="tile"><div class="t">Tạo đề từ ma trận <span class="tag ok">Có</span></div><p>Chọn môn, lớp, ma trận CV 7991 → nhiều mã đề + đáp án Word.</p></div>
-          <div class="tile"><div class="t">Thêm câu hỏi <span class="tag ok">Có</span></div><p>Nhập tay hoặc để AI soạn: 4 dạng câu, mức NB/TH/VD.</p></div>
-          <div class="tile"><div class="t">Chấm trắc nghiệm <span class="tag ok">Có</span></div><p>Nhập bài làm theo mã đề → điểm từng câu.</p></div>
-          <div class="tile"><div class="t">Làm slide bài giảng <span class="tag warn">Thử</span></div><p>Chủ đề/giáo án → slide PPTX (qua OpenMAIC).</p></div>
-          <div class="tile"><div class="t">Video bài giảng <span class="tag warn">Thử</span></div><p>Slide → video MP4 có giọng đọc tiếng Việt.</p></div>
-          <div class="tile"><div class="t">Viết giáo trình <span class="tag warn">Thử</span></div><p>Tài liệu môn học → giáo trình nhiều chương (qua DeepTutor).</p></div>
+        <h1>Chào Cô Lan</h1>
+        <div class="tools">
+          <div class="tool"><div class="ic blue"><svg class="i"><use href="#exam"/></svg></div><div class="name">Tạo đề</div></div>
+          <div class="tool"><div class="ic blue"><svg class="i"><use href="#bank"/></svg></div><div class="name">Thêm câu hỏi</div></div>
+          <div class="tool"><div class="ic green"><svg class="i"><use href="#grade"/></svg></div><div class="name">Chấm bài</div></div>
+          <div class="tool"><div class="ic violet"><svg class="i"><use href="#slide"/></svg></div><div class="name">Làm slide</div><span class="pill">Thử</span></div>
+          <div class="tool"><div class="ic violet"><svg class="i"><use href="#video"/></svg></div><div class="name">Video bài giảng</div><span class="pill">Thử</span></div>
+          <div class="tool"><div class="ic violet"><svg class="i"><use href="#book"/></svg></div><div class="name">Giáo trình</div><span class="pill">Thử</span></div>
+          <div class="tool"><div class="ic amber"><svg class="i"><use href="#cap"/></svg></div><div class="name">Gia sư AI</div><span class="pill">Thử</span></div>
+          <div class="tool"><div class="ic amber"><svg class="i"><use href="#users"/></svg></div><div class="name">Học viên</div><span class="pill">Sắp có</span></div>
         </div>
         <div class="row">
-          <div class="tile">
-            <h2>Đề gần đây</h2>
-            <table>
-              <tr><th>Tên đề</th><th>Môn · Lớp</th><th>Mã đề</th><th></th></tr>
-              <tr><td>Kiểm tra 15 phút</td><td>Toán · 10</td><td>101–104</td><td><a href="#">Tải Word</a></td></tr>
-              <tr><td>Giữa kì I</td><td>Toán · 10</td><td>101–108</td><td><a href="#">Tải Word</a></td></tr>
-            </table>
+          <div class="card">
+            <h2>Gần đây</h2>
+            <div class="item"><div class="ic blue" style="margin:0;width:38px;height:38px"><svg class="i"><use href="#exam"/></svg></div><div class="grow">Kiểm tra 15 phút<small>Toán 10 · 4 mã đề</small></div><a class="dl" href="#"><svg class="i"><use href="#down"/></svg></a></div>
+            <div class="item"><div class="ic blue" style="margin:0;width:38px;height:38px"><svg class="i"><use href="#exam"/></svg></div><div class="grow">Giữa kì I<small>Toán 10 · 8 mã đề</small></div><a class="dl" href="#"><svg class="i"><use href="#down"/></svg></a></div>
+            <div class="item"><div class="ic violet" style="margin:0;width:38px;height:38px"><svg class="i"><use href="#slide"/></svg></div><div class="grow">Mệnh đề — bài 1<small>Slide · 12 trang</small></div><a class="dl" href="#"><svg class="i"><use href="#down"/></svg></a></div>
           </div>
-          <div class="tile">
-            <h2>Kênh đang dùng</h2>
-            <div class="chan"><span>Claude.ai</span><span class="tag ok">Đã kết nối</span></div>
-            <div class="chan"><span>ChatGPT</span><span class="tag">Chưa</span></div>
-            <div class="chan"><span>Zalo (bot)</span><span class="tag ok">Đang chạy</span></div>
+          <div class="card">
+            <h2>Kênh</h2>
+            <div class="item"><svg class="i"><use href="#spark"/></svg><div class="grow">Claude</div><span class="dot ok"></span></div>
+            <div class="item"><svg class="i"><use href="#chat"/></svg><div class="grow">ChatGPT</div><span class="dot"></span></div>
+            <div class="item"><svg class="i"><use href="#bot"/></svg><div class="grow">Zalo</div><span class="dot ok"></span></div>
           </div>
         </div>
       </main>
@@ -133,39 +187,31 @@
   </div>
 </section>
 
-<!-- 3. Kết nối -->
+<!-- Kết nối -->
 <section class="view" id="connect">
   <div class="app">
     <aside>
-      <div class="logo">EDU<span>VN</span></div>
+      <div class="brand"><span class="mark"><svg class="i"><use href="#cap"/></svg></span>EDUVN</div>
       <nav>
-        <a href="#">Trang chủ</a>
-        <div class="group">Hệ thống</div>
-        <a class="on" href="#">Kết nối AI &amp; Zalo</a>
+        <a href="#"><svg class="i"><use href="#home"/></svg>Trang chủ</a>
+        <div class="grp">Hệ thống</div>
+        <a class="on" href="#"><svg class="i"><use href="#plug"/></svg>Kết nối</a>
       </nav>
+      <div class="me"><div class="avatar">L</div><div>Cô Lan<small>Giáo viên</small></div></div>
     </aside>
     <div>
-      <header>
-        <select class="org"><option>Không gian của Cô Lan</option></select>
-        <div class="muted">Cô Lan · Giáo viên ▾</div>
-      </header>
+      <div class="top"><div class="org" style="margin-left:auto">THPT Nguyễn Du<svg class="i" style="width:16px;height:16px"><use href="#chev"/></svg></div></div>
       <main>
-        <h1>Kết nối AI &amp; Zalo</h1>
-        <div class="muted">Ra lệnh bằng lời ở nơi bạn quen dùng — hệ thống làm phần còn lại.</div>
-        <div class="grid" style="grid-template-columns:1fr 1fr">
-          <div class="tile">
-            <div class="t">Claude.ai / ChatGPT (MCP)</div>
-            <p>Thêm connector với địa chỉ:</p>
-            <p><code>https://eduvn.example.vn/mcp</code> <a href="#">Sao chép</a></p>
-            <p>Khi thêm, bạn đăng nhập bằng tài khoản EDUVN — AI chỉ thấy dữ liệu tổ chức của bạn.</p>
-            <p>Thử nói: <i>"Tạo đề 15 phút Toán 10 chương Mệnh đề, 4 mã, xuất Word"</i></p>
+        <h1>Kết nối</h1>
+        <div class="connect">
+          <div class="card">
+            <h2 style="display:flex;gap:10px;align-items:center"><span class="ic violet" style="margin:0;width:38px;height:38px"><svg class="i"><use href="#spark"/></svg></span>Claude · ChatGPT</h2>
+            <div class="field">https://eduvn.vn/mcp<span class="copy"><svg class="i"><use href="#copy"/></svg></span></div>
           </div>
-          <div class="tile">
-            <div class="t">Zalo</div>
-            <p>1. Kết bạn Zalo với bot <b>EDUVN Trợ lý</b> hoặc thêm bot vào nhóm lớp.</p>
-            <p>2. Nhắn cho bot mã liên kết: <code>/lienket 482913</code> (hết hạn sau 10 phút)</p>
-            <p>3. Trong nhóm, @EDUVN Trợ lý kèm yêu cầu.</p>
-            <p><span class="tag ok">Đã liên kết: Zalo của Cô Lan</span></p>
+          <div class="card">
+            <h2 style="display:flex;gap:10px;align-items:center"><span class="ic green" style="margin:0;width:38px;height:38px"><svg class="i"><use href="#bot"/></svg></span>Zalo</h2>
+            <div class="code">482 913</div>
+            <div class="hint">Nhắn <b>/lienket 482913</b> cho bot</div>
           </div>
         </div>
       </main>
