@@ -5,11 +5,16 @@ import { QuestionFilter, QuestionInput } from "../domain/question";
 import { ResponseValue } from "../domain/scoring";
 import type { Actor, ExamLinks, Service } from "../service";
 import type { ClassService } from "../services/classes";
+import type { LessonService } from "../services/lessons";
 import { registerClassTools } from "./classes";
+import { registerLessonTools } from "./lessons";
 
 export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks>;
   classes: ClassService;
   makeClassLink: (classRef: string, kind: "class_list" | "gradebook") => Promise<{ url: string; expiresInMinutes: number }>;
+  lessons: LessonService;
+  makeLessonLink: (id: string) => Promise<{ url: string; expiresInMinutes: number }>;
+  makeMatrixLink: (examId: string) => Promise<Record<string, unknown>>;
 };
 
 function json(data: unknown) {
@@ -20,7 +25,7 @@ function fail(message: string) {
   return { content: [{ type: "text" as const, text: message }], isError: true };
 }
 
-export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink }: McpDeps): McpServer {
+export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink, lessons, makeLessonLink, makeMatrixLink }: McpDeps): McpServer {
   const server = new McpServer({ name: "eduvn", version: "0.1.0" });
 
   server.registerTool(
@@ -53,7 +58,7 @@ export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLi
     {
       title: "Tạo đề theo ma trận",
       description:
-        "Tạo đề kiểm tra theo ma trận (CV 7991): mỗi ô = chủ đề × mức độ × dạng câu × số câu. Tạo nhiều mã đề (101, 102…), trộn câu và phương án. Thiếu câu thì báo ô thiếu.",
+        "Tạo đề kiểm tra theo ma trận (CV 7991): mỗi ô = chủ đề × mức độ × dạng câu × số câu (+ yccd tuỳ chọn: yêu cầu cần đạt, dùng cho bản đặc tả khi xuat_ma_tran). Tạo nhiều mã đề (101, 102…), trộn câu và phương án. Thiếu câu thì báo ô thiếu.",
       inputSchema: {
         title: z.string().min(1),
         subject: z.string().min(1),
@@ -97,6 +102,18 @@ export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLi
     async ({ examId }) => json(await makeLinks(examId)),
   );
 
+  server.registerTool(
+    "xuat_ma_tran",
+    {
+      title: "Xuất ma trận + bản đặc tả",
+      description:
+        "Link tải .docx gồm Ma trận (chủ đề × dạng câu × mức độ NB/TH/VD, số câu, số điểm, tỉ lệ %) và Bản đặc tả (chủ đề × mức độ, yêu cầu cần đạt, số câu từng dạng) của một đề, theo CV 7991. Trả kèm cảnh báo (vd tổng điểm ≠ 10) và tỉ lệ NB/TH/VD. Yêu cầu cần đạt lấy từ trường yccd ở từng ô của tao_de.",
+      inputSchema: { examId: z.string() },
+    },
+    async ({ examId }) => json(await makeMatrixLink(examId)),
+  );
+
+  registerLessonTools(server, { lessons, actor, makeLessonLink });
   registerClassTools(server, { classes, actor, makeClassLink });
 
   return server;

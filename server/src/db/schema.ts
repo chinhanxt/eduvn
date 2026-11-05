@@ -2,6 +2,7 @@ import { index, integer, jsonb, pgTable, primaryKey, real, text, timestamp, uuid
 import { ROLES } from "../domain/authz";
 import type { Scale } from "../domain/comments";
 import type { GradeColumn } from "../domain/gradebook";
+import type { LessonPlan } from "../domain/lesson";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionInput } from "../domain/question";
 import type { Variant } from "../domain/variants";
@@ -145,4 +146,24 @@ export const comments = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.studentId, t.term] })],
+);
+
+export const lessonPlans = pgTable(
+  "lesson_plans",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    subject: text("subject").notNull(),
+    grade: integer("grade").notNull(),
+    title: text("title").notNull(),
+    body: jsonb("body").$type<LessonPlan>().notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("lesson_plans_org_idx").on(t.orgId)],
 );

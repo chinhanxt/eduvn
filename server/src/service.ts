@@ -10,7 +10,7 @@ import { type GradeResult, type KeyEntry, type Variant, answerKey, gradeVariant,
 import { NotFoundError } from "./errors";
 
 export type Actor = { userId: string; orgId: string; role: Role };
-export type ExamLinks = { exams: { code: string; url: string }[]; answerKey: string; expiresInMinutes: number };
+export type ExamLinks = { exams: { code: string; url: string }[]; answerKey: string; matrix: string; expiresInMinutes: number };
 
 export const GenerateExamInput = z.object({
   title: z.string().trim().min(1),

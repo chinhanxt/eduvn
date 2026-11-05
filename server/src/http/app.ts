@@ -10,6 +10,11 @@ import { ResponseValue } from "../domain/scoring";
 import { answerKey } from "../domain/variants";
 import { NotFoundError, UnauthorizedError, ValidationError } from "../errors";
 import { renderAnswerKeyDocx, renderExamDocx } from "../export/docx";
+import { renderLessonDocx } from "../export/lesson";
+import { renderMatrixDocx } from "../export/matrix";
+import { buildMatrixReport } from "../domain/matrixReport";
+import { rulesForSubject } from "../domain/scoring";
+import { createLessonService } from "../services/lessons";
 import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
@@ -27,6 +32,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const app = Fastify({ logger: false, bodyLimit: 8 * 1024 * 1024, routerOptions: { maxParamLength: 2048 } });
   const service = createService(deps.db);
   const classes = createClassService(deps.db);
+  const lessons = createLessonService(deps.db);
   const signer = createDownloadSigner(deps.downloadSecret, `${LINK_TTL_MINUTES}m`);
   const metadataUrl = `${deps.publicUrl}/.well-known/oauth-protected-resource`;
 
@@ -60,11 +66,12 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   async function makeLinks(actor: Actor, examId: string): Promise<ExamLinks> {
     const exam = await service.getExam(actor, examId);
-    const url = async (kind: "exam" | "key", code?: string) =>
+    const url = async (kind: "exam" | "key" | "matrix", code?: string) =>
       `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, examId: exam.id, kind, code })}`;
     return {
       exams: await Promise.all(exam.variants.map(async (v) => ({ code: v.code, url: await url("exam", v.code) }))),
       answerKey: await url("key"),
+      matrix: await url("matrix"),
       expiresInMinutes: LINK_TTL_MINUTES,
     };
   }
@@ -72,6 +79,18 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   async function makeClassLink(actor: Actor, classRef: string, kind: "class_list" | "gradebook") {
     const classId = await classes.classIdFor(actor, classRef, "class:read");
     return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, classId, kind })}`, expiresInMinutes: LINK_TTL_MINUTES };
+  }
+
+  async function makeMatrixLink(actor: Actor, examId: string) {
+    const exam = await service.getExam(actor, examId);
+    const report = buildMatrixReport(exam.matrix, rulesForSubject(exam.matrix.subject), exam.variants[0]);
+    const url = `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, examId: exam.id, kind: "matrix" })}`;
+    return { url, expiresInMinutes: LINK_TTL_MINUTES, totalCount: report.totalCount, totalPoints: report.totalPoints, levelRatio: report.levelRatio, warnings: report.warnings };
+  }
+
+  async function makeLessonLink(actor: Actor, lessonId: string) {
+    const id = await lessons.idFor(actor, lessonId);
+    return { url: `${deps.publicUrl}/dl/${await signer.sign({ orgId: actor.orgId, lessonId: id, kind: "lesson" })}`, expiresInMinutes: LINK_TTL_MINUTES };
   }
 
   app.get("/health", async () => ({ ok: true }));
@@ -109,12 +128,32 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   app.post<{ Params: { id: string } }>("/api/exams/:id/links", async (req) => makeLinks(await authenticate(req), req.params.id));
 
+  app.post<{ Params: { id: string } }>("/api/exams/:id/matrix", async (req) => makeMatrixLink(await authenticate(req), req.params.id));
+
+  app.get("/api/lessons", async (req) => lessons.list(await authenticate(req)));
+  app.get("/api/lessons/:id", async (req) => lessons.get(await authenticate(req), Cid(req)));
+  app.post("/api/lessons", async (req, reply) => {
+    const r = await lessons.save(await authenticate(req), { plan: req.body });
+    return reply.code(201).send(r);
+  });
+  app.put("/api/lessons/:id", async (req) => lessons.save(await authenticate(req), { id: Cid(req), plan: req.body }));
+  app.delete("/api/lessons/:id", async (req, reply) => {
+    await lessons.remove(await authenticate(req), Cid(req));
+    return reply.code(204).send();
+  });
+  app.post("/api/lessons/:id/export", async (req) => makeLessonLink(await authenticate(req), Cid(req)));
+
   app.get<{ Params: { token: string } }>("/dl/:token", async (req, reply) => {
     let claims: DownloadClaims;
     try {
       claims = await signer.verify(req.params.token);
     } catch {
       throw new NotFoundError("Link tải đã hết hạn hoặc không hợp lệ");
+    }
+    if (claims.lessonId !== undefined) {
+      const l = await lessons.loadForExport(claims.orgId, claims.lessonId);
+      const file = `giao-an-${l.title.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/gi, "d").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase().slice(0, 50) || "bai"}.docx`;
+      return reply.header("content-type", DOCX).header("cache-control", "no-store").header("content-disposition", `attachment; filename="${file}"`).send(await renderLessonDocx(l.plan));
     }
     if (claims.classId !== undefined) {
       const gb = await classes.loadForExport(claims.orgId, claims.classId);
@@ -127,7 +166,11 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     const shortId = exam.id.slice(0, 8);
     let buffer: Buffer;
     let filename: string;
-    if (claims.kind === "key") {
+    if (claims.kind === "matrix") {
+      const report = buildMatrixReport(exam.matrix, rulesForSubject(exam.matrix.subject), exam.variants[0]);
+      buffer = await renderMatrixDocx(`${exam.title}`, report);
+      filename = `ma-tran-${shortId}.docx`;
+    } else if (claims.kind === "key") {
       buffer = await renderAnswerKeyDocx(meta, exam.variants.map((v) => ({ code: v.code, entries: answerKey(v) })));
       filename = `dap-an-${shortId}.docx`;
     } else {
@@ -186,7 +229,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
-    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind) => makeClassLink(actor, ref, kind) });
+    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind) => makeClassLink(actor, ref, kind), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     reply.raw.on("close", () => {
       server.close().catch((err) => console.error("mcp close", err));

@@ -7,6 +7,8 @@ export const MatrixCell = z.object({
   level: Level,
   type: QuestionType,
   count: z.number().int().positive(),
+  /** Yêu cầu cần đạt (CV 7991), dùng cho bản đặc tả. */
+  yccd: z.string().trim().normalize("NFC").optional(),
 });
 export type MatrixCell = z.infer<typeof MatrixCell>;
 
