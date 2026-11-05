@@ -71,6 +71,10 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     bearer_methods_supported: ["header"],
   }));
 
+  app.get("/api/me", async (req) => service.me(await authenticate(req)));
+
+  app.get("/api/exams", async (req) => service.listExamSummaries(await authenticate(req)));
+
   app.post("/api/questions", async (req, reply) => reply.code(201).send(await service.addQuestion(await authenticate(req), req.body)));
 
   app.get("/api/questions", async (req) => service.searchQuestions(await authenticate(req), req.query));

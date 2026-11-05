@@ -118,6 +118,33 @@ describe("ngân hàng câu hỏi + đề", () => {
   });
 });
 
+describe("me + danh sách đề", () => {
+  it("GET /api/me trả người dùng, tổ chức, vai trò", async () => {
+    const res = await t.app.inject({ method: "GET", url: "/api/me", headers: auth });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.user).toEqual({ name: "Cô Lan", email: "gv1@example.test" });
+    expect(body.role).toBe("owner");
+    expect(body.orgs).toEqual([{ id: body.org.id, name: body.org.name, role: "owner" }]);
+    expect((await t.app.inject({ method: "GET", url: "/api/me" })).statusCode).toBe(401);
+  });
+
+  it("GET /api/exams: mới nhất trước, chỉ đề của tổ chức mình", async () => {
+    expect((await t.app.inject({ method: "GET", url: "/api/exams", headers: auth })).json()).toEqual([]);
+    await seedBank();
+    for (const [title, variants] of [["Đề A", 2], ["Đề B", 3]] as const) {
+      const r = await t.app.inject({ method: "POST", url: "/api/exams", headers: auth, payload: { title, matrix, variants, seed: 1 } });
+      expect(r.statusCode).toBe(201);
+    }
+    const list = (await t.app.inject({ method: "GET", url: "/api/exams", headers: auth })).json();
+    expect(list.map((e: { title: string }) => e.title)).toEqual(["Đề B", "Đề A"]);
+    expect(list[0]).toMatchObject({ subject: "Toán", grade: 10, codes: ["101", "102", "103"] });
+    expect(typeof list[0].createdAt).toBe("string");
+    const authB = { authorization: `Bearer ${await t.sign({ sub: "gv-2" })}` };
+    expect((await t.app.inject({ method: "GET", url: "/api/exams", headers: authB })).json()).toEqual([]);
+  });
+});
+
 describe("cách ly tổ chức", () => {
   it("người dùng khác không đụng được đề/ngân hàng của tổ chức khác", async () => {
     await seedBank();

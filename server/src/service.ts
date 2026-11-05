@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Db } from "./db/client";
-import { type ExamRow, findExam, insertExam, insertQuestion, listQuestions } from "./db/repo";
+import { type ExamRow, findExam, findUser, insertExam, insertQuestion, listExams, listQuestions, orgsOf } from "./db/repo";
 import { type Role, assertCan } from "./domain/authz";
 import { ExamMatrix, type Shortage, selectQuestions } from "./domain/matrix";
 import { QuestionFilter, type StoredQuestion, parseQuestion } from "./domain/question";
@@ -92,7 +92,33 @@ export function createService(db: Db) {
     return loadExam(orgId, examId);
   }
 
-  return { addQuestion, searchQuestions, generateExam, getExam, getAnswerKeys, grade, loadExamForExport };
+  async function me(actor: Actor) {
+    const user = await findUser(db, actor.userId);
+    if (!user) throw new NotFoundError("Không tìm thấy người dùng");
+    const orgs = await orgsOf(db, actor.userId);
+    const org = orgs.find((o) => o.id === actor.orgId);
+    return {
+      user: { name: user.name, email: user.email },
+      org: { id: actor.orgId, name: org?.name ?? "" },
+      role: actor.role,
+      orgs,
+    };
+  }
+
+  async function listExamSummaries(actor: Actor) {
+    assertCan(actor.role, "exam:read_key");
+    const rows = await listExams(db, actor.orgId);
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      subject: r.matrix.subject,
+      grade: r.matrix.grade,
+      codes: r.variants.map((v) => v.code),
+      createdAt: r.createdAt.toISOString(),
+    }));
+  }
+
+  return { me, listExamSummaries, addQuestion, searchQuestions, generateExam, getExam, getAnswerKeys, grade, loadExamForExport };
 }
 
 export type Service = ReturnType<typeof createService>;

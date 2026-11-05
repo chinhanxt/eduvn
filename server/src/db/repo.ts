@@ -1,4 +1,4 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import type { Role } from "../domain/authz";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionFilter, QuestionInput, StoredQuestion } from "../domain/question";
@@ -102,4 +102,26 @@ export async function findExam(db: Db, orgId: string, examId: string): Promise<E
     .from(exams)
     .where(and(eq(exams.orgId, orgId), eq(exams.id, examId)));
   return row ?? null;
+}
+
+export async function findUser(db: Db, userId: string): Promise<UserRow | null> {
+  const [row] = await db.select().from(users).where(eq(users.id, userId));
+  return row ?? null;
+}
+
+export async function orgsOf(db: Db, userId: string): Promise<{ id: string; name: string; role: Role }[]> {
+  return db
+    .select({ id: organizations.id, name: organizations.name, role: memberships.role })
+    .from(memberships)
+    .innerJoin(organizations, eq(organizations.id, memberships.orgId))
+    .where(eq(memberships.userId, userId))
+    .orderBy(asc(memberships.createdAt));
+}
+
+export async function listExams(db: Db, orgId: string): Promise<{ id: string; title: string; matrix: ExamMatrix; variants: Variant[]; createdAt: Date }[]> {
+  return db
+    .select({ id: exams.id, title: exams.title, matrix: exams.matrix, variants: exams.variants, createdAt: exams.createdAt })
+    .from(exams)
+    .where(eq(exams.orgId, orgId))
+    .orderBy(desc(exams.createdAt));
 }
