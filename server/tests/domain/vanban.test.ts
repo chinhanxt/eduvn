@@ -22,7 +22,12 @@ describe("văn bản NĐ30: thể thức", () => {
     const cv = ok(congVan());
     expect(soKyHieu(cv)).toBe("Số: …/THPTND-VP");
     expect(formatNgay(cv)).toBe("TP. Hồ Chí Minh, ngày … tháng … năm …");
-    expect(soKyHieu(ok(keHoach({ loai: "quyet_dinh", so: "7" })))).toBe("Số: 7/QĐ-THPTND");
+    expect(soKyHieu(ok(keHoach({ loai: "quyet_dinh", so: "7" })))).toBe("Số: 07/QĐ-THPTND");
+    expect(soKyHieu(ok(keHoach({ loai: "quyet_dinh", so: "05" })))).toBe("Số: 05/QĐ-THPTND");
+    expect(soKyHieu(ok(keHoach({ loai: "quyet_dinh", so: 9 })))).toBe("Số: 09/QĐ-THPTND");
+    expect(soKyHieu(ok(keHoach({ loai: "quyet_dinh", so: "123" })))).toBe("Số: 123/QĐ-THPTND");
+    expect(formatNgay(ok(keHoach({ ngay: "2026-02-05" })))).toContain("ngày 05 tháng 02 năm 2026");
+    expect(formatNgay(ok(keHoach({ ngay: "2026-05-15" })))).toContain("ngày 15 tháng 5 năm 2026");
     expect(soKyHieu(ok(keHoach({ loai: "to_trinh", kinh_gui: ["Sở"] })))).toBe("Số: 45/TTr-THPTND");
     expect(noiNhanLines(ok(keHoach({ noi_nhan: ["A"] })))).toEqual(["- A;", "- Lưu: VT."]);
   });

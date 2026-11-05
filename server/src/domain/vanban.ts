@@ -148,9 +148,9 @@ export function validateVanBan(input: unknown): VanBanResult {
   if (/\s/.test(r.ky_hieu_co_quan)) issues.push("ky_hieu_co_quan không được chứa khoảng trắng (vd \"THPTND\")");
 
   let so = "";
-  if (typeof r.so === "number") so = String(r.so);
+  if (typeof r.so === "number") so = r.so < 10 ? `0${r.so}` : String(r.so);
   else if (typeof r.so === "string" && r.so !== "") {
-    if (/^\d+$/.test(r.so)) so = String(Number(r.so));
+    if (/^\d+$/.test(r.so)) so = r.so.length === 1 ? `0${r.so}` : r.so; // NĐ30: số < 10 thêm số 0 đứng trước
     else issues.push(`so phải là số nguyên hoặc để trống (nhận "${r.so}")`);
   }
   let ngay = "";
@@ -194,7 +194,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 /** "TP. Hồ Chí Minh, ngày 05 tháng 11 năm 2026" (NĐ 30: ngày/tháng nhỏ hơn 10 thêm số 0). */
 export function formatNgay(v: VanBan): string {
-  const date = v.ngay === "" ? "ngày … tháng … năm …" : `ngày ${pad(Number(v.ngay.slice(8)))} tháng ${pad(Number(v.ngay.slice(5, 7)))} năm ${v.ngay.slice(0, 4)}`;
+  const date = v.ngay === "" ? "ngày … tháng … năm …" : `ngày ${pad(Number(v.ngay.slice(8)))} tháng ${Number(v.ngay.slice(5, 7)) <= 2 ? pad(Number(v.ngay.slice(5, 7))) : Number(v.ngay.slice(5, 7))} năm ${v.ngay.slice(0, 4)}`;
   return `${v.dia_danh}, ${date}`;
 }
 
