@@ -47,3 +47,26 @@ D nặng nhất (OpenMAIC cần Postgres + server riêng, DeepTutor Python + RAG
 | D | Khoá LLM cho OpenMAIC/DeepTutor (Anthropic / OpenAI / Gemini / DeepSeek…) |
 
 Mỗi luồng khi bắt đầu sẽ được tách thành checklist ngắn ngay trong file này.
+
+---
+
+## Luồng A — checklist (mockup đã duyệt 2026-11-05: `web/mockup/index.html`)
+
+**Server (nhỏ):**
+- [ ] `GET /api/me` → `{ user: { name, email }, org: { id, name }, role, orgs: [{ id, name, role }] }` (repo: `orgsOf(db, userId)` join `organizations`).
+- [ ] `GET /api/exams` → đề của tổ chức, mới nhất trước: `[{ id, title, subject, grade, codes: string[], createdAt }]`, quyền `exam:read_key`.
+- [ ] Test cho 2 route trong `server/tests/http/api.test.ts`.
+
+**Web (`web/`, thêm vào pnpm workspace):** Vite 8 + React 19 + TypeScript + react-router 8 + oidc-client-ts 3.
+- [ ] Giao diện theo mockup: CSS biến màu, sidebar navy, thẻ đổ bóng, font Be Vietnam Pro, icon Lucide dạng SVG sprite → component `<Icon name>`; ít chữ.
+- [ ] Đăng nhập OIDC (PKCE) với Keycloak realm `eduvn`, client `eduvn-dev`, `redirect_uri` `http://localhost:5173/callback`. 3 nút như mockup; Google/Microsoft gửi `kc_idp_hint` (`google`/`microsoft`) — chưa cấu hình IdP thì Keycloak hiện trang đăng nhập thường.
+- [ ] Gọi API kèm Bearer + `x-org-id` (tổ chức chọn ở góc trên, lưu localStorage). Vite proxy `/api`, `/dl`, `/mcp` → `http://localhost:4310`.
+- [ ] Trang chủ: lưới 8 công cụ + "Gần đây" (5 đề mới, nút tải) + "Kênh".
+- [ ] Ngân hàng câu hỏi: lọc môn/lớp, bảng câu hỏi, nút Thêm → form câu trắc nghiệm (mcq) tối giản.
+- [ ] Đề thi: danh sách + Tạo đề (tên, môn, lớp, các dòng ma trận thêm/xoá, số mã đề, thời gian) → hiện mã đề + link tải Word; thiếu câu thì hiện ô thiếu.
+- [ ] Chấm bài: chọn đề + mã đề → ô nhập sinh từ đáp án (mcq: A–D; đúng/sai: 4 nút Đ/S; trả lời ngắn: ô chữ) → tổng điểm.
+- [ ] Slide, Video, Giáo trình, Gia sư AI: trang giữ chỗ nhãn "Thử" (luồng D lắp sau). Học viên, Tổ chức: "Sắp có".
+- [ ] Kết nối: URL MCP (copy) + thẻ Zalo "Sắp có" (luồng C lắp sau).
+- [ ] Smoke E2E `web/scripts/smoke.mjs` (playwright-core, dùng Chrome có sẵn): đăng nhập gv1 → thêm 2 câu → tạo đề → chấm → chụp màn hình các trang vào `/tmp/eduvn-web-*.png`.
+
+**Xong khi:** `pnpm -C web build` sạch, test server xanh, smoke E2E chạy qua với Keycloak + Postgres thật, ảnh chụp khớp mockup.
