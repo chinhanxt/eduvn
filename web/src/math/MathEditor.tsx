@@ -36,10 +36,7 @@ function serialize(root: HTMLElement): string {
   const nodes = [...root.childNodes];
   const isFormula = (n: Node | undefined) => n instanceof HTMLElement && n.classList.contains("me-wrap") && !!(n.firstChild as MathfieldElement).value.trim();
   const text = (raw: string, next: Node | undefined) => {
-    let e = escapeText(raw);
-    // chữ kết thúc bằng \ rồi tới công thức: thêm một \ để $ mở công thức không bị hiểu là \$
-    if (isFormula(next) && /(?:^|[^\\])(?:\\\\)*\\$/.test(e)) e += "\\";
-    return e;
+    return escapeText(raw, isFormula(next));
   };
   nodes.forEach((n, i) => {
     if (n.nodeType === Node.TEXT_NODE) out += text((n.nodeValue ?? "").replaceAll(ZW, ""), nodes[i + 1]);

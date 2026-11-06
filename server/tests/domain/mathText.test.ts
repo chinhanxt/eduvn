@@ -10,6 +10,10 @@ describe("splitMath — dấu \\ trước $", () => {
     expect(splitMath("giá \\$5")).toEqual([{ kind: "text", value: "giá $5" }]);
     expect(hasBalancedMath("a\\\\$x$")).toBe(true);
     expect(hasBalancedMath("a\\\\$x")).toBe(false);
+    // mỗi cặp \\ trước $ là một dấu \ thường; số lẻ thì $ là đô la thường
+    expect(splitMath("a\\\\\\\\$x$")).toEqual([{ kind: "text", value: "a\\\\" }, { kind: "math", value: "x" }]);
+    expect(splitMath("a\\\\\\$5")).toEqual([{ kind: "text", value: "a\\$5" }]);
+    expect(hasBalancedMath("a\\\\\\$5")).toBe(true);
     expect(hasBalancedMath("giá \\$5")).toBe(true);
   });
 });

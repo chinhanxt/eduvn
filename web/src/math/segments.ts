@@ -14,12 +14,12 @@ export function splitMath(s: string): Segment[] {
         buf += "\\".repeat(n);
         i += n - 1;
       } else if (n % 2 === 1) {
-        // số lẻ dấu \ trước $: $ là dấu đô la thường
-        buf += "\\".repeat(n - 1) + (inMath ? "\\$" : "$");
+        // số lẻ dấu \ trước $: $ là dấu đô la thường; trong chữ mỗi cặp \\ là một dấu \ thường
+        buf += inMath ? "\\".repeat(n - 1) + "\\$" : "\\".repeat((n - 1) / 2) + "$";
         i += n;
       } else {
-        // số chẵn: \\ = một dấu \ thường (trong chữ), $ là dấu mở/đóng công thức
-        buf += "\\".repeat(inMath ? n : n - 1);
+        // số chẵn: $ là dấu mở/đóng công thức; trong chữ mỗi cặp \\ là một dấu \ thường
+        buf += "\\".repeat(inMath ? n : n / 2);
         i += n - 1;
       }
       continue;
@@ -40,9 +40,14 @@ export function splitMath(s: string): Segment[] {
   return out;
 }
 
-export const escapeText = (t: string): string => t.replace(/\$/g, "\\$");
+/** Mã hoá chữ thường: dãy \ đứng ngay trước $ được nhân đôi, $ thành \$; beforeMath: chữ đứng ngay trước công thức. */
+export const escapeText = (t: string, beforeMath = false): string => {
+  const e = t.replace(/(\\*)\$/g, (_m, bs: string) => bs + bs + "\\$");
+  return beforeMath ? e.replace(/(\\+)$/, (_m, bs: string) => bs + bs) : e;
+};
 
-export const joinSegments = (segs: Segment[]): string => segs.map((s) => (s.kind === "text" ? escapeText(s.value) : `$${s.value}$`)).join("");
+export const joinSegments = (segs: Segment[]): string =>
+  segs.map((s, i) => (s.kind === "text" ? escapeText(s.value, segs[i + 1]?.kind === "math") : `$${s.value}$`)).join("");
 
 const UNSAFE = /\\(href|url|html\w*|class|cssId|style|data|includegraphics)(?![A-Za-z])/;
 export const isSafeLatex = (l: string): boolean => !UNSAFE.test(l);

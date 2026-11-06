@@ -15,12 +15,12 @@ export function splitMath(s: string): Segment[] {
         buf += "\\".repeat(n);
         i += n - 1;
       } else if (n % 2 === 1) {
-        // số lẻ dấu \ trước $: $ là dấu đô la thường
-        buf += "\\".repeat(n - 1) + (inMath ? "\\$" : "$");
+        // số lẻ dấu \ trước $: $ là dấu đô la thường; trong chữ mỗi cặp \\ là một dấu \ thường
+        buf += inMath ? "\\".repeat(n - 1) + "\\$" : "\\".repeat((n - 1) / 2) + "$";
         i += n;
       } else {
-        // số chẵn: \\ = một dấu \ thường (trong chữ), $ là dấu mở/đóng công thức
-        buf += "\\".repeat(inMath ? n : n - 1);
+        // số chẵn: $ là dấu mở/đóng công thức; trong chữ mỗi cặp \\ là một dấu \ thường
+        buf += "\\".repeat(inMath ? n : n / 2);
         i += n - 1;
       }
       continue;

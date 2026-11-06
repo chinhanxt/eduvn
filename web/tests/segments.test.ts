@@ -26,3 +26,20 @@ describe("segments", () => {
     expect(isSafeLatex("\\htmlData{a=b}{x}")).toBe(false);
   });
 });
+
+describe("mã hoá ↔ giải mã chữ có dấu \\ không mất chữ", () => {
+  const texts = ["a", "a\\", "a\\\\", "a\\\\\\", "a\\b", "a\\\\b", "giá $5", "a\\$", "a\\\\$b", "\\"];
+  it.each(texts)("chữ %j đứng trước công thức", (t) => {
+    const segs = [{ kind: "text" as const, value: t }, { kind: "math" as const, value: "x^2" }];
+    expect(splitMath(joinSegments(segs))).toEqual(segs);
+  });
+  it.each(texts)("chữ %j đứng một mình", (t) => {
+    const segs = [{ kind: "text" as const, value: t }];
+    expect(splitMath(joinSegments(segs))).toEqual(segs);
+  });
+  it("công thức giữa hai đoạn chữ", () => {
+    const segs = [{ kind: "text" as const, value: "Tính \\$" }, { kind: "math" as const, value: "\\frac{1}{2}" }, { kind: "text" as const, value: " đồng" }];
+    expect(splitMath(joinSegments(segs))).toEqual(segs);
+  });
+});
+
