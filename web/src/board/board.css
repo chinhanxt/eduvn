@@ -1,0 +1,31 @@
+/* web/src/board/board.css — bảng giảng (bd-) */
+.bd { position: fixed; inset: 0; display: grid; grid-template-columns: 64px 1fr auto; background: var(--bg); z-index: 10; }
+.bd-rail { background: var(--side); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px; }
+.bd-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; margin-bottom: 14px; }
+.bd-rb { width: 42px; height: 42px; border-radius: 12px; border: 0; background: transparent; color: var(--side-ink); display: grid; place-items: center; position: relative; transition: background .2s, color .2s; }
+.bd-rb:hover { background: rgba(255,255,255,.05); }
+.bd-rb.on { background: var(--side-active); color: #fff; }
+.bd-rb.on::before { content: ""; position: absolute; left: -11px; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--brand); }
+.bd-sep { width: 28px; height: 1px; background: rgba(255,255,255,.08); margin: 6px 0; }
+.bd-swatches { margin-top: auto; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.bd-sw { width: 18px; height: 18px; border-radius: 50%; border: 0; box-shadow: 0 0 0 2px var(--side); }
+.bd-sw.on { box-shadow: 0 0 0 2px var(--side), 0 0 0 4px rgba(255,255,255,.55); }
+.bd-main { display: grid; grid-template-rows: 62px 1fr 56px; min-width: 0; min-height: 0; }
+.bd-top { display: flex; align-items: center; gap: 10px; padding: 0 22px; }
+.bd-title { font-weight: 700; font-size: 16px; }
+.bd-chip { background: var(--card); box-shadow: var(--shadow); padding: 5px 12px; border-radius: 999px; font-size: 12.5px; color: var(--muted); font-weight: 500; }
+.bd-grow { flex: 1; }
+.bd-state { font-size: 12.5px; color: var(--amber); font-weight: 500; }
+.bd-state.ok { color: var(--green); }
+.bd-err { font-size: 12.5px; color: #b42318; background: #fdecec; padding: 4px 10px; border-radius: 8px; cursor: pointer; max-width: 420px; }
+.bd-btn { display: inline-flex; align-items: center; gap: 7px; border: 0; font-weight: 500; font-size: 13px; padding: 8px 12px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); color: var(--ink); }
+.bd-btn:disabled { opacity: .4; }
+.bd-btn.pri { background: var(--brand); color: #fff; }
+.bd-btn svg.i { width: 17px; height: 17px; }
+.bd-wrap { display: grid; place-items: center; padding: 2px 22px; min-height: 0; }
+.bd-stage { position: relative; aspect-ratio: 16 / 9; width: min(100%, calc((100vh - 140px) * 16 / 9)); border-radius: 18px; background: #242b35; overflow: hidden; user-select: none; touch-action: none; box-shadow: 0 2px 6px rgba(20,28,60,.15), 0 18px 40px rgba(20,28,60,.22); }
+.bd-svg { position: absolute; inset: 0; width: 100%; height: 100%; font-family: "Be Vietnam Pro", system-ui, sans-serif; }
+.bd-tool-pen { cursor: crosshair; } .bd-tool-eraser { cursor: cell; }
+.bd-tool-pen .bd-obj, .bd-tool-eraser .bd-obj { pointer-events: none; }
+.bd-ink { pointer-events: none; }
+.bd-pages { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: var(--muted); font-weight: 500; }
