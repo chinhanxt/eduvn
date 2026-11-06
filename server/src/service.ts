@@ -5,6 +5,7 @@ import { type Role, assertCan } from "./domain/authz";
 import { ExamMatrix, type Shortage, selectQuestions } from "./domain/matrix";
 import { QuestionFilter, type StoredQuestion, parseQuestion } from "./domain/question";
 import { mulberry32 } from "./domain/rng";
+import { rankRelated } from "./domain/related";
 import { type ResponseValue, rulesForSubject } from "./domain/scoring";
 import { type GradeResult, type KeyEntry, type Variant, answerKey, gradeVariant, makeVariants } from "./domain/variants";
 import { NotFoundError } from "./errors";
@@ -27,6 +28,15 @@ export type GenerateExamResult =
 
 const Uuid = z.uuid();
 
+export const RelatedInput = z.object({
+  subject: z.string().trim().normalize("NFC").min(1),
+  grade: z.coerce.number().int().min(1).max(16),
+  topic: z.string().trim().normalize("NFC").max(120).optional(),
+  text: z.string().max(2000).optional(),
+  limit: z.coerce.number().int().min(1).max(30).default(8),
+  exclude: z.preprocess((v) => (typeof v === "string" ? v.split(",").filter(Boolean) : v), z.array(z.string()).max(100)).optional(),
+});
+
 export function createService(db: Db) {
   async function loadExam(orgId: string, examId: string): Promise<ExamRow> {
     const exam = Uuid.safeParse(examId).success ? await findExam(db, orgId, examId) : null;
@@ -48,6 +58,13 @@ export function createService(db: Db) {
   async function searchQuestions(actor: Actor, filter: unknown): Promise<StoredQuestion[]> {
     assertCan(actor.role, "question:read");
     return listQuestions(db, actor.orgId, QuestionFilter.parse(filter));
+  }
+
+  async function relatedQuestions(actor: Actor, query: unknown): Promise<StoredQuestion[]> {
+    assertCan(actor.role, "question:read");
+    const p = RelatedInput.parse(query);
+    const pool = await listQuestions(db, actor.orgId, { subject: p.subject, grade: p.grade, limit: 2000 });
+    return rankRelated(pool, { topic: p.topic, text: p.text, exclude: p.exclude }, p.limit);
   }
 
   async function generateExam(actor: Actor, input: GenerateExamInput): Promise<GenerateExamResult> {
@@ -118,7 +135,7 @@ export function createService(db: Db) {
     }));
   }
 
-  return { me, listExamSummaries, addQuestion, searchQuestions, generateExam, getExam, getAnswerKeys, grade, loadExamForExport };
+  return { me, listExamSummaries, addQuestion, searchQuestions, relatedQuestions, generateExam, getExam, getAnswerKeys, grade, loadExamForExport };
 }
 
 export type Service = ReturnType<typeof createService>;

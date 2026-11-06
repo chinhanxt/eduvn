@@ -137,6 +137,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   app.post("/api/questions", async (req, reply) => reply.code(201).send(await service.addQuestion(await authenticate(req), req.body)));
 
   app.get("/api/questions", async (req) => service.searchQuestions(await authenticate(req), req.query));
+  app.get("/api/questions/related", async (req) => service.relatedQuestions(await authenticate(req), req.query));
 
   app.post("/api/exams", async (req, reply) => {
     const actor = await authenticate(req);
