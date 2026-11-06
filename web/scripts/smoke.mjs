@@ -78,6 +78,7 @@ try {
   assert(true, "gõ $ mở ô công thức + bàn phím toán");
   await page.keyboard.type("x^2"); // MathLive tự thoát số mũ sau 1 chữ số
   await page.keyboard.type("-3");
+  await shot("cong-thuc");
   await page.getByTestId("kb-done").click();
   await page.keyboard.type(" có đỉnh là");
   for (let k = 0; k < 4; k++) await page.getByTestId(`q-opt-${k}`).fill(`Điểm ${"ABCD"[k]}`);
@@ -85,7 +86,7 @@ try {
   await page.getByTestId("q-save").click();
   await page.waitForFunction(() => [...document.querySelectorAll("[data-testid=q-table] .me-tex")].length > 0);
   assert(true, "câu hỏi có công thức hiển thị dạng toán trong bảng");
-  await shot("cong-thuc");
+  await shot("cong-thuc-bang");
 
   // P4 — bảng giảng
   const apiPost = (url, body) => page.evaluate(async ([url, body]) => {
