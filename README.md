@@ -1,5 +1,10 @@
 # EDUVN
 
+<p align="center">
+  <img src="docs/media/bang-giang.webp" alt="Bảng giảng EDUVN: vẽ đồ thị hàm số có thanh trượt, hình không gian cắt thiết diện, gợi ý câu hỏi, trợ giảng" width="960">
+</p>
+<p align="center"><sub>Mockup thiết kế bảng giảng (tua nhanh 2×) · <a href="docs/media/bang-giang.mp4">xem video đầy đủ 1:31</a></sub></p>
+
 Hệ thống hỗ trợ giáo viên & sinh viên Việt Nam: ngân hàng câu hỏi, ra đề, chấm, slide, video bài giảng, giáo trình, quản lý học viên — dùng qua AI chat (MCP + SSO), Zalo và web.
 
 | Đọc trước | |
