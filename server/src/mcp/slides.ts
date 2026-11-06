@@ -15,7 +15,7 @@ export function registerSlideTools(server: McpServer, { slides, actor, makeSlide
     "tao_slide",
     {
       title: "Tạo slide bài giảng (.pptx)",
-      description: `Tạo bộ slide .pptx (16:9, theme EDUVN) và trả link tải (hết hạn sau 15 phút). Hai cách: (1) truyền "deck" là JSON dàn ý; (2) truyền "lessonPlanId" để tự dựng từ giáo án đã lưu (bìa, Mục tiêu, mỗi hoạt động một slide chuyển mục + slide nội dung, kết thúc; 4 bước tổ chức nằm trong ghi chú). Truyền "id" kèm "deck" để cập nhật bộ slide có sẵn. Sai giới hạn thì không lưu và trả danh sách lỗi tiếng Việt để sửa rồi gửi lại.\n${SLIDE_SHAPE_HELP}`,
+      description: `Tạo bộ slide .pptx (16:9, theme EDUVN) và trả link tải (hết hạn sau 15 phút). Hai cách: (1) truyền "deck" là JSON dàn ý; (2) truyền "lessonPlanId" để tự dựng từ giáo án đã lưu (bìa, Mục tiêu, mỗi hoạt động một slide chuyển mục + slide nội dung, kết thúc; 4 bước tổ chức nằm trong ghi chú). Truyền "id" kèm "deck" để cập nhật bộ slide có sẵn. Sai giới hạn thì không lưu và trả danh sách lỗi tiếng Việt để sửa rồi gửi lại. Công thức viết LaTeX trong $…$ (vd $x^2-3$); trong .pptx hiển thị dạng chữ thường (x²−3).\n${SLIDE_SHAPE_HELP}`,
       inputSchema: {
         id: z.string().optional().describe("id bộ slide để cập nhật (kèm deck)"),
         deck: z.looseObject({}).optional().describe("Dàn ý slide theo JSON mô tả ở trên"),
