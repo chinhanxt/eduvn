@@ -13,6 +13,7 @@ import type { BoardApi } from "./useBoard";
 type Props = { obj: GraphObj; tool: Tool; selected: boolean; onSelect: () => void; onEdit: () => void; b: BoardApi; toBoard: ToBoard };
 
 export function GraphView({ obj, tool, selected, onSelect, onEdit, b, toBoard }: Props) {
+  const slSnap = useRef(false);
   const drag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
   const box = { x: obj.x + 20, y: obj.y + 20, w: obj.w - 40, h: obj.h - 40 };
   const v = obj.view;
@@ -45,7 +46,7 @@ export function GraphView({ obj, tool, selected, onSelect, onEdit, b, toBoard }:
 
   return (
     <g className="bd-obj" data-testid="bd-graph">
-      <rect x={obj.x} y={obj.y} width={obj.w} height={obj.h} rx={16} className={selected ? "bd-card sel" : "bd-card"} onPointerDown={down} onPointerMove={move} onPointerUp={up} />
+      <rect x={obj.x} y={obj.y} width={obj.w} height={obj.h} rx={16} className={selected ? "bd-card sel" : "bd-card"} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onLostPointerCapture={up} />
       <clipPath id={clip}><rect x={box.x} y={box.y} width={box.w} height={box.h} /></clipPath>
       <g pointerEvents="none">
         {ticks(v.xMin, v.xMax).map((t) => <line key={`gx${t}`} x1={mapX(t, v, box)} x2={mapX(t, v, box)} y1={box.y} y2={box.y + box.h} className="bd-grid" />)}
@@ -75,7 +76,7 @@ export function GraphView({ obj, tool, selected, onSelect, onEdit, b, toBoard }:
             {params.map((p) => (
               <label key={p} className="bd-sl">
                 <i>{p}</i>
-                <input type="range" min={-5} max={5} step={0.1} value={obj.params[p] ?? 1} onPointerDown={(e) => { e.stopPropagation(); b.snapshot(); }} onChange={(e) => b.updateObj(obj.id, { params: { ...obj.params, [p]: Number(e.target.value) } }, true)} data-testid={`bd-sl-${p}`} />
+                <input type="range" min={-5} max={5} step={0.1} value={obj.params[p] ?? 1} onPointerDown={(e) => { e.stopPropagation(); slSnap.current = true; }} onFocus={() => { slSnap.current = true; }} onKeyDown={() => { slSnap.current = true; }} onPointerUp={() => { slSnap.current = false; }} onBlur={() => { slSnap.current = false; }} onChange={(e) => { if (slSnap.current) { b.snapshot(); slSnap.current = false; } b.updateObj(obj.id, { params: { ...obj.params, [p]: Number(e.target.value) } }, true); }} data-testid={`bd-sl-${p}`} />
                 <output>{vn(obj.params[p] ?? 1)}</output>
               </label>
             ))}

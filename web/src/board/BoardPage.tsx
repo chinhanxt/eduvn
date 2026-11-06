@@ -1,13 +1,15 @@
 // web/src/board/BoardPage.tsx
 import { type PointerEvent, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
-import { gradeLabel } from "../api";
+import { type BankQuestion, gradeLabel } from "../api";
 import { Icon } from "../Icon";
 import "./board.css";
 import { type BoardObj, type GraphObj, graphFromExprs, newId, newSolid, PALETTE, type Stroke } from "./doc";
 import { GraphDialog, GraphView } from "./GraphView";
 import { hitStroke, strokePath } from "./ink";
+import { Projector } from "./Projector";
 import { SolidPicker, SolidView } from "./SolidView";
+import { SuggestPanel } from "./SuggestPanel";
 import { useBoard } from "./useBoard";
 
 export type Tool = "pointer" | "pen" | "eraser";
@@ -29,7 +31,9 @@ export function BoardPage() {
   const [draft, setDraft] = useState<number[] | null>(null);
   const [graphDlg, setGraphDlg] = useState<{ edit?: GraphObj } | null>(null);
   const [picker, setPicker] = useState(false);
-  const erasing = useRef(false);
+  const [suggest, setSuggest] = useState(false);
+  const [projected, setProjected] = useState<BankQuestion | null>(null);
+  const erasing = useRef<{ snapped: boolean } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +55,8 @@ export function BoardPage() {
       } else if ((e.key === "Delete" || e.key === "Backspace") && selected) {
         b.removeObjs([selected]);
         setSelected(null);
-      } else if (e.key === "v") setTool("pointer");
+      } else if (mod || e.altKey) return;
+      else if (e.key === "v") setTool("pointer");
       else if (e.key === "p") setTool("pen");
       else if (e.key === "e") setTool("eraser");
     };
@@ -66,18 +71,22 @@ export function BoardPage() {
 
   const erase = (x: number, y: number) => {
     const hits = objs.filter((o): o is Stroke => o.type === "stroke" && hitStroke(o.pts, x, y, 14)).map((o) => o.id);
-    if (hits.length) b.removeObjs(hits, true);
+    if (!hits.length) return;
+    if (erasing.current && !erasing.current.snapped) {
+      b.snapshot();
+      erasing.current.snapped = true;
+    }
+    b.removeObjs(hits, true);
   };
   const onDown = (e: PointerEvent<SVGSVGElement>) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || !e.isPrimary) return;
     const [x, y] = toBoard(e);
     if (tool === "pen") {
       svgRef.current?.setPointerCapture(e.pointerId);
       setDraft([Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
     } else if (tool === "eraser") {
       svgRef.current?.setPointerCapture(e.pointerId);
-      b.snapshot();
-      erasing.current = true;
+      erasing.current = { snapped: false };
       erase(x, y);
     } else setSelected(null);
   };
@@ -88,13 +97,14 @@ export function BoardPage() {
       if (draft.length < 4000 && Math.hypot(x - lx, y - ly) > 1.5) setDraft([...draft, Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
     } else if (erasing.current) erase(x, y);
   };
-  const onUp = () => {
+  const onUp = (e: PointerEvent<SVGSVGElement>) => {
+    if (!e.isPrimary) return;
     if (draft) {
       const pts = draft.length >= 4 ? draft : [draft[0]!, draft[1]!, draft[0]! + 0.5, draft[1]!];
       b.addObj({ type: "stroke", id: newId(), color, width: 4.5, pts });
       setDraft(null);
     }
-    erasing.current = false;
+    erasing.current = null;
   };
 
   const rail = (icon: string, title: string, on: boolean, onClick: () => void, testId?: string) => (
@@ -112,7 +122,7 @@ export function BoardPage() {
         <div className="bd-sep" />
         {rail("graph", "Đồ thị hàm số", false, () => setGraphDlg({}), "t-graph")}
         {rail("box", "Hình không gian", picker, () => setPicker((p) => !p), "t-solid")}
-        {/* Task 14: nút gợi ý bài */}
+        {rail("spark", "Gợi ý bài liên quan", suggest, () => setSuggest((s) => !s), "t-suggest")}
         <div className="bd-swatches">
           {PALETTE.map((c) => (
             <button key={c} className={c === color && tool === "pen" ? "bd-sw on" : "bd-sw"} style={{ background: c }} aria-label="Màu bút" onClick={() => { setColor(c); setTool("pen"); }} />
@@ -128,7 +138,7 @@ export function BoardPage() {
           <span className={b.dirty ? "bd-state" : "bd-state ok"} data-testid="bd-state">{b.saving ? "Đang lưu…" : b.dirty ? "Chưa lưu" : "Đã lưu"}</span>
           <button className="bd-btn" onClick={b.undo} title="Hoàn tác (Ctrl+Z)"><Icon name="undo" /></button>
           <button className="bd-btn pri" onClick={() => void b.save()} data-testid="bd-save"><Icon name="save" />Lưu</button>
-          <button className="bd-btn" onClick={() => void rootRef.current?.requestFullscreen()} title="Toàn màn hình"><Icon name="max" /></button>
+          <button className="bd-btn" onClick={() => void rootRef.current?.requestFullscreen().catch(() => {})} title="Toàn màn hình"><Icon name="max" /></button>
         </header>
         <div className="bd-wrap">
           <div className="bd-stage" data-testid="bd-stage">
@@ -141,7 +151,7 @@ export function BoardPage() {
               {objs.map((o) => (o.type === "stroke" ? <path key={o.id} className="bd-ink" d={strokePath(o.pts, o.width)} fill={o.color} /> : null))}
               {draft && <path d={strokePath(draft, 4.5)} fill={color} />}
             </svg>
-            {/* Task 14: <Projector /> */}
+            {projected && <Projector key={projected.id} q={projected} onClose={() => setProjected(null)} />}
           </div>
         </div>
         <footer className="bd-pages">
@@ -152,7 +162,7 @@ export function BoardPage() {
           <button className="bd-btn" onClick={() => confirm("Xoá trang này?") && b.deletePage()} disabled={n <= 1} title="Xoá trang"><Icon name="trash" /></button>
         </footer>
       </section>
-      {/* Task 14: <SuggestPanel /> */}
+      {suggest && <SuggestPanel board={b.board} page={b.current} onProject={setProjected} onClose={() => setSuggest(false)} />}
       {graphDlg && (
         <GraphDialog
           initial={graphDlg.edit}
