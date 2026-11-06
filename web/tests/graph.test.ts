@@ -21,6 +21,22 @@ describe("compileExpr", () => {
   });
 });
 
+describe("compileExpr chặt", () => {
+  it("chỉ nhận y = … hoặc tên hàm một chữ cái (x)", () => {
+    for (const l of ["\\sqrt{x}=2", "\\sin x=x"]) {
+      const r = compileExpr(l);
+      expect(r.ok).toBe(false);
+      if (!r.ok) expect(r.error).toContain("y =");
+    }
+    expect(compileExpr("f(x)=x+1").ok).toBe(true);
+    expect(compileExpr("g(x)=x^2").ok).toBe(true);
+  });
+  it("tên tham số sai quy tắc server → báo lỗi", () => {
+    const r = compileExpr("\\alpha x");
+    if (!r.ok) expect(r.error).toContain("Tên tham số không hợp lệ");
+  });
+});
+
 describe("samplePath", () => {
   const v = { xMin: -5, xMax: 5, yMin: -5, yMax: 5 };
   const b = { x: 0, y: 0, w: 500, h: 500 };
@@ -33,6 +49,8 @@ describe("samplePath", () => {
   });
 });
 
+it("ticks 0..1 không dính sai số", () => expect(ticks(0, 1, 10)).toEqual([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]));
+it("ticks khoảng rỗng", () => expect(ticks(1, 1)).toEqual([]));
 it("ticks đẹp", () => expect(ticks(-4, 5)).toEqual([-4, -3, -2, -1, 0, 1, 2, 3, 4, 5]));
 it("autoView bao đỉnh parabol và trục hoành", () => {
   const v = autoView([(x) => x * x - 3], -5, 5);

@@ -21,8 +21,8 @@ export function compileExpr(latex: string): Compiled {
       let rhs = e;
       if (e.operator === "Equal") {
         const eq = e as unknown as { op1: typeof e; op2: typeof e };
-        const lhs = eq.op1 as unknown as { symbol?: string; nops: number; op1: { symbol?: string } };
-        const isFn = lhs.symbol === "y" || (lhs.nops === 1 && lhs.op1.symbol === "x");
+        const lhs = eq.op1 as unknown as { symbol?: string; operator?: string; nops: number; op1: { symbol?: string } };
+        const isFn = lhs.symbol === "y" || (/^[a-zA-Z]$/.test(lhs.operator ?? "") && lhs.nops === 1 && lhs.op1.symbol === "x");
         rhs = eq.op2;
         if (!isFn) {
           out = { ok: false, error: "Chỉ vẽ hàm dạng y = … hoặc f(x) = …" };
@@ -34,6 +34,12 @@ export function compileExpr(latex: string): Compiled {
       if (!c.success) out = { ok: false, error: "Chưa vẽ được công thức này" };
       else {
         const params = [...rhs.unknowns].filter((u) => u !== "x").sort();
+        const badName = params.find((n) => !/^[A-Za-z]\w{0,11}$/.test(n));
+        if (badName !== undefined) {
+          out = { ok: false, error: `Tên tham số không hợp lệ: ${badName}` };
+          cache.set(latex, out);
+          return out;
+        }
         out = {
           ok: true,
           params,
@@ -77,12 +83,15 @@ export function samplePath(f: (x: number) => number, v: View2, b: Box, n = 480):
 }
 
 export function ticks(min: number, max: number, target = 10): number[] {
+  if (!(max > min)) return [];
   const raw = (max - min) / target;
   const p = 10 ** Math.floor(Math.log10(raw));
   const m = raw / p;
   const step = (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
+  if (!Number.isFinite(step) || !(step > 0)) return [];
+  const start = Math.ceil(min / step - 1e-9);
   const out: number[] = [];
-  for (let t = Math.ceil(min / step) * step; t <= max + 1e-9; t += step) out.push(Math.round(t / step) * step);
+  for (let k = start; k <= 1000 + start && k * step <= max + 1e-9; k++) out.push(Number((k * step).toFixed(12)) + 0);
   return out;
 }
 
