@@ -55,7 +55,8 @@ export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLi
     {
       title: "Thêm câu hỏi",
       description:
-        "Thêm 1–100 câu hỏi vào ngân hàng. mcq: 4 phương án, answer = chỉ số 0–3. true_false: 4 ý (statements), answer = 4 giá trị true/false. short_answer: answer là chuỗi ngắn. essay: rubric + points. level: NB (nhận biết), TH (thông hiểu), VD (vận dụng).",
+        "Thêm 1–100 câu hỏi vào ngân hàng. mcq: 4 phương án, answer = chỉ số 0–3. true_false: 4 ý (statements), answer = 4 giá trị true/false. short_answer: answer là chuỗi ngắn. essay: rubric + points. level: NB (nhận biết), TH (thông hiểu), VD (vận dụng)." +
+        ' Công thức toán: viết LaTeX trong cặp $…$ chen giữa chữ, vd stem "Cho hàm số $f(x)=x^2-2x+3$. Giá trị $f\\left(\\frac{1}{2}\\right)$ bằng", phương án "$\\frac{9}{4}$"; dấu đô la thường viết \\$. File Word xuất ra phương trình sửa được.',
       inputSchema: { questions: z.array(QuestionInput).min(1).max(100) },
     },
     async ({ questions }) => {
