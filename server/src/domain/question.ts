@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { hasBalancedMath } from "./mathText";
 
 export const LEVELS = ["NB", "TH", "VD"] as const; // Nhận biết, Thông hiểu, Vận dụng
 export const QUESTION_TYPES = ["mcq", "true_false", "short_answer", "essay"] as const;
@@ -8,21 +9,25 @@ export type Level = z.infer<typeof Level>;
 export const QuestionType = z.enum(QUESTION_TYPES);
 export type QuestionType = z.infer<typeof QuestionType>;
 
+const MATH_MSG = "Công thức thiếu dấu $ đóng (ký hiệu đô la thường viết \\$)";
+/** Chuỗi bắt buộc, cho phép công thức $…$. */
+const mathText = () => z.string().trim().min(1).refine(hasBalancedMath, MATH_MSG);
+
 const base = {
   subject: z.string().trim().normalize("NFC").min(1),
   /** 1–12: lớp phổ thông; 13–16: năm 1–4 đại học. */
   grade: z.number().int().min(1).max(16),
   topic: z.string().trim().normalize("NFC").min(1),
   level: Level,
-  stem: z.string().trim().min(1),
-  explanation: z.string().optional(),
+  stem: mathText(),
+  explanation: z.string().refine(hasBalancedMath, MATH_MSG).optional(),
   tags: z.array(z.string()).default([]),
 };
 
 export const McqQuestion = z.object({
   ...base,
   type: z.literal("mcq"),
-  options: z.array(z.string().trim().min(1)).length(4),
+  options: z.array(mathText()).length(4),
   /** Chỉ số phương án đúng 0–3 (A–D). */
   answer: z.number().int().min(0).max(3),
 });
@@ -30,20 +35,20 @@ export const McqQuestion = z.object({
 export const TrueFalseQuestion = z.object({
   ...base,
   type: z.literal("true_false"),
-  statements: z.array(z.string().trim().min(1)).length(4),
+  statements: z.array(mathText()).length(4),
   answer: z.array(z.boolean()).length(4),
 });
 
 export const ShortAnswerQuestion = z.object({
   ...base,
   type: z.literal("short_answer"),
-  answer: z.string().trim().min(1),
+  answer: mathText(),
 });
 
 export const EssayQuestion = z.object({
   ...base,
   type: z.literal("essay"),
-  rubric: z.string().trim().min(1),
+  rubric: mathText(),
   points: z.number().positive(),
 });
 
