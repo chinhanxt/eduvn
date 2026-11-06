@@ -84,10 +84,11 @@ export function useBoard(id: string) {
     },
     save: async () => {
       if (!board || !doc) return;
+      const sent = doc;
       setSaving(true);
       try {
         await api(`/api/boards/${id}`, { method: "PUT", body: { title: board.title, subject: board.subject, grade: board.grade, topic: board.topic, doc } });
-        setDirty(false);
+        if (docRef.current === sent) setDirty(false);
       } catch (e) {
         setError(errText(e));
       } finally {
