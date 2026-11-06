@@ -69,6 +69,87 @@ try {
   assert(hasTopic === 2, `đã thêm 2 câu hỏi vào ngân hàng (thấy ${hasTopic})`);
   await shot("ngan-hang");
 
+  // P4 — ô công thức trong ngân hàng
+  await page.getByTestId("q-topic").fill(`Thiết diện ${topic}`);
+  await page.getByTestId("q-stem").click();
+  await page.keyboard.type("Cho hàm số ");
+  await page.keyboard.type("$");
+  await page.waitForSelector("[data-testid=math-kb].on");
+  assert(true, "gõ $ mở ô công thức + bàn phím toán");
+  await page.keyboard.type("x^2"); // MathLive tự thoát số mũ sau 1 chữ số
+  await page.keyboard.type("-3");
+  await page.getByTestId("kb-done").click();
+  await page.keyboard.type(" có đỉnh là");
+  for (let k = 0; k < 4; k++) await page.getByTestId(`q-opt-${k}`).fill(`Điểm ${"ABCD"[k]}`);
+  await page.getByLabel("Đáp án A").check();
+  await page.getByTestId("q-save").click();
+  await page.waitForFunction(() => [...document.querySelectorAll("[data-testid=q-table] .me-tex")].length > 0);
+  assert(true, "câu hỏi có công thức hiển thị dạng toán trong bảng");
+  await shot("cong-thuc");
+
+  // P4 — bảng giảng
+  const apiPost = (url, body) => page.evaluate(async ([url, body]) => {
+    const k = Object.keys(localStorage).find((x) => x.startsWith("oidc.user:"));
+    const token = JSON.parse(localStorage.getItem(k)).access_token;
+    const r = await fetch(url, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) });
+    return { status: r.status, body: await r.json() };
+  }, [url, body]);
+  const tdTopic = `Thiết diện ${Date.now() % 1000}`;
+  for (let k = 0; k < 4; k++) {
+    const r = await apiPost("/api/questions", { type: "mcq", subject: "Toán", grade: 11, topic: tdTopic, level: "TH", tags: [], stem: `Thiết diện của hình lập phương cắt bởi $(MNP)$ — câu ${k + 1}`, options: ["Tam giác", "Tứ giác", "Ngũ giác", "Lục giác"], answer: 3 });
+    assert(r.status === 201, `thêm câu thiết diện ${k + 1}`);
+  }
+  await page.goto(`${BASE}/bang-giang`);
+  await page.waitForSelector("h1");
+  await page.getByTestId("bg-new").click();
+  await page.getByTestId("bg-title").fill("Ôn tập hình không gian");
+  await page.locator("form input[type=number]").fill("11");
+  await page.getByTestId("bg-topic").fill(tdTopic);
+  await page.getByTestId("bg-create").click();
+  await page.waitForSelector("[data-testid=bd-stage]");
+  const stage = await page.getByTestId("bd-stage").boundingBox();
+  await page.getByTestId("t-pen").click();
+  await page.mouse.move(stage.x + 60, stage.y + 60);
+  await page.mouse.down();
+  for (let k = 1; k <= 12; k++) await page.mouse.move(stage.x + 60 + k * 12, stage.y + 60 + Math.sin(k) * 10);
+  await page.mouse.up();
+  assert((await page.locator(".bd-ink").count()) === 1, "vẽ được 1 nét bút");
+
+  await page.getByTestId("t-graph").click();
+  await page.waitForSelector("[data-testid=bd-expr-0]");
+  await page.waitForTimeout(600); // chờ math-field gắn xong rồi mới gõ
+  await page.locator("[data-testid=bd-expr-0]").click();
+  await page.keyboard.type("y=x^2");
+  await page.keyboard.type("-3");
+  await page.getByTestId("bd-graph-ok").click();
+  await page.waitForSelector("[data-testid=bd-graph] .bd-curve");
+  assert(true, "vẽ đồ thị y = x² − 3");
+
+  await page.getByTestId("t-solid").click();
+  await page.getByTestId("bd-lib-cube").click();
+  await page.waitForSelector("[data-testid=bd-solid]");
+  await page.getByTestId("bd-m-cut").click();
+  for (const p of ["A", "C", "C'"]) await page.locator(`[data-pt="${p}"] .bd-hit`).click({ force: true }); // chấm đỉnh nằm trên vùng bấm; bấm thật vẫn nổi bọt về <g>
+  await page.waitForFunction(() => document.querySelector("[data-testid=bd-info]")?.textContent?.includes("hình chữ nhật"));
+  assert(true, "cắt lập phương qua A, C, C' → hình chữ nhật");
+  await shot("bang-giang");
+
+  await page.getByTestId("t-suggest").click();
+  await page.waitForSelector("[data-testid=bd-q]");
+  assert((await page.getByTestId("bd-q").count()) >= 1, "gợi ý bài liên quan có câu");
+  await page.getByTestId("bd-show").first().click();
+  await page.getByTestId("bd-reveal").click();
+  await page.waitForSelector("[data-testid=bd-proj] .bd-po.right");
+  assert(true, "chiếu câu + hiện đáp án");
+  await shot("bang-giang-chieu");
+  await page.locator("[data-testid=bd-proj] .xbtn").click();
+
+  await page.getByTestId("bd-save").click();
+  await page.waitForFunction(() => document.querySelector("[data-testid=bd-state]")?.textContent === "Đã lưu");
+  await page.reload();
+  await page.waitForSelector("[data-testid=bd-solid]");
+  assert((await page.locator(".bd-ink").count()) === 1 && (await page.getByTestId("bd-graph").count()) === 1, "lưu và mở lại bài giảng còn nguyên");
+
   // Tạo đề: trước hết đòi 5 câu để thấy ô thiếu
   await page.goto(`${BASE}/de-thi`);
   await page.waitForSelector("h1");
