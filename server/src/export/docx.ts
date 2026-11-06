@@ -1,4 +1,5 @@
 import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from "docx";
+import { mathRuns } from "./mathDocx";
 import type { QuestionType } from "../domain/question";
 import type { KeyEntry, Variant, VariantItem } from "../domain/variants";
 
@@ -24,7 +25,7 @@ function centered(text: string, bold = false): Paragraph {
 }
 
 function indented(text: string): Paragraph {
-  return new Paragraph({ text, indent: { left: 360 } });
+  return new Paragraph({ indent: { left: 360 }, children: mathRuns(text) });
 }
 
 function bold(text: string, before = 240): Paragraph {
@@ -43,7 +44,7 @@ function itemParagraphs(it: VariantItem): Paragraph[] {
   const q = it.question;
   const head = new Paragraph({
     spacing: { before: 120 },
-    children: [new TextRun({ text: `Câu ${it.sectionNo}. `, bold: true }), new TextRun(q.stem)],
+    children: [new TextRun({ text: `Câu ${it.sectionNo}. `, bold: true }), ...mathRuns(q.stem)],
   });
   switch (q.type) {
     case "mcq":
@@ -76,7 +77,7 @@ export async function renderExamDocx(meta: ExamMeta, variant: Variant): Promise<
 }
 
 function cell(text: string, isBold = false): TableCell {
-  return new TableCell({ children: [new Paragraph({ children: [new TextRun({ text, bold: isBold })] })] });
+  return new TableCell({ children: [new Paragraph({ children: mathRuns(text, { bold: isBold }) })] });
 }
 
 export async function renderAnswerKeyDocx(meta: ExamMeta, keys: { code: string; entries: KeyEntry[] }[]): Promise<Buffer> {
