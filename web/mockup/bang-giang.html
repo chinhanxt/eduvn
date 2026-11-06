@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDUVN — Bảng giảng AI (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --side: #1e2340; --side-ink: #c9cee6; --side-active: #2f3663;
+    --bg: #f4f6fb; --card: #ffffff; --ink: #1b2033; --muted: #7a8199; --line: #eceef4;
+    --brand: #4f6bed;
+    --shadow: 0 1px 2px rgba(20, 28, 60, .06), 0 6px 18px rgba(20, 28, 60, .07);
+    --shadow-hi: 0 2px 4px rgba(20, 28, 60, .08), 0 12px 28px rgba(20, 28, 60, .12);
+    --blue: #4f6bed; --blue-bg: #eaeefe; --violet: #8b5cf6; --violet-bg: #f1ebfe;
+    --amber: #e08a00; --amber-bg: #fff4e0; --green: #16a34a; --green-bg: #e6f6ec;
+    --board: #242b35; --chalk: #f3f0e6; --coral: #ff7a6b; --sky: #5cc8ff; --gold: #ffb547;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; font: 14px/1.5 "Be Vietnam Pro", system-ui, sans-serif; color: var(--ink); background: var(--bg); overflow: hidden; }
+  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  button { font: inherit; cursor: pointer; }
+
+  .shell { display: grid; grid-template-columns: 64px 1fr 300px; height: 100vh; }
+
+  /* Thanh công cụ trái */
+  .rail { background: var(--side); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px; }
+  .mark { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; margin-bottom: 14px; }
+  .rail button { width: 42px; height: 42px; border-radius: 12px; border: 0; background: transparent; color: var(--side-ink); display: grid; place-items: center; position: relative; transition: background .2s, color .2s; }
+  .rail button:hover { background: rgba(255,255,255,.05); }
+  .rail button.on { background: var(--side-active); color: #fff; }
+  .rail button.on::before { content: ""; position: absolute; left: -11px; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--brand); }
+  .rail .sep { width: 28px; height: 1px; background: rgba(255,255,255,.08); margin: 6px 0; }
+  .swatches { margin-top: auto; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .sw { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 2px var(--side); }
+  .sw.on { box-shadow: 0 0 0 2px var(--side), 0 0 0 4px rgba(255,255,255,.55); }
+
+  /* Cột giữa */
+  .center { display: grid; grid-template-rows: 62px 1fr 66px; min-width: 0; min-height: 0; }
+  .top { display: flex; align-items: center; gap: 12px; padding: 0 22px; }
+  .title { font-weight: 700; font-size: 16px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--card); box-shadow: var(--shadow); padding: 6px 12px; border-radius: 999px; font-size: 12.5px; color: var(--muted); font-weight: 500; }
+  .status i { width: 8px; height: 8px; border-radius: 50%; background: var(--brand); animation: pulse 1.4s infinite; }
+  .status b { font-weight: 500; color: var(--ink); }
+  .status.violet i { background: var(--violet); } .status.green i { background: var(--green); } .status.amber i { background: var(--amber); }
+  .status.paused i { background: #b8bdcc; animation: none; }
+  .top .grow { flex: 1; }
+  .clock { font-variant-numeric: tabular-nums; }
+  .clock i { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; border: 0; font-weight: 500; font-size: 13px; padding: 8px 14px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); color: var(--ink); }
+  .btn.pri { background: var(--brand); color: #fff; }
+  .btn svg.i { width: 17px; height: 17px; }
+  .btn.sq { padding: 8px; }
+
+  .wrap { display: grid; place-items: center; padding: 2px 22px; min-height: 0; }
+  .stage { position: relative; aspect-ratio: 16 / 9; width: min(100%, calc((100vh - 140px) * 16 / 9)); border-radius: 18px; background: var(--board); overflow: hidden; container-type: inline-size; user-select: none;
+           box-shadow: 0 2px 6px rgba(20,28,60,.15), 0 18px 40px rgba(20,28,60,.22), inset 0 0 0 1px rgba(255,255,255,.05); }
+  .stage svg.board { position: absolute; inset: 0; width: 100%; height: 100%; font-family: "Be Vietnam Pro", system-ui, sans-serif; }
+  .ink { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .ovl { position: absolute; inset: 0; font-size: clamp(9px, 1.22cqw, 17px); pointer-events: none; }
+  .pg { position: absolute; inset: 0; }
+  .ovl svg.i { width: 1.35em; height: 1.35em; }
+
+  .pen { position: absolute; width: 0; height: 0; z-index: 30; pointer-events: none; }
+  .pen i { position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%; background: rgba(255,255,255,.92);
+           box-shadow: 0 0 0 5px rgba(255,255,255,.14), 0 0 18px rgba(255,255,255,.55); transition: transform .15s, opacity .2s; opacity: .75; }
+  .pen.down i { transform: scale(.55); opacity: 1; }
+  .rip { position: absolute; width: 12px; height: 12px; margin: -6px; border-radius: 50%; border: 2px solid #fff; animation: rip .6s ease-out forwards; z-index: 29; }
+  @keyframes rip { to { transform: scale(6); opacity: 0; } }
+  .press { transform: scale(.93) !important; filter: brightness(.95); }
+
+  .fchip { position: absolute; display: inline-flex; gap: .5em; align-items: center; padding: .3em .8em; border-radius: 999px; background: rgba(255,255,255,.09); color: #fff; font-weight: 500; white-space: nowrap;
+           opacity: 0; transform: translateY(6px); transition: opacity .4s, transform .4s; }
+  .fchip.on { opacity: 1; transform: none; }
+  .fchip .c { width: .65em; height: .65em; border-radius: 50%; }
+  .fchip svg.i { color: #7ee2a8; width: 1.1em; height: 1.1em; }
+
+  .pop { position: absolute; display: flex; gap: .25em; background: #fff; border-radius: 12px; padding: .3em; box-shadow: var(--shadow-hi); opacity: 0; transform: scale(.92) translateY(4px); transform-origin: left top; transition: .25s; }
+  .pop.on { opacity: 1; transform: none; }
+  .pop button { border: 0; background: transparent; font-size: .88em; display: flex; align-items: center; gap: .45em; padding: .45em .8em; border-radius: 9px; color: var(--ink); font-weight: 500; transition: transform .15s; }
+  .pop button.hl { background: var(--blue-bg); color: var(--brand); }
+
+  .sliders { position: absolute; display: flex; gap: 2em; padding: .7em 1.1em; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; color: #fff;
+             opacity: 0; transform: translateY(6px); transition: .4s; }
+  .sliders.on { opacity: 1; transform: none; }
+  .sl { display: flex; align-items: center; gap: .9em; flex: 1; }
+  .sl b { font-style: italic; font-weight: 600; }
+  .track { position: relative; flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,.15); }
+  .track i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--sky); }
+  .knob { position: absolute; top: 50%; width: 1.05em; height: 1.05em; margin: -.525em; border-radius: 50%; background: #fff; box-shadow: 0 0 0 .3em rgba(92,200,255,.3); }
+  .sliders output { min-width: 2em; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .tbar { position: absolute; display: flex; gap: .2em; padding: .35em; background: #fff; border-radius: 14px; box-shadow: var(--shadow-hi); opacity: 0; transform: translate(-50%, 8px); transition: .35s; }
+  .tbar.on { opacity: 1; transform: translate(-50%, 0); }
+  .tbar button { border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: .15em; padding: .45em .7em; border-radius: 10px; font-size: .72em; color: var(--muted); transition: background .2s, transform .15s; }
+  .tbar button svg.i { width: 1.9em; height: 1.9em; color: var(--ink); }
+  .tbar button.on { background: var(--blue-bg); color: var(--brand); }
+  .tbar button.on svg.i { color: var(--brand); }
+
+  /* Thẻ gợi ý bài */
+  .sug { position: absolute; left: 57%; top: 5%; width: 39%; bottom: 5%; background: #fff; border-radius: 16px; box-shadow: var(--shadow-hi); padding: 1.1em 1.2em; display: flex; flex-direction: column; gap: .85em;
+         opacity: 0; transform: translateX(28px); transition: .45s cubic-bezier(.2,.8,.2,1); }
+  .sug.on { opacity: 1; transform: none; }
+  .hd { display: flex; align-items: center; gap: .6em; font-weight: 600; }
+  .hd .ic { width: 2.1em; height: 2.1em; border-radius: .65em; display: grid; place-items: center; }
+  .hd small { margin-left: auto; color: var(--muted); font-weight: 500; }
+  .live-b { display: none; align-items: center; gap: .35em; font-size: .75em; color: var(--green); background: var(--green-bg); padding: .15em .6em; border-radius: 999px; margin-left: auto; }
+  .sug.proj .live-b { display: inline-flex; } .sug.proj .hd small { display: none; }
+  .live-b i { width: .5em; height: .5em; border-radius: 50%; background: var(--green); animation: pulse 1.4s infinite; }
+  .tags { display: flex; gap: .4em; flex-wrap: wrap; }
+  .tag { font-size: .74em; padding: .15em .65em; border-radius: 999px; background: #f2f3f7; color: var(--muted); }
+  .q { font-size: .95em; line-height: 1.6; min-height: 5em; }
+  .sk { height: .75em; border-radius: .4em; margin: .55em 0; background: linear-gradient(90deg, #eef0f6 25%, #f8f9fc 50%, #eef0f6 75%); background-size: 200% 100%; animation: sh 1.1s infinite linear; }
+  @keyframes sh { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: .5em; }
+  .opt { display: flex; gap: .6em; align-items: center; padding: .5em .7em; border-radius: 10px; background: var(--bg); font-size: .9em; opacity: 0; transform: translateY(5px); transition: .3s; }
+  .opt.on { opacity: 1; transform: none; }
+  .opt b { width: 1.7em; height: 1.7em; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: var(--shadow); font-size: .82em; flex: none; }
+  .opt.right { background: var(--green-bg); color: var(--green); font-weight: 600; }
+  .opt.right b { background: var(--green); color: #fff; }
+  .acts { display: flex; gap: .5em; opacity: 0; transition: .3s; }
+  .acts.on { opacity: 1; }
+  .acts button { flex: 1; display: flex; align-items: center; justify-content: center; gap: .45em; border: 0; border-radius: 10px; padding: .6em; font-size: .85em; font-weight: 500; background: var(--bg); color: var(--ink); transition: transform .15s; }
+  .acts .pri { background: var(--brand); color: #fff; }
+  .more { margin-top: auto; border-top: 1px solid var(--line); padding-top: .5em; }
+  .mi { display: flex; align-items: center; gap: .7em; padding: .45em 0; font-size: .86em; opacity: 0; transform: translateY(4px); transition: .3s; }
+  .mi.on { opacity: 1; transform: none; }
+  .mi .n { width: 1.8em; height: 1.8em; border-radius: .55em; background: var(--blue-bg); color: var(--brand); display: grid; place-items: center; font-size: .8em; font-weight: 600; flex: none; }
+  .mi small { margin-left: auto; color: var(--muted); white-space: nowrap; }
+
+  /* Trợ giảng ảo */
+  .tutor { position: absolute; left: 3%; top: 5%; bottom: 5%; width: 50%; background: #fff; border-radius: 16px; box-shadow: var(--shadow-hi); display: grid; grid-template-rows: auto auto 1fr; padding: 1em 1.1em; gap: .9em;
+           opacity: 0; transform: translateX(-28px); transition: .45s cubic-bezier(.2,.8,.2,1); }
+  .tutor.on { opacity: 1; transform: none; }
+  .tabs { display: flex; gap: .25em; background: var(--bg); padding: .25em; border-radius: 12px; width: max-content; }
+  .tabs button { border: 0; background: transparent; font-size: .82em; padding: .4em .9em; border-radius: 9px; color: var(--muted); display: flex; gap: .45em; align-items: center; font-weight: 500; transition: .2s; }
+  .tabs button.on { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
+  .who { display: flex; align-items: center; gap: 1.1em; }
+  .face { width: 7.2em; height: 7.2em; border-radius: 50%; overflow: hidden; flex: none; box-shadow: 0 0 0 .3em var(--blue-bg); transition: box-shadow .3s, opacity .35s; }
+  .face.talk { box-shadow: 0 0 0 .3em var(--blue-bg), 0 0 0 .65em rgba(79,107,237,.14); }
+  .face svg { width: 100%; height: 100%; display: block; }
+  .who b { display: block; font-size: 1.1em; }
+  .who small { color: var(--muted); }
+  .wave { display: flex; gap: 3px; align-items: center; height: 1.5em; margin-top: .35em; }
+  .wave i { width: 3px; border-radius: 3px; background: var(--brand); height: 18%; transition: height .08s; }
+  .chat { display: flex; flex-direction: column; gap: .6em; overflow: hidden; justify-content: flex-start; min-height: 0; padding-top: .2em; }
+  .msg { max-width: 88%; padding: .6em .9em; border-radius: 14px; font-size: .9em; line-height: 1.55; background: var(--bg); animation: in .3s; }
+  .msg.me { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 4px; }
+  .msg.ai { border-bottom-left-radius: 4px; }
+  .msg .lbl { display: flex; align-items: center; gap: .35em; font-size: .76em; opacity: .7; margin-bottom: .15em; font-weight: 500; }
+  .msg .lbl svg.i { width: 1.15em; height: 1.15em; }
+  .score { display: flex; align-items: center; gap: .6em; margin-top: .5em; font-size: .82em; color: var(--green); font-weight: 600; }
+  .score .bar { flex: 1; max-width: 9em; height: .4em; border-radius: .2em; background: var(--green-bg); overflow: hidden; }
+  .score .bar i { display: block; height: 100%; width: 0; background: var(--green); transition: width 1s; }
+  .eye { transform-box: fill-box; transform-origin: center; animation: blink 4.2s infinite; }
+  @keyframes blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+
+  .caret { display: inline-block; width: .45em; height: 1em; vertical-align: -.15em; background: currentColor; opacity: .55; margin-left: 2px; animation: bl .9s steps(2) infinite; }
+  @keyframes bl { 50% { opacity: 0; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Thanh dưới */
+  .bot { display: flex; align-items: center; gap: 16px; padding: 0 22px; }
+  .play { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--brand); color: #fff; display: grid; place-items: center; box-shadow: var(--shadow); flex: none; }
+  .play svg.i { width: 18px; height: 18px; fill: currentColor; }
+  .steps { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .step { cursor: pointer; }
+  .step .bar { height: 4px; border-radius: 4px; background: #dde1ec; overflow: hidden; }
+  .step .bar i { display: block; height: 100%; width: 0; background: var(--brand); }
+  .step span { display: flex; gap: 7px; align-items: center; font-size: 12.5px; color: var(--muted); margin-top: 7px; font-weight: 500; }
+  .step .n { width: 19px; height: 19px; border-radius: 50%; background: #e4e7f0; display: grid; place-items: center; font-size: 10.5px; font-weight: 600; }
+  .step.on span { color: var(--ink); }
+  .step.on .n { background: var(--brand); color: #fff; }
+  .step.done .n { background: var(--green); color: #fff; }
+  .step.done .bar i { background: var(--green); }
+  .speed { border: 0; background: var(--card); box-shadow: var(--shadow); border-radius: 10px; padding: 7px 11px; font-size: 12.5px; font-weight: 600; color: var(--ink); min-width: 46px; }
+
+  /* Dòng AI bên phải */
+  .feed { background: var(--card); box-shadow: -1px 0 0 var(--line); display: flex; flex-direction: column; min-height: 0; }
+  .fh { display: flex; align-items: center; gap: 10px; padding: 20px 18px 14px; font-weight: 600; }
+  .fh .live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--green); background: var(--green-bg); padding: 3px 9px; border-radius: 999px; font-weight: 500; }
+  .fh .live i { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.4s infinite; }
+  .list { flex: 1; overflow: hidden; padding: 0 14px 12px; display: flex; flex-direction: column; gap: 8px; justify-content: flex-end; }
+  .ev { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--bg); font-size: 13px; animation: in .3s; transition: opacity .4s; }
+  .ev.old { opacity: .55; }
+  .eic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+  .eic svg.i { width: 16px; height: 16px; }
+  .blue { background: var(--blue-bg); color: var(--blue); } .violet { background: var(--violet-bg); color: var(--violet); }
+  .amber { background: var(--amber-bg); color: var(--amber); } .green { background: var(--green-bg); color: var(--green); }
+  .ev .t { flex: 1; min-width: 0; padding-top: 1px; }
+  .ev .t small { display: block; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .ev .st { width: 16px; height: 16px; margin-top: 7px; flex: none; }
+  .ev.live .st { border: 2px solid var(--blue-bg); border-top-color: var(--brand); border-radius: 50%; animation: spin .8s linear infinite; }
+  .ev.done .st { color: var(--green); }
+  .ask { margin: 0 14px 16px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--bg); color: var(--muted); font-size: 13px; }
+  .ask .m { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; }
+  .ask .m svg.i { width: 16px; height: 16px; }
+
+  @media (max-width: 1100px) { .shell { grid-template-columns: 64px 1fr; } .feed { display: none; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+  <symbol id="i-pointer" viewBox="0 0 24 24"><path d="M4.04 4.69a.5.5 0 0 1 .65-.65l16 6.5a.5.5 0 0 1-.06.95l-6.12 1.58a2 2 0 0 0-1.44 1.43l-1.58 6.13a.5.5 0 0 1-.95.06z"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="i-eraser" viewBox="0 0 24 24"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></symbol>
+  <symbol id="i-shapes" viewBox="0 0 24 24"><path d="M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04L16.3 8.9a.7.7 0 0 1-.57 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></symbol>
+  <symbol id="i-graph" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16c.5-2 1.5-7 4-7 2 0 2 3 4.5 3 1.5 0 2.5-3 3.5-5"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></symbol>
+  <symbol id="i-pages" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></symbol>
+  <symbol id="i-max" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="7 4 20 12 7 20 7 4"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-table" viewBox="0 0 24 24"><path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7"/><path d="M10 4H3"/><path d="M21 12h-9"/><path d="M8 12H3"/><path d="M21 20h-5"/><path d="M12 20H3"/><path d="M14 2v4"/><path d="M8 10v4"/><path d="M16 18v4"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M16.47 7.5C15.64 4.24 13.95 2 12 2 9.24 2 7 6.48 7 12s2.24 10 5 10c.34 0 .68-.07 1-.2"/><path d="m15.19 13.71 3.82 1.86-1.86 3.81"/><path d="M19 15.57c-1.8.89-4.27 1.43-7 1.43-5.52 0-10-2.24-10-5s4.48-5 10-5c4.84 0 8.87 1.72 9.8 4"/></symbol>
+  <symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/></symbol>
+  <symbol id="i-angle" viewBox="0 0 24 24"><path d="M4 20V4"/><path d="M4 20h16"/><path d="M4 11a9 9 0 0 1 9 9"/></symbol>
+  <symbol id="i-paint" viewBox="0 0 24 24"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><path d="m5 2 5 5"/><path d="M2 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z"/></symbol>
+  <symbol id="i-net" viewBox="0 0 24 24"><path d="M9 3h6v6H9z"/><path d="M3 9h6v6H3z"/><path d="M9 9h6v6H9z"/><path d="M15 9h6v6h-6z"/><path d="M9 15h6v6H9z"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></symbol>
+  <symbol id="i-present" viewBox="0 0 24 24"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></symbol>
+  <symbol id="i-game" viewBox="0 0 24 24"><path d="M6 11h4"/><path d="M8 9v4"/><path d="M15 12h.01"/><path d="M18 10h.01"/><path d="M17.32 5H6.68a4 4 0 0 0-3.98 3.59C2.6 9.42 2 14.46 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.41-1.41A2 2 0 0 1 9.83 16h4.34a2 2 0 0 1 1.41.59L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.55-.6-6.58-.69-7.26A4 4 0 0 0 17.32 5z"/></symbol>
+  <symbol id="i-fileplus" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.41 7.59A1.4 1.4 0 0 1 5.42 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.42a1.4 1.4 0 0 1 .99.41l3.39 3.39a.7.7 0 0 0 1.2-.5z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.36 18.36a9 9 0 0 0 0-12.73"/></symbol>
+  <symbol id="i-lang" viewBox="0 0 24 24"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="mark"><svg class="i"><use href="#i-cap"/></svg></div>
+    <button data-tool="pointer" title="Chọn"><svg class="i"><use href="#i-pointer"/></svg></button>
+    <button data-tool="pen" title="Bút" class="on"><svg class="i"><use href="#i-pen"/></svg></button>
+    <button data-tool="eraser" title="Tẩy"><svg class="i"><use href="#i-eraser"/></svg></button>
+    <button data-tool="shapes" title="Hình"><svg class="i"><use href="#i-shapes"/></svg></button>
+    <div class="sep"></div>
+    <button data-tool="graph" title="Đồ thị"><svg class="i"><use href="#i-graph"/></svg></button>
+    <button data-tool="box" title="Hình 3D"><svg class="i"><use href="#i-box"/></svg></button>
+    <button data-tool="spark" title="Gợi ý bài"><svg class="i"><use href="#i-spark"/></svg></button>
+    <button data-tool="bot" title="Trợ giảng ảo"><svg class="i"><use href="#i-bot"/></svg></button>
+    <div class="sep"></div>
+    <button title="Trang"><svg class="i"><use href="#i-pages"/></svg></button>
+    <div class="swatches">
+      <span class="sw on" style="background:#f3f0e6"></span>
+      <span class="sw" style="background:#ff7a6b"></span>
+      <span class="sw" style="background:#5cc8ff"></span>
+      <span class="sw" style="background:#ffb547"></span>
+    </div>
+  </aside>
+
+  <section class="center">
+    <div class="top">
+      <span class="title">Bảng giảng AI</span>
+      <span class="chip">Toán 11 · Ôn tập chương</span>
+      <span class="chip status" id="status"><i></i><b id="stTxt">Sẵn sàng</b></span>
+      <span class="grow"></span>
+      <span class="chip clock"><i></i><span id="clock">00:00</span></span>
+      <span class="chip">Trang <b id="pageNo" style="color:var(--ink);font-weight:600">1</b>/2</span>
+      <button class="btn pri"><svg class="i"><use href="#i-save"/></svg>Lưu bài giảng</button>
+      <button class="btn sq" title="Toàn màn hình"><svg class="i"><use href="#i-max"/></svg></button>
+    </div>
+
+    <div class="wrap">
+      <div class="stage" id="stage">
+        <svg class="board" id="board" viewBox="0 0 1280 720">
+          <defs>
+            <pattern id="dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(255,255,255,.07)"/></pattern>
+            <linearGradient id="scanG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#7c93ff" stop-opacity="0"/><stop offset=".85" stop-color="#7c93ff" stop-opacity=".35"/><stop offset="1" stop-color="#c3cdff" stop-opacity=".9"/>
+            </linearGradient>
+          </defs>
+          <rect width="1280" height="720" fill="url(#dots)"/>
+          <g id="p1">
+            <g id="graphG" opacity="0"></g>
+            <g id="ink1"></g>
+            <g id="lasso"></g>
+          </g>
+          <g id="p2">
+            <g id="cubeG" opacity="0"></g>
+            <g id="sketch"></g>
+            <g id="scan"></g>
+          </g>
+        </svg>
+
+        <div class="ovl">
+          <div class="pg" id="o1">
+            <div class="pop" id="pop"><button class="hl" id="popGo"><svg class="i"><use href="#i-graph"/></svg>Vẽ đồ thị</button><button><svg class="i"><use href="#i-table"/></svg>Bảng giá trị</button></div>
+            <div class="fchip" id="f1"><svg class="i"><use href="#i-check"/></svg><span class="c" style="background:var(--coral)"></span><span>y = x² − 3</span></div>
+            <div class="fchip" id="f2"><svg class="i"><use href="#i-check"/></svg><span class="c" style="background:var(--sky)"></span><span id="f2t">y = A sin x + B</span></div>
+            <div class="sliders" id="sliderBox">
+              <div class="sl"><b>A</b><div class="track"><i id="fillA"></i><span class="knob" id="kA"></span></div><output id="vA">1</output></div>
+              <div class="sl"><b>B</b><div class="track"><i id="fillB"></i><span class="knob" id="kB"></span></div><output id="vB">0</output></div>
+            </div>
+          </div>
+          <div class="pg" id="o2">
+            <div class="tbar" id="tbar">
+              <button id="tRot"><svg class="i"><use href="#i-rotate"/></svg>Xoay</button>
+              <button id="tCut"><svg class="i"><use href="#i-cut"/></svg>Cắt</button>
+              <button id="tAng"><svg class="i"><use href="#i-angle"/></svg>Đo góc</button>
+              <button><svg class="i"><use href="#i-paint"/></svg>Tô mặt</button>
+              <button><svg class="i"><use href="#i-net"/></svg>Trải phẳng</button>
+            </div>
+
+            <div class="sug" id="sug">
+              <div class="hd"><span class="ic violet"><svg class="i"><use href="#i-spark"/></svg></span>Gợi ý bài liên quan<small>1/3</small><span class="live-b"><i></i>Đang chiếu</span></div>
+              <div class="tags"><span class="tag">Toán 11</span><span class="tag">Thiết diện</span><span class="tag">Thông hiểu</span><span class="tag">Ngân hàng của tôi</span></div>
+              <div class="q" id="q"></div>
+              <div class="opts" id="opts">
+                <div class="opt"><b>A</b>Tam giác</div><div class="opt"><b>B</b>Tứ giác</div>
+                <div class="opt"><b>C</b>Ngũ giác</div><div class="opt" id="optD"><b>D</b>Lục giác</div>
+              </div>
+              <div class="acts" id="acts">
+                <button class="pri" id="bShow"><svg class="i"><use href="#i-present"/></svg>Chiếu</button>
+                <button><svg class="i"><use href="#i-game"/></svg>Trò chơi</button>
+                <button><svg class="i"><use href="#i-fileplus"/></svg>Vào đề</button>
+              </div>
+              <div class="more">
+                <div class="mi"><span class="n">2</span>Tính diện tích thiết diện theo a<small>Vận dụng</small></div>
+                <div class="mi"><span class="n">3</span>Góc giữa (MNP) và mặt đáy<small>Vận dụng cao</small></div>
+              </div>
+            </div>
+
+            <div class="tutor" id="tutor">
+              <div class="tabs"><button class="on" id="tabVi"><svg class="i"><use href="#i-cap"/></svg>Giảng bài</button><button id="tabEn"><svg class="i"><use href="#i-lang"/></svg>Tiếng Anh</button></div>
+              <div class="who">
+                <div class="face" id="face"></div>
+                <div><b id="tName">Cô Mai</b><small id="tSub">Trợ giảng ảo</small><div class="wave" id="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+              </div>
+              <div class="chat" id="chat"></div>
+            </div>
+          </div>
+          <div class="pen" id="pen"><i></i></div>
+          <div id="fx" style="position:absolute;inset:0"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bot">
+      <button class="play" id="play" title="Tạm dừng / chạy (phím cách)"><svg class="i"><use href="#i-pause"/></svg></button>
+      <div class="steps" id="steps">
+        <div class="step"><div class="bar"><i></i></div><span><b class="n">1</b>Đồ thị hàm số</span></div>
+        <div class="step"><div class="bar"><i></i></div><span><b class="n">2</b>Hình không gian 3D</span></div>
+        <div class="step"><div class="bar"><i></i></div><span><b class="n">3</b>Gợi ý bài liên quan</span></div>
+        <div class="step"><div class="bar"><i></i></div><span><b class="n">4</b>Trợ giảng ảo</span></div>
+      </div>
+      <button class="speed" id="speed">1×</button>
+      <button class="btn sq" id="replay" title="Chạy lại"><svg class="i"><use href="#i-replay"/></svg></button>
+    </div>
+  </section>
+
+  <aside class="feed">
+    <div class="fh"><span class="eic violet"><svg class="i"><use href="#i-spark"/></svg></span>Dòng AI<span class="live"><i></i>Trực tiếp</span></div>
+    <div class="list" id="list"></div>
+    <div class="ask"><span>Nói hoặc gõ yêu cầu…</span><span class="m"><svg class="i"><use href="#i-mic"/></svg></span></div>
+  </aside>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const $ = (s) => document.querySelector(s);
+const W = 1280, H = 720;
+const CHALK = "#f3f0e6";
+const stage = $("#stage");
+
+/* ---------- Đồng hồ kịch bản: tạm dừng / tốc độ / nhảy phần ---------- */
+let gen = 0, playing = true, speed = 1, sceneIdx = 0, sceneT = 0, lessonT = 0;
+class Abort extends Error {}
+const frame = () => new Promise((r) => requestAnimationFrame(r));
+async function tween(g, ms, fn) {
+  let t = 0, last = performance.now();
+  fn && fn(0);
+  while (t < ms) {
+    await frame();
+    if (g !== gen) throw new Abort();
+    const now = performance.now();
+    if (playing) t += (now - last) * speed;
+    last = now;
+    fn && fn(Math.min(1, t / ms));
+  }
+}
+const wait = (g, ms) => tween(g, ms);
+const ease = (t) => (t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+const bg = (p) => p.catch((e) => { if (!(e instanceof Abort)) console.error(e); });
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function html(s) { const t = document.createElement("template"); t.innerHTML = s.trim(); return t.content.firstChild; }
+const ico = (n) => `<svg class="i"><use href="#i-${n}"/></svg>`;
+function place(node, x, y) { node.style.left = (x / W * 100) + "%"; node.style.top = (y / H * 100) + "%"; }
+function center(node) {
+  const r = node.getBoundingClientRect(), s = stage.getBoundingClientRect();
+  return [(r.left + r.width / 2 - s.left) / s.width * W, (r.top + r.height / 2 - s.top) / s.height * H];
+}
+
+/* ---------- Bút ---------- */
+const penEl = $("#pen");
+let penX = 640, penY = 420;
+function penAt(x, y) { penX = x; penY = y; place(penEl, x, y); }
+const pen = { down: () => penEl.classList.add("down"), up: () => penEl.classList.remove("down") };
+async function penTo(g, x, y, ms) {
+  const x0 = penX, y0 = penY, d = Math.hypot(x - x0, y - y0);
+  await tween(g, ms ?? Math.min(520, 90 + d * .7), (t) => { const e = ease(t); penAt(x0 + (x - x0) * e, y0 + (y - y0) * e); });
+}
+async function tap(g, node) {
+  const [x, y] = center(node);
+  await penTo(g, x, y);
+  const r = document.createElement("div");
+  r.className = "rip"; place(r, x, y); $("#fx").appendChild(r);
+  node.classList.add("press");
+  await wait(g, 170);
+  node.classList.remove("press");
+  setTimeout(() => r.remove(), 700);
+}
+
+/* ---------- Nét viết tay ---------- */
+const GL = {
+  "y": [62, "M6 50 Q14 84 30 92 M58 50 Q46 96 32 120 Q22 134 8 126"],
+  "=": [56, "M6 64 L50 62 M6 82 L50 80"],
+  "x": [56, "M6 52 Q26 74 50 100 M50 52 Q28 74 6 100"],
+  "²": [32, "M4 20 Q12 6 22 12 Q28 20 4 42 L28 40"],
+  "−": [50, "M6 74 L44 73"],
+  "3": [56, "M8 16 Q34 -4 46 18 Q46 40 22 46 Q50 50 48 76 Q42 106 8 92"],
+  "A": [62, "M4 100 L30 2 L58 100 M15 64 L47 63"],
+  "s": [50, "M42 56 Q26 42 12 54 Q6 70 28 74 Q48 80 40 96 Q26 106 6 94"],
+  "i": [24, "M12 52 L12 100 M11 30 L13 33"],
+  "n": [56, "M8 50 L8 100 M8 70 Q20 48 35 52 Q46 56 46 72 L46 100"],
+  "+": [52, "M26 56 L26 96 M6 76 L46 76"],
+  "B": [62, "M8 0 L8 100 M8 0 Q50 -2 48 25 Q45 48 8 48 Q56 46 54 74 Q52 102 8 100"],
+  " ": [26, ""],
+};
+const jit = (a) => (Math.random() - .5) * 2 * a;
+function glyphPath(d, ox, oy, s) {
+  return d.replace(/(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g, (m, x, y) => {
+    x = +x; y = +y;
+    return (ox + (x + (100 - y) * .12) * s + jit(1)).toFixed(1) + " " + (oy + y * s + jit(1)).toFixed(1);
+  });
+}
+async function ink(g, d, group, color = CHALK, w = 4.2, rate = 2.3) {
+  const p = el("path", { d, class: "ink", stroke: color, "stroke-width": w }, group);
+  const L = p.getTotalLength();
+  p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+  const s = p.getPointAtLength(0);
+  await penTo(g, s.x, s.y);
+  pen.down();
+  await tween(g, 40 + L * rate, (t) => { p.style.strokeDashoffset = L * (1 - t); const q = p.getPointAtLength(L * t); penAt(q.x, q.y); });
+  pen.up();
+  p.style.strokeDasharray = "none";
+  return p;
+}
+async function write(g, text, ox, oy, s, group) {
+  let x = ox;
+  for (const ch of text) {
+    const [w, d] = GL[ch];
+    if (d) for (const sub of d.split(/(?=M)/)) await ink(g, glyphPath(sub, x, oy, s), group);
+    x += (w + 6) * s;
+  }
+  return { x0: ox, x1: x, y0: oy, y1: oy + 130 * s };
+}
+async function lasso(g, b) {
+  const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2, rx = (b.x1 - b.x0) / 2 + 26, ry = (b.y1 - b.y0) / 2 + 16;
+  let d = "";
+  for (let a = -2.2, k = 0; a <= -2.2 + Math.PI * 2 + .45; a += .12, k++) {
+    const r = 1 + jit(.03);
+    d += (k ? "L" : "M") + (cx + Math.cos(a) * rx * r).toFixed(1) + " " + (cy + Math.sin(a) * ry * r).toFixed(1);
+  }
+  const p = await ink(g, d, $("#lasso"), "#8fa2ff", 2.2, .9);
+  p.style.strokeDasharray = "7 7";
+  return p;
+}
+
+/* ---------- Đồ thị ---------- */
+const G = { x0: 540, x1: 1180, y0: 60, y1: 450, xmin: -4, xmax: 4, ymin: -4, ymax: 5 };
+const gx = (x) => G.x0 + (x - G.xmin) / (G.xmax - G.xmin) * (G.x1 - G.x0);
+const gy = (y) => G.y1 - (y - G.ymin) / (G.ymax - G.ymin) * (G.y1 - G.y0);
+function fpath(f) {
+  let d = "", on = false;
+  for (let x = G.xmin; x <= G.xmax + 1e-9; x += .04) {
+    const y = f(x);
+    if (y < G.ymin - .05 || y > G.ymax + .05) { on = false; continue; }
+    d += (on ? "L" : "M") + gx(x).toFixed(1) + " " + gy(y).toFixed(1);
+    on = true;
+  }
+  return d;
+}
+let parP, sinP;
+function buildGraph() {
+  const gg = $("#graphG");
+  gg.innerHTML = "";
+  el("rect", { x: 520, y: 40, width: 680, height: 430, rx: 16, fill: "rgba(255,255,255,.035)", stroke: "rgba(255,255,255,.12)" }, gg);
+  for (let x = G.xmin; x <= G.xmax; x++) el("line", { x1: gx(x), x2: gx(x), y1: G.y0, y2: G.y1, stroke: "rgba(255,255,255,.07)" }, gg);
+  for (let y = G.ymin; y <= G.ymax; y++) el("line", { x1: G.x0, x2: G.x1, y1: gy(y), y2: gy(y), stroke: "rgba(255,255,255,.07)" }, gg);
+  el("line", { x1: G.x0, x2: G.x1, y1: gy(0), y2: gy(0), stroke: "rgba(255,255,255,.5)", "stroke-width": 1.5 }, gg);
+  el("line", { x1: gx(0), x2: gx(0), y1: G.y0, y2: G.y1, stroke: "rgba(255,255,255,.5)", "stroke-width": 1.5 }, gg);
+  for (let x = G.xmin + 1; x < G.xmax; x++) if (x) el("text", { x: gx(x), y: gy(0) + 20, fill: "rgba(255,255,255,.45)", "font-size": 13, "text-anchor": "middle" }, gg).textContent = x;
+  for (let y = G.ymin + 1; y < G.ymax; y++) if (y) el("text", { x: gx(0) - 10, y: gy(y) + 4, fill: "rgba(255,255,255,.45)", "font-size": 13, "text-anchor": "end" }, gg).textContent = y;
+  el("text", { x: G.x1 - 4, y: gy(0) - 10, fill: "rgba(255,255,255,.7)", "font-size": 15, "font-style": "italic", "text-anchor": "end" }, gg).textContent = "x";
+  el("text", { x: gx(0) + 10, y: G.y0 + 14, fill: "rgba(255,255,255,.7)", "font-size": 15, "font-style": "italic" }, gg).textContent = "y";
+  parP = el("path", { class: "ink", stroke: "var(--coral)", "stroke-width": 3.4 }, gg);
+  sinP = el("path", { class: "ink", stroke: "var(--sky)", "stroke-width": 3.4 }, gg);
+}
+async function drawCurve(g, p, d, ms) {
+  p.setAttribute("d", d);
+  const L = p.getTotalLength();
+  p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+  await tween(g, ms, (t) => { p.style.strokeDashoffset = L * (1 - ease(t)); });
+  p.style.strokeDasharray = "none";
+}
+const SL = { A: [0, 3, 1], B: [-2, 2, 0] };
+const fmt = (v) => (Math.round(v * 10) / 10).toString().replace(".", ",");
+function setSlider(k, v) {
+  SL[k][2] = v;
+  const pct = (v - SL[k][0]) / (SL[k][1] - SL[k][0]) * 100;
+  $("#fill" + k).style.width = pct + "%";
+  $("#k" + k).style.left = pct + "%";
+  $("#v" + k).textContent = fmt(v);
+  const A = SL.A[2], B = SL.B[2];
+  if (sinP && sinP.dataset.live) sinP.setAttribute("d", fpath((x) => A * Math.sin(x) + B));
+  const a = Math.abs(A - 1) < .05 ? "" : fmt(A) + " ";
+  const b = Math.abs(B) < .05 ? "" : " + " + fmt(B);
+  $("#f2t").textContent = `y = ${a}sin x${b}`;
+}
+async function dragSlider(g, k, to) {
+  const knob = $("#k" + k), from = SL[k][2];
+  const [x, y] = center(knob);
+  await penTo(g, x, y);
+  pen.down();
+  await tween(g, 1500, (t) => { setSlider(k, from + (to - from) * ease(t)); const c = center(knob); penAt(c[0], c[1]); });
+  pen.up();
+}
+
+/* ---------- Hình lập phương 3D ---------- */
+const V = [[0,0,0],[1,0,0],[1,1,0],[0,1,0],[0,0,1],[1,0,1],[1,1,1],[0,1,1]];
+const VN = ["A", "B", "C", "D", "A'", "B'", "C'", "D'"];
+const E = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+const FACES = [[0,3,7,4],[1,2,6,5],[0,1,5,4],[3,2,6,7],[0,1,2,3],[4,5,6,7]];
+const FN = [[-1,0,0],[1,0,0],[0,-1,0],[0,1,0],[0,0,-1],[0,0,1]];
+const COL = { blue: ["rgba(92,140,255,.32)", "#9cb4ff"], gold: ["rgba(255,181,71,.30)", "#ffc56b"] };
+const cube = {};
+function cubeReset() {
+  Object.assign(cube, { on: false, a: 0, cx: 455, cy: 350, S: 200, th: .62, ph: .42, spin: .22, labels: 0,
+    sway: 0, swayBase: 0, swayT: 0, sec: null, poly: null, planeT: 0, secT: 0, angle: 0, points: [], edgeLbl: 0, pulse: 0 });
+}
+function rotDir(v) {
+  const X = v[0], Y = v[2], Z = v[1];
+  const c = Math.cos(cube.th), s = Math.sin(cube.th), cp = Math.cos(cube.ph), sp = Math.sin(cube.ph);
+  const X1 = X * c + Z * s, Z1 = -X * s + Z * c;
+  return [X1, Y * cp - Z1 * sp, Y * sp + Z1 * cp];
+}
+function P(p) { const r = rotDir([p[0] - .5, p[1] - .5, p[2] - .5]); return [cube.cx + r[0] * cube.S, cube.cy - r[1] * cube.S, r[2]]; }
+const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const mul = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = (a) => mul(a, 1 / Math.hypot(...a));
+function section(n, d) {
+  const pts = [];
+  for (const [i, j] of E) {
+    const f1 = dot(n, V[i]) - d, f2 = dot(n, V[j]) - d;
+    if (f1 * f2 < 0 || Math.abs(f1) < 1e-9) {
+      const t = Math.abs(f1) < 1e-9 ? 0 : f1 / (f1 - f2);
+      const p = add(V[i], mul(sub(V[j], V[i]), t));
+      if (!pts.some((q) => Math.hypot(...sub(p, q)) < 1e-6)) pts.push(p);
+    }
+  }
+  const c = mul(pts.reduce(add, [0, 0, 0]), 1 / pts.length);
+  const u = norm(sub(pts[0], c)), w = cross(norm(n), u);
+  pts.sort((a, b) => Math.atan2(dot(sub(a, c), w), dot(sub(a, c), u)) - Math.atan2(dot(sub(b, c), w), dot(sub(b, c), u)));
+  return { pts, c };
+}
+function setSection(n, d, color) { cube.sec = { n, d, color }; cube.poly = section(n, d); }
+function bestTheta(n) {
+  const u = norm(n), sp = Math.sin(cube.ph), cp = Math.cos(cube.ph);
+  let best = cube.th, score = -1;
+  for (let k = 0; k < 720; k++) {
+    const th = cube.th + k / 720 * Math.PI * 2;
+    const z = Math.abs(u[2] * sp + (-u[0] * Math.sin(th) + u[1] * Math.cos(th)) * cp);
+    if (z > score + 1e-3) { score = z; best = th; }
+  }
+  return best;
+}
+async function faceSection(g, n, ms = 900) {
+  cube.spin = 0; cube.sway = 0;
+  const t0 = cube.th, t1 = bestTheta(n);
+  await tween(g, ms, (t) => (cube.th = t0 + (t1 - t0) * ease(t)));
+  cube.swayBase = t1; cube.swayT = 0; cube.sway = .32;
+}
+const pts2 = (arr) => arr.map((p) => { const q = P(p); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" ");
+function label(x, y, t, fill, size = 17, weight = 500) {
+  return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" fill="${fill}" font-size="${size}" font-weight="${weight}" text-anchor="middle" dominant-baseline="middle">${t}</text>`;
+}
+function renderCube() {
+  const g = $("#cubeG");
+  g.setAttribute("opacity", cube.a);
+  if (!cube.on && cube.a <= 0) { g.innerHTML = ""; return; }
+  let s = "";
+  const vis = FN.map((n) => rotDir(n)[2] > 0);
+  FACES.forEach((f, k) => { if (vis[k]) s += `<polygon points="${pts2(f.map((i) => V[i]))}" fill="rgba(140,165,255,.06)"/>`; });
+  const C = P([.5, .5, .5]);
+  // mặt phẳng cắt trượt vào
+  if (cube.sec && cube.planeT > 0) {
+    const n = norm(cube.sec.n), c0 = cube.poly.c, t = ease(cube.planeT);
+    const u = norm(cross(n, Math.abs(n[2]) > .9 ? [1, 0, 0] : [0, 0, 1])), w = cross(n, u);
+    const cc = add(c0, mul(n, (1 - t) * 1.2));
+    const q = [[1,1],[1,-1],[-1,-1],[-1,1]].map(([a, b]) => add(cc, add(mul(u, a * .95), mul(w, b * .95))));
+    const op = (cube.secT > 0 ? .55 - .35 * cube.secT : 1) * Math.min(1, cube.planeT * 3);
+    s += `<polygon points="${pts2(q)}" fill="${COL[cube.sec.color][0]}" fill-opacity=".45" stroke="${COL[cube.sec.color][1]}" stroke-dasharray="8 6" stroke-width="1.4" opacity="${op.toFixed(2)}"/>`;
+  }
+  E.forEach(([i, j]) => {
+    const k = [0, 1, 2].find((c) => V[i][c] !== V[j][c]);
+    const [a, b] = [0, 1, 2].filter((c) => c !== k);
+    const fa = FN.findIndex((n) => n[a] === (V[i][a] ? 1 : -1)), fb = FN.findIndex((n) => n[b] === (V[i][b] ? 1 : -1));
+    const hidden = !vis[fa] && !vis[fb];
+    const p = P(V[i]), q = P(V[j]);
+    s += `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${hidden ? "rgba(255,255,255,.38)" : "#fff"}" stroke-width="${hidden ? 1.6 : 2.6}" ${hidden ? 'stroke-dasharray="7 7"' : ""} stroke-linecap="round"/>`;
+  });
+  if (cube.sec && cube.secT > 0) {
+    const { pts, c } = cube.poly, t = ease(cube.secT);
+    const sp = pts.map((p) => add(c, mul(sub(p, c), t)));
+    const sw = 2.6 + (cube.pulse ? 1.6 * (1 + Math.sin(performance.now() / 180)) : 0);
+    s += `<polygon points="${pts2(sp)}" fill="${COL[cube.sec.color][0]}" stroke="${COL[cube.sec.color][1]}" stroke-width="${sw.toFixed(2)}" stroke-linejoin="round"/>`;
+    const Pc = P(c);
+    if (cube.angle > 0) {
+      const v0 = pts[0], u1 = norm(sub(pts[1], v0)), u2 = norm(sub(pts[pts.length - 1], v0));
+      const arc = [];
+      for (let k = 0; k <= 16 * cube.angle; k++) arc.push(add(v0, mul(norm(add(mul(u1, 1 - k / 16), mul(u2, k / 16))), .13)));
+      s += `<polyline points="${pts2(arc)}" fill="none" stroke="#fff" stroke-width="2"/>`;
+      const lp = P(add(v0, mul(norm(add(u1, u2)), .27)));
+      s += label(lp[0], lp[1], "120°", "#fff", 16, 600);
+    }
+    if (cube.edgeLbl > 0) {
+      for (let k = 0; k < pts.length; k += 2) {
+        const m = P(mul(add(pts[k], pts[(k + 1) % pts.length]), .5));
+        const dx = m[0] - Pc[0], dy = m[1] - Pc[1], L = Math.hypot(dx, dy) || 1;
+        s += `<g opacity="${cube.edgeLbl}">${label(m[0] + dx / L * 26, m[1] + dy / L * 18, "a√2/2", COL[cube.sec.color][1], 15, 600)}</g>`;
+      }
+    }
+  }
+  if (cube.labels > 0) {
+    s += `<g opacity="${cube.labels}">`;
+    V.forEach((v, i) => {
+      const p = P(v), dx = p[0] - C[0], dy = p[1] - C[1], L = Math.hypot(dx, dy) || 1;
+      s += `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#fff"/>` + label(p[0] + dx / L * 20, p[1] + dy / L * 18, VN[i], "rgba(255,255,255,.85)");
+    });
+    s += "</g>";
+  }
+  cube.points.forEach(([name, v]) => {
+    const p = P(v), dx = p[0] - C[0], dy = p[1] - C[1], L = Math.hypot(dx, dy) || 1;
+    s += `<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="var(--gold)" stroke="#242b35" stroke-width="2"/>` + label(p[0] + dx / L * 22, p[1] + dy / L * 20, name, "var(--gold)", 18, 700);
+  });
+  g.innerHTML = s;
+}
+
+/* ---------- Trợ giảng ảo ---------- */
+function avatar(o) {
+  return `<svg viewBox="0 0 120 120"><rect width="120" height="120" fill="${o.bg}"/>
+  <path d="M30 66 Q26 22 60 20 Q94 22 90 66 L92 96 Q76 102 60 100 Q44 102 28 96Z" fill="${o.hair}"/>
+  <path d="M18 120 Q22 90 60 86 Q98 90 102 120Z" fill="${o.shirt}"/>
+  <path d="M48 87 L60 102 L72 87" fill="none" stroke="${o.collar}" stroke-width="2.4" stroke-linejoin="round"/>
+  <rect x="52" y="70" width="16" height="19" rx="7" fill="#eab896"/>
+  <ellipse cx="60" cy="55" rx="22" ry="26" fill="#f6d2b8"/>
+  <path d="M37 54 Q37 28 60 27 Q84 28 84 54 Q75 40 57 39 Q45 42 37 54Z" fill="${o.hair}"/>
+  <path d="M46 50 Q51 48 55 50 M65 50 Q69 48 74 50" stroke="${o.hair}" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+  <ellipse class="eye" cx="51" cy="57" rx="2.3" ry="2.9" fill="#2a2140"/><ellipse class="eye" cx="69" cy="57" rx="2.3" ry="2.9" fill="#2a2140"/>
+  <circle cx="45" cy="65" r="3.6" fill="#f29a9a" opacity=".35"/><circle cx="75" cy="65" r="3.6" fill="#f29a9a" opacity=".35"/>
+  <ellipse class="mouth" cx="60" cy="70" rx="4.6" ry="1.6" fill="#c2566b"/>
+  <path d="M38.5 58 Q40 71 52 72.5" stroke="#3a3f55" stroke-width="1.4" fill="none"/><circle cx="53" cy="72.5" r="1.7" fill="#3a3f55"/></svg>`;
+}
+const MAI = { bg: "#fff4e0", hair: "#2a2140", shirt: "#ffffff", collar: "#d5d9e8" };
+const LIA = { bg: "#eaeefe", hair: "#9a6b47", shirt: "#3d55d1", collar: "#ffffff" };
+let speaking = false, listening = false;
+function setTutor(o, name, sub) { $("#face").innerHTML = avatar(o); $("#tName").textContent = name; $("#tSub").textContent = sub; }
+async function stream(g, node, text, cps, tail = "") {
+  await tween(g, text.length * 1000 / cps, (t) => {
+    node.innerHTML = esc(text.slice(0, Math.round(text.length * t))) + (t < 1 ? '<span class="caret"></span>' : "");
+  });
+  node.innerHTML = esc(text) + tail;
+}
+function trimChat() { const c = $("#chat"); while (c.children.length > 4) c.firstChild.remove(); }
+async function say(g, name, text, extra = "") {
+  const m = html(`<div class="msg ai"><div class="lbl">${ico("speaker")}${name}</div><span></span></div>`);
+  $("#chat").appendChild(m); trimChat();
+  speaking = true; $("#face").classList.add("talk");
+  try { await stream(g, m.querySelector("span"), text, 17); }
+  finally { speaking = false; $("#face").classList.remove("talk"); }
+  if (extra) { m.insertAdjacentHTML("beforeend", extra); await wait(g, 60); m.querySelector(".bar i") && (m.querySelector(".bar i").style.width = "92%"); }
+}
+async function student(g, text) {
+  const m = html(`<div class="msg me"><div class="lbl">${ico("mic")}Học sinh · Tổ 2</div><span></span></div>`);
+  $("#chat").appendChild(m); trimChat();
+  listening = true;
+  try { await stream(g, m.querySelector("span"), text, 20); } finally { listening = false; }
+}
+
+/* ---------- Dòng AI, trạng thái, công cụ ---------- */
+const clock = () => { const s = Math.floor(lessonT / 1000); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+async function log(g, icon, tone, text) {
+  const e = html(`<div class="ev live"><span class="eic ${tone}">${ico(icon)}</span><div class="t"><span></span><small>${clock()}</small></div><span class="st"></span></div>`);
+  const list = $("#list");
+  list.appendChild(e);
+  [...list.children].forEach((c, i, a) => c.classList.toggle("old", i < a.length - 3));
+  while (list.children.length > 9) list.firstChild.remove();
+  await stream(g, e.querySelector(".t span"), text, 46);
+  e.classList.replace("live", "done");
+  e.querySelector(".st").innerHTML = ico("check");
+}
+function setStatus(text, tone = "") { const s = $("#status"); s.className = "chip status " + tone; $("#stTxt").textContent = text; s.dataset.tone = tone; }
+function setTool(t) { document.querySelectorAll(".rail button[data-tool]").forEach((b) => b.classList.toggle("on", b.dataset.tool === t)); }
+let shift = 0;
+function setShift(s) {
+  shift = s;
+  $("#p1").setAttribute("transform", `translate(${-s * W} 0)`);
+  $("#p2").setAttribute("transform", `translate(${(1 - s) * W} 0)`);
+  $("#o1").style.transform = `translateX(${-s * 100}%)`;
+  $("#o2").style.transform = `translateX(${(1 - s) * 100}%)`;
+  $("#pageNo").textContent = s > .5 ? "2" : "1";
+}
+const on = (sel, v = true) => $(sel).classList.toggle("on", v);
+
+/* ---------- Kịch bản 4 phần ---------- */
+async function scene1(g) {
+  setTool("pen"); setStatus("Đang nghe bút");
+  await penTo(g, 110, 90, 600);
+  bg(log(g, "pen", "blue", "Nhận nét viết tay…"));
+  const b1 = await write(g, "y = x² − 3", 70, 62, .52, $("#ink1"));
+  await lasso(g, b1);
+  place($("#pop"), b1.x0, b1.y1 + 26); on("#pop");
+  await wait(g, 350);
+  await tap(g, $("#popGo"));
+  on("#pop", false);
+  setStatus("AI đang nhận dạng", "violet");
+  await log(g, "spark", "violet", "Công thức: y = x² − 3");
+  place($("#f1"), b1.x0, b1.y1 + 26); on("#f1");
+  setTool("graph"); setStatus("Đang vẽ đồ thị", "green");
+  await tween(g, 500, (t) => $("#graphG").setAttribute("opacity", ease(t)));
+  bg(log(g, "graph", "green", "Parabol, đỉnh (0; −3)"));
+  await drawCurve(g, parP, fpath((x) => x * x - 3), 1700);
+  await wait(g, 600);
+
+  setTool("pen"); setStatus("Đang nghe bút");
+  $("#lasso").innerHTML = "";
+  const b2 = await write(g, "y = A sin x + B", 70, 236, .52, $("#ink1"));
+  await lasso(g, b2);
+  place($("#pop"), b2.x0, b2.y1 + 26); on("#pop");
+  await wait(g, 300);
+  await tap(g, $("#popGo"));
+  on("#pop", false);
+  setStatus("AI đang nhận dạng", "violet");
+  await log(g, "spark", "violet", "Có tham số A, B → tạo thanh trượt");
+  place($("#f2"), b2.x0, b2.y1 + 26); on("#f2");
+  setTool("graph"); setStatus("Đang vẽ đồ thị", "green");
+  setSlider("A", 1); setSlider("B", 0);
+  await drawCurve(g, sinP, fpath((x) => Math.sin(x)), 1800);
+  sinP.dataset.live = "1";
+  place($("#sliderBox"), 520, 488); $("#sliderBox").style.width = (680 / W * 100) + "%"; on("#sliderBox");
+  await wait(g, 700);
+  await dragSlider(g, "A", 2);
+  bg(log(g, "sliders", "blue", "A = 2 → biên độ gấp đôi"));
+  await wait(g, 500);
+  await dragSlider(g, "B", 1);
+  await log(g, "sliders", "blue", "B = 1 → tịnh tiến lên 1 đơn vị");
+  await wait(g, 1200);
+}
+
+function cubeSketch() {
+  const F = [[330,290],[500,290],[500,460],[330,460]], Bk = F.map(([x, y]) => [x + 82, y - 62]);
+  const ln = (a, b) => {
+    const mx = (a[0] + b[0]) / 2 + jit(7), my = (a[1] + b[1]) / 2 + jit(7);
+    return `M${(a[0] + jit(4)).toFixed(1)} ${(a[1] + jit(4)).toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${(b[0] + jit(5)).toFixed(1)} ${(b[1] + jit(5)).toFixed(1)}`;
+  };
+  const out = [];
+  for (let i = 0; i < 4; i++) out.push(ln(F[i], F[(i + 1) % 4]));
+  for (let i = 0; i < 3; i++) out.push(ln(F[i], Bk[i]));
+  out.push(ln(Bk[0], Bk[1]), ln(Bk[1], Bk[2]));
+  return out;
+}
+async function scan(g, x0, y0, x1, y1) {
+  const s = $("#scan");
+  s.innerHTML = "";
+  const br = (x, y, dx, dy) => `M${x + dx * 26} ${y} L${x} ${y} L${x} ${y + dy * 26}`;
+  el("path", { d: [br(x0, y0, 1, 1), br(x1, y0, -1, 1), br(x0, y1, 1, -1), br(x1, y1, -1, -1)].join(" "), stroke: "#8fa2ff", "stroke-width": 3, fill: "none", "stroke-linecap": "round" }, s);
+  const cp = el("clipPath", { id: "scanClip" }, s);
+  el("rect", { x: x0, y: y0, width: x1 - x0, height: y1 - y0 }, cp);
+  const bar = el("rect", { x: x0, width: x1 - x0, height: 70, fill: "url(#scanG)", "clip-path": "url(#scanClip)" }, s);
+  await tween(g, 1500, (t) => bar.setAttribute("y", y0 - 70 + ((t * 2) % 1) * (y1 - y0 + 70)));
+  s.innerHTML = "";
+}
+async function scene2(g) {
+  setStatus("Sang trang mới");
+  await tween(g, 800, (t) => setShift(ease(t)));
+  setTool("pen"); setStatus("Đang nghe bút");
+  bg(log(g, "pen", "blue", "Nhận nét vẽ tay…"));
+  for (const d of cubeSketch()) await ink(g, d, $("#sketch"), CHALK, 4, 1.5);
+  setTool("box"); setStatus("AI đang nhận dạng hình", "violet");
+  await scan(g, 300, 205, 610, 485);
+  await log(g, "box", "violet", "Nhận ra: hình lập phương");
+  cube.on = true;
+  await tween(g, 900, (t) => { cube.a = ease(t); $("#sketch").setAttribute("opacity", 1 - ease(t)); });
+  setStatus("Hình 3D · kéo để xoay", "green");
+  bg(log(g, "box", "green", "Dựng 3D, đặt tên ABCD.A'B'C'D'"));
+  await tween(g, 600, (t) => (cube.labels = t));
+  place($("#tbar"), 455, 566); on("#tbar");
+  await wait(g, 900);
+  await tap(g, $("#tRot")); on("#tRot");
+  await penTo(g, 380, 330);
+  pen.down(); cube.spin = 0;
+  const th0 = cube.th;
+  await tween(g, 1500, (t) => { const e = ease(t); cube.th = th0 + e * 1.4; penAt(380 + e * 170, 330 + Math.sin(e * Math.PI) * 14); });
+  pen.up(); cube.spin = .22; on("#tRot", false);
+  await wait(g, 300);
+  await tap(g, $("#tCut")); on("#tCut");
+  setStatus("Đang cắt khối", "violet");
+  bg(log(g, "cut", "blue", "Mặt phẳng qua trung điểm 6 cạnh"));
+  setSection([1, 1, 1], 1.5, "blue");
+  await faceSection(g, [1, 1, 1]);
+  await tween(g, 1300, (t) => (cube.planeT = t));
+  await tween(g, 900, (t) => (cube.secT = t));
+  await log(g, "spark", "violet", "Thiết diện: lục giác đều");
+  on("#tCut", false);
+  await tap(g, $("#tAng")); on("#tAng");
+  await tween(g, 700, (t) => (cube.angle = t));
+  await log(g, "angle", "blue", "Góc trong 120°, cạnh a√2/2");
+  await wait(g, 1500);
+  on("#tAng", false);
+}
+
+const PROBLEM = "Cho hình lập phương ABCD.A'B'C'D'. Gọi M, N, P lần lượt là trung điểm của AB, BC, CC'. Thiết diện của hình lập phương cắt bởi mặt phẳng (MNP) là hình gì?";
+function resetSug() {
+  $("#q").innerHTML = '<div class="sk"></div><div class="sk" style="width:92%"></div><div class="sk" style="width:64%"></div>';
+  document.querySelectorAll(".opt, .mi").forEach((n) => n.classList.remove("on", "right"));
+  $("#sug").classList.remove("proj"); on("#acts", false);
+}
+async function scene3(g) {
+  setTool("spark"); setStatus("AI đang tìm bài", "violet");
+  cube.angle = 0;
+  resetSug(); on("#sug");
+  bg(log(g, "bank", "blue", "Tìm trong ngân hàng: Thiết diện"));
+  await wait(g, 1400);
+  await log(g, "check", "green", "3 câu khớp bài đang dạy");
+  await stream(g, $("#q"), PROBLEM, 60);
+  for (const o of document.querySelectorAll(".opt")) { o.classList.add("on"); await wait(g, 160); }
+  on("#acts");
+  for (const o of document.querySelectorAll(".mi")) { o.classList.add("on"); await wait(g, 200); }
+  await wait(g, 900);
+  await tap(g, $("#bShow"));
+  $("#sug").classList.add("proj"); setStatus("Đang chiếu lên bảng", "green");
+  bg(log(g, "present", "blue", "Chiếu câu 1, dựng mặt phẳng (MNP)"));
+  await tween(g, 500, (t) => (cube.secT = 1 - t));
+  cube.sec = null; cube.planeT = 0;
+  for (const p of [["M", [.5, 0, 0]], ["N", [1, .5, 0]], ["P", [1, 1, .5]]]) { cube.points.push(p); await wait(g, 450); }
+  setSection([1, -1, 1], .5, "gold");
+  await faceSection(g, [1, -1, 1]);
+  await tween(g, 1200, (t) => (cube.planeT = t));
+  await tween(g, 900, (t) => (cube.secT = t));
+  $("#optD").classList.add("right");
+  await log(g, "check", "green", "Đáp án D · lục giác");
+  await wait(g, 1800);
+}
+
+async function scene4(g) {
+  on("#sug", false); on("#tbar", false);
+  setTool("bot"); setStatus("Trợ giảng ảo", "violet");
+  setTutor(MAI, "Cô Mai", "Trợ giảng ảo · Toán");
+  $("#chat").innerHTML = ""; $("#tabVi").classList.add("on"); $("#tabEn").classList.remove("on");
+  const cx0 = cube.cx;
+  await tween(g, 900, (t) => { cube.cx = cx0 + (950 - cx0) * ease(t); });
+  on("#tutor");
+  bg(log(g, "bot", "violet", "Bật trợ giảng ảo: Cô Mai"));
+  await wait(g, 500);
+  cube.pulse = 1;
+  await say(g, "Cô Mai", "Mặt phẳng (MNP) đi qua trung điểm của 6 cạnh, nên cắt hình lập phương theo một lục giác.");
+  cube.pulse = 0;
+  await wait(g, 400);
+  bg(log(g, "mic", "blue", "Nghe học sinh hỏi…"));
+  await student(g, "Cô ơi, sao biết đó là lục giác đều ạ?");
+  await wait(g, 300);
+  await tween(g, 500, (t) => (cube.edgeLbl = t));
+  await say(g, "Cô Mai", "Mỗi cạnh là đường trung bình của một mặt vuông, nên đều dài a√2/2. Sáu cạnh bằng nhau, sáu góc 120°, vậy là lục giác đều.");
+  await wait(g, 900);
+  await tap(g, $("#tabEn"));
+  $("#tabVi").classList.remove("on"); $("#tabEn").classList.add("on");
+  await tween(g, 250, (t) => ($("#face").style.opacity = 1 - t));
+  setTutor(LIA, "Lia", "Luyện nói tiếng Anh");
+  $("#chat").innerHTML = "";
+  await tween(g, 250, (t) => ($("#face").style.opacity = t));
+  bg(log(g, "lang", "blue", "Chuyển sang luyện nói tiếng Anh"));
+  await say(g, "Lia", "Hi class! Can you name this shape in English?");
+  await wait(g, 300);
+  await student(g, "It's a regular hexagon.");
+  await wait(g, 300);
+  await say(g, "Lia", "Excellent! Six equal sides and six equal angles.",
+    `<div class="score">Phát âm 92/100<span class="bar"><i></i></span></div>`);
+  await log(g, "check", "green", "Chấm phát âm: 92/100");
+  await wait(g, 2600);
+}
+const SCENES = [scene1, scene2, scene3, scene4];
+const EST = [30000, 27000, 19000, 34000];
+
+/* ---------- Đặt lại / nhảy phần ---------- */
+function reset(n) {
+  $("#ink1").innerHTML = ""; $("#lasso").innerHTML = ""; $("#sketch").innerHTML = ""; $("#scan").innerHTML = "";
+  $("#sketch").setAttribute("opacity", 1);
+  buildGraph(); $("#graphG").setAttribute("opacity", 0);
+  ["#pop", "#f1", "#f2", "#sliderBox", "#tbar", "#sug", "#tutor", "#tRot", "#tCut", "#tAng"].forEach((s) => on(s, false));
+  SL.A[2] = 1; SL.B[2] = 0; setSlider("A", 1); setSlider("B", 0); $("#f2t").textContent = "y = A sin x + B";
+  resetSug();
+  delete sinP.dataset.live;
+  $("#chat").innerHTML = ""; setTutor(MAI, "Cô Mai", "Trợ giảng ảo · Toán"); $("#face").style.opacity = 1;
+  $("#list").innerHTML = "";
+  speaking = listening = false; pen.up();
+  cubeReset();
+  setShift(n >= 1 ? 1 : 0);
+  if (n >= 2) {
+    Object.assign(cube, { on: true, a: 1, labels: 1, planeT: 1, secT: 1 });
+    setSection([1, 1, 1], 1.5, "blue");
+    place($("#tbar"), 455, 566); on("#tbar");
+  }
+  if (n >= 3) {
+    setSection([1, -1, 1], .5, "gold");
+    cube.points = [["M", [.5, 0, 0]], ["N", [1, .5, 0]], ["P", [1, 1, .5]]];
+  }
+  if (n >= 2) { cube.th = bestTheta(cube.sec.n); cube.swayBase = cube.th; cube.sway = .32; }
+  penAt(640, 420);
+  document.querySelectorAll(".step").forEach((s, i) => {
+    s.classList.toggle("done", i < n); s.classList.remove("on");
+    s.querySelector(".bar i").style.width = i < n ? "100%" : "0";
+  });
+}
+async function runFrom(i) {
+  const g = ++gen;
+  reset(i);
+  try {
+    for (let k = i; k < 4; k++) {
+      sceneIdx = k; sceneT = 0;
+      const st = document.querySelectorAll(".step")[k];
+      st.classList.add("on");
+      await SCENES[k](g);
+      st.classList.replace("on", "done");
+      st.querySelector(".bar i").style.width = "100%";
+    }
+    setStatus("Hết bản xem thử", "green");
+    sceneIdx = -1;
+    await wait(g, 3000);
+    runFrom(0);
+  } catch (e) { if (!(e instanceof Abort)) console.error(e); }
+}
+
+/* ---------- Vòng hoạt ảnh ---------- */
+let last = performance.now(), dragging = null;
+function loop(now) {
+  const dt = Math.min(64, now - last); last = now;
+  if (playing) {
+    const d = dt * speed;
+    sceneT += d; lessonT += d;
+    if (cube.on && !dragging) {
+      if (cube.sway) { cube.swayT += d; cube.th = cube.swayBase + Math.sin(cube.swayT / 1700) * cube.sway; }
+      else cube.th += d / 1000 * cube.spin;
+    }
+    $("#clock").textContent = clock();
+  }
+  renderCube();
+  const mouth = document.querySelector("#face .mouth");
+  if (mouth) mouth.setAttribute("ry", speaking && playing ? (1.6 + Math.abs(Math.sin(now / 75)) * 3.6 * (.55 + .45 * Math.sin(now / 230))).toFixed(2) : 1.6);
+  document.querySelectorAll("#wave i").forEach((b, i) => {
+    b.style.height = (speaking || listening) && playing ? (20 + Math.abs(Math.sin(now / (90 + i * 23) + i)) * 80) + "%" : "18%";
+    b.style.background = listening ? "var(--green)" : "var(--brand)";
+  });
+  if (sceneIdx >= 0) {
+    const st = document.querySelectorAll(".step")[sceneIdx];
+    if (st && st.classList.contains("on")) st.querySelector(".bar i").style.width = Math.min(97, sceneT / EST[sceneIdx] * 100) + "%";
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- Điều khiển ---------- */
+function setPlaying(v) {
+  playing = v;
+  $("#play").innerHTML = ico(v ? "pause" : "play");
+  $("#status").classList.toggle("paused", !v);
+}
+$("#play").onclick = () => setPlaying(!playing);
+$("#replay").onclick = () => { setPlaying(true); lessonT = 0; runFrom(0); };
+$("#speed").onclick = () => { speed = speed === 1 ? 1.5 : speed === 1.5 ? 2 : 1; $("#speed").textContent = String(speed).replace(".", ",") + "×"; };
+document.querySelectorAll(".step").forEach((s, i) => (s.onclick = () => { setPlaying(true); runFrom(i); }));
+addEventListener("keydown", (e) => { if (e.code === "Space") { e.preventDefault(); setPlaying(!playing); } });
+stage.addEventListener("pointerdown", (e) => { if (cube.on && shift > .5) dragging = { x: e.clientX, y: e.clientY }; });
+addEventListener("pointermove", (e) => {
+  if (!dragging) return;
+  const dth = (e.clientX - dragging.x) * .01;
+  cube.th += dth; cube.swayBase += dth;
+  cube.ph = Math.max(-.2, Math.min(1.2, cube.ph + (e.clientY - dragging.y) * .006));
+  dragging = { x: e.clientX, y: e.clientY };
+});
+addEventListener("pointerup", () => (dragging = null));
+
+const qs = new URLSearchParams(location.search);
+if (qs.get("speed")) speed = +qs.get("speed");
+cubeReset();
+requestAnimationFrame(loop);
+runFrom(Math.max(0, Math.min(3, (+qs.get("scene") || 1) - 1)));
+</script>
+</body>
+</html>
