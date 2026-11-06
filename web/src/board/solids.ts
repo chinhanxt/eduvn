@@ -141,12 +141,22 @@ export function solidScene(st: SolidState): Scene {
   const [ccx, ccy] = P(centroid(def.verts));
   const label = (name: string, p: V3, vertex: boolean) => {
     const [px, py] = P(p);
-    const dx = px - ccx, dy = py - ccy, L = Math.hypot(dx, dy) || 1;
+    let dx = px - ccx, dy = py - ccy;
+    let L = Math.hypot(dx, dy);
+    if (L < 1e-9) {
+      dx = 1;
+      dy = -1;
+      L = Math.SQRT2;
+    }
     return { name, vertex, px, py, x: px + (dx / L) * 20, y: py + (dy / L) * 18 };
   };
   const labels = [
     ...def.names.map((n, i) => label(n, def.verts[i]!, true)),
-    ...st.points.map((p) => label(p.name, resolvePoint(st, p.name)!, false)),
+    ...st.points.flatMap((p) => {
+      if (def.names.includes(p.name)) return [];
+      const v = resolvePoint(st, p.name);
+      return v ? [label(p.name, v, false)] : [];
+    }),
   ];
   let section: Scene["section"] = null;
   if (st.section) {

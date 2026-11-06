@@ -61,3 +61,19 @@ describe("hình chóp S.ABCD", () => {
     expect(shapeName(poly!)).toBe("hình vuông");
   });
 });
+
+describe("điểm người dùng không hợp lệ", () => {
+  it("chỉ số đỉnh ngoài khối → không ném lỗi, không có nhãn", () => {
+    const st: SolidState = { kind: "pyramid3", cx: 400, cy: 360, size: 200, th: 0.6, ph: 0.4, points: [{ name: "M", a: 6, b: 7, t: 0.5 }], section: null, angle: null };
+    const sc = solidScene(st);
+    expect(sc.labels.some((l) => l.name === "M")).toBe(false);
+    expect(pickPoint(st, 0, 0)).toBeNull();
+  });
+  it("điểm trùng tên đỉnh → đỉnh thắng, chỉ một nhãn A tại đỉnh", () => {
+    const st = cube({ points: [{ name: "A", a: 1, b: 2, t: 0.5 }] });
+    const as = solidScene(st).labels.filter((l) => l.name === "A");
+    expect(as).toHaveLength(1);
+    const [ax, ay] = project(st, SOLIDS.cube.verts[0]!);
+    expect([as[0]!.px, as[0]!.py]).toEqual([ax, ay]);
+  });
+});
