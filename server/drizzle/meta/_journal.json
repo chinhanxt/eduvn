@@ -50,6 +50,13 @@
       "when": 1793866634586,
       "tag": "0006_certain_hannibal_king",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793953831089,
+      "tag": "0007_calm_scrambler",
+      "breakpoints": true
     }
   ]
 }

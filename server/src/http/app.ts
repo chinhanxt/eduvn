@@ -19,6 +19,7 @@ import { createVanBanService } from "../services/vanban";
 import { renderVanBanDocx } from "../export/vanban";
 import { renderGameHtml } from "../export/game";
 import { renderSlidesPptx } from "../export/slides";
+import { createBoardService } from "../services/boards";
 import { createGameService } from "../services/games";
 import { createSlideService } from "../services/slides";
 import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
@@ -43,6 +44,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const vanBan = createVanBanService(deps.db);
   const slides = createSlideService(deps.db);
   const games = createGameService(deps.db);
+  const boardsSvc = createBoardService(deps.db);
   const signer = createDownloadSigner(deps.downloadSecret, `${LINK_TTL_MINUTES}m`);
   const metadataUrl = `${deps.publicUrl}/.well-known/oauth-protected-resource`;
 
@@ -205,6 +207,16 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     return reply.code(204).send();
   });
   app.post("/api/games/:id/export", async (req) => makeGameLink(await authenticate(req), Cid(req)));
+
+  const BIG = { bodyLimit: 4 * 1024 * 1024 };
+  app.get("/api/boards", async (req) => boardsSvc.list(await authenticate(req)));
+  app.get("/api/boards/:id", async (req) => boardsSvc.get(await authenticate(req), Cid(req)));
+  app.post("/api/boards", BIG, async (req, reply) => reply.code(201).send(await boardsSvc.create(await authenticate(req), req.body)));
+  app.put("/api/boards/:id", BIG, async (req) => boardsSvc.save(await authenticate(req), Cid(req), req.body));
+  app.delete("/api/boards/:id", async (req, reply) => {
+    await boardsSvc.remove(await authenticate(req), Cid(req));
+    return reply.code(204).send();
+  });
 
   app.get<{ Params: { token: string }; Querystring: { mo?: string } }>("/dl/:token", async (req, reply) => {
     let claims: DownloadClaims;

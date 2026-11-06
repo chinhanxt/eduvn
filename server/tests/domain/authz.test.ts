@@ -27,6 +27,12 @@ describe("authz", () => {
     for (const a of ACTIONS) expect(can("student", a)).toBe(false);
   });
 
+  it("bảng giảng: GV soạn, trợ giảng chỉ xem", () => {
+    expect(can("teacher", "board:manage")).toBe(true);
+    expect(can("assistant", "board:read")).toBe(true);
+    expect(can("assistant", "board:manage")).toBe(false);
+  });
+
   it("assertCan ném ForbiddenError có tên vai trò", () => {
     expect(() => assertCan("student", "exam:read_key")).toThrow(ForbiddenError);
     expect(() => assertCan("student", "exam:read_key")).toThrow(/student/);

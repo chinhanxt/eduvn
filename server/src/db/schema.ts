@@ -5,6 +5,7 @@ import type { GradeColumn } from "../domain/gradebook";
 import type { LessonPlan } from "../domain/lesson";
 import type { VanBan } from "../domain/vanban";
 import type { GameBody } from "../domain/games";
+import type { BoardDoc } from "../domain/board";
 import type { SlideDeck } from "../domain/slides";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionInput } from "../domain/question";
@@ -208,6 +209,27 @@ export const decks = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("decks_org_idx").on(t.orgId)],
+);
+
+export const boards = pgTable(
+  "boards",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    title: text("title").notNull(),
+    subject: text("subject").notNull(),
+    grade: integer("grade").notNull(),
+    topic: text("topic").notNull().default(""),
+    body: jsonb("body").$type<BoardDoc>().notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("boards_org_idx").on(t.orgId)],
 );
 
 export const games = pgTable(
