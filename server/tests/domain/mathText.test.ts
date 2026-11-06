@@ -4,6 +4,16 @@ import { hasBalancedMath, latexToPlain, splitMath, toPlainText } from "../../src
 import { parseQuestion } from "../../src/domain/question";
 import { mcq } from "../helpers/fixtures";
 
+describe("splitMath — dấu \\ trước $", () => {
+  it("\\\\$ = dấu \\ thường + mở công thức; \\$ vẫn là đô la thường", () => {
+    expect(splitMath("a\\\\$x$")).toEqual([{ kind: "text", value: "a\\" }, { kind: "math", value: "x" }]);
+    expect(splitMath("giá \\$5")).toEqual([{ kind: "text", value: "giá $5" }]);
+    expect(hasBalancedMath("a\\\\$x$")).toBe(true);
+    expect(hasBalancedMath("a\\\\$x")).toBe(false);
+    expect(hasBalancedMath("giá \\$5")).toBe(true);
+  });
+});
+
 describe("splitMath", () => {
   it("tách chữ và công thức", () => {
     expect(splitMath("Cho $f(x)=x^2$. Tính $f(2)$")).toEqual([

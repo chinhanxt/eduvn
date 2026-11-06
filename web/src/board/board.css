@@ -1,6 +1,6 @@
 /* web/src/board/board.css — bảng giảng (bd-) */
 .bd { position: fixed; inset: 0; display: grid; grid-template-columns: 64px 1fr auto; background: var(--bg); z-index: 10; }
-.bd-rail { background: var(--side); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px; }
+.bd-rail { background: var(--side); color: var(--side-ink); position: static; height: auto; overflow: visible; display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px; }
 .bd-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; margin-bottom: 14px; }
 .bd-rb { width: 42px; height: 42px; border-radius: 12px; border: 0; background: transparent; color: var(--side-ink); display: grid; place-items: center; position: relative; transition: background .2s, color .2s; }
 .bd-rb:hover { background: rgba(255,255,255,.05); }

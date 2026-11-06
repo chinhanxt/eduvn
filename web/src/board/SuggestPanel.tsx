@@ -46,7 +46,7 @@ export function SuggestPanel({ board, page, onProject, onClose }: Props) {
     setGameErr(null);
     setBusy(true);
     try {
-      const g = await api<{ id: string }>("/api/games", { method: "POST", body: { title: `Ôn tập: ${board.topic || board.title}`, kind: "quiz", source: { questionIds: pick } } });
+      const g = await api<{ id: string }>("/api/games", { method: "POST", body: { title: `Ôn tập: ${board.topic || board.title}`.slice(0, 120), kind: "quiz", source: { questionIds: pick } } });
       await exportGame(g.id, true);
     } catch (e) {
       setGameErr(errText(e));

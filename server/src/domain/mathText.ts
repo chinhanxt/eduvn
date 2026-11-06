@@ -8,9 +8,21 @@ export function splitMath(s: string): Segment[] {
   let inMath = false;
   for (let i = 0; i < s.length; i++) {
     const ch = s[i]!;
-    if (ch === "\\" && s[i + 1] === "$") {
-      buf += inMath ? "\\$" : "$";
-      i++;
+    if (ch === "\\") {
+      let n = 1;
+      while (s[i + n] === "\\") n++;
+      if (s[i + n] !== "$") {
+        buf += "\\".repeat(n);
+        i += n - 1;
+      } else if (n % 2 === 1) {
+        // số lẻ dấu \ trước $: $ là dấu đô la thường
+        buf += "\\".repeat(n - 1) + (inMath ? "\\$" : "$");
+        i += n;
+      } else {
+        // số chẵn: \\ = một dấu \ thường (trong chữ), $ là dấu mở/đóng công thức
+        buf += "\\".repeat(inMath ? n : n - 1);
+        i += n - 1;
+      }
       continue;
     }
     if (ch === "$") {
@@ -32,8 +44,11 @@ export function splitMath(s: string): Segment[] {
 export function hasBalancedMath(s: string): boolean {
   let n = 0;
   for (let i = 0; i < s.length; i++) {
-    if (s[i] === "\\" && s[i + 1] === "$") {
-      i++;
+    if (s[i] === "\\") {
+      let k = 1;
+      while (s[i + k] === "\\") k++;
+      if (s[i + k] === "$" && k % 2 === 1) i += k;
+      else i += k - 1;
       continue;
     }
     if (s[i] === "$") n++;

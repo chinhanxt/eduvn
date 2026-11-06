@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { isSafeLatex, joinSegments, splitMath } from "../src/math/segments";
 
+describe("segments — dấu \\ trước $", () => {
+  it("\\\\$ = dấu \\ thường + mở công thức; \\$ vẫn là đô la thường", () => {
+    expect(splitMath("a\\\\$x$")).toEqual([{ kind: "text", value: "a\\" }, { kind: "math", value: "x" }]);
+    expect(splitMath("giá \\$5")).toEqual([{ kind: "text", value: "giá $5" }]);
+  });
+});
+
 describe("segments", () => {
   it("tách như server", () => {
     expect(splitMath("Cho $f(x)$, giá 5\\$")).toEqual([

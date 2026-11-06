@@ -1,5 +1,5 @@
 // server/src/services/boards.ts
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Db } from "../db/client";
 import { boards } from "../db/schema";
@@ -13,7 +13,8 @@ const Uuid = z.uuid();
 export type BoardSummary = { id: string; title: string; subject: string; grade: number; topic: string; pageCount: number; updatedAt: string };
 
 type Row = { id: string; title: string; subject: string; grade: number; topic: string; body: BoardDoc; updatedAt: Date };
-const summary = (r: Row): BoardSummary => ({ id: r.id, title: r.title, subject: r.subject, grade: r.grade, topic: r.topic, pageCount: r.body.pages.length, updatedAt: r.updatedAt.toISOString() });
+type ListRow = Omit<Row, "body"> & { pageCount: number };
+const summary = (r: Row | ListRow): BoardSummary => ({ id: r.id, title: r.title, subject: r.subject, grade: r.grade, topic: r.topic, pageCount: "body" in r ? r.body.pages.length : Number(r.pageCount), updatedAt: r.updatedAt.toISOString() });
 
 export function createBoardService(db: Db) {
   async function load(orgId: string, id: string) {
@@ -46,7 +47,7 @@ export function createBoardService(db: Db) {
 
   async function list(actor: Actor): Promise<BoardSummary[]> {
     assertCan(actor.role, "board:read");
-    const rows = await db.select().from(boards).where(eq(boards.orgId, actor.orgId)).orderBy(desc(boards.updatedAt));
+    const rows = await db.select({ id: boards.id, title: boards.title, subject: boards.subject, grade: boards.grade, topic: boards.topic, updatedAt: boards.updatedAt, pageCount: sql<number>`jsonb_array_length(${boards.body}->'pages')` }).from(boards).where(eq(boards.orgId, actor.orgId)).orderBy(desc(boards.updatedAt));
     return rows.map(summary);
   }
 

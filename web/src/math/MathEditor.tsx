@@ -33,12 +33,20 @@ export function makeMathField(latex: string, onInput: () => void, onExit: (forwa
 
 function serialize(root: HTMLElement): string {
   let out = "";
-  root.childNodes.forEach((n) => {
-    if (n.nodeType === Node.TEXT_NODE) out += escapeText((n.nodeValue ?? "").replaceAll(ZW, ""));
+  const nodes = [...root.childNodes];
+  const isFormula = (n: Node | undefined) => n instanceof HTMLElement && n.classList.contains("me-wrap") && !!(n.firstChild as MathfieldElement).value.trim();
+  const text = (raw: string, next: Node | undefined) => {
+    let e = escapeText(raw);
+    // chữ kết thúc bằng \ rồi tới công thức: thêm một \ để $ mở công thức không bị hiểu là \$
+    if (isFormula(next) && /(?:^|[^\\])(?:\\\\)*\\$/.test(e)) e += "\\";
+    return e;
+  };
+  nodes.forEach((n, i) => {
+    if (n.nodeType === Node.TEXT_NODE) out += text((n.nodeValue ?? "").replaceAll(ZW, ""), nodes[i + 1]);
     else if (n instanceof HTMLElement && n.classList.contains("me-wrap")) {
       const v = (n.firstChild as MathfieldElement).value.trim();
       if (v) out += `$${v}$`;
-    } else out += escapeText(n.textContent ?? "");
+    } else out += text(n.textContent ?? "", nodes[i + 1]);
   });
   return out.replace(/ /g, " ");
 }

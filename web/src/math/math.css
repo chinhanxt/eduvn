@@ -24,7 +24,7 @@ math-field::part(menu-toggle), math-field::part(virtual-keyboard-toggle) { displ
 .me-voice-out button { border: 0; background: var(--brand); color: #fff; border-radius: 10px; padding: 7px 12px; font-weight: 500; }
 .me-voice-out button:disabled { opacity: .4; }
 
-.kb { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: #fff; box-shadow: 0 -1px 0 var(--line), 0 -12px 32px rgba(20,28,60,.10); padding: 10px 22px 16px; transform: translateY(105%); transition: transform .3s cubic-bezier(.2,.8,.2,1); }
+.kb { position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; background: #fff; box-shadow: 0 -1px 0 var(--line), 0 -12px 32px rgba(20,28,60,.10); padding: 10px 22px 16px; transform: translateY(105%); transition: transform .3s cubic-bezier(.2,.8,.2,1); }
 .kb.on { transform: none; }
 .kb-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .kb-tabs { display: flex; gap: 3px; background: var(--bg); padding: 3px; border-radius: 11px; }

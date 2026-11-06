@@ -138,7 +138,7 @@ export function BoardPage() {
           <span className={b.dirty ? "bd-state" : "bd-state ok"} data-testid="bd-state">{b.saving ? "Đang lưu…" : b.dirty ? "Chưa lưu" : "Đã lưu"}</span>
           <button className="bd-btn" onClick={b.undo} title="Hoàn tác (Ctrl+Z)"><Icon name="undo" /></button>
           <button className="bd-btn pri" onClick={() => void b.save()} data-testid="bd-save"><Icon name="save" />Lưu</button>
-          <button className="bd-btn" onClick={() => void rootRef.current?.requestFullscreen().catch(() => {})} title="Toàn màn hình"><Icon name="max" /></button>
+          <button className="bd-btn" onClick={() => void (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {})} title="Toàn màn hình"><Icon name="max" /></button>
         </header>
         <div className="bd-wrap">
           <div className="bd-stage" data-testid="bd-stage">

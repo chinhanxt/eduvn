@@ -36,6 +36,27 @@ describe("HTTP bảng giảng", () => {
     expect((await call("GET", `/api/boards/${id}`)).statusCode).toBe(404);
   });
 
+  it("danh sách trả pageCount (không tải nội dung)", async () => {
+    const id = (await call("POST", "/api/boards", meta)).json().id;
+    const d = sampleDoc();
+    const doc = { ...d, pages: [d.pages[0]!, { id: "p2", objects: [] }] };
+    expect((await call("PUT", `/api/boards/${id}`, { ...meta, doc })).statusCode).toBe(200);
+    const list = (await call("GET", "/api/boards")).json();
+    expect(list).toHaveLength(1);
+    expect(list[0]).toMatchObject({ id, ...meta, pageCount: 2 });
+    expect(typeof list[0].pageCount).toBe("number");
+    expect(list[0].updatedAt).toEqual(expect.any(String));
+    expect(list[0]).not.toHaveProperty("body");
+    expect(list[0]).not.toHaveProperty("doc");
+  });
+
+  it("tài liệu quá 4 MB → 413 tiếng Việt", async () => {
+    const id = (await call("POST", "/api/boards", meta)).json().id;
+    const res = await call("PUT", `/api/boards/${id}`, { ...meta, pad: "x".repeat(4 * 1024 * 1024 + 10) });
+    expect(res.statusCode).toBe(413);
+    expect(res.json().error).toBe("Bài giảng quá lớn (tối đa 4 MB) — xoá bớt nét vẽ hoặc tách trang.");
+  });
+
   it("tổ chức khác không thấy", async () => {
     const id = (await call("POST", "/api/boards", meta)).json().id;
     const other = { authorization: `Bearer ${await t.sign({ sub: "gv-2", name: "Thầy Minh" })}` };

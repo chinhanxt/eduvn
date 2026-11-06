@@ -115,7 +115,7 @@ export function GraphDialog({ initial, onCancel, onDone }: DialogProps) {
       const c = compileExpr(r.latex);
       if (!c.ok) e[r.key] = c.error;
     }
-    if (!(xMax > xMin)) e[rows[0]!.key] = "Khoảng x không hợp lệ";
+    if (!(Number.isFinite(xMin) && Number.isFinite(xMax) && xMax > xMin)) e[rows[0]!.key] = "Khoảng x không hợp lệ";
     setErrs(e);
     if (Object.keys(e).length) return;
     onDone(filled.map((r) => r.latex.trim()), [xMin, xMax]);
