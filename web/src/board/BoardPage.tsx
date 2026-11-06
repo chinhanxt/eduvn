@@ -4,7 +4,8 @@ import { Link, useParams } from "react-router";
 import { gradeLabel } from "../api";
 import { Icon } from "../Icon";
 import "./board.css";
-import { type BoardObj, newId, PALETTE, type Stroke } from "./doc";
+import { type BoardObj, type GraphObj, graphFromExprs, newId, PALETTE, type Stroke } from "./doc";
+import { GraphDialog, GraphView } from "./GraphView";
 import { hitStroke, strokePath } from "./ink";
 import { useBoard } from "./useBoard";
 
@@ -25,6 +26,7 @@ export function BoardPage() {
   const [color, setColor] = useState(PALETTE[0]!);
   const [selected, setSelected] = useState<string | null>(null);
   const [draft, setDraft] = useState<number[] | null>(null);
+  const [graphDlg, setGraphDlg] = useState<{ edit?: GraphObj } | null>(null);
   const erasing = useRef(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -106,7 +108,8 @@ export function BoardPage() {
         {rail("pen", "Bút (P)", tool === "pen", () => setTool("pen"), "t-pen")}
         {rail("eraser", "Tẩy (E)", tool === "eraser", () => setTool("eraser"), "t-eraser")}
         <div className="bd-sep" />
-        {/* Task 12: nút đồ thị · Task 13: nút hình khối · Task 14: nút gợi ý bài */}
+        {rail("graph", "Đồ thị hàm số", false, () => setGraphDlg({}), "t-graph")}
+        {/* Task 13: nút hình khối · Task 14: nút gợi ý bài */}
         <div className="bd-swatches">
           {PALETTE.map((c) => (
             <button key={c} className={c === color && tool === "pen" ? "bd-sw on" : "bd-sw"} style={{ background: c }} aria-label="Màu bút" onClick={() => { setColor(c); setTool("pen"); }} />
@@ -146,12 +149,30 @@ export function BoardPage() {
           <button className="bd-btn" onClick={() => confirm("Xoá trang này?") && b.deletePage()} disabled={n <= 1} title="Xoá trang"><Icon name="trash" /></button>
         </footer>
       </section>
-      {/* Task 14: <SuggestPanel /> · Task 12: <GraphDialog /> · Task 13: <SolidPicker /> */}
+      {/* Task 14: <SuggestPanel /> · Task 13: <SolidPicker /> */}
+      {graphDlg && (
+        <GraphDialog
+          initial={graphDlg.edit}
+          onCancel={() => setGraphDlg(null)}
+          onDone={(exprs, xr) => {
+            if (graphDlg.edit) b.updateObj(graphDlg.edit.id, graphFromExprs(exprs, xr, graphDlg.edit));
+            else {
+              const g = graphFromExprs(exprs, xr);
+              b.addObj(g);
+              setSelected(g.id);
+            }
+            setTool("pointer");
+            setGraphDlg(null);
+          }}
+        />
+      )}
     </div>
   );
 
   function renderObject(o: BoardObj) {
-    // Task 12: o.type === "graph" → <GraphView …/> ; Task 13: o.type === "solid" → <SolidView …/>
+    if (o.type === "graph")
+      return <GraphView key={o.id} obj={o} tool={tool} selected={selected === o.id} onSelect={() => setSelected(o.id)} onEdit={() => setGraphDlg({ edit: o })} b={b} toBoard={toBoard} />;
+    // Task 13: o.type === "solid" → <SolidView …/>
     void o;
     void selected;
     return null;
