@@ -1,4 +1,5 @@
 import { userManager } from "./auth";
+import type { BoardDoc } from "./board/doc";
 
 const ORG_KEY = "eduvn.org";
 export const getOrgId = () => window.localStorage.getItem(ORG_KEY);
@@ -131,3 +132,9 @@ export async function exportGame(id: string, open = false) {
   if (open) window.open(`${link.url}?mo=1`, "_blank", "noopener");
   else window.location.assign(link.url);
 }
+
+export type BoardSummary = { id: string; title: string; subject: string; grade: number; topic: string; pageCount: number; updatedAt: string };
+export type BoardDetail = BoardSummary & { doc: BoardDoc };
+/** Câu hỏi đầy đủ (gợi ý bài, chiếu lên bảng). */
+export type BankQuestion = Question & { options?: string[]; statements?: string[]; answer: number | boolean[] | string; explanation?: string; rubric?: string; points?: number };
+export const gradeLabel = (g: number): string => (g <= 12 ? `Lớp ${g}` : `Năm ${g - 12}`);

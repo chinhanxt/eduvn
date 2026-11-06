@@ -11,6 +11,8 @@ import { Gradebook } from "./pages/Gradebook";
 import { LessonDetailPage, Lessons } from "./pages/Lessons";
 import { VanBan } from "./pages/VanBan";
 import { Slides } from "./pages/Slides";
+import { Boards } from "./pages/Boards";
+import { BoardPage } from "./board/BoardPage";
 import { Games } from "./pages/Games";
 import { Connect } from "./pages/Connect";
 import { Placeholder } from "./pages/Placeholder";
@@ -28,7 +30,10 @@ export function App() {
       ) : !user ? (
         <Route path="*" element={<Login />} />
       ) : (
+        <>
+        <Route path="bang-giang/:id" element={<BoardPage />} />
         <Route element={<Shell />}>
+          <Route path="bang-giang" element={<Boards />} />
           <Route index element={<Home />} />
           <Route path="ngan-hang" element={<Bank />} />
           <Route path="de-thi" element={<Exams />} />
@@ -48,6 +53,7 @@ export function App() {
           <Route path="to-chuc" element={<Placeholder tool={{ to: "/to-chuc", name: "Tổ chức", icon: "org", color: "amber", pill: "Sắp có" }} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
+        </>
       )}
     </Routes>
     {user && <MathKeyboard />}
