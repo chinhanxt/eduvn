@@ -3,3 +3,5 @@ packages:
   - web
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@cortex-js/compute-engine@0.181.1'
