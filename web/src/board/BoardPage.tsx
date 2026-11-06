@@ -97,7 +97,8 @@ export function BoardPage() {
       if (draft.length < 4000 && Math.hypot(x - lx, y - ly) > 1.5) setDraft([...draft, Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
     } else if (erasing.current) erase(x, y);
   };
-  const onUp = () => {
+  const onUp = (e: PointerEvent<SVGSVGElement>) => {
+    if (!e.isPrimary) return;
     if (draft) {
       const pts = draft.length >= 4 ? draft : [draft[0]!, draft[1]!, draft[0]! + 0.5, draft[1]!];
       b.addObj({ type: "stroke", id: newId(), color, width: 4.5, pts });
@@ -150,7 +151,7 @@ export function BoardPage() {
               {objs.map((o) => (o.type === "stroke" ? <path key={o.id} className="bd-ink" d={strokePath(o.pts, o.width)} fill={o.color} /> : null))}
               {draft && <path d={strokePath(draft, 4.5)} fill={color} />}
             </svg>
-            {projected && <Projector q={projected} onClose={() => setProjected(null)} />}
+            {projected && <Projector key={projected.id} q={projected} onClose={() => setProjected(null)} />}
           </div>
         </div>
         <footer className="bd-pages">

@@ -15,27 +15,43 @@ export function SuggestPanel({ board, page, onProject, onClose }: Props) {
   const [rows, setRows] = useState<BankQuestion[] | null>(null);
   const [pick, setPick] = useState<string[]>([]);
   const [err, setErr] = useState<string | null>(null);
+  const [gameErr, setGameErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    let dead = false;
     const t = setTimeout(() => {
       const q = new URLSearchParams({ subject: board.subject, grade: String(board.grade), topic: board.topic, text: kw, limit: "8" });
       api<BankQuestion[]>(`/api/questions/related?${q}`)
         .then((r) => {
+          if (dead) return;
           setRows(r);
+          setPick((p) => p.filter((id) => r.some((x) => x.id === id)));
           setErr(null);
         })
-        .catch((e: unknown) => setErr(errText(e)));
+        .catch((e: unknown) => {
+          if (dead) return;
+          setRows([]);
+          setErr(errText(e));
+        });
     }, 400);
-    return () => clearTimeout(t);
+    return () => {
+      dead = true;
+      clearTimeout(t);
+    };
   }, [board.subject, board.grade, board.topic, kw]);
 
   const makeGame = async () => {
-    setErr(null);
+    if (busy) return;
+    setGameErr(null);
+    setBusy(true);
     try {
       const g = await api<{ id: string }>("/api/games", { method: "POST", body: { title: `Ôn tập: ${board.topic || board.title}`, kind: "quiz", source: { questionIds: pick } } });
       await exportGame(g.id, true);
     } catch (e) {
-      setErr(errText(e));
+      setGameErr(errText(e));
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -46,7 +62,7 @@ export function SuggestPanel({ board, page, onProject, onClose }: Props) {
         <button className="xbtn" onClick={onClose} aria-label="Đóng"><Icon name="x" size={16} /></button>
       </div>
       <div className="bd-side-ctx">{[board.topic, kw].filter(Boolean).join(" · ") || "Chưa có chủ đề"}</div>
-      {err && <div className="err">{err}</div>}
+      {(err ?? gameErr) && <div className="err">{err ?? gameErr}</div>}
       <div className="bd-side-list">
         {rows === null && <div className="bd-sk" />}
         {rows?.length === 0 && <div className="empty">Chưa có câu phù hợp. Thêm câu chủ đề “{board.topic || "…"}” trong Ngân hàng câu hỏi.</div>}
@@ -61,7 +77,7 @@ export function SuggestPanel({ board, page, onProject, onClose }: Props) {
           </div>
         ))}
       </div>
-      <button className="bd-btn pri bd-side-ft" disabled={pick.length === 0} onClick={() => void makeGame()}>
+      <button className="bd-btn pri bd-side-ft" disabled={pick.length === 0 || busy} onClick={() => void makeGame()}>
         <Icon name="game" />Tạo trò chơi ({pick.length})
       </button>
     </aside>

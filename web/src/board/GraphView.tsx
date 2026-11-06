@@ -76,7 +76,7 @@ export function GraphView({ obj, tool, selected, onSelect, onEdit, b, toBoard }:
             {params.map((p) => (
               <label key={p} className="bd-sl">
                 <i>{p}</i>
-                <input type="range" min={-5} max={5} step={0.1} value={obj.params[p] ?? 1} onPointerDown={(e) => { e.stopPropagation(); slSnap.current = true; }} onFocus={() => { slSnap.current = true; }} onPointerUp={() => { slSnap.current = false; }} onBlur={() => { slSnap.current = false; }} onChange={(e) => { if (slSnap.current) { b.snapshot(); slSnap.current = false; } b.updateObj(obj.id, { params: { ...obj.params, [p]: Number(e.target.value) } }, true); }} data-testid={`bd-sl-${p}`} />
+                <input type="range" min={-5} max={5} step={0.1} value={obj.params[p] ?? 1} onPointerDown={(e) => { e.stopPropagation(); slSnap.current = true; }} onFocus={() => { slSnap.current = true; }} onKeyDown={() => { slSnap.current = true; }} onPointerUp={() => { slSnap.current = false; }} onBlur={() => { slSnap.current = false; }} onChange={(e) => { if (slSnap.current) { b.snapshot(); slSnap.current = false; } b.updateObj(obj.id, { params: { ...obj.params, [p]: Number(e.target.value) } }, true); }} data-testid={`bd-sl-${p}`} />
                 <output>{vn(obj.params[p] ?? 1)}</output>
               </label>
             ))}
