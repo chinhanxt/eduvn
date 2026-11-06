@@ -11,6 +11,7 @@ export function Boards() {
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ title: "", subject: SUBJECT_DEFAULT, grade: 10, topic: "" });
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const load = useCallback(() => {
     api<BoardSummary[]>("/api/boards").then(setRows).catch((e: unknown) => setError(errText(e)));
@@ -20,17 +21,29 @@ export function Boards() {
   const create = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    const title = form.title.trim();
+    if (!title) {
+      setError("Nhập tên bài");
+      return;
+    }
+    setBusy(true);
     try {
-      const b = await api<BoardSummary>("/api/boards", { method: "POST", body: form });
+      const b = await api<BoardSummary>("/api/boards", { method: "POST", body: { ...form, title } });
       nav(`/bang-giang/${b.id}`);
     } catch (err) {
       setError(errText(err));
+    } finally {
+      setBusy(false);
     }
   };
   const remove = async (b: BoardSummary) => {
     if (!confirm(`Xoá bài giảng "${b.title}"?`)) return;
-    await api(`/api/boards/${b.id}`, { method: "DELETE" });
-    load();
+    try {
+      await api(`/api/boards/${b.id}`, { method: "DELETE" });
+      load();
+    } catch (e) {
+      setError(errText(e));
+    }
   };
 
   return (
@@ -44,15 +57,15 @@ export function Boards() {
       {adding && (
         <form className="card" style={{ marginBottom: 16 }} onSubmit={(e) => void create(e)}>
           <div className="formrow">
-            <label className="lbl">Tên bài<input className="inp" style={{ width: 280 }} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} data-testid="bg-title" /></label>
+            <label className="lbl">Tên bài<input className="inp" style={{ width: 280 }} required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} data-testid="bg-title" /></label>
             <label className="lbl">Môn<input className="inp w-m" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} /></label>
-            <label className="lbl">Lớp<input className="inp w-s" type="number" min={1} max={16} value={form.grade} onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })} /></label>
+            <label className="lbl">Lớp<input className="inp w-s" type="number" min={1} max={16} value={form.grade} onChange={(e) => { const n = Math.round(Number(e.target.value)); if (e.target.value !== "" && Number.isFinite(n)) setForm({ ...form, grade: Math.min(16, Math.max(1, n)) }); }} /></label>
             <label className="lbl">Chủ đề<input className="inp w-m" value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} data-testid="bg-topic" /></label>
-            <button className="btn" data-testid="bg-create"><Icon name="check" size={18} />Tạo</button>
+            <button className="btn" disabled={busy} data-testid="bg-create"><Icon name="check" size={18} />Tạo</button>
           </div>
         </form>
       )}
-      {rows?.length === 0 && <div className="card empty">—</div>}
+      {rows?.length === 0 && <div className="card empty">Chưa có bài giảng</div>}
       <div className="cards">
         {rows?.map((b) => (
           <div className="cls" key={b.id} data-testid="bg-card">
