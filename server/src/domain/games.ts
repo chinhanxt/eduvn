@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { QuestionInput } from "./question";
+import { toPlainText as P } from "./mathText";
 
 /** Trò chơi ôn tập sinh từ câu hỏi trong ngân hàng / đề. */
 
@@ -28,11 +29,12 @@ export const usable = (q: QuestionInput): boolean => q.type === "mcq" || q.type 
 export function itemsFromQuestions(qs: readonly QuestionInput[]): GameItem[] {
   const out: GameItem[] = [];
   for (const q of qs) {
-    const explain = q.explanation?.trim() ?? "";
-    if (q.type === "mcq") out.push({ kind: "choice", q: q.stem, options: [...q.options], answer: q.answer, explain });
+    const explain = P(q.explanation?.trim() ?? "");
+    const stem = P(q.stem);
+    if (q.type === "mcq") out.push({ kind: "choice", q: stem, options: q.options.map(P), answer: q.answer, explain });
     else if (q.type === "true_false") {
-      q.statements.forEach((st, i) => out.push({ kind: "choice", q: `${q.stem}\n${st}`, options: ["Đúng", "Sai"], answer: q.answer[i] ? 0 : 1, explain }));
-    } else if (q.type === "short_answer") out.push({ kind: "text", q: q.stem, answer: q.answer, explain });
+      q.statements.forEach((st, i) => out.push({ kind: "choice", q: `${stem}\n${P(st)}`, options: ["Đúng", "Sai"], answer: q.answer[i] ? 0 : 1, explain }));
+    } else if (q.type === "short_answer") out.push({ kind: "text", q: stem, answer: P(q.answer), explain });
   }
   return out;
 }

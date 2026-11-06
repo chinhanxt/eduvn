@@ -37,3 +37,14 @@ describe("renderGameHtml", () => {
     expect(html).toContain("Chơi lại");
   });
 });
+
+describe("công thức trong trò chơi", () => {
+  it("đổi $…$ sang chữ thường ở câu hỏi, phương án, đáp án", () => {
+    const qs = [mcq({ stem: "Tính $\\frac{1}{2}+\\frac{1}{4}$", options: ["$\\frac34$", "$1$", "$\\frac12$", "$x^2$"] }), mcq(), mcq(), short({ answer: "$\\sqrt2$" })];
+    const r = buildGame("quiz", qs, { source: "x" });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.body.items[0]).toMatchObject({ q: "Tính 1/2+1/4", options: ["3/4", "1", "1/2", "x²"] });
+    expect(r.body.items[3]).toMatchObject({ kind: "text", answer: "√2" });
+  });
+});

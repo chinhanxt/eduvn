@@ -80,4 +80,8 @@ describe("câu hỏi có công thức", () => {
     expect(() => parseQuestion(mcq({ stem: "Cho $x^2" }))).toThrow(/dấu \$/);
     expect(() => parseQuestion(mcq({ options: ["$a", "b", "c", "d"] }))).toThrow(/dấu \$/);
   });
+  it("ký hiệu Hy Lạp và logic bổ sung", () => {
+    expect(latexToPlain("\\rho+\\tau")).toBe("ρ+τ");
+    expect(latexToPlain("p\\therefore q")).toBe("p∴q");
+  });
 });

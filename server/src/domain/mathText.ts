@@ -49,6 +49,10 @@ const SYMBOLS: Record<string, string> = {
   Rightarrow: "⇒", Leftrightarrow: "⇔", iff: "⇔", forall: "∀", exists: "∃", setminus: "∖", angle: "∠", equiv: "≡", ldots: "…",
   dots: "…", cdots: "⋯", int: "∫", sum: "∑", prime: "′", lvert: "|", rvert: "|", mid: "|",
   leqslant: "≤", geqslant: "≥",
+  rho: "ρ", tau: "τ", xi: "ξ", zeta: "ζ", eta: "η", kappa: "κ", nu: "ν", chi: "χ", psi: "ψ", upsilon: "υ", iota: "ι",
+  Gamma: "Γ", Sigma: "Σ", Phi: "Φ", Psi: "Ψ", Lambda: "Λ", Theta: "Θ", Pi: "Π",
+  leftarrow: "←", Leftarrow: "⇐", leftrightarrow: "↔", therefore: "∴", because: "∵", wedge: "∧", vee: "∨", neg: "¬",
+  nabla: "∇", partial: "∂", degree: "°", ell: "ℓ",
   "{": "{", "}": "}", "$": "$", "%": "%", ",": " ", ";": " ", ":": " ", "!": "", " ": " ", quad: " ", qquad: " ",
 };
 const SUP: Record<string, string> = {

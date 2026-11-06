@@ -1,4 +1,5 @@
 import PptxGenJS from "pptxgenjs";
+import { toPlainText } from "../domain/mathText";
 import { type Slide, type SlideDeck, answerIndex } from "../domain/slides";
 
 const NAVY = "1E2340";
@@ -125,7 +126,31 @@ function renderSlide(pptx: PptxGenJS, deck: SlideDeck, sl: Slide, index: number)
   void index;
 }
 
-export async function renderSlidesPptx(deck: SlideDeck): Promise<Buffer> {
+const P = (s: string | undefined): string | undefined => (s === undefined ? undefined : toPlainText(s));
+const PL = (l: string[] | undefined): string[] | undefined => l?.map(toPlainText);
+
+/** pptx không có phương trình: đổi công thức $…$ sang chữ thường Unicode. */
+export function plainDeck(deck: SlideDeck): SlideDeck {
+  return {
+    ...deck,
+    title: toPlainText(deck.title),
+    subtitle: P(deck.subtitle),
+    slides: deck.slides.map((s) => ({
+      ...s,
+      title: toPlainText(s.title),
+      bullets: PL(s.bullets),
+      left: PL(s.left),
+      right: PL(s.right),
+      question: P(s.question),
+      options: PL(s.options),
+      notes: P(s.notes),
+      answer: typeof s.answer === "string" ? toPlainText(s.answer) : s.answer,
+    })),
+  };
+}
+
+export async function renderSlidesPptx(deckIn: SlideDeck): Promise<Buffer> {
+  const deck = plainDeck(deckIn);
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE"; // 13.333 x 7.5 in (16:9)
   pptx.title = deck.title;

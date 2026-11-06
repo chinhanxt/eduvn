@@ -77,3 +77,13 @@ describe("renderSlidesPptx", () => {
     expect(notes.join("")).toContain("Đáp án: A. 2+2=4");
   });
 });
+
+import { plainDeck } from "../../src/export/slides";
+
+describe("plainDeck", () => {
+  it("đổi công thức trong mọi chuỗi của slide", () => {
+    const d = plainDeck({ title: "Hàm $y=x^2$", slides: [{ layout: "quiz", title: "Câu 1", question: "Đỉnh của $y=x^2-3$?", options: ["$(0;-3)$", "$(0;3)$"], answer: 0, bullets: ["$\\sqrt2$"] }] });
+    expect(d.title).toBe("Hàm y=x²");
+    expect(d.slides[0]).toMatchObject({ question: "Đỉnh của y=x²−3?", options: ["(0;−3)", "(0;3)"], bullets: ["√2"], answer: 0 });
+  });
+});
