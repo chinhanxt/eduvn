@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ApiError, api, type Question } from "../api";
 import { Icon } from "../Icon";
+import { MathEditor } from "../math/MathEditor";
+import { MathText } from "../math/MathText";
 
 export const SUBJECT_DEFAULT = "Toán";
 const TYPE_LABEL: Record<Question["type"], string> = { mcq: "Trắc nghiệm", true_false: "Đúng/sai", short_answer: "Trả lời ngắn", essay: "Tự luận" };
@@ -48,7 +50,7 @@ export function Bank() {
             <tbody>
               {rows?.map((q) => (
                 <tr key={q.id}>
-                  <td>{q.stem}</td>
+                  <td><MathText value={q.stem} /></td>
                   <td>{q.topic}</td>
                   <td><span className="tag green">{q.level}</span></td>
                   <td><span className="tag violet">{TYPE_LABEL[q.type]}</span></td>
@@ -65,6 +67,7 @@ export function Bank() {
 function AddForm({ subject, grade, onDone }: { subject: string; grade: number; onDone: () => void }) {
   const [topic, setTopic] = useState("Mệnh đề");
   const [level, setLevel] = useState("NB");
+  const [formKey, setFormKey] = useState(0);
   const [stem, setStem] = useState("");
   const [options, setOptions] = useState(["", "", "", ""]);
   const [answer, setAnswer] = useState(0);
@@ -78,6 +81,7 @@ function AddForm({ subject, grade, onDone }: { subject: string; grade: number; o
     try {
       await api("/api/questions", { method: "POST", body: { type: "mcq", subject, grade, topic, level, stem, options, answer } });
       setStem("");
+      setFormKey((k) => k + 1);
       setOptions(["", "", "", ""]);
       setAnswer(0);
       onDone();
@@ -99,12 +103,14 @@ function AddForm({ subject, grade, onDone }: { subject: string; grade: number; o
           </select>
         </label>
       </div>
-      <input className="inp w-l" placeholder="Câu hỏi" value={stem} onChange={(e) => setStem(e.target.value)} data-testid="q-stem" />
+      <MathEditor key={`stem-${formKey}`} value={stem} onChange={setStem} placeholder="Câu hỏi — gõ $ để chèn công thức" testId="q-stem" />
       {options.map((o, i) => (
         <div className="opt" key={i}>
           <input type="radio" name="ans" checked={answer === i} onChange={() => setAnswer(i)} aria-label={`Đáp án ${"ABCD"[i]}`} />
           <span className="letter">{"ABCD"[i]}</span>
-          <input className="inp w-l" value={o} onChange={(e) => setOptions(options.map((x, j) => (j === i ? e.target.value : x)))} data-testid={`q-opt-${i}`} />
+          <div style={{ flex: 1 }}>
+            <MathEditor key={`opt-${i}-${formKey}`} value={o} onChange={(v) => setOptions((prev) => prev.map((x, j) => (j === i ? v : x)))} placeholder={`Phương án ${"ABCD"[i]}`} testId={`q-opt-${i}`} />
+          </div>
         </div>
       ))}
       <div style={{ marginTop: 14 }}>

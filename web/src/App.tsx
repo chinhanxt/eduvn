@@ -14,11 +14,13 @@ import { Slides } from "./pages/Slides";
 import { Games } from "./pages/Games";
 import { Connect } from "./pages/Connect";
 import { Placeholder } from "./pages/Placeholder";
+import { MathKeyboard } from "./math/MathKeyboard";
 import { TOOLS } from "./tools";
 
 export function App() {
   const { user, ready } = useAuth();
   return (
+    <>
     <Routes>
       <Route path="/callback" element={<Callback />} />
       {!ready ? (
@@ -48,5 +50,7 @@ export function App() {
         </Route>
       )}
     </Routes>
+    {user && <MathKeyboard />}
+    </>
   );
 }
