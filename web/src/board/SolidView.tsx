@@ -1,5 +1,5 @@
 // web/src/board/SolidView.tsx
-import { type PointerEvent, useRef, useState } from "react";
+import { type PointerEvent, useEffect, useRef, useState } from "react";
 import { Icon } from "../Icon";
 import type { Tool, ToBoard } from "./BoardPage";
 import type { SolidObj } from "./doc";
@@ -21,22 +21,25 @@ type Props = { obj: SolidObj; tool: Tool; selected: boolean; onSelect: () => voi
 export function SolidView({ obj, tool, selected, onSelect, b, toBoard }: Props) {
   const [mode, setMode] = useState<Mode>("rotate");
   const [picks, setPicks] = useState<string[]>([]);
-  const drag = useRef<{ kind: "rot" | "move"; sx: number; sy: number; a: number; c: number } | null>(null);
+  const drag = useRef<{ kind: "rot" | "move"; sx: number; sy: number; a: number; c: number; moved: boolean } | null>(null);
   const sc = solidScene(obj);
+  useEffect(() => {
+    if (!selected) setPicks([]);
+  }, [selected]);
 
   const down = (e: PointerEvent<SVGGElement>) => {
-    if ((e.target as Element).closest(".bd-tbw")) return;
     e.stopPropagation();
+    if ((e.target as Element).closest(".bd-tbw")) return;
     onSelect();
-    if (tool !== "pointer") return;
+    if (tool !== "pointer" || !selected) return;
     const [x, y] = toBoard(e);
     if (mode === "rotate") {
       e.currentTarget.setPointerCapture(e.pointerId);
-      drag.current = { kind: "rot", sx: x, sy: y, a: obj.th, c: obj.ph };
-      b.snapshot();
+      drag.current = { kind: "rot", sx: x, sy: y, a: obj.th, c: obj.ph, moved: false };
       return;
     }
     if (mode === "point") {
+      if (obj.points.length >= 12) return;
       const ep = pickEdgePoint(obj, x, y);
       if (ep) b.updateObj(obj.id, { points: [...obj.points, { name: nextPointName(obj), ...ep }] });
       return;
@@ -53,6 +56,10 @@ export function SolidView({ obj, tool, selected, onSelect, b, toBoard }: Props) 
     const d = drag.current;
     if (!d) return;
     const [x, y] = toBoard(e);
+    if (!d.moved) {
+      d.moved = true;
+      b.snapshot();
+    }
     if (d.kind === "rot") b.updateObj(obj.id, { th: d.a + (x - d.sx) * 0.01, ph: Math.max(-0.2, Math.min(1.3, d.c + (y - d.sy) * 0.006)) }, true);
     else b.updateObj(obj.id, { cx: Math.max(40, Math.min(1240, d.a + x - d.sx)), cy: Math.max(40, Math.min(680, d.c + y - d.sy)) }, true);
   };
@@ -63,20 +70,20 @@ export function SolidView({ obj, tool, selected, onSelect, b, toBoard }: Props) 
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
     const [x, y] = toBoard(e);
-    drag.current = { kind: "move", sx: x, sy: y, a: obj.cx, c: obj.cy };
-    b.snapshot();
+    drag.current = { kind: "move", sx: x, sy: y, a: obj.cx, c: obj.cy, moved: false };
   };
 
   let info = "";
-  if ((mode === "cut" || mode === "angle") && selected) info = `Chọn điểm ${picks.length + 1}/3${picks.length ? `: ${picks.join(", ")}` : ""}`;
-  else if (mode === "point" && selected) info = "Bấm lên cạnh để lấy điểm (chia 1/4, 1/3, 1/2…)";
+  const prompting = selected && (mode === "cut" || mode === "angle") && (picks.length > 0 || (mode === "cut" ? !obj.section : !obj.angle));
+  if (prompting) info = `Chọn điểm ${picks.length + 1}/3${picks.length ? `: ${picks.join(", ")}` : ""}`;
+  else if (mode === "point" && selected) info = obj.points.length >= 12 ? "Tối đa 12 điểm" : "Bấm lên cạnh để lấy điểm (chia 1/4, 1/3, 1/2…)";
   else if (sc.section && obj.angle && sc.angle) info = `Thiết diện: ${sc.section.name} · Góc ${obj.angle.join("")}: ${fmtDeg(sc.angle.value)}`;
   else if (sc.section) info = `Thiết diện: ${sc.section.name}`;
   else if (obj.angle && sc.angle) info = `Góc ${obj.angle.join("")} = ${fmtDeg(sc.angle.value)}`;
   else if (obj.section) info = "3 điểm thẳng hàng — chọn lại";
 
   return (
-    <g className="bd-obj" data-testid="bd-solid" onPointerDown={down} onPointerMove={move} onPointerUp={up}>
+    <g className="bd-obj" data-testid="bd-solid" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onLostPointerCapture={up}>
       {sc.faces.map((f, i) => <polygon key={`f${i}`} points={pts(f)} className="bd-face" />)}
       {sc.section && <polygon points={pts(sc.section.pts)} className="bd-sec" />}
       {sc.edges.map((e, i) => <line key={`e${i}`} x1={e.a[0]} y1={e.a[1]} x2={e.b[0]} y2={e.b[1]} className={e.hidden ? "bd-edge hid" : "bd-edge"} />)}
@@ -94,7 +101,7 @@ export function SolidView({ obj, tool, selected, onSelect, b, toBoard }: Props) 
         </g>
       ))}
       {(selected || info) && (
-        <foreignObject x={obj.cx - 230} y={obj.cy + obj.size * 0.9} width={460} height={110}>
+        <foreignObject x={Math.max(0, Math.min(1280 - 460, obj.cx - 230))} y={Math.min(720 - 110, obj.cy + obj.size * 0.9)} width={460} height={110}>
           <div className="bd-tbw">
             {info && <div className="bd-info" data-testid="bd-info">{info}</div>}
             {selected && (
@@ -104,7 +111,7 @@ export function SolidView({ obj, tool, selected, onSelect, b, toBoard }: Props) 
                     <Icon name={icon} />{label}
                   </button>
                 ))}
-                <button onPointerDown={startMove} onPointerMove={move} onPointerUp={up} title="Kéo để dời hình"><Icon name="move" />Dời</button>
+                <button onPointerDown={startMove} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onLostPointerCapture={up} title="Kéo để dời hình"><Icon name="move" />Dời</button>
                 <button onPointerDown={(e) => e.stopPropagation()} onClick={() => b.updateObj(obj.id, { points: [], section: null, angle: null })} title="Xoá điểm, thiết diện, góc"><Icon name="eraser" />Xoá dựng</button>
                 <button onPointerDown={(e) => e.stopPropagation()} onClick={() => b.removeObjs([obj.id])} title="Xoá hình"><Icon name="trash" /></button>
               </div>
