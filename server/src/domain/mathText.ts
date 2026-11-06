@@ -48,7 +48,7 @@ const SYMBOLS: Record<string, string> = {
   varnothing: "∅", emptyset: "∅", perp: "⊥", parallel: "∥", triangle: "△", backsim: "∽", sim: "∼", circ: "°", to: "→", rightarrow: "→",
   Rightarrow: "⇒", Leftrightarrow: "⇔", iff: "⇔", forall: "∀", exists: "∃", setminus: "∖", angle: "∠", equiv: "≡", ldots: "…",
   dots: "…", cdots: "⋯", int: "∫", sum: "∑", prime: "′", lvert: "|", rvert: "|", mid: "|",
-  sin: "sin", cos: "cos", tan: "tan", cot: "cot", ln: "ln", log: "log", lim: "lim", max: "max", min: "min",
+  leqslant: "≤", geqslant: "≥",
   "{": "{", "}": "}", "$": "$", "%": "%", ",": " ", ";": " ", ":": " ", "!": "", " ": " ", quad: " ", qquad: " ",
 };
 const SUP: Record<string, string> = {
@@ -60,7 +60,8 @@ const SUB: Record<string, string> = {
   "+": "₊", "−": "₋", "-": "₋", "=": "₌", "(": "₍", ")": "₎", n: "ₙ", k: "ₖ", i: "ᵢ", x: "ₓ", a: "ₐ", m: "ₘ",
 };
 const BB: Record<string, string> = { R: "ℝ", N: "ℕ", Z: "ℤ", Q: "ℚ", C: "ℂ" };
-const FUNCS = /(sin|cos|tan|cot|ln|log)([A-Za-zα-ω(])/g;
+const FUNCS = new Set(["sin", "cos", "tan", "cot", "sinh", "cosh", "tanh", "ln", "log", "lim", "max", "min"]);
+const SIZING = new Set(["big", "Big", "bigg", "Bigg", "bigl", "bigr", "Bigl", "Bigr", "biggl", "biggr", "Biggl", "Biggr"]);
 
 /** LaTeX → chữ thường Unicode gần đúng (dùng cho pptx, trò chơi, chỗ không có phương trình). */
 export function latexToPlain(latex: string): string {
@@ -148,7 +149,18 @@ export function latexToPlain(latex: string): string {
       case "textbf":
         return rawGroup();
       case "mathbf":
+      case "mathcal":
+      case "mathscr":
+      case "mathfrak":
+      case "boldsymbol":
         return arg();
+      case "binom":
+      case "dbinom":
+      case "tbinom": {
+        const a = arg();
+        const b = arg();
+        return `C(${a}, ${b})`;
+      }
       case "mathbb": {
         const v = arg();
         return BB[v] ?? v;
@@ -167,7 +179,12 @@ export function latexToPlain(latex: string): string {
         return env === "cases" ? `{${rows.join("; ")}}` : rows.join("; ");
       }
       default:
-        return SYMBOLS[c] ?? c;
+        if (FUNCS.has(c)) {
+          skipSpaces();
+          return /[A-Za-z0-9(\\α-ω]/.test(s[i] ?? "") ? `${c} ` : c;
+        }
+        if (SYMBOLS[c] !== undefined) return SYMBOLS[c]!;
+        return /[A-Za-z]/.test(c) ? "" : c;
     }
   }
   function seq(stop?: string): string {
@@ -185,7 +202,7 @@ export function latexToPlain(latex: string): string {
           continue;
         }
         const c = readCommand();
-        if (c === "left" || c === "right") {
+        if (c === "left" || c === "right" || SIZING.has(c)) {
           skipSpaces();
           if (s[i] === ".") i++;
           continue;
@@ -219,7 +236,7 @@ export function latexToPlain(latex: string): string {
     }
     return out;
   }
-  return seq().replace(FUNCS, "$1 $2").replace(/\s+/g, " ").trim();
+  return seq().replace(/\s+/g, " ").trim();
 }
 
 export function toPlainText(s: string): string {

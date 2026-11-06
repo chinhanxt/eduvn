@@ -53,6 +53,15 @@ describe("latexToPlain", () => {
     ["x^{n+1}", "xⁿ⁺¹"],
     ["x^{ab}", "x^(ab)"],
     ["\\text{5 cm}", "5 cm"],
+    ["x\\leqslant 2", "x≤2"],
+    ["x\\geqslant 2", "x≥2"],
+    ["\\binom{n}{k}", "C(n, k)"],
+    ["\\mathcal{A}", "A"],
+    ["\\big(x\\big)", "(x)"],
+    ["a\\foo b", "ab"],
+    ["\\text{cosmic tangent}", "cosmic tangent"],
+    ["\\sinh x", "sinh x"],
+    ["\\max x", "max x"],
   ])("%s → %s", (latex, plain) => expect(latexToPlain(latex)).toBe(plain));
 });
 
