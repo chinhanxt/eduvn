@@ -21,7 +21,7 @@ export function MathKeyboard() {
   );
 
   return (
-    <div ref={ref} className={active ? "kb on" : "kb"} onMouseDown={(e) => e.preventDefault()} data-testid="math-kb" aria-hidden={!active}>
+    <div ref={ref} className={active ? "kb on" : "kb"} onMouseDown={(e) => e.preventDefault()} data-testid="math-kb" aria-hidden={!active} inert={!active}>
       <div className="kb-head">
         <div className="kb-tabs">
           {TAB_NAMES.map((t) => (

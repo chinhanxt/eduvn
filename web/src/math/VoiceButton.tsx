@@ -55,7 +55,14 @@ export function VoiceButton({ onLatex }: { onLatex: (latex: string) => void }) {
             <span className="me-voice-dot"><Icon name="mic" size={16} /></span>
             {listening ? "Đang nghe…" : "Đọc hoặc gõ câu đọc"}
           </div>
-          <input autoFocus value={text} placeholder="vd: x bình phương trừ ba" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => (e.key === "Enter" ? insert() : e.key === "Escape" ? close() : undefined)} />
+          <input autoFocus value={text} placeholder="vd: x bình phương trừ ba" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === "Escape") {
+              e.preventDefault();
+              e.stopPropagation();
+              if (e.key === "Enter") insert();
+              else close();
+            }
+          }} />
           <div className="me-voice-out">
             <span className="me-tex" dangerouslySetInnerHTML={{ __html: latex ? texMarkup(latex) : "" }} />
             <button type="button" disabled={!latex} onClick={insert}>Chèn</button>
