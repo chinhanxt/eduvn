@@ -104,4 +104,55 @@ describe("AgentPool", () => {
     await expect(p.start()).rejects.toThrow();
     expect(() => p.pick()).toThrow(expect.objectContaining({ status: 503, code: "ai_unavailable" }));
   });
+  it("báo model ngay sau start, chưa cần thuê phiên", async () => {
+    const p = mk(1);
+    await p.start();
+    expect(p.models().map((m) => m.id)).toEqual(["fake-fast", "fake-smart"]);
+    expect(p.stats().sessions).toBe(0);
+  });
+  it("khởi động lại có lùi dần và dừng hẳn sau stop()", async () => {
+    let calls = 0;
+    const logs: string[] = [];
+    const p = new AgentPool({
+      size: 1,
+      idleSessionMs: 1000,
+      restartDelayMs: 20,
+      onLog: (m) => logs.push(m),
+      factory: () => {
+        calls++;
+        return new AcpAgent({ command: "/khong/co", args: [], cwd: tmpdir() });
+      },
+    });
+    pools.push(p);
+    await expect(p.start()).rejects.toThrow();
+    await new Promise((r) => setTimeout(r, 200));
+    expect(calls).toBeLessThanOrEqual(5);
+    expect(calls).toBeGreaterThan(1);
+    expect(logs.length).toBeGreaterThan(0);
+    await p.stop();
+    const after = calls;
+    await new Promise((r) => setTimeout(r, 250));
+    expect(calls).toBe(after);
+  });
+  it("sweep không đóng hội thoại đang chạy lượt", async () => {
+    const p = mk(1, 1000);
+    await p.start();
+    const l = await p.lease("bận", "fake-fast");
+    const run = l.agent.prompt(l.sessionId, [{ type: "text", text: "[[sleep:300]]" }]);
+    p.sweep(Date.now() + 100000);
+    expect(p.stats().conversations).toBe(1);
+    await run;
+    l.release();
+    p.sweep(Date.now() + 100000);
+    expect(p.stats().conversations).toBe(0);
+  });
+  it("hai lần thuê đồng thời cùng khoá dùng chung một phiên", async () => {
+    const p = mk(2);
+    await p.start();
+    const [a, b] = await Promise.all([p.lease("k", "fake-fast"), p.lease("k", "fake-fast")]);
+    expect(a.sessionId).toBe(b.sessionId);
+    expect(p.stats().sessions).toBe(1);
+    a.release();
+    b.release();
+  });
 });
