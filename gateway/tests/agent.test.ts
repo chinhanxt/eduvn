@@ -1,9 +1,9 @@
-import { existsSync, mkdtempSync } from "node:fs";
+import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { AcpAgent } from "../src/acp/agent";
+import { AcpAgent, childEnv } from "../src/acp/agent";
 
 export const fakeAcpPath = fileURLToPath(new URL("./fixtures/fake-acp.mjs", import.meta.url));
 const agents: AcpAgent[] = [];
@@ -145,5 +145,52 @@ describe("AcpAgent", () => {
     await exited;
     expect(existsSync(join(dir, "conversations", `${sid}.db`))).toBe(false);
     expect(existsSync(join(dir, "brain", sid))).toBe(false);
+  });
+});
+
+describe("AcpAgent môi trường, công cụ, stderr", () => {
+  it("chỉ chuyển biến môi trường trong danh sách cho phép", async () => {
+    process.env.GATEWAY_TOKEN = "bi-mat-token";
+    process.env.ANTHROPIC_API_KEY = "sk-bi-mat";
+    try {
+      const a = mk();
+      await a.start();
+      const sid = await a.newSession();
+      const r = await a.prompt(sid, [{ type: "text", text: "[[env]]" }]);
+      const keys = r.text.replace(/^\[[^\]]*\] ?/, "").split(",");
+      expect(keys).not.toContain("GATEWAY_TOKEN");
+      expect(keys).not.toContain("ANTHROPIC_API_KEY");
+      expect(keys).toContain("PATH");
+    } finally {
+      delete process.env.GATEWAY_TOKEN;
+      delete process.env.ANTHROPIC_API_KEY;
+    }
+  });
+  it("childEnv giữ đúng danh sách + env thêm", () => {
+    const e = childEnv({ X: "1" }, { PATH: "/bin", SECRET: "s", HOME: "/h" });
+    expect(e).toEqual({ PATH: "/bin", HOME: "/h", X: "1" });
+  });
+  it("đếm công cụ đã chạy xong (completed)", async () => {
+    const a = mk();
+    await a.start();
+    const sid = await a.newSession();
+    const r = await a.prompt(sid, [{ type: "text", text: "[[toolran]]" }]);
+    expect(r.text).toContain("ĐÃ ĐỌC FILE");
+    expect(r.toolsRan).toBe(1);
+    const r2 = await a.prompt(sid, [{ type: "text", text: "[[toolran]] không dùng công cụ" }]);
+    expect(r2.toolsRan).toBe(0);
+  });
+  it("giữ dòng stderr cuối và gửi kèm sự kiện exit", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "se-"));
+    const script = join(dir, "e.mjs");
+    writeFileSync(script, 'for (let i = 1; i <= 30; i++) process.stderr.write("dòng " + i + "\\n");\nsetTimeout(() => process.exit(1), 100);\n');
+    const a = new AcpAgent({ command: process.execPath, args: [script], cwd: tmpdir(), startTimeoutMs: 2000 });
+    agents.push(a);
+    const exited = new Promise<string[]>((r) => a.once("exit", (_e, tail) => r(tail)));
+    await expect(a.start()).rejects.toThrow();
+    const tail = await exited;
+    expect(tail.length).toBeLessThanOrEqual(20);
+    expect(tail.at(-1)).toBe("dòng 30");
+    expect(a.lastStderr().at(-1)).toBe("dòng 30");
   });
 });

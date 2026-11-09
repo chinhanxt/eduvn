@@ -9,17 +9,20 @@ export type BackendInput = {
   model: string; // id model cụ thể, vd "claude-sonnet-5-5-low"
   system: string; // lời dặn hệ thống đã gộp (chốt an toàn + tác vụ + system của người gọi)
   messages: ChatMessage[]; // không chứa role "system"; phần tử cuối là tin của người dùng
-  conversation?: string; // khoá hội thoại: giữ phiên để tận dụng ngữ cảnh + cache
+  conversation?: string; // khoá hội thoại đầy đủ (`tác-vụ:khách`): giữ phiên để tận dụng ngữ cảnh + cache
+  sig?: string; // chữ ký phiên (model + băm lời dặn): đổi thì mở phiên mới
   timeoutMs: number;
   priority: 0 | 1; // 0 = tương tác (chat), 1 = theo lô
   signal?: AbortSignal; // huỷ khi người dùng ngắt kết nối
 };
-export type BackendOutput = { text: string; usage?: Usage; deniedTools: number };
+export type BackendOutput = { text: string; usage?: Usage; deniedTools: number; toolsRan?: number };
 
 export interface Backend {
   readonly name: string;
   available(): boolean;
   complete(input: BackendInput, onDelta?: (text: string) => void): Promise<BackendOutput>;
+  /** Bỏ phiên đang giữ của hội thoại (lịch sử máy khách đã đổi, hoặc phiên nghi ngờ). */
+  forget?(key: string): void;
 }
 
 export const clientClosed = (): GatewayError => new GatewayError(499, "client_closed", "Người dùng đã huỷ");

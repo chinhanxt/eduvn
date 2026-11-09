@@ -2,11 +2,12 @@ import type { AgentPool } from "../acp/pool";
 import { RpcError } from "../acp/rpc";
 import { type Backend, type BackendInput, type BackendOutput, type ContentPart, GatewayError, clientClosed, textOf } from "../types";
 
-/** Lỗi từ agent → mã HTTP có nghĩa (quá giờ 504, model không có 400, chưa sẵn sàng 503, còn lại 502). */
+/** Lỗi từ agent → mã HTTP có nghĩa. -32010 là quá giờ của riêng cổng (504); -32000 là lỗi của ACP (vd auth_required) → 502. */
 export function toGatewayError(e: unknown): Error {
   if (e instanceof GatewayError) return e;
   if (!(e instanceof RpcError)) return new GatewayError(502, "upstream_error", (e as Error).message);
-  if (e.code === -32000) return new GatewayError(504, "timeout", e.message);
+  if (e.code === -32010) return new GatewayError(504, "timeout", e.message);
+  if (e.code === -32000) return new GatewayError(502, "upstream_error", e.message);
   if (e.code === -32001) return new GatewayError(503, "ai_unavailable", e.message);
   if (e.code === -32002) return new GatewayError(409, "busy", e.message);
   if (e.code === -32602) return new GatewayError(400, "bad_model", e.message);
@@ -43,9 +44,13 @@ export class AcpBackend implements Backend {
     return this.pool.stats().alive > 0;
   }
 
+  forget(key: string): void {
+    this.pool.forget(key);
+  }
+
   complete(input: BackendInput, onDelta?: (t: string) => void): Promise<BackendOutput> {
     const run = async (): Promise<BackendOutput> => {
-      const lease = await this.pool.lease(input.conversation, input.model).catch((e: unknown) => {
+      const lease = await this.pool.lease(input.conversation, input.model, input.sig).catch((e: unknown) => {
         throw toGatewayError(e);
       });
       const onAbort = () => lease.agent.cancel(lease.sessionId);
@@ -54,7 +59,7 @@ export class AcpBackend implements Backend {
         if (input.signal?.aborted) throw clientClosed();
         const r = await lease.agent.prompt(lease.sessionId, toBlocks(input, lease.fresh), onDelta, input.timeoutMs);
         if (input.signal?.aborted) throw clientClosed();
-        return { text: r.text, usage: r.usage, deniedTools: r.deniedTools };
+        return { text: r.text, usage: r.usage, deniedTools: r.deniedTools, toolsRan: r.toolsRan };
       } catch (e) {
         if (input.conversation) this.pool.forget(input.conversation);
         throw toGatewayError(e);

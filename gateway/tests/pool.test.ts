@@ -156,3 +156,61 @@ describe("AgentPool", () => {
     b.release();
   });
 });
+
+describe("AgentPool giới hạn dài hạn", () => {
+  it("vượt maxConversations thì bỏ hội thoại rảnh lâu nhất", async () => {
+    const p = new AgentPool({ size: 1, idleSessionMs: 60000, maxConversations: 2, factory: () => new AcpAgent({ command: process.execPath, args: [fake], cwd: tmpdir() }) });
+    pools.push(p);
+    await p.start();
+    for (const k of ["a", "b"]) (await p.lease(k, "fake-fast")).release();
+    await new Promise((r) => setTimeout(r, 10));
+    (await p.lease("a", "fake-fast")).release(); // a mới dùng, b cũ nhất
+    (await p.lease("c", "fake-fast")).release();
+    expect(p.stats().conversations).toBe(2);
+    expect((await p.lease("a", "fake-fast")).fresh).toBe(false);
+    expect((await p.lease("b", "fake-fast")).fresh).toBe(true);
+  });
+  it("chữ ký khác thì mở phiên mới", async () => {
+    const p = mk(1);
+    await p.start();
+    const a = await p.lease("k", "fake-fast", "s1");
+    a.release();
+    expect((await p.lease("k", "fake-fast", "s1")).fresh).toBe(false);
+    expect((await p.lease("k", "fake-fast", "s2")).fresh).toBe(true);
+  });
+  it("tiến trình mở đủ phiên thì nghỉ: không nhận mới khi còn cái khác, hết hội thoại thì được thay mới", async () => {
+    const logs: string[] = [];
+    const p = new AgentPool({ size: 2, idleSessionMs: 60000, restartDelayMs: 50, recycleAfterSessions: 2, onLog: (m) => logs.push(m), factory: () => new AcpAgent({ command: process.execPath, args: [fake], cwd: tmpdir() }) });
+    pools.push(p);
+    await p.start();
+    const ls = [];
+    for (const k of ["a", "b", "c"]) {
+      const l = await p.lease(k, "fake-fast");
+      l.release();
+      ls.push(l);
+    }
+    const old = ls[0]!.agent; // a và c cùng một tiến trình (a, c) → đủ 2 phiên
+    expect(ls[2]!.agent).toBe(old);
+    expect(p.stats().draining).toBe(1);
+    const d = await p.lease("d", "fake-fast");
+    d.release();
+    expect(d.agent).not.toBe(old);
+    p.forget("a");
+    p.forget("c");
+    await waitFor(() => !old.alive && p.stats().alive === 2);
+    expect(p.alive()).not.toContain(old);
+    expect(p.stats().restarts).toBe(0);
+    expect((await p.lease("b", "fake-fast")).fresh).toBe(false);
+    await waitFor(() => logs.join("\n").includes("thay mới"));
+  });
+  it("tiến trình chết ghi log kèm stderr và đếm restarts", async () => {
+    const logs: string[] = [];
+    const p = new AgentPool({ size: 1, idleSessionMs: 60000, restartDelayMs: 50, onLog: (m) => logs.push(m), factory: () => new AcpAgent({ command: process.execPath, args: [fake], cwd: tmpdir() }) });
+    pools.push(p);
+    await p.start();
+    const a = await p.lease("x", "fake-fast");
+    await expect(a.agent.prompt(a.sessionId, [{ type: "text", text: "[[crash]]" }])).rejects.toThrow();
+    await waitFor(() => p.stats().alive === 1 && p.stats().restarts === 1);
+    expect(logs.some((m) => m.includes("đã dừng"))).toBe(true);
+  });
+});

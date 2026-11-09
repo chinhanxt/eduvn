@@ -16,7 +16,8 @@ describe("loadConfig", () => {
     expect(c.MAX_CONCURRENCY).toBe(6);
     expect(c.SESSION_IDLE_MS).toBe(900000);
     expect(c.ANTHROPIC_API_KEY).toBe("");
-    expect(c.WORK_DIR.endsWith(".work")).toBe(true);
+    expect(c.WORK_DIR).toBe("/var/tmp/eduvn-gateway");
+    expect([c.MAX_CONVERSATIONS, c.AGY_RECYCLE_SESSIONS, c.CHAT_RESERVED, c.CHAT_MAX_WAIT_MS]).toEqual([300, 150, 1, 30000]);
     expect(c.TASKS_FILE.endsWith("tasks.json")).toBe(true);
   });
   it("token phải đủ dài", () => {

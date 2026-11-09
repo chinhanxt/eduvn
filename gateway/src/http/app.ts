@@ -17,6 +17,8 @@ export type AppDeps = {
   batchWaitMs?: number;
   /** Số lô chạy cùng lúc tối đa (mặc định 20). */
   maxJobs?: number;
+  /** Cấu hình log Fastify (mặc định tắt; gateway truyền cấu hình thật). Không bao giờ ghi nội dung yêu cầu. */
+  logger?: boolean | object;
 };
 
 const Part = z.union([
@@ -31,7 +33,14 @@ const ChatBody = z.object({
   messages: z.array(Msg).min(1).max(200),
   stream: z.boolean().default(false),
   user: z.string().min(1).max(200).optional(),
-  response_format: z.object({ type: z.enum(["text", "json_object"]) }).optional(),
+  conversation: z.string().min(1).max(200).optional(),
+  // json_schema chỉ bật chế độ JSON (đọc và kiểm là JSON hợp lệ); lược đồ bên trong KHÔNG được ép.
+  response_format: z.object({ type: z.enum(["text", "json_object", "json_schema"]) }).optional(),
+  stream_options: z.object({ include_usage: z.boolean().nullish() }).nullish(),
+  tools: z.array(z.unknown()).nullish(),
+  tool_choice: z.unknown().optional(),
+  n: z.number().int().nullish(),
+  // max_tokens, max_completion_tokens, temperature, top_p, stop: nhận và bỏ qua (z.object tự lược khoá lạ).
 });
 const BatchBody = z.object({
   model: z.string().min(1).max(100),
@@ -57,8 +66,15 @@ export function toMessages(ms: MsgIn[]): ChatMessage[] {
 }
 const view = (j: Job) => ({ id: j.id, status: j.status, total: j.total, done: j.done, failed: j.failed, results: j.results });
 
-export function buildApp(d: AppDeps): FastifyInstance {
-  const app = Fastify({ bodyLimit: 20 * 1024 * 1024 });
+export type GatewayApp = FastifyInstance & { abortAll: () => void };
+
+export function buildApp(d: AppDeps): GatewayApp {
+  const app = Fastify({ bodyLimit: 20 * 1024 * 1024, logger: d.logger ?? false, forceCloseConnections: true }) as unknown as GatewayApp;
+  const startedAt = Math.floor(Date.now() / 1000);
+  const aborts = new Set<AbortController>();
+  app.decorate("abortAll", () => {
+    for (const ac of aborts) ac.abort();
+  });
 
   app.setErrorHandler((err, _req, reply) => {
     if (err instanceof GatewayError) return reply.code(err.status).send({ error: { code: err.code, message: err.message } });
@@ -75,24 +91,35 @@ export function buildApp(d: AppDeps): FastifyInstance {
     if (!safeEqual(h, `Bearer ${d.token}`)) return reply.code(401).send({ error: { code: "unauthorized", message: "Thiếu hoặc sai token" } });
   });
 
-  app.get("/health", async () => ({ ok: true, ...d.health() }));
+  app.get("/health", async (_req, reply) => {
+    const h = d.health();
+    const ok = h.ok !== false;
+    if (!ok) reply.code(503);
+    return { ...h, ok };
+  });
 
   app.get("/v1/models", async () => ({
     object: "list",
     data: [
-      ...d.llm.taskNames().map((t) => ({ id: `task:${t}`, object: "model", owned_by: "eduvn" })),
-      ...d.models().map((m) => ({ id: m.id, object: "model", owned_by: "agy", name: m.name })),
+      ...d.llm.taskNames().map((t) => ({ id: `task:${t}`, object: "model", created: startedAt, owned_by: "eduvn" })),
+      ...d.models().map((m) => ({ id: m.id, object: "model", created: startedAt, owned_by: "agy", name: m.name })),
     ],
   }));
 
   app.post("/v1/chat/completions", async (req, reply) => {
     const b = ChatBody.parse(req.body);
+    if (b.tools?.length || (b.tool_choice != null && b.tool_choice !== "none")) throw new GatewayError(400, "tools_unsupported", "Cổng AI không hỗ trợ gọi công cụ (tools)");
+    if (b.n != null && b.n > 1) throw new GatewayError(400, "n_unsupported", "Cổng AI chỉ trả một lựa chọn (n=1)");
+    const header = req.headers["x-eduvn-conversation"];
+    const hv = typeof header === "string" ? header : undefined;
+    if (hv !== undefined && (hv.length < 1 || hv.length > 200)) throw new GatewayError(400, "bad_request", "x-eduvn-conversation phải dài 1-200 ký tự");
+    const conversation = b.conversation ?? hv ?? b.user;
     const base = {
       model: b.model,
       messages: toMessages(b.messages),
-      conversation: b.user,
-      json: b.response_format?.type === "json_object" ? true : undefined,
-      interactive: b.stream || !!b.user,
+      conversation,
+      json: b.response_format?.type === "json_object" || b.response_format?.type === "json_schema" ? true : undefined,
+      interactive: b.stream || !!conversation,
     };
     const id = `chatcmpl-${randomUUID()}`;
     const created = Math.floor(Date.now() / 1000);
@@ -114,9 +141,11 @@ export function buildApp(d: AppDeps): FastifyInstance {
     reply.hijack();
     const raw = reply.raw;
     const ac = new AbortController();
+    aborts.add(ac);
     let closed = false;
     let ping: NodeJS.Timeout | undefined;
     raw.on("close", () => {
+      aborts.delete(ac);
       closed = true;
       clearInterval(ping);
       if (!raw.writableFinished) ac.abort();
@@ -135,6 +164,11 @@ export function buildApp(d: AppDeps): FastifyInstance {
       try {
         const r = await d.llm.complete({ ...base, signal: ac.signal, onDelta: (t) => chunk({ content: t }, null) });
         chunk({}, "stop", r.model);
+        if (b.stream_options?.include_usage) {
+          const pt = r.usage?.inputTokens ?? 0;
+          const ct = r.usage?.outputTokens ?? 0;
+          send({ id, object: "chat.completion.chunk", created, model: r.model, choices: [], usage: { prompt_tokens: pt, completion_tokens: ct, total_tokens: pt + ct } });
+        }
       } catch (e) {
         const err = e instanceof GatewayError ? e : new GatewayError(500, "internal", "Lỗi cổng AI");
         send({ error: { code: err.code, message: err.message } });

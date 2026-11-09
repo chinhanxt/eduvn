@@ -2,6 +2,7 @@
 // Agent ACP giả cho test: nói JSON-RPC qua stdin/stdout giống `agy acp`.
 // Lệnh đặc biệt trong nội dung prompt:
 //   [[sleep:N]] chờ N ms (huỷ được)   [[crash]] thoát tiến trình   [[tool]] xin quyền dùng công cụ rồi kết thúc không chữ
+//   [[env]] trả tên các biến môi trường   [[toolran]] chạy công cụ (tool_call completed) rồi trả "ĐÃ ĐỌC FILE", trừ khi prompt có "không dùng công cụ"
 //   [[json]] trả JSON trong khối mã   [[badjson]] trả chữ thường, trừ khi prompt có "Chỉ trả về JSON"
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -107,7 +108,13 @@ async function prompt(id, p) {
     return send({ id, result: { stopReason: "end_turn", usage: { inputTokens: text.length, outputTokens: 0 } } });
   }
   let out;
-  if (text.includes("[[json]]")) out = 'Đây là kết quả:\n```json\n{"ok":true,"n":2}\n```';
+  if (text.includes("[[toolran]]") && !text.includes("không dùng công cụ")) {
+    const upd = (u) => send({ method: "session/update", params: { sessionId: p.sessionId, update: u } });
+    upd({ sessionUpdate: "tool_call", toolCallId: "t1", title: "read", status: "in_progress" });
+    upd({ sessionUpdate: "tool_call_update", toolCallId: "t1", status: "completed" });
+    out = "ĐÃ ĐỌC FILE";
+  } else if (text.includes("[[env]]")) out = Object.keys(process.env).sort().join(",");
+  else if (text.includes("[[json]]")) out = 'Đây là kết quả:\n```json\n{"ok":true,"n":2}\n```';
   else if (text.includes("[[badjson]]")) out = text.includes("Chỉ trả về JSON") ? '{"ok":true,"retry":1}' : "không phải JSON";
   else out = `[${s.model}#${s.turns}] ${last}${images ? ` (ảnh:${images})` : ""}`;
   for (const part of [out.slice(0, 3), out.slice(3, 8), out.slice(8)].filter(Boolean)) {

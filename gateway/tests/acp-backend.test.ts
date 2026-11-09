@@ -109,3 +109,22 @@ describe("AcpBackend huỷ", () => {
     expect(Date.now() - t0).toBeLessThan(1500);
   });
 });
+
+describe("AcpBackend mã lỗi, chữ ký, công cụ", () => {
+  it("-32010 (quá giờ của cổng) → 504; -32000 (ACP, vd auth_required) → 502", () => {
+    expect(toGatewayError(new RpcError(-32010, "quá giờ"))).toMatchObject({ status: 504, code: "timeout" });
+    expect(toGatewayError(new RpcError(-32000, "auth_required"))).toMatchObject({ status: 502, code: "upstream_error" });
+  });
+  it("chữ ký đổi thì mở phiên mới; forget bỏ phiên; toolsRan được báo", async () => {
+    const { pool, backend } = await mk();
+    const a = await backend.complete(input({ conversation: "k", sig: "s1" }));
+    const b = await backend.complete(input({ conversation: "k", sig: "s1" }));
+    const c = await backend.complete(input({ conversation: "k", sig: "s2" }));
+    expect([a.text, b.text, c.text].map((t) => /#(\d)\]/.exec(t)![1])).toEqual(["1", "2", "1"]);
+    expect(pool.stats().conversations).toBe(1);
+    backend.forget("k");
+    expect(pool.stats().conversations).toBe(0);
+    const t = await backend.complete(input({ messages: [{ role: "user", content: "[[toolran]]" }] }));
+    expect(t.toolsRan).toBe(1);
+  });
+});

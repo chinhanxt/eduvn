@@ -6,10 +6,14 @@ export type PoolOptions = {
   factory: (slot: number) => AcpAgent;
   idleSessionMs: number;
   restartDelayMs?: number;
+  /** Số hội thoại giữ tối đa; vượt thì bỏ hội thoại rảnh lâu nhất (mặc định 300). */
+  maxConversations?: number;
+  /** Tiến trình mở đủ ngần này phiên thì cho nghỉ và thay bằng tiến trình mới (mặc định 150). */
+  recycleAfterSessions?: number;
   onLog?: (msg: string) => void;
 };
 export type Lease = { agent: AcpAgent; sessionId: string; fresh: boolean; release: () => void };
-type Conversation = { agent: AcpAgent; sessionId: string; model: string; lastUsed: number; busy: number };
+type Conversation = { agent: AcpAgent; sessionId: string; model: string; sig: string; lastUsed: number; busy: number };
 
 /** Vài tiến trình `agy acp` chạy sẵn + phiên bám theo hội thoại. */
 export class AgentPool {
@@ -20,6 +24,11 @@ export class AgentPool {
   private readonly timers = new Set<NodeJS.Timeout>();
   private readonly creating = new Map<string, Promise<Conversation>>();
   private readonly pending = new Map<AcpAgent, number>();
+  private readonly opened = new Map<AcpAgent, number>();
+  private readonly draining = new Set<AcpAgent>();
+  private readonly retired = new Set<AcpAgent>();
+  private restartCount = 0;
+  private recycling = false;
 
   constructor(private readonly opts: PoolOptions) {
     this.agents = new Array<AcpAgent | null>(opts.size).fill(null);
@@ -34,19 +43,30 @@ export class AgentPool {
     }
   }
 
-  private async spawn(slot: number): Promise<void> {
+  private log(msg: string): void {
+    (this.opts.onLog ?? console.warn)(msg);
+  }
+
+  /** `quiet`: thay thế chủ động (không tự hẹn khởi động lại nếu lỗi). */
+  private async spawn(slot: number, quiet = false): Promise<void> {
     if (this.stopped) return;
     const agent = this.opts.factory(slot);
     let lost = false;
-    const onLost = () => {
+    const onLost = (reason?: Error, tail?: string[]) => {
       if (lost) return;
       lost = true;
+      if (reason && !this.stopped && !this.retired.has(agent)) {
+        this.log(`Tiến trình AI #${slot} đã dừng: ${reason.message}${tail?.length ? ` · stderr cuối: ${tail.slice(-8).join(" | ")}` : ""}`);
+      }
+      this.draining.delete(agent);
+      this.opened.delete(agent);
       if (this.agents[slot] === agent) this.agents[slot] = null;
       for (const [k, c] of this.conversations) if (c.agent === agent) this.conversations.delete(k);
-      if (this.stopped) return;
+      if (this.stopped || quiet || this.retired.has(agent)) return;
       const delay = Math.min((this.opts.restartDelayMs ?? 1000) * 2 ** this.failures[slot]!, 60000);
       const t = setTimeout(() => {
         this.timers.delete(t);
+        this.restartCount++;
         void this.spawn(slot).catch(() => {});
       }, delay);
       t.unref();
@@ -56,9 +76,9 @@ export class AgentPool {
     try {
       await agent.start();
     } catch (e) {
-      (this.opts.onLog ?? console.warn)(`Tiến trình AI #${slot} không khởi động được: ${e instanceof Error ? e.message : String(e)}`);
+      this.log(`Tiến trình AI #${slot} không khởi động được: ${e instanceof Error ? e.message : String(e)}${agent.lastStderr().length ? ` · stderr cuối: ${agent.lastStderr().slice(-8).join(" | ")}` : ""}`);
       onLost();
-      this.failures[slot] = Math.min((this.failures[slot] ?? 0) + 1, 20);
+      if (!quiet) this.failures[slot] = Math.min((this.failures[slot] ?? 0) + 1, 20);
       throw e;
     }
     this.failures[slot] = 0;
@@ -83,15 +103,21 @@ export class AgentPool {
   pick(): AcpAgent {
     const live = this.alive();
     if (!live.length) throw new GatewayError(503, "ai_unavailable", "Chưa có tiến trình AI nào sẵn sàng");
+    const fresh = live.filter((a) => !this.draining.has(a));
+    const pool = fresh.length ? fresh : live; // tiến trình sắp nghỉ chỉ dùng khi không còn cái nào khác
     const load = (a: AcpAgent) => a.activePrompts + (this.pending.get(a) ?? 0) + a.sessionCount / 1000;
-    return live.reduce((best, a) => (load(a) < load(best) ? a : best));
+    return pool.reduce((best, a) => (load(a) < load(best) ? a : best));
   }
 
   private async open(model: string): Promise<{ agent: AcpAgent; sessionId: string }> {
     const agent = this.pick();
     this.pending.set(agent, (this.pending.get(agent) ?? 0) + 1);
     try {
-      return { agent, sessionId: await agent.newSession(model) };
+      const sessionId = await agent.newSession(model);
+      const n = (this.opened.get(agent) ?? 0) + 1;
+      this.opened.set(agent, n);
+      if (n >= (this.opts.recycleAfterSessions ?? 150)) this.draining.add(agent);
+      return { agent, sessionId };
     } finally {
       this.pending.set(agent, (this.pending.get(agent) ?? 1) - 1);
     }
@@ -110,20 +136,22 @@ export class AgentPool {
         done = true;
         c.busy--;
         c.lastUsed = Date.now();
+        this.recycleIdle();
       },
     };
   }
 
   /** Lấy phiên: có `key` thì dùng lại phiên của hội thoại; không thì mở phiên tạm, trả lại là đóng. */
-  async lease(key: string | undefined, model: string): Promise<Lease> {
+  async lease(key: string | undefined, model: string, sig: string = model): Promise<Lease> {
     if (key) {
       const inflight = this.creating.get(key);
       if (inflight) await inflight.catch(() => {});
       const c = this.conversations.get(key);
-      if (c && c.model === model && c.agent.alive) return this.use(c, false);
+      if (c && c.model === model && c.sig === sig && c.agent.alive) return this.use(c, false);
       if (c) this.forget(key);
+      else this.evictOverflow();
       const p = this.open(model).then(({ agent, sessionId }) => {
-        const entry: Conversation = { agent, sessionId, model, lastUsed: Date.now(), busy: 0 };
+        const entry: Conversation = { agent, sessionId, model, sig, lastUsed: Date.now(), busy: 0 };
         this.conversations.set(key, entry);
         return entry;
       });
@@ -135,7 +163,45 @@ export class AgentPool {
       }
     }
     const { agent, sessionId } = await this.open(model);
-    return { agent, sessionId, fresh: true, release: () => void agent.closeSession(sessionId) };
+    return { agent, sessionId, fresh: true, release: () => void agent.closeSession(sessionId).finally(() => this.recycleIdle()) };
+  }
+
+  /** Quá `maxConversations`: bỏ hội thoại rảnh lâu nhất để chỗ cho hội thoại mới. */
+  private evictOverflow(): void {
+    const max = this.opts.maxConversations ?? 300;
+    while (this.conversations.size >= max) {
+      let oldest: [string, Conversation] | undefined;
+      for (const e of this.conversations) if (!e[1].busy && (!oldest || e[1].lastUsed < oldest[1].lastUsed)) oldest = e;
+      if (!oldest) return;
+      this.forget(oldest[0]);
+    }
+  }
+
+  /** Thay tiến trình đã mở đủ phiên khi nó không còn hội thoại/lượt nào: mở cái mới vào chỗ cũ rồi dừng cái cũ. */
+  private recycleIdle(): void {
+    if (this.stopped || this.recycling) return;
+    const idle = (a: AcpAgent) =>
+      a.alive && a.activePrompts === 0 && a.sessionCount === 0 && !(this.pending.get(a) ?? 0) && ![...this.conversations.values()].some((c) => c.agent === a);
+    const old = this.agents.find((a): a is AcpAgent => !!a && this.draining.has(a) && idle(a));
+    if (!old) return;
+    const slot = this.agents.indexOf(old);
+    this.recycling = true;
+    void (async () => {
+      try {
+        await this.spawn(slot, true); // cái mới thế chỗ trong agents[slot]
+        if (this.agents[slot] === old) return; // spawn không thay được (đang tắt)
+        this.retired.add(old);
+        this.draining.delete(old);
+        this.opened.delete(old);
+        await old.stop();
+        this.log(`Tiến trình AI #${slot} đã mở đủ phiên nên được thay mới.`);
+      } catch (e) {
+        this.log(`Không thay mới được tiến trình AI #${slot}: ${e instanceof Error ? e.message : String(e)}`);
+      } finally {
+        this.recycling = false;
+        this.recycleIdle();
+      }
+    })();
   }
 
   /** Bỏ phiên của hội thoại (vd sau lỗi giữa chừng): lần sau mở phiên mới với toàn bộ lịch sử. */
@@ -143,14 +209,15 @@ export class AgentPool {
     const c = this.conversations.get(key);
     if (!c) return;
     this.conversations.delete(key);
-    void c.agent.closeSession(c.sessionId);
+    void c.agent.closeSession(c.sessionId).finally(() => this.recycleIdle());
   }
 
   sweep(now = Date.now()): void {
     for (const [k, c] of this.conversations) if (!c.busy && now - c.lastUsed > this.opts.idleSessionMs) this.forget(k);
+    this.recycleIdle();
   }
 
-  stats(): { size: number; alive: number; sessions: number; conversations: number; active: number } {
+  stats(): { size: number; alive: number; sessions: number; conversations: number; active: number; restarts: number; draining: number } {
     const live = this.alive();
     return {
       size: this.agents.length,
@@ -158,6 +225,8 @@ export class AgentPool {
       sessions: live.reduce((s, a) => s + a.sessionCount, 0),
       conversations: this.conversations.size,
       active: live.reduce((s, a) => s + a.activePrompts, 0),
+      restarts: this.restartCount,
+      draining: live.filter((a) => this.draining.has(a)).length,
     };
   }
 

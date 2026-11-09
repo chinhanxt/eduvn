@@ -65,7 +65,7 @@ export class JsonRpcPeer {
       if (timeoutMs > 0) {
         p.timer = setTimeout(() => {
           this.pending.delete(id);
-          reject(new RpcError(-32000, `Hết thời gian chờ ${method}`));
+          reject(new RpcError(-32010, `Hết thời gian chờ ${method}`));
         }, timeoutMs);
       }
       this.pending.set(id, p);

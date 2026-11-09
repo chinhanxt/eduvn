@@ -78,3 +78,16 @@ describe("PriorityLimiter", () => {
     await expect(l.run(0, async () => 1, ac.signal)).rejects.toMatchObject({ status: 499 });
   });
 });
+
+describe("PriorityLimiter chờ quá lâu", () => {
+  it("chat chờ quá maxWaitMs thì 503 busy, rời hàng", async () => {
+    const l = new PriorityLimiter(1, 0, 60);
+    const g = gate();
+    const a = l.run(0, () => g.p);
+    await tick();
+    await expect(l.run(0, async () => "x")).rejects.toMatchObject({ status: 503, code: "busy" });
+    expect(l.queued).toBe(0);
+    g.open();
+    await a;
+  });
+});

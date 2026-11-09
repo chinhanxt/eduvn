@@ -1,4 +1,4 @@
-import { clientClosed } from "./types";
+import { clientClosed, GatewayError } from "./types";
 
 /**
  * Giới hạn số lời gọi AI chạy cùng lúc.
@@ -12,6 +12,7 @@ export class PriorityLimiter {
   constructor(
     private readonly max: number,
     private readonly reserved = 1,
+    private readonly maxWaitMs = 0, // chờ quá lâu: chat báo bận (0 = không giới hạn)
   ) {}
 
   get active(): number {
@@ -32,15 +33,28 @@ export class PriorityLimiter {
     else {
       await new Promise<void>((resolve, reject) => {
         const q = this.waiting[priority];
-        const onAbort = () => {
+        let timer: NodeJS.Timeout | undefined;
+        const leave = () => {
           const i = q.indexOf(go);
           if (i >= 0) q.splice(i, 1);
+        };
+        const onAbort = () => {
+          clearTimeout(timer);
+          leave();
           reject(clientClosed());
         };
         const go = () => {
+          clearTimeout(timer);
           signal?.removeEventListener("abort", onAbort);
           resolve();
         };
+        if (priority === 0 && this.maxWaitMs > 0) {
+          timer = setTimeout(() => {
+            leave();
+            signal?.removeEventListener("abort", onAbort);
+            reject(new GatewayError(503, "busy", "Hệ thống đang bận, thử lại sau ít giây"));
+          }, this.maxWaitMs);
+        }
         q.push(go);
         signal?.addEventListener("abort", onAbort, { once: true });
       });

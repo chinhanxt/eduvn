@@ -14,9 +14,17 @@ export type AgentOptions = {
   /** Thư mục `<gemini_dir>/antigravity-cli`: xoá dữ liệu phiên ở đây khi đóng phiên. */
   dataDir?: string;
 };
-export type PromptResult = { text: string; stopReason: string; usage?: Usage; deniedTools: number };
+export type PromptResult = { text: string; stopReason: string; usage?: Usage; deniedTools: number; toolsRan: number };
 export type ModelInfo = { id: string; name: string };
-type Collector = { text: string; denied: number; onDelta?: (t: string) => void };
+type Collector = { text: string; denied: number; tools: Map<string, string>; onDelta?: (t: string) => void };
+
+/** Chỉ những biến môi trường này được chuyển cho `agy`; khoá API, token cổng… không bao giờ lọt sang. */
+const ENV_ALLOW = ["PATH", "HOME", "USER", "LOGNAME", "SHELL", "LANG", "LANGUAGE", "LC_ALL", "LC_CTYPE", "TZ", "TMPDIR", "XDG_RUNTIME_DIR", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_DATA_HOME"];
+export function childEnv(extra: NodeJS.ProcessEnv = {}, base: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = {};
+  for (const k of ENV_ALLOW) if (base[k] !== undefined) env[k] = base[k];
+  return { ...env, ...extra };
+}
 type SessionNew = { sessionId: string; models?: { availableModels?: { modelId: string; name: string }[] } };
 type PromptReply = { stopReason: string; usage?: { inputTokens?: number; outputTokens?: number; cachedReadTokens?: number } };
 
@@ -29,6 +37,8 @@ export class AcpAgent extends EventEmitter {
   private endFn: ((reason: Error) => void) | null = null;
   private active = 0;
   private up = false;
+  private stderrTail: string[] = [];
+  private stderrPart = "";
   models: ModelInfo[] = [];
 
   constructor(private readonly opts: AgentOptions) {
@@ -45,14 +55,24 @@ export class AcpAgent extends EventEmitter {
     return this.sessions.size;
   }
 
+  /** 20 dòng stderr cuối của tiến trình (để chẩn đoán khi nó chết). */
+  lastStderr(): string[] {
+    return this.stderrPart ? [...this.stderrTail, this.stderrPart] : [...this.stderrTail];
+  }
+
   async start(): Promise<void> {
     const p = spawn(this.opts.command, this.opts.args, {
       cwd: this.opts.cwd,
-      env: { ...process.env, ...this.opts.env },
+      env: childEnv(this.opts.env),
       stdio: ["pipe", "pipe", "pipe"],
     });
     this.proc = p;
-    p.stderr.on("data", () => {}); // agy ghi log ra stderr; không cần
+    p.stderr.on("data", (d: Buffer) => {
+      const lines = (this.stderrPart + d.toString("utf8")).split("\n");
+      this.stderrPart = (lines.pop() ?? "").slice(-2000);
+      for (const l of lines) this.stderrTail.push(l.slice(0, 2000));
+      if (this.stderrTail.length > 20) this.stderrTail.splice(0, this.stderrTail.length - 20);
+    });
     const peer = new JsonRpcPeer(p.stdout, p.stdin);
     this.peer = peer;
     peer.onNotification((method, params) => this.onNotification(method, params));
@@ -71,7 +91,7 @@ export class AcpAgent extends EventEmitter {
       } catch {
         // đã chết
       }
-      this.emit("exit", reason);
+      this.emit("exit", reason, this.lastStderr());
     };
     this.endFn = end;
     p.on("exit", (code, signal) => end(new Error(`Tiến trình AI đã dừng (${code ?? signal})`)));
@@ -115,7 +135,7 @@ export class AcpAgent extends EventEmitter {
   async prompt(sessionId: string, blocks: ContentPart[], onDelta?: (t: string) => void, timeoutMs = 120000): Promise<PromptResult> {
     const peer = this.need();
     if (this.collectors.has(sessionId)) throw new RpcError(-32002, "Phiên đang bận");
-    const c: Collector = { text: "", denied: 0, onDelta };
+    const c: Collector = { text: "", denied: 0, tools: new Map(), onDelta };
     this.collectors.set(sessionId, c);
     this.active++;
     let timer: NodeJS.Timeout | undefined;
@@ -149,7 +169,7 @@ export class AcpAgent extends EventEmitter {
             });
             void Promise.race([settled, cap]).then(() => {
               clearTimeout(t2);
-              reject(new RpcError(-32000, "AI trả lời quá thời gian"));
+              reject(new RpcError(-32010, "AI trả lời quá thời gian"));
             });
           }, timeoutMs);
         }),
@@ -159,6 +179,7 @@ export class AcpAgent extends EventEmitter {
         text: c.text,
         stopReason: res.stopReason,
         deniedTools: c.denied,
+        toolsRan: [...c.tools.values()].filter((s) => s === "completed").length,
         usage: u ? { inputTokens: u.inputTokens, outputTokens: u.outputTokens, cachedReadTokens: u.cachedReadTokens } : undefined,
       };
     } catch (e) {
@@ -220,10 +241,17 @@ export class AcpAgent extends EventEmitter {
     return this.peer;
   }
 
-  private onNotification(method: string, params: { sessionId?: string; update?: { sessionUpdate?: string; content?: { type?: string; text?: string } } }): void {
+  private onNotification(
+    method: string,
+    params: { sessionId?: string; update?: { sessionUpdate?: string; toolCallId?: string; status?: string; content?: { type?: string; text?: string } } },
+  ): void {
     if (method !== "session/update" || !params?.sessionId) return;
     const c = this.collectors.get(params.sessionId);
     const u = params.update;
+    if (c && u?.toolCallId && (u.sessionUpdate === "tool_call" || u.sessionUpdate === "tool_call_update")) {
+      c.tools.set(u.toolCallId, u.status ?? c.tools.get(u.toolCallId) ?? "pending");
+      return;
+    }
     if (!c || u?.sessionUpdate !== "agent_message_chunk" || u.content?.type !== "text" || !u.content.text) return;
     c.text += u.content.text;
     c.onDelta?.(u.content.text);

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { PriorityLimiter } from "./limiter";
 import { resolveRoute, type Route, type TasksFile } from "./routes";
 import { type Backend, clientClosed, type BackendOutput, type ChatMessage, type ContentPart, GatewayError, textOf, type Usage } from "./types";
@@ -69,18 +70,24 @@ const stripImages = (msgs: ChatMessage[]): ChatMessage[] =>
 
 const MAX_MSGS = 30;
 const MAX_CHARS = 24000;
+const hasImage = (m: ChatMessage): boolean => Array.isArray(m.content) && m.content.some((p) => p.type === "image");
+/** Giới hạn độ dài; bỏ tin rỗng (trừ tin cuối) và tin trợ lý đứng đầu để lịch sử luôn mở đầu bằng tin người dùng. */
 const cap = (msgs: ChatMessage[]): ChatMessage[] => {
-  const out = [...msgs];
+  const out = [...msgs.slice(0, -1).filter((m) => textOf(m.content).trim() || hasImage(m)), ...msgs.slice(-1)];
   let chars = out.reduce((n, m) => n + textOf(m.content).length, 0);
   while (out.length > 1 && (out.length > MAX_MSGS || chars > MAX_CHARS)) chars -= textOf(out.shift()!.content).length;
+  while (out.length && out[0]!.role === "assistant") out.shift();
   return out;
 };
+const norm = (m: ChatMessage): string => `${m.role}\u0000${textOf(stripImages([m])[0]!.content)}`;
+const isPrefix = (stored: ChatMessage[], hist: ChatMessage[]): boolean => stored.length <= hist.length && stored.every((m, i) => norm(m) === norm(hist[i]!));
 
 const note = (messages: ChatMessage[], text: string): ChatMessage[] => [...messages, { role: "user", content: text }];
 
 export class LlmService {
   private readonly locks = new Map<string, Promise<unknown>>();
   private readonly transcripts = new Map<string, { messages: ChatMessage[]; lastUsed: number }>();
+  private readonly m = { requests: 0, errors: 0, fallbacks: 0, retries: 0, toolBlocked: 0 };
 
   constructor(
     private readonly deps: {
@@ -88,8 +95,22 @@ export class LlmService {
       backends: Record<string, Backend>;
       limiter: PriorityLimiter;
       fallback?: string;
+      log?: (msg: string) => void;
     },
   ) {}
+
+  metrics(): { requests: number; errors: number; fallbacks: number; retries: number; toolBlocked: number } {
+    return { ...this.m };
+  }
+
+  private warn(msg: string): void {
+    (this.deps.log ?? console.warn)(msg);
+  }
+
+  /** Khoá hội thoại nội bộ: tách theo tác vụ để cùng một khách dùng nhiều tác vụ không lẫn ngữ cảnh. */
+  private keyOf(r: Route, conversation?: string): string | undefined {
+    return conversation ? `${r.task ?? r.model}:${conversation}` : undefined;
+  }
 
   route(model: string, interactive = false): Route {
     return resolveRoute(this.deps.tasks, model, { interactive });
@@ -107,11 +128,22 @@ export class LlmService {
     return Object.keys(this.deps.tasks.tasks);
   }
 
-  complete(req: CompleteRequest): Promise<CompleteResult> {
-    const key = req.conversation;
-    if (!key) return this.run(req);
+  async complete(req: CompleteRequest): Promise<CompleteResult> {
+    this.m.requests++;
+    try {
+      return await this.dispatch(req);
+    } catch (e) {
+      this.m.errors++;
+      throw e;
+    }
+  }
+
+  private dispatch(req: CompleteRequest): Promise<CompleteResult> {
+    const r = this.route(req.model, req.interactive);
+    const key = this.keyOf(r, req.conversation);
+    if (!key) return this.run(req, r, undefined);
     // Cùng hội thoại: chạy lần lượt để lịch sử không bị ghi chồng.
-    const next = (this.locks.get(key) ?? Promise.resolve()).catch(() => {}).then(() => this.run(req));
+    const next = (this.locks.get(key) ?? Promise.resolve()).catch(() => {}).then(() => this.run(req, r, key));
     this.locks.set(key, next);
     void next
       .catch(() => {})
@@ -121,19 +153,28 @@ export class LlmService {
     return next;
   }
 
-  private async run(req: CompleteRequest): Promise<CompleteResult> {
-    const r = this.route(req.model, req.interactive);
+  private forgetSession(key: string | undefined): void {
+    if (key) for (const b of Object.values(this.deps.backends)) b.forget?.(key);
+  }
+
+  private async run(req: CompleteRequest, r: Route, key: string | undefined): Promise<CompleteResult> {
     const wantJson = req.json ?? r.json;
     const system = [GUARD, r.system, ...req.messages.filter((m) => m.role === "system").map((m) => textOf(m.content))]
       .filter(Boolean)
       .join("\n\n");
     let messages = req.messages.filter((m) => m.role !== "system");
     if (!messages.some((m) => m.role === "user")) throw new GatewayError(400, "no_user_message", "Thiếu tin nhắn của người dùng");
-    const key = req.conversation;
+    const sig = `${r.model}|${createHash("sha1").update(system).digest("hex")}`;
     if (key) {
       const past = this.transcripts.get(key)?.messages ?? [];
-      // Một tin duy nhất: ghép với lịch sử đã lưu; nhiều tin: máy khách tự giữ lịch sử.
-      messages = messages.length === 1 ? cap([...past, ...messages]) : cap(messages);
+      if (messages.length === 1) {
+        // Một tin duy nhất: ghép với lịch sử đã lưu.
+        messages = cap([...past, ...messages]);
+      } else {
+        // Nhiều tin: máy khách tự giữ lịch sử. Nếu nó không nối tiếp lịch sử ta đã lưu (sửa/xoá tin), bỏ phiên cũ.
+        if (!isPrefix(past, messages.slice(0, -1))) this.forgetSession(key);
+        messages = cap(messages);
+      }
     }
     const started = Date.now();
     const signal = req.signal;
@@ -141,9 +182,9 @@ export class LlmService {
     return this.deps.limiter.run(r.priority, async () => {
       const [primary, backup] = this.pickBackends(r.backend);
       let used = primary!;
-      const call = async (msgs: ChatMessage[], onDelta?: (t: string) => void): Promise<BackendOutput> => {
+      const call = async (msgs: ChatMessage[], onDelta?: (t: string) => void, ephemeral = false): Promise<BackendOutput> => {
         if (signal?.aborted) throw clientClosed();
-        const input = { model: r.model, system, messages: msgs, conversation: req.conversation, timeoutMs: r.timeoutMs, priority: r.priority, signal };
+        const input = { model: r.model, system, messages: msgs, conversation: ephemeral ? undefined : key, sig, timeoutMs: r.timeoutMs, priority: r.priority, signal };
         let emitted = false;
         const track = onDelta && ((t: string) => {
           emitted = true;
@@ -156,16 +197,39 @@ export class LlmService {
           if (emitted) throw e instanceof GatewayError ? e : new GatewayError(502, "upstream_error", (e as Error).message);
           // Lỗi phía AI (tài khoản agy bị khoá, mạng, quá giờ…): chuyển sang backend dự phòng nếu có.
           if (!backup || used === backup || (e instanceof GatewayError && e.status < 500)) throw e;
+          this.m.fallbacks++;
+          this.warn(`Cổng AI: ${used.name} lỗi (${(e as Error).message}); chuyển sang ${backup.name}`);
           used = backup;
           return used.complete(input, onDelta);
         }
       };
+      // AI đã chạy công cụ: bỏ câu trả lời, hỏi lại một lần ở phiên mới; vẫn vậy thì chặn.
+      const ask = async (msgs: ChatMessage[], onDelta?: (t: string) => void): Promise<BackendOutput> => {
+        let emitted = false;
+        const track = onDelta && ((t: string) => {
+          emitted = true;
+          onDelta(t);
+        });
+        const out = await call(msgs, track);
+        if (!out.toolsRan) return out;
+        this.warn(`Cổng AI: AI đã chạy ${out.toolsRan} công cụ (tác vụ ${r.task ?? r.model}); bỏ câu trả lời`);
+        this.forgetSession(key);
+        if (!emitted) {
+          this.m.retries++;
+          const again = await call(note(msgs, RETRY_TEXT), onDelta, true);
+          if (!again.toolsRan) return again;
+          this.warn("Cổng AI: AI lại chạy công cụ sau khi nhắc; chặn câu trả lời");
+        }
+        this.m.toolBlocked++;
+        throw new GatewayError(502, "tool_used", "AI đã cố dùng công cụ; câu trả lời bị chặn");
+      };
       const stream = wantJson ? undefined : req.onDelta;
       let retried = false;
-      let out = await call(messages, stream);
+      let out = await ask(messages, stream);
       if (!out.text.trim()) {
         retried = true;
-        out = await call(note(messages, RETRY_TEXT), stream);
+        this.m.retries++;
+        out = await ask(note(messages, RETRY_TEXT), stream);
       }
       if (!out.text.trim()) throw new GatewayError(502, "empty_answer", "AI không trả lời");
       let json: unknown;
@@ -174,13 +238,16 @@ export class LlmService {
           json = extractJson(out.text);
         } catch {
           retried = true;
-          out = await call(note(messages, RETRY_JSON));
+          this.m.retries++;
+          out = await ask(note(messages, RETRY_JSON));
           json = extractJson(out.text);
         }
-        req.onDelta?.(out.text);
       }
-      if (key) this.transcripts.set(key, { messages: cap(stripImages([...messages, { role: "assistant", content: out.text }])), lastUsed: Date.now() });
-      return { text: out.text, json, model: r.model, task: r.task, backend: used.name, ms: Date.now() - started, usage: out.usage, retried };
+      // Chế độ JSON: trả đúng JSON đã kiểm (không kèm lời dẫn/khối mã của AI).
+      const text = wantJson ? JSON.stringify(json) : out.text;
+      if (wantJson) req.onDelta?.(text);
+      if (key) this.transcripts.set(key, { messages: cap(stripImages([...messages, { role: "assistant", content: text }])), lastUsed: Date.now() });
+      return { text, json, model: r.model, task: r.task, backend: used.name, ms: Date.now() - started, usage: out.usage, retried };
     }, signal);
   }
 

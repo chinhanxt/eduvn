@@ -94,7 +94,7 @@ describe("HTTP cổng AI", () => {
     expect(b.choices[0]).toEqual({ index: 0, message: { role: "assistant", content: "Đáp: chào cô" }, finish_reason: "stop" });
     expect(b.usage).toEqual({ prompt_tokens: 3, completion_tokens: 12, total_tokens: 15 });
     expect(b.eduvn).toMatchObject({ task: "gia_su_chat", backend: "acp", retried: false });
-    expect(backend.calls[0]).toMatchObject({ conversation: "hs-1", priority: 0 });
+    expect(backend.calls[0]).toMatchObject({ conversation: "gia_su_chat:hs-1", priority: 0 });
   });
   it("chat stream: các mảnh SSE rồi [DONE]", async () => {
     app = mk();
@@ -215,5 +215,71 @@ describe("HTTP cổng AI", () => {
     await hang.aborted;
     await new Promise((r) => setTimeout(r, 30));
     expect(fb.calls.length).toBe(0);
+  });
+});
+
+describe("HTTP cổng AI: hợp đồng OpenAI cho OpenMAIC/DeepTutor", () => {
+  const chat = (payload: object, headers: Record<string, string> = {}) =>
+    app!.inject({ method: "POST", url: "/v1/chat/completions", headers: { ...auth, ...headers }, payload: { model: "gia_su_chat", messages: [{ role: "user", content: "chào" }], ...payload } });
+  it("khoá hội thoại: body conversation > header > user", async () => {
+    app = mk();
+    await chat({ conversation: "A", user: "U" }, { "x-eduvn-conversation": "H" });
+    await chat({ user: "U" }, { "x-eduvn-conversation": "H" });
+    await chat({ user: "U" });
+    expect(backend.calls.map((c) => c.conversation)).toEqual(["gia_su_chat:A", "gia_su_chat:H", "gia_su_chat:U"]);
+    expect((await chat({ conversation: "x".repeat(201) })).statusCode).toBe(400);
+  });
+  it("response_format json_schema bật chế độ JSON", async () => {
+    app = mk();
+    const r = await chat({ messages: [{ role: "user", content: "cho json" }], response_format: { type: "json_schema", json_schema: { name: "x", schema: { type: "object" } } } });
+    expect(JSON.parse(r.json().choices[0].message.content)).toEqual({ ok: true });
+  });
+  it("tools / tool_choice → 400 tools_unsupported; tool_choice none và tools rỗng được", async () => {
+    app = mk();
+    const a = await chat({ tools: [{ type: "function", function: { name: "f" } }] });
+    expect(a.statusCode).toBe(400);
+    expect(a.json().error.code).toBe("tools_unsupported");
+    expect((await chat({ tool_choice: "auto" })).statusCode).toBe(400);
+    expect((await chat({ tools: [], tool_choice: "none" })).statusCode).toBe(200);
+  });
+  it("nhận và bỏ qua max_tokens, temperature…; n>1 → 400", async () => {
+    app = mk();
+    expect((await chat({ max_tokens: 10, max_completion_tokens: 10, temperature: 0.2, top_p: 1, stop: ["x"], n: 1 })).statusCode).toBe(200);
+    expect((await chat({ n: 2 })).statusCode).toBe(400);
+  });
+  it("stream_options.include_usage thêm mảnh usage trước [DONE]", async () => {
+    app = mk();
+    const r = await chat({ stream: true, stream_options: { include_usage: true } });
+    const events = r.body.split("\n\n").filter(Boolean).map((l) => l.replace(/^data: /, ""));
+    expect(events.at(-1)).toBe("[DONE]");
+    const last = JSON.parse(events.at(-2)!);
+    expect(last.choices).toEqual([]);
+    expect(last.usage).toEqual({ prompt_tokens: 3, completion_tokens: 9, total_tokens: 12 });
+    const plain = await chat({ stream: true });
+    expect(plain.body).not.toContain('"usage"');
+  });
+  it("/v1/models có created", async () => {
+    app = mk();
+    const d = (await app.inject({ method: "GET", url: "/v1/models", headers: auth })).json().data;
+    expect(d.every((m: { created: number }) => Number.isInteger(m.created) && m.created > 1e9)).toBe(true);
+  });
+  it("health 503 khi không có backend nào", async () => {
+    app = mk({ health: () => ({ ok: false, pool: { alive: 0 } }) });
+    const r = await app.inject({ method: "GET", url: "/health" });
+    expect(r.statusCode).toBe(503);
+    expect(r.json().ok).toBe(false);
+  });
+  it("abortAll huỷ stream đang chạy", async () => {
+    const hang = new HangBackend();
+    const llm = new LlmService({ tasks, backends: { acp: hang }, limiter: new PriorityLimiter(4) });
+    app = buildApp({ llm, jobs: new JobStore(), token: TOKEN, health: () => ({}), models: () => [] });
+    await app.listen({ port: 0, host: "127.0.0.1" });
+    const port = (app.server.address() as { port: number }).port;
+    const res = await fetch(`http://127.0.0.1:${port}/v1/chat/completions`, { method: "POST", headers: { ...auth, "content-type": "application/json" }, body: JSON.stringify({ model: "default", stream: true, messages: [{ role: "user", content: "x" }] }) });
+    const reader = res.body!.getReader();
+    await reader.read();
+    await hang.started;
+    app.abortAll();
+    await hang.aborted;
   });
 });

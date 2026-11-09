@@ -17,7 +17,12 @@ const Env = z.object({
   AGY_PROCESSES: z.coerce.number().int().min(1).max(8).default(2),
   MAX_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(6),
   SESSION_IDLE_MS: z.coerce.number().int().min(10000).default(900000),
-  WORK_DIR: z.string().min(1).default(".work"),
+  MAX_CONVERSATIONS: z.coerce.number().int().min(1).max(100000).default(300),
+  // Đo thật (agy, 60 phiên): RSS 164→293 MB sau 20 phiên →318 MB sau 60; fd đã xoá nhưng còn mở ~0,3-0,8/phiên (50 sau 60), mỗi -wal ~1,3 MB giữ đĩa đến khi tiến trình thoát.
+  AGY_RECYCLE_SESSIONS: z.coerce.number().int().min(1).default(150),
+  CHAT_RESERVED: z.coerce.number().int().min(0).max(31).default(1),
+  CHAT_MAX_WAIT_MS: z.coerce.number().int().min(1000).default(30000),
+  WORK_DIR: z.string().min(1).default("/var/tmp/eduvn-gateway"),
   TASKS_FILE: z.string().min(1).default("tasks.json"),
   ANTHROPIC_API_KEY: z.string().default(""),
   ANTHROPIC_BASE_URL: z.url().default("https://api.anthropic.com"),
