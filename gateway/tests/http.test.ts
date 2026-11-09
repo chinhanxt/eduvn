@@ -23,12 +23,46 @@ class EchoBackend implements Backend {
     return { text: out, deniedTools: 0, usage: { inputTokens: 3, outputTokens: out.length } };
   }
 }
+class SlowBackend implements Backend {
+  readonly name = "acp";
+  constructor(private readonly ms: number) {}
+  available() {
+    return true;
+  }
+  async complete(): Promise<BackendOutput> {
+    await new Promise((r) => setTimeout(r, this.ms));
+    return { text: "xong", deniedTools: 0 };
+  }
+}
+class HangBackend implements Backend {
+  readonly name = "acp";
+  started: Promise<void>;
+  aborted: Promise<void>;
+  private markStarted!: () => void;
+  private markAborted!: () => void;
+  constructor() {
+    this.started = new Promise((r) => (this.markStarted = r));
+    this.aborted = new Promise((r) => (this.markAborted = r));
+  }
+  available() {
+    return true;
+  }
+  complete(input: BackendInput): Promise<BackendOutput> {
+    this.markStarted();
+    return new Promise((_, rej) => {
+      input.signal?.addEventListener("abort", () => {
+        this.markAborted();
+        rej(new Error("aborted"));
+      });
+    });
+  }
+}
 const tasks = parseTasks({ defaults: { model: "claude-sonnet-5-5-low", timeoutMs: 5000, backend: "acp" }, tasks: { gia_su_chat: { model: "claude-sonnet-5-5-low", priority: "interactive" } } });
 let backend: EchoBackend;
-function mk() {
+function mk(extra: Partial<Parameters<typeof buildApp>[0]> = {}, be?: Backend) {
   backend = new EchoBackend();
-  const llm = new LlmService({ tasks, backends: { acp: backend }, limiter: new PriorityLimiter(4) });
-  return buildApp({ llm, jobs: new JobStore(), token: TOKEN, health: () => ({ pool: { alive: 2 } }), models: () => [{ id: "claude-sonnet-5-5-low", name: "Claude Sonnet 5.5 (Low)" }] });
+  const llm = new LlmService({ tasks, backends: { acp: be ?? backend }, limiter: new PriorityLimiter(4) });
+  return buildApp({ llm, jobs: new JobStore(), token: TOKEN, health: () => ({ pool: { alive: 2 } }), models: () => [{ id: "claude-sonnet-5-5-low", name: "Claude Sonnet 5.5 (Low)" }], ...extra });
 }
 const auth = { authorization: `Bearer ${TOKEN}` };
 let app: ReturnType<typeof mk> | null = null;
@@ -122,5 +156,64 @@ describe("HTTP cổng AI", () => {
     }
     expect(j).toMatchObject({ status: "done", done: 1 });
     expect((await app.inject({ method: "GET", url: "/v1/jobs/khong-co", headers: auth })).statusCode).toBe(404);
+  });
+  it("tương thích OpenAI: vai tool, assistant content null, khoá lạ bị bỏ qua", async () => {
+    app = mk();
+    const r = await app.inject({
+      method: "POST",
+      url: "/v1/chat/completions",
+      headers: auth,
+      payload: {
+        model: "default",
+        foo: 1,
+        messages: [
+          { role: "user", content: "hỏi" },
+          { role: "assistant", content: null, tool_calls: [{ id: "c1", type: "function", function: { name: "f", arguments: "{}" } }] },
+          { role: "tool", tool_call_id: "c1", name: "f", content: "42" },
+        ],
+      },
+    });
+    expect(r.statusCode).toBe(200);
+    expect(backend.calls[0]!.messages.map((m) => m.role)).toEqual(["user", "assistant", "user"]);
+    expect(backend.calls[0]!.messages[1]!.content).toBe("");
+    expect(backend.calls[0]!.messages[2]!.content).toBe("Kết quả công cụ: 42");
+  });
+  it("stream gửi : ping khi backend chậm", async () => {
+    app = mk({ pingMs: 20 }, new SlowBackend(120));
+    const r = await app.inject({ method: "POST", url: "/v1/chat/completions", headers: auth, payload: { model: "default", stream: true, messages: [{ role: "user", content: "x" }] } });
+    expect(r.body).toContain(": ping\n\n");
+    expect(r.body.trim().endsWith("data: [DONE]")).toBe(true);
+  });
+  it("batch wait bị chặn thời gian: trả running", async () => {
+    app = mk({ batchWaitMs: 50 }, new SlowBackend(300));
+    const r = await app.inject({ method: "POST", url: "/v1/batch", headers: auth, payload: { model: "default", wait: true, items: [{ messages: [{ role: "user", content: "x" }] }] } });
+    expect(r.json().status).toBe("running");
+  });
+  it("quá 20 lô đang chạy → 429", async () => {
+    const slow = new SlowBackend(400);
+    app = mk({}, slow);
+    const body = { model: "default", items: [{ messages: [{ role: "user", content: "x" }] }] };
+    for (let i = 0; i < 20; i++) expect((await app.inject({ method: "POST", url: "/v1/batch", headers: auth, payload: body })).statusCode).toBe(200);
+    const r = await app.inject({ method: "POST", url: "/v1/batch", headers: auth, payload: body });
+    expect(r.statusCode).toBe(429);
+    expect(r.json().error.code).toBe("too_many_jobs");
+  });
+  it("khách ngắt stream giữa chừng: backend thấy abort, không chuyển dự phòng", async () => {
+    const hang = new HangBackend();
+    const fb = new EchoBackend();
+    backend = fb;
+    const llm = new LlmService({ tasks, backends: { acp: hang, anthropic: { ...fb, name: "anthropic", available: () => true, complete: fb.complete.bind(fb) } as Backend }, limiter: new PriorityLimiter(4), fallback: "anthropic" });
+    app = buildApp({ llm, jobs: new JobStore(), token: TOKEN, health: () => ({}), models: () => [] });
+    await app.listen({ port: 0, host: "127.0.0.1" });
+    const port = (app.server.address() as { port: number }).port;
+    const ac = new AbortController();
+    const res = await fetch(`http://127.0.0.1:${port}/v1/chat/completions`, { method: "POST", headers: { ...auth, "content-type": "application/json" }, body: JSON.stringify({ model: "default", stream: true, messages: [{ role: "user", content: "x" }] }), signal: ac.signal });
+    const reader = res.body!.getReader();
+    await reader.read();
+    await hang.started;
+    ac.abort();
+    await hang.aborted;
+    await new Promise((r) => setTimeout(r, 30));
+    expect(fb.calls.length).toBe(0);
   });
 });

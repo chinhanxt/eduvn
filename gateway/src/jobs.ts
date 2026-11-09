@@ -30,6 +30,13 @@ export class JobStore {
     return this.finished.get(id) ?? Promise.resolve();
   }
 
+  /** Số việc đang chạy. */
+  running(): number {
+    let n = 0;
+    for (const j of this.jobs.values()) if (j.status === "running") n++;
+    return n;
+  }
+
   startBatch(llm: LlmService, req: { model: string; items: BatchItem[]; concurrency: number }): Job {
     this.sweep();
     const job: Job = { id: randomUUID(), status: "running", total: req.items.length, done: 0, failed: 0, createdAt: Date.now(), results: req.items.map(() => null) };
@@ -50,10 +57,10 @@ export class JobStore {
         job.done++;
       }
     };
-    const all = Promise.all(Array.from({ length: Math.max(1, Math.min(req.concurrency, req.items.length)) }, worker)).then(() => {
+    const all: Promise<void> = Promise.all(Array.from({ length: Math.max(1, Math.min(req.concurrency, req.items.length)) }, worker)).then(() => {}).finally(() => {
       job.status = "done";
       job.finishedAt = Date.now();
-    });
+    }).catch(() => {});
     this.finished.set(job.id, all);
     return job;
   }

@@ -3,7 +3,7 @@ import Fastify, { type FastifyInstance } from "fastify";
 import { z } from "zod";
 import type { Job, JobStore } from "../jobs";
 import type { LlmService } from "../llm";
-import { type ChatMessage, type ContentPart, GatewayError, safeEqual } from "../types";
+import { type ChatMessage, type ContentPart, GatewayError, safeEqual, textOf } from "../types";
 
 export type AppDeps = {
   llm: LlmService;
@@ -11,13 +11,20 @@ export type AppDeps = {
   token: string;
   health: () => Record<string, unknown>;
   models: () => { id: string; name: string }[];
+  /** Chu kỳ gửi `: ping` khi stream (mặc định 10 s). */
+  pingMs?: number;
+  /** Thời gian tối đa `/v1/batch` với wait=true chờ (mặc định 120 s). */
+  batchWaitMs?: number;
+  /** Số lô chạy cùng lúc tối đa (mặc định 20). */
+  maxJobs?: number;
 };
 
 const Part = z.union([
   z.object({ type: z.literal("text"), text: z.string() }),
   z.object({ type: z.literal("image_url"), image_url: z.object({ url: z.string().regex(/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/) }) }),
 ]);
-const Msg = z.object({ role: z.enum(["system", "user", "assistant"]), content: z.union([z.string(), z.array(Part).min(1)]) });
+// Tương thích OpenAI: vai "tool", content null; tool_calls/name/tool_call_id bị bỏ qua (z.object tự lược khoá lạ).
+const Msg = z.object({ role: z.enum(["system", "user", "assistant", "tool"]), content: z.union([z.string(), z.array(Part).min(1)]).nullish() });
 type MsgIn = z.infer<typeof Msg>;
 const ChatBody = z.object({
   model: z.string().min(1).max(100),
@@ -41,10 +48,12 @@ function dataUrl(url: string): ContentPart {
   return { type: "image", mimeType: m[1]!, data: m[2]! };
 }
 export function toMessages(ms: MsgIn[]): ChatMessage[] {
-  return ms.map((m) => ({
-    role: m.role,
-    content: typeof m.content === "string" ? m.content : m.content.map((p): ContentPart => (p.type === "text" ? { type: "text", text: p.text } : dataUrl(p.image_url.url))),
-  }));
+  return ms.map((m): ChatMessage => {
+    const content: ChatMessage["content"] =
+      m.content == null ? "" : typeof m.content === "string" ? m.content : m.content.map((p): ContentPart => (p.type === "text" ? { type: "text", text: p.text } : dataUrl(p.image_url.url)));
+    if (m.role !== "tool") return { role: m.role, content };
+    return { role: "user", content: "Kết quả công cụ: " + textOf(content) };
+  });
 }
 const view = (j: Job) => ({ id: j.id, status: j.status, total: j.total, done: j.done, failed: j.failed, results: j.results });
 
@@ -104,30 +113,55 @@ export function buildApp(d: AppDeps): FastifyInstance {
     d.llm.route(b.model, true); // tác vụ không có → lỗi 404 trước khi mở stream
     reply.hijack();
     const raw = reply.raw;
-    raw.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-cache", connection: "keep-alive", "x-accel-buffering": "no" });
-    const send = (o: unknown) => raw.write(`data: ${JSON.stringify(o)}\n\n`);
+    const ac = new AbortController();
+    let closed = false;
+    let ping: NodeJS.Timeout | undefined;
+    raw.on("close", () => {
+      closed = true;
+      clearInterval(ping);
+      if (!raw.writableFinished) ac.abort();
+    });
+    const send = (o: unknown) => {
+      if (!closed) raw.write(`data: ${JSON.stringify(o)}\n\n`);
+    };
     const chunk = (delta: object, finish: string | null, model = b.model) =>
       send({ id, object: "chat.completion.chunk", created, model, choices: [{ index: 0, delta, finish_reason: finish }] });
-    chunk({ role: "assistant" }, null);
     try {
-      const r = await d.llm.complete({ ...base, onDelta: (t) => chunk({ content: t }, null) });
-      chunk({}, "stop", r.model);
-    } catch (e) {
-      const err = e instanceof GatewayError ? e : new GatewayError(500, "internal", "Lỗi cổng AI");
-      send({ error: { code: err.code, message: err.message } });
+      raw.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-cache", connection: "keep-alive", "x-accel-buffering": "no" });
+      chunk({ role: "assistant" }, null);
+      ping = setInterval(() => {
+        if (!closed) raw.write(": ping\n\n");
+      }, d.pingMs ?? 10000);
+      try {
+        const r = await d.llm.complete({ ...base, signal: ac.signal, onDelta: (t) => chunk({ content: t }, null) });
+        chunk({}, "stop", r.model);
+      } catch (e) {
+        const err = e instanceof GatewayError ? e : new GatewayError(500, "internal", "Lỗi cổng AI");
+        send({ error: { code: err.code, message: err.message } });
+      }
+      clearInterval(ping);
+      if (!closed) raw.end("data: [DONE]\n\n");
+    } catch {
+      clearInterval(ping);
+      raw.destroy();
     }
-    raw.end("data: [DONE]\n\n");
   });
 
   app.post("/v1/batch", async (req) => {
     const b = BatchBody.parse(req.body);
     d.llm.route(b.model); // tác vụ không có → 404 ngay
+    if (d.jobs.running() >= (d.maxJobs ?? 20)) throw new GatewayError(429, "too_many_jobs", "Đang chạy quá nhiều lô, thử lại sau");
     const job = d.jobs.startBatch(d.llm, {
       model: b.model,
       concurrency: b.concurrency,
       items: b.items.map((it) => ({ id: it.id, messages: toMessages(it.messages), json: it.json })),
     });
-    if (b.wait) await d.jobs.wait(job.id);
+    // Chờ tối đa batchWaitMs (mặc định 120 s) rồi trả trạng thái hiện tại (có thể vẫn "running"); client hỏi tiếp qua /v1/jobs/:id.
+    if (b.wait) {
+      let t: NodeJS.Timeout | undefined;
+      await Promise.race([d.jobs.wait(job.id), new Promise<void>((r) => (t = setTimeout(r, d.batchWaitMs ?? 120000)))]);
+      clearTimeout(t);
+    }
     return view(job);
   });
 

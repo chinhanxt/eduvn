@@ -57,4 +57,24 @@ describe("PriorityLimiter", () => {
     await expect(l.run(0, async () => 7)).resolves.toBe(7);
     expect(l.active).toBe(0);
   });
+  it("người chờ bị huỷ thì rời hàng và báo lỗi, người khác vẫn chạy", async () => {
+    const l = new PriorityLimiter(1, 0);
+    const g = gate();
+    const first = l.run(0, () => g.p);
+    const ac = new AbortController();
+    let ran = false;
+    const second = l.run(0, async () => { ran = true; }, ac.signal);
+    const third = l.run(0, async () => "ba");
+    const rej = expect(second).rejects.toMatchObject({ status: 499, code: "client_closed" });
+    await tick();
+    expect(l.queued).toBe(2);
+    ac.abort();
+    await rej;
+    expect(l.queued).toBe(1);
+    g.open();
+    await first;
+    expect(await third).toBe("ba");
+    expect(ran).toBe(false);
+    await expect(l.run(0, async () => 1, ac.signal)).rejects.toMatchObject({ status: 499 });
+  });
 });

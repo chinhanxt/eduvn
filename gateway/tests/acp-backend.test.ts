@@ -96,3 +96,16 @@ describe("AcpBackend", () => {
     expect(backend.available()).toBe(false);
   });
 });
+
+describe("AcpBackend huỷ", () => {
+  it("huỷ giữa lượt thì gọi session/cancel và báo 499", async () => {
+    const { backend } = await mk();
+    const ac = new AbortController();
+    const t0 = Date.now();
+    const p = backend.complete(input({ messages: [{ role: "user", content: "[[sleep:2000]] chậm" }], signal: ac.signal }));
+    const rej = expect(p).rejects.toMatchObject({ status: 499, code: "client_closed" });
+    setTimeout(() => ac.abort(), 100);
+    await rej;
+    expect(Date.now() - t0).toBeLessThan(1500);
+  });
+});

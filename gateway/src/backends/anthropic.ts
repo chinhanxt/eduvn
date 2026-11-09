@@ -1,4 +1,4 @@
-import { type Backend, type BackendInput, type BackendOutput, type ChatMessage, GatewayError, type Usage } from "../types";
+import { type Backend, type BackendInput, type BackendOutput, type ChatMessage, GatewayError, clientClosed, type Usage } from "../types";
 
 export type AnthropicOptions = { apiKey: string; baseUrl: string; maxTokens?: number };
 type Event = {
@@ -69,7 +69,10 @@ export class AnthropicBackend implements Backend {
   async complete(input: BackendInput, onDelta?: (t: string) => void): Promise<BackendOutput> {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), input.timeoutMs);
+    const onAbort = () => ctrl.abort();
+    input.signal?.addEventListener("abort", onAbort, { once: true });
     try {
+      if (input.signal?.aborted) throw clientClosed();
       const res = await fetch(`${this.o.baseUrl.replace(/\/+$/, "")}/v1/messages`, {
         method: "POST",
         signal: ctrl.signal,
@@ -105,11 +108,13 @@ export class AnthropicBackend implements Backend {
       }
       return { text, usage, deniedTools: 0 };
     } catch (e) {
+      if (input.signal?.aborted) throw clientClosed();
       if ((e as Error).name === "AbortError") throw new GatewayError(504, "timeout", "AI trả lời quá thời gian");
       if (e instanceof GatewayError) throw e;
       throw new GatewayError(502, "upstream_error", `Không gọi được Anthropic: ${(e as Error).message}`);
     } finally {
       clearTimeout(timer);
+      input.signal?.removeEventListener("abort", onAbort);
     }
   }
 }

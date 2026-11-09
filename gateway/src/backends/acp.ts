@@ -1,6 +1,6 @@
 import type { AgentPool } from "../acp/pool";
 import { RpcError } from "../acp/rpc";
-import { type Backend, type BackendInput, type BackendOutput, type ContentPart, GatewayError, textOf } from "../types";
+import { type Backend, type BackendInput, type BackendOutput, type ContentPart, GatewayError, clientClosed, textOf } from "../types";
 
 /** Lỗi từ agent → mã HTTP có nghĩa (quá giờ 504, model không có 400, chưa sẵn sàng 503, còn lại 502). */
 export function toGatewayError(e: unknown): Error {
@@ -48,13 +48,18 @@ export class AcpBackend implements Backend {
       const lease = await this.pool.lease(input.conversation, input.model).catch((e: unknown) => {
         throw toGatewayError(e);
       });
+      const onAbort = () => lease.agent.cancel(lease.sessionId);
+      input.signal?.addEventListener("abort", onAbort, { once: true });
       try {
+        if (input.signal?.aborted) throw clientClosed();
         const r = await lease.agent.prompt(lease.sessionId, toBlocks(input, lease.fresh), onDelta, input.timeoutMs);
+        if (input.signal?.aborted) throw clientClosed();
         return { text: r.text, usage: r.usage, deniedTools: r.deniedTools };
       } catch (e) {
         if (input.conversation) this.pool.forget(input.conversation);
         throw toGatewayError(e);
       } finally {
+        input.signal?.removeEventListener("abort", onAbort);
         lease.release();
       }
     };

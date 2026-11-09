@@ -12,6 +12,7 @@ export type BackendInput = {
   conversation?: string; // khoá hội thoại: giữ phiên để tận dụng ngữ cảnh + cache
   timeoutMs: number;
   priority: 0 | 1; // 0 = tương tác (chat), 1 = theo lô
+  signal?: AbortSignal; // huỷ khi người dùng ngắt kết nối
 };
 export type BackendOutput = { text: string; usage?: Usage; deniedTools: number };
 
@@ -20,6 +21,8 @@ export interface Backend {
   available(): boolean;
   complete(input: BackendInput, onDelta?: (text: string) => void): Promise<BackendOutput>;
 }
+
+export const clientClosed = (): GatewayError => new GatewayError(499, "client_closed", "Người dùng đã huỷ");
 
 export class GatewayError extends Error {
   constructor(
