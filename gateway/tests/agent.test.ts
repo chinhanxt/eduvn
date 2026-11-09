@@ -7,13 +7,14 @@ import { AcpAgent } from "../src/acp/agent";
 
 export const fakeAcpPath = fileURLToPath(new URL("./fixtures/fake-acp.mjs", import.meta.url));
 const agents: AcpAgent[] = [];
-function mk(extra: { dataDir?: string; command?: string } = {}) {
+function mk(extra: { dataDir?: string; command?: string; noInit?: boolean } = {}) {
   const a = new AcpAgent({
     command: extra.command ?? process.execPath,
     args: extra.command ? [] : [fakeAcpPath],
     cwd: tmpdir(),
-    env: extra.dataDir ? { FAKE_DATA_DIR: extra.dataDir } : {},
+    env: { ...(extra.dataDir ? { FAKE_DATA_DIR: extra.dataDir } : {}), ...(extra.noInit ? { FAKE_NO_INIT: "1" } : {}) },
     dataDir: extra.dataDir,
+    startTimeoutMs: extra.noInit ? 200 : undefined,
   });
   agents.push(a);
   return a;
@@ -95,5 +96,52 @@ describe("AcpAgent", () => {
     expect(existsSync(join(dir, "conversations", `${sid}.db`))).toBe(false);
     expect(existsSync(join(dir, "brain", sid))).toBe(false);
     expect(a.sessionCount).toBe(0);
+  });
+  it("huỷ do quá giờ: chữ đến muộn không lọt sang lượt sau", async () => {
+    const a = mk();
+    await a.start();
+    const sid = await a.newSession();
+    await expect(a.prompt(sid, [{ type: "text", text: "[[sleep:5000]] [[latechunks]]" }], undefined, 100)).rejects.toThrow(/quá thời gian/);
+    const r = await a.prompt(sid, [{ type: "text", text: "lượt mới" }]);
+    expect(r.text).not.toContain("LATE");
+    expect(r.text).toMatch(/lượt mới$/);
+  });
+  it("prompt thứ hai cùng phiên khi đang bận bị từ chối", async () => {
+    const a = mk();
+    await a.start();
+    const sid = await a.newSession();
+    const first = a.prompt(sid, [{ type: "text", text: "[[sleep:300]]" }]);
+    await expect(a.prompt(sid, [{ type: "text", text: "x" }])).rejects.toThrow(/Phiên đang bận/);
+    await first;
+  });
+  it("initialize quá giờ thì start thất bại và tiến trình con bị giết", async () => {
+    const a = mk({ noInit: true });
+    await expect(a.start()).rejects.toThrow();
+    const pid = (a as unknown as { proc: { pid: number } }).proc.pid;
+    await new Promise((r) => setTimeout(r, 200));
+    expect(() => process.kill(pid, 0)).toThrow();
+    expect(a.alive).toBe(false);
+  });
+  it("stdout đóng mà tiến trình còn sống: coi như chết", async () => {
+    const a = mk();
+    await a.start();
+    const sid = await a.newSession();
+    let exits = 0;
+    a.on("exit", () => exits++);
+    await expect(a.prompt(sid, [{ type: "text", text: "[[closeout]]" }])).rejects.toThrow(/đã dừng/);
+    expect(a.alive).toBe(false);
+    expect(exits).toBe(1);
+  });
+  it("tiến trình chết khi còn phiên mở thì xoá dữ liệu phiên", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "acp-data-"));
+    const a = mk({ dataDir: dir });
+    await a.start();
+    const sid = await a.newSession();
+    expect(existsSync(join(dir, "conversations", `${sid}.db`))).toBe(true);
+    const exited = new Promise((r) => a.once("exit", r));
+    await expect(a.prompt(sid, [{ type: "text", text: "[[crash]]" }])).rejects.toThrow();
+    await exited;
+    expect(existsSync(join(dir, "conversations", `${sid}.db`))).toBe(false);
+    expect(existsSync(join(dir, "brain", sid))).toBe(false);
   });
 });

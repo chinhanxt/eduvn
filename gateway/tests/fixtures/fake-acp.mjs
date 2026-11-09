@@ -20,6 +20,7 @@ const send = (m) => process.stdout.write(JSON.stringify({ jsonrpc: "2.0", ...m }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 process.stdout.write("Khởi động agent giả\n");
+const noInit = process.env.FAKE_NO_INIT === "1";
 
 createInterface({ input: process.stdin }).on("line", (line) => {
   const m = JSON.parse(line);
@@ -36,6 +37,7 @@ createInterface({ input: process.stdin }).on("line", (line) => {
   const fail = (code, message) => send({ id: m.id, error: { code, message } });
   switch (m.method) {
     case "initialize":
+      if (noInit) return;
       return reply({ protocolVersion: 1, agentCapabilities: { promptCapabilities: { image: true } } });
     case "session/new": {
       const id = "s" + ++n;
@@ -79,7 +81,20 @@ async function prompt(id, p) {
   const last = text.trim().split("\n").filter(Boolean).pop() ?? "";
   const sl = /\[\[sleep:(\d+)\]\]/.exec(text);
   if (sl) for (let t = 0; t < Number(sl[1]) && !s.cancelled; t += 10) await sleep(10);
-  if (s.cancelled) return send({ id, result: { stopReason: "cancelled" } });
+  if (s.cancelled) {
+    if (text.includes("[[latechunks]]")) {
+      for (const t of ["LATE1", "LATE2"]) {
+        await sleep(20);
+        send({ method: "session/update", params: { sessionId: p.sessionId, update: { sessionUpdate: "agent_message_chunk", content: { type: "text", text: t } } } });
+      }
+    }
+    return send({ id, result: { stopReason: "cancelled" } });
+  }
+  if (text.includes("[[closeout]]")) {
+    process.stdout.end();
+    setTimeout(() => process.exit(0), 5000);
+    return;
+  }
   if (text.includes("[[crash]]")) process.exit(3);
   if (text.includes("[[tool]]") && !text.includes("không dùng công cụ")) {
     const rid = ++reqId;

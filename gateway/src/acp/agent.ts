@@ -26,6 +26,7 @@ export class AcpAgent extends EventEmitter {
   private peer: JsonRpcPeer | null = null;
   private readonly collectors = new Map<string, Collector>();
   private readonly sessions = new Set<string>();
+  private endFn: ((reason: Error) => void) | null = null;
   private active = 0;
   private up = false;
   models: ModelInfo[] = [];
@@ -52,7 +53,6 @@ export class AcpAgent extends EventEmitter {
     });
     this.proc = p;
     p.stderr.on("data", () => {}); // agy ghi log ra stderr; không cần
-    p.stdin.on("error", () => {}); // tiến trình chết giữa chừng: EPIPE
     const peer = new JsonRpcPeer(p.stdout, p.stdin);
     this.peer = peer;
     peer.onNotification((method, params) => this.onNotification(method, params));
@@ -63,17 +63,35 @@ export class AcpAgent extends EventEmitter {
       ended = true;
       this.up = false;
       peer.close(reason);
+      for (const sid of this.sessions) this.removeSessionData(sid);
       this.sessions.clear();
       this.collectors.clear();
+      try {
+        p.kill("SIGKILL");
+      } catch {
+        // đã chết
+      }
       this.emit("exit", reason);
     };
+    this.endFn = end;
     p.on("exit", (code, signal) => end(new Error(`Tiến trình AI đã dừng (${code ?? signal})`)));
     p.on("error", (e) => end(new Error(`Tiến trình AI đã dừng: ${e.message}`)));
-    await peer.request(
-      "initialize",
-      { protocolVersion: 1, clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false } },
-      this.opts.startTimeoutMs ?? 30000,
-    );
+    p.stdout.on("close", () => end(new Error("Tiến trình AI đã dừng (mất kết nối)")));
+    p.stdin.on("error", () => end(new Error("Tiến trình AI đã dừng (mất kết nối)")));
+    try {
+      await peer.request(
+        "initialize",
+        { protocolVersion: 1, clientCapabilities: { fs: { readTextFile: false, writeTextFile: false }, terminal: false } },
+        this.opts.startTimeoutMs ?? 30000,
+      );
+    } catch (e) {
+      try {
+        p.kill("SIGKILL");
+      } catch {
+        // đã chết
+      }
+      throw e;
+    }
     this.up = true;
   }
 
@@ -96,19 +114,43 @@ export class AcpAgent extends EventEmitter {
 
   async prompt(sessionId: string, blocks: ContentPart[], onDelta?: (t: string) => void, timeoutMs = 120000): Promise<PromptResult> {
     const peer = this.need();
+    if (this.collectors.has(sessionId)) throw new RpcError(-32002, "Phiên đang bận");
     const c: Collector = { text: "", denied: 0, onDelta };
     this.collectors.set(sessionId, c);
     this.active++;
     let timer: NodeJS.Timeout | undefined;
+    let timedOut = false;
+    const never = new Promise<never>(() => {});
     try {
       const req = peer.request<PromptReply>("session/prompt", { sessionId, prompt: blocks });
-      req.catch(() => {}); // tránh unhandled khi đã hết giờ
+      const settled = req.then(
+        () => {},
+        () => {},
+      );
+      const guarded = req.then(
+        (v) => (timedOut ? never : v),
+        (e) => (timedOut ? never : Promise.reject(e)),
+      );
       const res = await Promise.race([
-        req,
+        guarded,
         new Promise<never>((_, reject) => {
           timer = setTimeout(() => {
-            peer.notify("session/cancel", { sessionId });
-            reject(new RpcError(-32000, "AI trả lời quá thời gian"));
+            timedOut = true;
+            try {
+              peer.notify("session/cancel", { sessionId });
+            } catch {
+              // kết nối đã đóng
+            }
+            // chờ lượt bị huỷ kết thúc để chữ đến muộn không lọt sang lượt sau
+            let t2: NodeJS.Timeout;
+            const cap = new Promise<void>((r) => {
+              t2 = setTimeout(r, 3000);
+              t2.unref();
+            });
+            void Promise.race([settled, cap]).then(() => {
+              clearTimeout(t2);
+              reject(new RpcError(-32000, "AI trả lời quá thời gian"));
+            });
           }, timeoutMs);
         }),
       ]);
@@ -121,8 +163,11 @@ export class AcpAgent extends EventEmitter {
       };
     } catch (e) {
       // Mất kết nối (stdout đóng) có thể đến trước sự kiện 'exit': gộp về một thông báo.
-      if (e instanceof RpcError) throw e;
-      throw new Error(`Tiến trình AI đã dừng: ${(e as Error).message}`);
+      const msg = (e as Error).message ?? "";
+      if (e instanceof RpcError || !/đã đóng|đã dừng|lỗi/.test(msg) || msg.startsWith("Tiến trình AI đã dừng")) throw e;
+      const err = new Error(`Tiến trình AI đã dừng: ${msg}`);
+      this.endFn?.(err);
+      throw err;
     } finally {
       clearTimeout(timer);
       this.active--;
