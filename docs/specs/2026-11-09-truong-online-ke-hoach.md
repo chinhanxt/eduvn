@@ -1,4 +1,4 @@
-# EDUVN thành trường online hai phía — kế hoạch tổng (đề xuất, chờ chinhan duyệt)
+# EDUVN thành trường online hai phía — kế hoạch tổng (chinhan duyệt 2026-11-09)
 
 Ngày: 2026-11-09. Gộp từ:
 - `docs/research/2026-11-09-online-school-pain-points.md`: nỗi khổ của GV và HS, bản đồ chức năng, top 10.
@@ -72,6 +72,15 @@ Tổng khoảng 26 loại tác vụ (8 bên OpenMAIC, khoảng 18 bên DeepTutor
 | **P7** — Chấm từ ảnh | Phiếu trả lời theo đúng 3 phần của CV 7991 (có mốc góc + QR); quét bằng điện thoại ngay trên trình duyệt; tự luận: AI đọc ảnh, GV duyệt chữ phiên âm rồi mới chấm theo rubric | TechStark/opencv-js, OMRChecker, sjreeves/bubble-sheet-omr, zxing-js (MIT/Apache); PaddleOCR, VietOCR, Pix2Text | L |
 | **P8** — Skill sư phạm VN | Ma trận 7991, câu hỏi theo YCCĐ, giáo án 5512, nhận xét TT22/27, đề cương học phần; mỗi skill có bộ kiểm (eval) | anthropics/k12-teacher-skills (Apache), instructional_agents (MIT), Oak aila + autoeval-tools (MIT), BloomLLM/AEQG (MIT). education-agent-skills là CC BY-SA: chỉ lấy ý tưởng | M |
 
+### Yêu cầu nét vẽ cho P10 (chinhan dặn khi duyệt mockup)
+
+Trong mockup, mũi tên đứt nét "là tung độ đỉnh" chạy xuyên qua đám mây ghi chú, chữ trên mũi tên đè lên mép đám mây, và đường dọc từ đám mây xuống chủ đề chính cắt ngang các nhánh. Bản thật phải đạt các yêu cầu sau:
+- **Đường nối không đi xuyên qua hình nào** ngoài hai hình nó nối. Đường cong hay vuông góc đều phải tự né (định tuyến tránh vật cản), kể cả mũi tên đứt nét và mũi tên liên hệ chéo.
+- **Chữ trên mũi tên đặt ở chỗ trống**: không chồng lên hình, lên chữ khác hay lên đường nối khác. Chữ có nền trắng mờ để đọc được khi đi qua lưới chấm.
+- **Đường nối không cắt ngang nhánh** của sơ đồ tư duy nếu còn đường khác. Đường nối từ ghi chú tới nút đi theo hướng ngắn nhất ra mép hình.
+- Khi kéo hình hay sắp xếp lại, đường nối và chữ trên mũi tên **tự tính lại**, không để sót đoạn đè.
+- Cách làm: tự viết bộ định tuyến (lưới + A* cho đường vuông góc; cong Bézier có điểm điều khiển né hình) và bộ đặt chữ (thử nhiều vị trí dọc đường, chọn chỗ ít va chạm nhất), kèm test thuần ở `web/src/diagram/`. Không dùng libavoid (LGPL).
+
 ## 4. Thứ tự đề xuất
 
 1. **G: Cổng AI.** Đây là nền cho P5–P8. Làm nhỏ trước: một backend `agyxt` + bảng định tuyến + job.
@@ -84,7 +93,12 @@ Tổng khoảng 26 loại tác vụ (8 bên OpenMAIC, khoảng 18 bên DeepTutor
 
 Mỗi đợt vẫn đi đúng quy trình cũ: plan riêng, rồi TDD, review từng task, review cuối, chạy thử toàn bộ, rồi chinhan duyệt.
 
-## 5. Cần chinhan chốt
+## 5. Đã chốt / còn mở
+
+- Đã chốt 2026-11-09: mockup sơ đồ (kèm yêu cầu nét vẽ ở trên), thứ tự ở mục 4.
+- Còn mở: điểm 3 (cách chạy gia sư chat) và điểm 4 (phổ thông / đại học).
+
+Các câu hỏi ban đầu:
 
 1. Mockup sơ đồ `web/mockup/so-do.html`: đạt chưa, cần sửa gì.
 2. Thứ tự ở mục 4.
