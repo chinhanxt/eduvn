@@ -281,8 +281,11 @@ export class AgentPool {
     };
   }
 
+  /** Hợp kho model của mọi tiến trình đang sống (mỗi tiến trình có thể đang ở một tài khoản proxy khác). */
   models(): ModelInfo[] {
-    return this.alive().find((a) => a.models.length)?.models ?? [];
+    const seen = new Map<string, ModelInfo>();
+    for (const a of this.alive()) for (const m of a.models) if (!seen.has(m.id)) seen.set(m.id, m);
+    return [...seen.values()];
   }
 
   async stop(): Promise<void> {
