@@ -202,10 +202,18 @@ export class AcpAgent extends EventEmitter {
   private removeSessionData(sessionId: string): void {
     const d = this.opts.dataDir;
     if (!d || !/^[\w-]+$/.test(sessionId)) return;
-    for (const p of [join(d, "conversations", `${sessionId}.db`), join(d, "brain", sessionId), join(d, "annotations", `${sessionId}.pbtxt`)]) {
-      rmSync(p, { recursive: true, force: true });
-    }
+    const paths = [
+      ...["", "-wal", "-shm", "-journal"].map((x) => join(d, "conversations", `${sessionId}.db${x}`)), // SQLite: file phụ -wal nặng ~1,5 MB/phiên
+      join(d, "brain", sessionId),
+      join(d, "annotations", `${sessionId}.pbtxt`),
+    ];
+    const rm = () => {
+      for (const p of paths) rmSync(p, { recursive: true, force: true });
+    };
+    rm();
+    setTimeout(rm, 3000).unref(); // agy có thể ghi nốt khi đóng phiên: xoá lần hai
   }
+
 
   private need(): JsonRpcPeer {
     if (!this.peer || !this.up) throw new RpcError(-32001, "Tiến trình AI chưa sẵn sàng");

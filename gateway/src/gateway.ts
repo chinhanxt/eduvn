@@ -36,6 +36,7 @@ export async function buildGateway(cfg: GatewayConfig, over: { agentOptions?: (s
   if (cfg.AGY_MANAGE_PROXY) {
     await ensureProxy({ port: cfg.AGY_PROXY_PORT, pidFile: join(cfg.WORK_DIR, "proxy.pid"), bin: cfg.AGY_SWITCH_BIN });
   }
+  const tasks = loadTasks(cfg.TASKS_FILE); // đọc trước khi bật tiến trình agy: lỗi cấu hình không để sót tiến trình
   const pool = new AgentPool({
     size: cfg.AGY_PROCESSES,
     idleSessionMs: cfg.SESSION_IDLE_MS,
@@ -46,12 +47,15 @@ export async function buildGateway(cfg: GatewayConfig, over: { agentOptions?: (s
   try {
     await pool.start();
   } catch (e) {
-    if (!backends.anthropic) throw e;
+    if (!backends.anthropic) {
+      await pool.stop(); // huỷ hẹn giờ khởi động lại
+      throw e;
+    }
     console.warn(`Cổng AI: không bật được agy (${(e as Error).message}); chạy bằng khoá API Anthropic.`);
   }
   const limiter = new PriorityLimiter(cfg.MAX_CONCURRENCY, 1);
   const llm = new LlmService({
-    tasks: loadTasks(cfg.TASKS_FILE),
+    tasks,
     backends,
     limiter,
     fallback: backends.anthropic ? "anthropic" : undefined,

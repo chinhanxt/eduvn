@@ -45,6 +45,8 @@ createInterface({ input: process.stdin }).on("line", (line) => {
       if (dataDir) {
         mkdirSync(join(dataDir, "conversations"), { recursive: true });
         writeFileSync(join(dataDir, "conversations", `${id}.db`), "x");
+        writeFileSync(join(dataDir, "conversations", `${id}.db-wal`), "x");
+        writeFileSync(join(dataDir, "conversations", `${id}.db-shm`), "x");
         mkdirSync(join(dataDir, "brain", id), { recursive: true });
       }
       return reply({ sessionId: id, models: { availableModels: MODELS, currentModelId: "fake-fast" } });

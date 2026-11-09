@@ -94,6 +94,8 @@ describe("AcpAgent", () => {
     expect(existsSync(join(dir, "conversations", `${sid}.db`))).toBe(true);
     await a.closeSession(sid);
     expect(existsSync(join(dir, "conversations", `${sid}.db`))).toBe(false);
+    expect(existsSync(join(dir, "conversations", `${sid}.db-wal`))).toBe(false);
+    expect(existsSync(join(dir, "conversations", `${sid}.db-shm`))).toBe(false);
     expect(existsSync(join(dir, "brain", sid))).toBe(false);
     expect(a.sessionCount).toBe(0);
   });

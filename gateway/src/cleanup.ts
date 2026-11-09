@@ -1,4 +1,4 @@
-import { readdirSync, rmSync, statSync } from "node:fs";
+import { lstatSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 const SESSION_DIRS = ["conversations", "brain", "annotations", "implicit", "log"];
@@ -15,7 +15,7 @@ export function cleanWorkDir(dir: string, maxAgeMs: number, now = Date.now()): n
   const walk = (p: string) => {
     let st;
     try {
-      st = statSync(p);
+      st = lstatSync(p); // không đi theo liên kết tượng trưng ra ngoài thư mục làm việc
     } catch {
       return;
     }
