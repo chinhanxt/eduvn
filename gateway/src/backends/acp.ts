@@ -1,0 +1,69 @@
+import type { AgentPool } from "../acp/pool";
+import { RpcError } from "../acp/rpc";
+import { type Backend, type BackendInput, type BackendOutput, type ContentPart, GatewayError, textOf } from "../types";
+
+/** Lỗi từ agent → mã HTTP có nghĩa (quá giờ 504, model không có 400, chưa sẵn sàng 503, còn lại 502). */
+export function toGatewayError(e: unknown): Error {
+  if (e instanceof GatewayError) return e;
+  if (!(e instanceof RpcError)) return new GatewayError(502, "upstream_error", (e as Error).message);
+  if (e.code === -32000) return new GatewayError(504, "timeout", e.message);
+  if (e.code === -32001) return new GatewayError(503, "ai_unavailable", e.message);
+  if (e.code === -32602) return new GatewayError(400, "bad_model", e.message);
+  return new GatewayError(502, "upstream_error", e.message);
+}
+
+/** ACP không có vai "system": phiên mới nhận lời dặn + lịch sử ở khối đầu; phiên cũ chỉ cần tin mới nhất. */
+export function toBlocks(input: BackendInput, fresh: boolean): ContentPart[] {
+  const last = input.messages[input.messages.length - 1]!;
+  const lastParts: ContentPart[] = typeof last.content === "string" ? [{ type: "text", text: last.content }] : last.content;
+  if (!fresh) return lastParts;
+  const head = [`<he_thong>\n${input.system}\n</he_thong>`];
+  const history = input.messages.slice(0, -1);
+  if (history.length) {
+    head.push(
+      "<hoi_thoai_truoc>\n" +
+        history.map((m) => `${m.role === "assistant" ? "Trợ lý" : "Người dùng"}: ${textOf(m.content)}`).join("\n") +
+        "\n</hoi_thoai_truoc>",
+    );
+  }
+  return [{ type: "text", text: head.join("\n\n") }, ...lastParts];
+}
+
+export class AcpBackend implements Backend {
+  readonly name = "acp";
+  private readonly locks = new Map<string, Promise<unknown>>();
+
+  constructor(private readonly pool: AgentPool) {}
+
+  available(): boolean {
+    return this.pool.stats().alive > 0;
+  }
+
+  complete(input: BackendInput, onDelta?: (t: string) => void): Promise<BackendOutput> {
+    const run = async (): Promise<BackendOutput> => {
+      const lease = await this.pool.lease(input.conversation, input.model).catch((e: unknown) => {
+        throw toGatewayError(e);
+      });
+      try {
+        const r = await lease.agent.prompt(lease.sessionId, toBlocks(input, lease.fresh), onDelta, input.timeoutMs);
+        return { text: r.text, usage: r.usage, deniedTools: r.deniedTools };
+      } catch (e) {
+        if (input.conversation) this.pool.forget(input.conversation);
+        throw toGatewayError(e);
+      } finally {
+        lease.release();
+      }
+    };
+    const key = input.conversation;
+    if (!key) return run();
+    // Một phiên chỉ chạy một lượt mỗi lúc: xếp hàng theo khoá hội thoại.
+    const next = (this.locks.get(key) ?? Promise.resolve()).catch(() => {}).then(run);
+    this.locks.set(key, next);
+    void next
+      .catch(() => {})
+      .finally(() => {
+        if (this.locks.get(key) === next) this.locks.delete(key);
+      });
+    return next;
+  }
+}
