@@ -24,6 +24,7 @@ eduvn/
 ├── docs/            tài liệu (spec, module, plan)
 ├── server/          EDU-CORE: REST + MCP + domain + DB (TypeScript)
 ├── web/             web app (từ P4)
+├── gateway/         Cổng AI: agy (Claude/Gemini) + khoá API dự phòng
 ├── services/        dịch vụ upstream chạy phía sau
 │   ├── openmaic/    slide, video (P5)
 │   ├── deeptutor/   giáo trình, gia sư (P6)

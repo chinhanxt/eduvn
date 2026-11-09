@@ -50,3 +50,9 @@ Chi tiết: `docs/modules/08-zalo-channel.md`. Tóm tắt: nick Zalo riêng cho 
 | Keycloak | 8180 |
 | OpenMAIC (P5) | 4320 |
 | DeepTutor (P6) | 4330 |
+| Cổng AI (gateway) | 4340 |
+| Proxy agy của cổng AI | 8900 |
+
+## Cổng AI (`gateway/`)
+
+Mọi lời gọi AI của lõi, OpenMAIC, DeepTutor đi qua `gateway` (API kiểu OpenAI, token dịch vụ). Bên trong: vài tiến trình `agy acp` chạy sẵn qua proxy xoay tài khoản riêng (8900), phiên bám theo hội thoại; định tuyến tác vụ → model/effort ở `gateway/tasks.json`; khoá API Anthropic là dự phòng. Agent không được dùng công cụ (mọi yêu cầu quyền đều bị từ chối). Chạy: `cp gateway/.env.example gateway/.env` rồi `pnpm --filter @eduvn/gateway start`; đo: `GATEWAY_TOKEN=… pnpm --filter @eduvn/gateway bench`.

@@ -7,4 +7,4 @@
 - **Một tác vụ nặng mỗi lúc** (build/render/test lớn) — máy dev từng treo khi chạy song song. Kiểm RAM/swap trước.
 - Nội dung hiển thị: tiếng Việt có dấu. Tên tool MCP: tiếng Việt không dấu `snake_case`.
 - `services/*`: không sửa code upstream nếu chưa có plan cho phép; ghi bản/commit upstream đang dùng trong README của thư mục.
-- Lệnh kiểm: `pnpm --filter @eduvn/server test` và `pnpm --filter @eduvn/server typecheck`, `pnpm --filter @eduvn/web test` (module thuần web: công thức, bảng).
+- Lệnh kiểm: `pnpm --filter @eduvn/server test` và `pnpm --filter @eduvn/server typecheck`, `pnpm --filter @eduvn/gateway test`, `pnpm --filter @eduvn/gateway typecheck`, `pnpm --filter @eduvn/web test` (module thuần web: công thức, bảng).
