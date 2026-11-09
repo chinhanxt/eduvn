@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
+import { clearSession } from "./studentApi";
 import { type Draft, type DraftStore, memoryStore } from "./syncQueue";
 
 type HsDb = Dexie & { drafts: EntityTable<Draft, "submissionId"> };
@@ -22,8 +23,20 @@ export async function pickStore(): Promise<DraftStore> {
       put: async (x) => {
         await d.drafts.put(x);
       },
+      purge: (id) => d.drafts.delete(id),
+      purgeAll: () => d.drafts.clear(),
     };
   } catch {
     return memoryStore();
+  }
+}
+
+/** Đăng xuất: xoá phiên và mọi bản nháp trên máy (máy dùng chung ở trường). */
+export async function logoutStudent(store?: DraftStore): Promise<void> {
+  clearSession();
+  try {
+    await (store ?? (await pickStore())).purgeAll?.();
+  } catch {
+    /* bỏ qua */
   }
 }

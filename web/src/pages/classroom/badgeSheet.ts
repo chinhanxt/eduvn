@@ -32,12 +32,20 @@ export function badgeSheetHtml(o: { className: string; subject: string | null; c
 
 /** Mở cửa sổ in. URL QR = <origin>/hs/qr#<token> (token nằm sau #, không lên log máy chủ). */
 export async function printBadges(o: { className: string; subject: string | null; classCode: string; cards: readonly { seat: number; fullName: string; pin: string; qrToken: string }[] }): Promise<void> {
-  const views = o.cards.map((c) => ({ seat: c.seat, fullName: c.fullName, pin: c.pin, qrUrl: `${window.location.origin}/hs/qr#${c.qrToken}` }));
-  const svgs = await Promise.all(views.map((v) => qrSvg(v.qrUrl)));
+  // Mở cửa sổ NGAY (còn trong cú nhấp của người dùng) rồi mới tạo QR, nếu không trình duyệt chặn pop-up.
   const w = window.open("", "_blank");
   if (!w) throw new Error("Trình duyệt chặn cửa sổ in — cho phép cửa sổ bật lên rồi thử lại");
-  w.document.write(badgeSheetHtml({ ...o, cards: views, svgs }));
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 300);
+  try {
+    w.document.write("<!doctype html><title>Thẻ lớp</title><p style=\"font:14px system-ui\">Đang tạo thẻ…</p>");
+    const views = o.cards.map((c) => ({ seat: c.seat, fullName: c.fullName, pin: c.pin, qrUrl: `${window.location.origin}/hs/qr#${c.qrToken}` }));
+    const svgs = await Promise.all(views.map((v) => qrSvg(v.qrUrl)));
+    w.document.open();
+    w.document.write(badgeSheetHtml({ ...o, cards: views, svgs }));
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 300);
+  } catch (e) {
+    w.close();
+    throw e;
+  }
 }

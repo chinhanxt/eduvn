@@ -1,4 +1,5 @@
-import type { StudentSession } from "./types";
+import type { SendResult, Sender } from "./syncQueue";
+import type { Answers, StudentSession } from "./types";
 
 const KEY = "eduvn.hs";
 export type StoredSession = StudentSession & { expiresAt: number };
@@ -8,7 +9,9 @@ export const isSessionValid = (s: StoredSession | null, now = Date.now()): s is 
 export function loadSession(): StoredSession | null {
   try {
     const s = JSON.parse(globalThis.localStorage?.getItem(KEY) ?? "null") as StoredSession | null;
-    return isSessionValid(s) ? s : null;
+    if (isSessionValid(s)) return s;
+    if (s) globalThis.localStorage?.removeItem(KEY);
+    return null;
   } catch {
     return null;
   }
@@ -44,7 +47,7 @@ export async function hsFetch(path: string, init: Init = {}): Promise<Response> 
   const headers: Record<string, string> = {};
   if (token) headers.authorization = `Bearer ${token}`;
   if (init.body !== undefined) headers["content-type"] = "application/json";
-  const retries = init.retries ?? 2;
+  const retries = init.keepalive ? 0 : (init.retries ?? 2); // keepalive: trang đang đóng, không chờ gửi lại
   for (let attempt = 0; ; attempt++) {
     const res = await fetch(path, { method: init.method ?? "GET", headers, body: init.body === undefined ? undefined : JSON.stringify(init.body), keepalive: init.keepalive });
     if ((res.status === 429 || res.status === 503) && attempt < retries) {
@@ -71,3 +74,26 @@ export async function hsJson<T>(path: string, init: Init = {}): Promise<T> {
 }
 
 export const errMsg = (e: unknown): string => (e instanceof StudentApiError ? e.message : e instanceof TypeError ? "Mất mạng – em kiểm tra kết nối rồi thử lại" : "Có lỗi, em thử lại nhé");
+
+/**
+ * Bộ gửi tự lưu cho AnswerSync. 401 → xoá phiên và trả "unauthorized" (AnswerSync báo sự kiện cho UI);
+ * 409/410/423 hoặc body.status đã nộp → "closed"; 429/503 → "retry"; lỗi mạng → "offline".
+ */
+export function autosaveSender(path: string, method = "PUT"): Sender {
+  return async (seq: number, answers: Answers, { keepalive }): Promise<SendResult> => {
+    try {
+      const res = await hsFetch(path, { method, body: { seq, answers }, keepalive, retries: 0 });
+      if (res.ok) return { kind: "ok", seq };
+      if (res.status === 401) {
+        clearSession();
+        return { kind: "unauthorized" };
+      }
+      const body = (await res.json().catch(() => null)) as { status?: string } | null;
+      if ([409, 410, 423].includes(res.status) || body?.status === "submitted" || body?.status === "auto_submitted") return { kind: "closed", status: body?.status ?? "submitted" };
+      if (res.status === 429 || res.status === 503) return { kind: "retry", afterMs: retryAfterMs(res.headers.get("retry-after"), 0) };
+      return { kind: "offline" };
+    } catch {
+      return { kind: "offline" };
+    }
+  };
+}

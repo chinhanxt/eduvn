@@ -1,21 +1,39 @@
-/** Đồng hồ theo máy chủ: độ lệch ước từ serverNow trong phản hồi, ưu tiên mẫu có độ trễ nhỏ. */
+/**
+ * Đồng hồ theo máy chủ, neo vào bộ đếm đơn điệu (performance.now) nên đổi giờ hệ thống không làm nhảy now()/remainingMs.
+ * sentAt/receivedAt và nguồn `mono` cùng đơn vị (ms của performance.now()). now() trả về ms epoch theo máy chủ.
+ */
+const RESYNC_AFTER_MS = 60_000;
+const JUMP_MS = 2_000;
 export class ServerClock {
-  private offset = 0;
+  private offset = 0; // serverEpoch - mono
   private bestRtt = Number.POSITIVE_INFINITY;
-  constructor(private readonly local: () => number = () => Date.now()) {}
+  private bestAt = Number.NEGATIVE_INFINITY;
+  private outlier: number | null = null;
+  constructor(private readonly mono: () => number = () => performance.now()) {}
 
-  /** sentAt/receivedAt: giờ máy lúc gửi/nhận; serverNow: ISO của máy chủ. Mẫu trễ hơn mẫu tốt nhất quá 50 ms thì bỏ. */
+  /** Mẫu nhận khi: trễ ≤ tốt nhất + 50 ms; hoặc mẫu tốt nhất đã cũ quá 60 s; hoặc lệch > 2 s được hai mẫu liên tiếp xác nhận. */
   sample(serverNow: string, sentAt: number, receivedAt: number): void {
     const server = Date.parse(serverNow);
     if (Number.isNaN(server)) return;
     const rtt = Math.max(0, receivedAt - sentAt);
-    if (rtt > this.bestRtt + 50) return;
-    this.bestRtt = Math.min(this.bestRtt, rtt);
-    this.offset = server - (sentAt + rtt / 2);
+    const offset = server - (sentAt + rtt / 2);
+    const t = this.mono();
+    const fresh = rtt <= this.bestRtt + 50;
+    const aged = t - this.bestAt > RESYNC_AFTER_MS;
+    let jump = false;
+    if (!fresh && !aged && Math.abs(offset - this.offset) > JUMP_MS) {
+      jump = this.outlier !== null && Math.abs(offset - this.outlier) <= 500;
+      this.outlier = offset;
+    } else this.outlier = null;
+    if (!fresh && !aged && !jump) return;
+    this.outlier = null;
+    this.bestRtt = fresh && !aged ? Math.min(this.bestRtt, rtt) : rtt;
+    this.bestAt = t;
+    this.offset = offset;
   }
 
   now(): number {
-    return this.local() + this.offset;
+    return this.mono() + this.offset;
   }
 
   remainingMs(deadlineIso: string): number {
