@@ -7,6 +7,7 @@ const env = {
   OIDC_JWKS_URL: "http://localhost:8180/realms/eduvn/protocol/openid-connect/certs",
   PUBLIC_URL: "http://localhost:4310/",
   DOWNLOAD_SECRET: "x".repeat(32),
+  STUDENT_SECRET: "y".repeat(32),
 };
 
 describe("loadConfig", () => {
@@ -23,6 +24,8 @@ describe("loadConfig", () => {
 
   it("từ chối secret ngắn và thiếu biến", () => {
     expect(() => loadConfig({ ...env, DOWNLOAD_SECRET: "short" })).toThrow();
+    expect(() => loadConfig({ ...env, STUDENT_SECRET: "short" })).toThrow();
+    expect(() => loadConfig({ ...env, STUDENT_SECRET: undefined })).toThrow();
     expect(() => loadConfig({ ...env, DATABASE_URL: undefined })).toThrow();
   });
 });

@@ -7,6 +7,7 @@ const Env = z.object({
   OIDC_AUDIENCE: z.string().min(1).default("eduvn-api"),
   PUBLIC_URL: z.url(),
   DOWNLOAD_SECRET: z.string().min(32),
+  STUDENT_SECRET: z.string().min(32),
   HOST: z.string().min(1).default("127.0.0.1"),
   PORT: z.coerce.number().int().min(1).max(65535).default(4310),
 });

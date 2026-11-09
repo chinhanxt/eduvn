@@ -22,16 +22,19 @@ export const ACTIONS = [
   "game:read",
   "board:manage",
   "board:read",
+  "assignment:manage",
+  "assignment:read",
+  "student:credentials",
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
-const TEACHING: readonly Action[] = ["question:read", "question:write", "exam:create", "exam:read_key", "exam:grade", "class:manage", "class:read", "grade:write", "lesson:manage", "lesson:read", "vanban:manage", "vanban:read", "slide:manage", "slide:read", "game:manage", "game:read", "board:manage", "board:read"];
+const TEACHING: readonly Action[] = ["question:read", "question:write", "exam:create", "exam:read_key", "exam:grade", "class:manage", "class:read", "grade:write", "lesson:manage", "lesson:read", "vanban:manage", "vanban:read", "slide:manage", "slide:read", "game:manage", "game:read", "board:manage", "board:read", "assignment:manage", "assignment:read", "student:credentials"];
 
 const GRANTS: Record<Role, readonly Action[]> = {
   owner: ACTIONS,
   admin: ACTIONS,
   teacher: TEACHING,
-  assistant: ["question:read", "exam:read_key", "exam:grade", "class:read", "grade:write", "lesson:read", "vanban:read", "slide:read", "game:read", "board:read"],
+  assistant: ["question:read", "exam:read_key", "exam:grade", "class:read", "grade:write", "lesson:read", "vanban:read", "slide:read", "game:read", "board:read", "assignment:read"],
   student: [],
 };
 
