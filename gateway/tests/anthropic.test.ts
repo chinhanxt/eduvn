@@ -66,4 +66,55 @@ describe("AnthropicBackend", () => {
   it("không có khoá thì không sẵn sàng", () => {
     expect(new AnthropicBackend({ apiKey: "", baseUrl: "http://x" }).available()).toBe(false);
   });
+  const okEvents = (res: import("node:http").ServerResponse) => res.writeHead(200, { "content-type": "text/event-stream" });
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  it("sự kiện bị cắt giữa JSON và giữa CRLF vẫn đọc được", async () => {
+    const url = await mock(async (res) => {
+      okEvents(res);
+      const a = ev({ type: "content_block_delta", delta: { type: "text_delta", text: "A" } });
+      const b = ev({ type: "content_block_delta", delta: { type: "text_delta", text: "B" } });
+      const cut = a.indexOf('"delta"');
+      res.write(a.slice(0, cut));
+      await sleep(20);
+      res.write(a.slice(cut, -3)); // dừng trước "\r\n\r\n" cuối: còn "\r"
+      await sleep(20);
+      res.write(a.slice(-3)); // "\n\r\n"
+      await sleep(20);
+      res.write(b.slice(0, -2));
+      await sleep(20);
+      res.end(b.slice(-2));
+    });
+    expect((await new AnthropicBackend({ apiKey: "x", baseUrl: url }).complete(input)).text).toBe("AB");
+  });
+  it("ký tự nhiều byte bị cắt giữa hai lần ghi", async () => {
+    const url = await mock(async (res) => {
+      okEvents(res);
+      const buf = Buffer.from(ev({ type: "content_block_delta", delta: { type: "text_delta", text: "ộ" } }));
+      const k = buf.indexOf(Buffer.from("ộ")) + 1;
+      res.write(buf.subarray(0, k));
+      await sleep(20);
+      res.end(buf.subarray(k));
+    });
+    expect((await new AnthropicBackend({ apiKey: "x", baseUrl: url }).complete(input)).text).toBe("ộ");
+  });
+  it("sự kiện cuối không có dòng trống vẫn đọc", async () => {
+    const url = await mock((res) => {
+      okEvents(res);
+      res.end(`data: ${JSON.stringify({ type: "content_block_delta", delta: { type: "text_delta", text: "end" } })}`);
+    });
+    expect((await new AnthropicBackend({ apiKey: "x", baseUrl: url }).complete(input)).text).toBe("end");
+  });
+  it("socket đứt giữa stream thành 502", async () => {
+    const url = await mock(async (res) => {
+      okEvents(res);
+      res.write(ev({ type: "content_block_delta", delta: { type: "text_delta", text: "x" } }));
+      await sleep(20);
+      res.socket?.destroy();
+    });
+    await expect(new AnthropicBackend({ apiKey: "x", baseUrl: url }).complete(input)).rejects.toMatchObject({ status: 502, code: "upstream_error" });
+  });
+  it("429 thành 503 upstream_busy", async () => {
+    const url = await mock((res) => res.writeHead(429).end("{}"));
+    await expect(new AnthropicBackend({ apiKey: "x", baseUrl: url }).complete(input)).rejects.toMatchObject({ status: 503, code: "upstream_busy" });
+  });
 });

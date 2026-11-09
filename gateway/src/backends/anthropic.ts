@@ -26,23 +26,33 @@ export async function* sseEvents(body: AsyncIterable<Uint8Array>): AsyncGenerato
   const dec = new TextDecoder();
   let buf = "";
   for await (const chunk of body) {
-    buf += dec.decode(chunk, { stream: true }).replace(/\r\n/g, "\n");
+    buf += dec.decode(chunk, { stream: true });
+    buf = buf.replace(/\r\n/g, "\n");
     let i: number;
     while ((i = buf.indexOf("\n\n")) >= 0) {
       const block = buf.slice(0, i);
       buf = buf.slice(i + 2);
-      const data = block
-        .split("\n")
-        .filter((l) => l.startsWith("data:"))
-        .map((l) => l.slice(5).trim())
-        .join("\n");
-      if (!data || data === "[DONE]") continue;
-      try {
-        yield JSON.parse(data) as Event;
-      } catch {
-        // bỏ dòng hỏng
-      }
+      const ev = parseBlock(block);
+      if (ev) yield ev;
     }
+    // giữ lại "\r" cuối đệm: có thể là nửa đầu của "\r\n" bị cắt giữa hai đoạn
+  }
+  buf = (buf + dec.decode()).replace(/\r\n/g, "\n");
+  const last = parseBlock(buf);
+  if (last) yield last;
+}
+
+function parseBlock(block: string): Event | null {
+  const data = block
+    .split("\n")
+    .filter((l) => l.startsWith("data:"))
+    .map((l) => l.slice(5).trim())
+    .join("\n");
+  if (!data || data === "[DONE]") return null;
+  try {
+    return JSON.parse(data) as Event;
+  } catch {
+    return null; // bỏ dòng hỏng
   }
 }
 
@@ -72,7 +82,12 @@ export class AnthropicBackend implements Backend {
           messages: input.messages.map(toAnthropic),
         }),
       });
-      if (!res.ok || !res.body) throw new GatewayError(502, "upstream_error", `Anthropic trả ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      if (!res.ok) {
+        const detail = (await res.text()).slice(0, 200);
+        if (res.status === 429 || res.status === 529) throw new GatewayError(503, "upstream_busy", `Anthropic đang bận (${res.status}): ${detail}`);
+        throw new GatewayError(502, "upstream_error", `Anthropic trả ${res.status}: ${detail}`);
+      }
+      if (!res.body) throw new GatewayError(502, "upstream_error", "Anthropic không trả nội dung");
       let text = "";
       const usage: Usage = {};
       for await (const ev of sseEvents(res.body as unknown as AsyncIterable<Uint8Array>)) {
@@ -91,7 +106,8 @@ export class AnthropicBackend implements Backend {
       return { text, usage, deniedTools: 0 };
     } catch (e) {
       if ((e as Error).name === "AbortError") throw new GatewayError(504, "timeout", "AI trả lời quá thời gian");
-      throw e;
+      if (e instanceof GatewayError) throw e;
+      throw new GatewayError(502, "upstream_error", `Không gọi được Anthropic: ${(e as Error).message}`);
     } finally {
       clearTimeout(timer);
     }
