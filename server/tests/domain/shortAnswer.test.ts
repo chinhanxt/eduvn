@@ -65,6 +65,9 @@ describe("matchShortAnswer", () => {
     expect(matchShortAnswer("2,5", "2.5")).toBe(true);
     expect(matchShortAnswer("1.250,5", "1250.5")).toBe(true);
     expect(matchShortAnswer("0.25", "0,25")).toBe(true);
+    expect(matchShortAnswer("0.250", "0.25")).toBe(true);
+    expect(matchShortAnswer("0.250", "250")).toBe(false);
+    expect(matchShortAnswer("-1.000", "-1000")).toBe(true);
   });
   it("căn: √3/2, sqrt(3)/2, \\frac{\\sqrt3}{2} như nhau; ngoặc lệch không là số; \\| là dấu |", () => {
     expect(matchShortAnswer("√3/2", "\\frac{\\sqrt3}{2}")).toBe(true);

@@ -48,7 +48,7 @@ export function normalizeAnswer(raw: string): string {
     .replace(/\s+/g, "")
     .replace(/[{}]/g, "");
   // Quy ước Việt Nam: dấu phẩy là thập phân; dấu chấm là phân cách hàng nghìn CHỈ khi cả số dạng 1.250.000 / 1.250,5.
-  if (/^[+-]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, "");
+  if (/^[+\-−]?[1-9]\d{0,2}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, "");
   return s.replace(/,/g, ".");
 }
 
@@ -99,4 +99,9 @@ function equalsOne(response: string, accepted: string): boolean {
 
 export function matchShortAnswer(response: string, key: string): boolean {
   return acceptedAnswers(key).some((k) => equalsOne(response, k));
+}
+
+/** Từng đáp án chấp nhận có đúng một nhóm "d.ddd" (vd 3.141, 2.000): mơ hồ giữa thập phân và hàng nghìn. Trả về đáp án đó hoặc null. */
+export function ambiguousKey(key: string): string | null {
+  return acceptedAnswers(key).find((k) => /^[+\-−]?[1-9]\d{0,2}\.\d{3}$/.test(k.replace(/\$/g, "").replace(/\s+/g, ""))) ?? null;
 }
