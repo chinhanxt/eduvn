@@ -148,4 +148,26 @@ describe("LlmService", () => {
   it("extractJson bỏ qua {…} không phải JSON", () => {
     expect(extractJson('Dùng {x} như sau: {"a":1}')).toEqual({ a: 1 });
   });
+  it("hai lượt đồng thời cùng khoá chạy lần lượt, lượt sau thấy lượt trước", async () => {
+    class Slow extends StubBackend {
+      async complete(input: BackendInput, onDelta?: (t: string) => void): Promise<BackendOutput> {
+        if (this.calls.length === 0) await new Promise((r) => setTimeout(r, 60));
+        return super.complete(input, onDelta);
+      }
+    }
+    const acp = new Slow("acp", ["đáp một", "đáp hai"]);
+    const svc = mk(acp);
+    await Promise.all([
+      svc.complete({ model: "default", messages: [user("một")], conversation: "c" }),
+      svc.complete({ model: "default", messages: [user("hai")], conversation: "c" }),
+    ]);
+    expect(acp.calls[1]!.messages).toEqual([user("một"), { role: "assistant", content: "đáp một" }, user("hai")]);
+  });
+  it("lịch sử lưu không giữ ảnh", async () => {
+    const acp = new StubBackend("acp", ["a", "b"]);
+    const svc = mk(acp);
+    await svc.complete({ model: "default", messages: [{ role: "user", content: [{ type: "text", text: "xem" }, { type: "image", mimeType: "image/png", data: "AA==" }] }], conversation: "c" });
+    await svc.complete({ model: "default", messages: [user("tiếp")], conversation: "c" });
+    expect(acp.calls[1]!.messages[0]).toEqual({ role: "user", content: [{ type: "text", text: "xem" }, { type: "text", text: "[ảnh]" }] });
+  });
 });
