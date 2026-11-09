@@ -2,7 +2,7 @@
 
 **Upstream:** https://github.com/THU-MAIC/OpenMAIC (MIT, TypeScript/Next, cần PostgreSQL + server chạy lâu từ v1.2). Thư mục: `services/openmaic/`.
 
-**Mục tiêu:** GV đưa chủ đề/giáo án → nhận slide PPTX và video MP4 tiếng Việt, sửa được.
+**Mục tiêu (dịch vụ dành cho giáo viên):** GV đưa chủ đề/giáo án → nhận slide PPTX và video MP4 tiếng Việt, sửa được.
 
 | | |
 |---|---|

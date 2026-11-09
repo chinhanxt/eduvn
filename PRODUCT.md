@@ -34,8 +34,8 @@ Dùng được cho **cả tổ chức nhỏ**: 1 giáo viên tự do → trung t
 | 6 | Kênh Zalo | Tin nhắn Zalo (nhóm lớp / riêng) | Bot trả lời, gửi đề, nhắc lịch, thông báo lớp | P2 |
 | 7 | Kết nối AI chat công khai | URL MCP công khai (HTTPS) | Connector trên Claude.ai / ChatGPT, đăng nhập SSO | P3 |
 | 8 | Quản lý học viên | Danh sách lớp (Excel), điểm danh | Lớp, sổ điểm, nhận xét theo TT22/TT27 | P4 |
-| 9 | Slide & video bài giảng | Chủ đề / giáo án / tài liệu | Slide PPTX, video MP4 có giọng đọc tiếng Việt (qua OpenMAIC) | P5 |
-| 10 | Giáo trình & gia sư SV | Tài liệu môn học, SGK | Giáo trình nhiều chương, gia sư hỏi đáp theo tài liệu (qua DeepTutor) | P6 |
+| 9 | Slide & video bài giảng (cho GV) | Chủ đề / giáo án / tài liệu | Slide PPTX, video MP4 có giọng đọc tiếng Việt (qua OpenMAIC) | P5 |
+| 10 | Gia sư & giáo trình cho học sinh | Tài liệu môn học, SGK | Gia sư hỏi đáp theo tài liệu, luyện câu + ôn giãn cách, giáo trình nhiều chương (qua DeepTutor) | P6 |
 | 11 | Chấm bài giấy | Ảnh phiếu trả lời / bài tự luận | Điểm + nhận xét (OCR tiếng Việt + mô hình đọc ảnh) | P7 |
 | 12 | Skill sư phạm VN | — | Giáo án CV 5512, ma trận/đặc tả CV 7991, nhận xét TT22/27 cho agent | P8 |
 
