@@ -14,12 +14,65 @@ export type AgentOptions = {
   /** Thư mục `<gemini_dir>/antigravity-cli`: xoá dữ liệu phiên ở đây khi đóng phiên. */
   dataDir?: string;
 };
-export type PromptResult = { text: string; stopReason: string; usage?: Usage; deniedTools: number; toolsRan: number };
+export type PromptResult = { text: string; stopReason: string; usage?: Usage; deniedTools: number; toolsRan: number; agyBlocked: number };
 export type ModelInfo = { id: string; name: string };
-type Collector = { text: string; denied: number; tools: Map<string, string>; onDelta?: (t: string) => void };
+type Collector = {
+  text: string;
+  denied: number;
+  tools: Map<string, string>;
+  onDelta?: (t: string) => void;
+  hold: string; // dòng dở dang chưa chắc có phải chữ cảnh báo của agy
+  mid: boolean; // dòng đang chạy đã phát một phần ra ngoài
+  blanks: string; // dòng trống đang chờ (bỏ nếu đầu/cuối câu)
+  blocked: number; // số dòng cảnh báo của agy đã loại
+};
+
+/** agy đôi khi trả chữ cảnh báo của bộ lọc an toàn thay cho câu trả lời; những dòng này không bao giờ được tới người dùng. */
+const BLOCK_LINE = [/^\s*(?:…\s*)?⚠/, /^\s*Please provide a response that complies with content policies/, /^\s*Retries remaining: \d+/];
+const BLOCK_START = ["Please provide a response that complies with content policies", "Retries remaining: "];
+const isBlockLine = (s: string): boolean => BLOCK_LINE.some((re) => re.test(s));
+/** Dòng dở dang còn có thể thành dòng cảnh báo thì giữ lại chờ thêm chữ. */
+const couldBeBlock = (partial: string): boolean => {
+  const t = partial.trimStart();
+  return t === "" || t === "…" || isBlockLine(partial) || BLOCK_START.some((p) => p.startsWith(t));
+};
+function emit(c: Collector, x: string): void {
+  if (!x) return;
+  const d = (c.text ? c.blanks : "") + x;
+  c.blanks = "";
+  c.text += d;
+  c.onDelta?.(d);
+}
+function feed(c: Collector, chunk: string, final = false): void {
+  let s = c.hold + chunk;
+  c.hold = "";
+  if (c.mid) {
+    const i = s.indexOf("\n");
+    if (i < 0) return emit(c, s);
+    emit(c, s.slice(0, i + 1));
+    s = s.slice(i + 1);
+    c.mid = false;
+  }
+  for (let i = s.indexOf("\n"); i >= 0; i = s.indexOf("\n")) {
+    const line = s.slice(0, i + 1);
+    s = s.slice(i + 1);
+    if (isBlockLine(line)) c.blocked++;
+    else if (!line.trim()) c.blanks += line;
+    else emit(c, line);
+  }
+  if (!s) return;
+  if (final) {
+    if (isBlockLine(s)) c.blocked++;
+    else if (s.trim()) emit(c, s);
+  } else if (couldBeBlock(s)) c.hold = s;
+  else {
+    emit(c, s);
+    c.mid = true;
+  }
+}
 
 /** Chỉ những biến môi trường này được chuyển cho `agy`; khoá API, token cổng… không bao giờ lọt sang. */
-const ENV_ALLOW = ["PATH", "HOME", "USER", "LOGNAME", "SHELL", "LANG", "LANGUAGE", "LC_ALL", "LC_CTYPE", "TZ", "TMPDIR", "XDG_RUNTIME_DIR", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_DATA_HOME"];
+const ENV_ALLOW = ["PATH", "HOME", "USER", "LOGNAME", "SHELL", "LANG", "LANGUAGE", "LC_ALL", "LC_CTYPE", "TZ", "TMPDIR", "XDG_RUNTIME_DIR", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_DATA_HOME", "HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "no_proxy", "SSL_CERT_FILE", "SSL_CERT_DIR", "NODE_EXTRA_CA_CERTS", "DBUS_SESSION_BUS_ADDRESS"];
 export function childEnv(extra: NodeJS.ProcessEnv = {}, base: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {};
   for (const k of ENV_ALLOW) if (base[k] !== undefined) env[k] = base[k];
@@ -135,7 +188,7 @@ export class AcpAgent extends EventEmitter {
   async prompt(sessionId: string, blocks: ContentPart[], onDelta?: (t: string) => void, timeoutMs = 120000): Promise<PromptResult> {
     const peer = this.need();
     if (this.collectors.has(sessionId)) throw new RpcError(-32002, "Phiên đang bận");
-    const c: Collector = { text: "", denied: 0, tools: new Map(), onDelta };
+    const c: Collector = { text: "", denied: 0, tools: new Map(), onDelta, hold: "", mid: false, blanks: "", blocked: 0 };
     this.collectors.set(sessionId, c);
     this.active++;
     let timer: NodeJS.Timeout | undefined;
@@ -174,11 +227,13 @@ export class AcpAgent extends EventEmitter {
           }, timeoutMs);
         }),
       ]);
+      feed(c, "", true);
       const u = res.usage;
       return {
         text: c.text,
         stopReason: res.stopReason,
         deniedTools: c.denied,
+        agyBlocked: c.blocked,
         toolsRan: [...c.tools.values()].filter((s) => s === "completed").length,
         usage: u ? { inputTokens: u.inputTokens, outputTokens: u.outputTokens, cachedReadTokens: u.cachedReadTokens } : undefined,
       };
@@ -253,8 +308,7 @@ export class AcpAgent extends EventEmitter {
       return;
     }
     if (!c || u?.sessionUpdate !== "agent_message_chunk" || u.content?.type !== "text" || !u.content.text) return;
-    c.text += u.content.text;
-    c.onDelta?.(u.content.text);
+    feed(c, u.content.text);
   }
 
   private onRequest(method: string, params: { sessionId?: string }): unknown {

@@ -108,7 +108,8 @@ export function buildApp(d: AppDeps): GatewayApp {
 
   app.post("/v1/chat/completions", async (req, reply) => {
     const b = ChatBody.parse(req.body);
-    if (b.tools?.length || (b.tool_choice != null && b.tool_choice !== "none")) throw new GatewayError(400, "tools_unsupported", "Cổng AI không hỗ trợ gọi công cụ (tools)");
+    const tc = b.tool_choice;
+    if (b.tools?.length || (tc != null && tc !== "none" && tc !== "auto")) throw new GatewayError(400, "tools_unsupported", "Cổng AI không hỗ trợ gọi công cụ (tools)");
     if (b.n != null && b.n > 1) throw new GatewayError(400, "n_unsupported", "Cổng AI chỉ trả một lựa chọn (n=1)");
     const header = req.headers["x-eduvn-conversation"];
     const hv = typeof header === "string" ? header : undefined;
@@ -134,7 +135,7 @@ export function buildApp(d: AppDeps): GatewayApp {
         model: r.model,
         choices: [{ index: 0, message: { role: "assistant", content: r.text }, finish_reason: "stop" }],
         usage: { prompt_tokens: pt, completion_tokens: ct, total_tokens: pt + ct },
-        eduvn: { task: r.task, backend: r.backend, ms: r.ms, retried: r.retried },
+        eduvn: { task: r.task, backend: r.backend, ms: r.ms, retried: r.retried, ...(r.refused ? { refused: true } : {}) },
       };
     }
     d.llm.route(b.model, true); // tác vụ không có → lỗi 404 trước khi mở stream

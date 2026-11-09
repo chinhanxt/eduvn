@@ -81,6 +81,7 @@ export async function buildGateway(cfg: GatewayConfig, over: { agentOptions?: (s
     limiter,
     fallback: backends.anthropic ? "anthropic" : undefined,
     log: (m) => logWarn(m),
+    maxConversations: cfg.MAX_CONVERSATIONS,
   });
   const jobs = new JobStore();
   const started = Date.now();

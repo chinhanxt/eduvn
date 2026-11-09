@@ -29,6 +29,7 @@ export class AgentPool {
   private readonly retired = new Set<AcpAgent>();
   private restartCount = 0;
   private recycling = false;
+  private readonly lingering = new Set<AcpAgent>(); // đã bị thay nhưng còn lượt dở
 
   constructor(private readonly opts: PoolOptions) {
     this.agents = new Array<AcpAgent | null>(opts.size).fill(null);
@@ -177,12 +178,25 @@ export class AgentPool {
     }
   }
 
-  /** Thay tiến trình đã mở đủ phiên khi nó không còn hội thoại/lượt nào: mở cái mới vào chỗ cũ rồi dừng cái cũ. */
+  private isIdle(a: AcpAgent): boolean {
+    return a.alive && a.activePrompts === 0 && a.sessionCount === 0 && !(this.pending.get(a) ?? 0) && ![...this.conversations.values()].some((c) => c.agent === a);
+  }
+
+  /**
+   * Thay tiến trình đã mở đủ phiên khi nó không còn hội thoại/lượt nào: mở cái mới vào chỗ cũ rồi dừng cái cũ.
+   * Nếu trong lúc cái mới khởi động lại có lượt đến cái cũ, cái cũ ở lại (lingering) và dừng ở lần rảnh kế tiếp.
+   */
   private recycleIdle(): void {
-    if (this.stopped || this.recycling) return;
-    const idle = (a: AcpAgent) =>
-      a.alive && a.activePrompts === 0 && a.sessionCount === 0 && !(this.pending.get(a) ?? 0) && ![...this.conversations.values()].some((c) => c.agent === a);
-    const old = this.agents.find((a): a is AcpAgent => !!a && this.draining.has(a) && idle(a));
+    if (this.stopped) return;
+    for (const a of [...this.lingering]) {
+      if (!a.alive) this.lingering.delete(a);
+      else if (this.isIdle(a)) {
+        this.lingering.delete(a);
+        void a.stop();
+      }
+    }
+    if (this.recycling) return;
+    const old = this.agents.find((a): a is AcpAgent => !!a && this.draining.has(a) && this.isIdle(a));
     if (!old) return;
     const slot = this.agents.indexOf(old);
     this.recycling = true;
@@ -193,8 +207,10 @@ export class AgentPool {
         this.retired.add(old);
         this.draining.delete(old);
         this.opened.delete(old);
-        await old.stop();
-        this.log(`Tiến trình AI #${slot} đã mở đủ phiên nên được thay mới.`);
+        if (this.isIdle(old)) {
+          await old.stop();
+          this.log(`Tiến trình AI #${slot} đã mở đủ phiên nên được thay mới.`);
+        } else this.lingering.add(old); // có lượt đến trong lúc thay: để nó chạy nốt
       } catch (e) {
         this.log(`Không thay mới được tiến trình AI #${slot}: ${e instanceof Error ? e.message : String(e)}`);
       } finally {
@@ -238,7 +254,8 @@ export class AgentPool {
     this.stopped = true;
     for (const t of this.timers) clearTimeout(t);
     this.timers.clear();
-    const live = this.alive();
+    const live = [...this.alive(), ...this.lingering];
+    this.lingering.clear();
     this.conversations.clear();
     this.agents.fill(null);
     await Promise.all(live.map((a) => a.stop()));

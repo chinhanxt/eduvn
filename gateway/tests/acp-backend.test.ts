@@ -5,7 +5,15 @@ import { AcpAgent } from "../src/acp/agent";
 import { AgentPool } from "../src/acp/pool";
 import { RpcError } from "../src/acp/rpc";
 import { AcpBackend, toBlocks, toGatewayError } from "../src/backends/acp";
+import { PriorityLimiter } from "../src/limiter";
+import { LlmService, RETRY_TEXT } from "../src/llm";
+import { parseTasks } from "../src/routes";
 import type { BackendInput } from "../src/types";
+
+const tasks = parseTasks({
+  defaults: { model: "fake-fast", timeoutMs: 5000, backend: "acp" },
+  tasks: { gia_su: { model: "fake-fast", priority: "interactive", refusal: "Mình không hỗ trợ." } },
+});
 
 const fake = fileURLToPath(new URL("./fixtures/fake-acp.mjs", import.meta.url));
 const pools: AgentPool[] = [];
@@ -126,5 +134,28 @@ describe("AcpBackend mã lỗi, chữ ký, công cụ", () => {
     expect(pool.stats().conversations).toBe(0);
     const t = await backend.complete(input({ messages: [{ role: "user", content: "[[toolran]]" }] }));
     expect(t.toolsRan).toBe(1);
+  });
+});
+
+describe("AcpBackend + LlmService với chữ cảnh báo agy", () => {
+  it("câu trả lời bị chặn (trống) thì hỏi lại với RETRY_TEXT", async () => {
+    const { backend } = await mk();
+    const svc = new LlmService({ tasks, backends: { acp: backend }, limiter: new PriorityLimiter(2), log: () => {} });
+    const deltas: string[] = [];
+    const r = await svc.complete({ model: "default", conversation: "c", messages: [{ role: "user", content: "[[agyblock]] hỏi" }], onDelta: (t) => deltas.push(t) });
+    expect(r.retried).toBe(true);
+    expect(r.text).toContain(RETRY_TEXT);
+    expect(deltas.join("")).not.toContain("⚠");
+    expect(deltas.join("")).not.toContain("Retries remaining");
+  });
+  it("bị chặn mãi: tác vụ có refusal thì trả câu mẫu, không có thì 502", async () => {
+    const { backend } = await mk();
+    const svc = new LlmService({ tasks, backends: { acp: backend }, limiter: new PriorityLimiter(2), log: () => {} });
+    const deltas: string[] = [];
+    const r = await svc.complete({ model: "gia_su", messages: [{ role: "user", content: "[[agyblock]] hỏi" }], onDelta: (t) => deltas.push(t) });
+    expect(r).toMatchObject({ text: "Mình không hỗ trợ.", refused: true });
+    expect(deltas).toEqual(["Mình không hỗ trợ."]);
+    expect(svc.metrics().refused).toBe(1);
+    await expect(svc.complete({ model: "default", messages: [{ role: "user", content: "[[agyblock]] hỏi" }] })).rejects.toMatchObject({ code: "empty_answer" });
   });
 });

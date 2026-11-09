@@ -167,8 +167,8 @@ describe("AcpAgent môi trường, công cụ, stderr", () => {
     }
   });
   it("childEnv giữ đúng danh sách + env thêm", () => {
-    const e = childEnv({ X: "1" }, { PATH: "/bin", SECRET: "s", HOME: "/h" });
-    expect(e).toEqual({ PATH: "/bin", HOME: "/h", X: "1" });
+    const e = childEnv({ X: "1" }, { PATH: "/bin", SECRET: "s", HOME: "/h", HTTPS_proxy: "x", https_proxy: "p", SSL_CERT_FILE: "/c", NODE_EXTRA_CA_CERTS: "/n", DBUS_SESSION_BUS_ADDRESS: "d" });
+    expect(e).toEqual({ PATH: "/bin", HOME: "/h", https_proxy: "p", SSL_CERT_FILE: "/c", NODE_EXTRA_CA_CERTS: "/n", DBUS_SESSION_BUS_ADDRESS: "d", X: "1" });
   });
   it("đếm công cụ đã chạy xong (completed)", async () => {
     const a = mk();
@@ -192,5 +192,21 @@ describe("AcpAgent môi trường, công cụ, stderr", () => {
     expect(tail.length).toBeLessThanOrEqual(20);
     expect(tail.at(-1)).toBe("dòng 30");
     expect(a.lastStderr().at(-1)).toBe("dòng 30");
+  });
+});
+
+describe("AcpAgent lọc chữ cảnh báo của agy", () => {
+  it("chữ cảnh báo bộ lọc an toàn không lọt vào delta lẫn kết quả; đếm số dòng bị loại", async () => {
+    const a = mk();
+    await a.start();
+    const sid = await a.newSession();
+    const deltas: string[] = [];
+    const r = await a.prompt(sid, [{ type: "text", text: "[[agyblock]]" }], (t) => deltas.push(t));
+    expect(r.text).toBe("");
+    expect(deltas.join("")).toBe("");
+    expect(r.agyBlocked).toBe(4);
+    const ok = await a.prompt(sid, [{ type: "text", text: "bình thường" }]);
+    expect(ok.agyBlocked).toBe(0);
+    expect(ok.text).toMatch(/bình thường$/);
   });
 });

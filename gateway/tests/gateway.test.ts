@@ -68,7 +68,7 @@ describe("buildGateway proxy và health", () => {
     const cfg = loadConfig({ GATEWAY_TOKEN: TOKEN, WORK_DIR: work, TASKS_FILE: tasksFile, AGY_SWITCH_BIN: bin, AGY_PROXY_PORT: String(port), AGY_PROCESSES: "1" });
     const gw = await buildGateway(cfg, { logger: false, agentOptions: () => ({ command: process.execPath, args: [fake], cwd: work }) });
     const h = (await gw.app.inject({ method: "GET", url: "/health" })).json();
-    expect(h.metrics).toEqual({ requests: 0, errors: 0, fallbacks: 0, retries: 0, toolBlocked: 0, restarts: 0 });
+    expect(h.metrics).toEqual({ requests: 0, errors: 0, fallbacks: 0, retries: 0, toolBlocked: 0, refused: 0, restarts: 0 });
     await gw.close();
     const lines = readFileSync(log, "utf8").trim().split("\n");
     expect(lines[0]).toContain("proxy start");

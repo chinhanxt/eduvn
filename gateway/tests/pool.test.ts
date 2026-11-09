@@ -214,3 +214,33 @@ describe("AgentPool giới hạn dài hạn", () => {
     expect(logs.some((m) => m.includes("đã dừng"))).toBe(true);
   });
 });
+
+describe("AgentPool thay mới có lượt đến giữa chừng", () => {
+  it("lượt đến lúc tiến trình thay thế đang khởi động: cái cũ ở lại chạy nốt, dừng khi rảnh", async () => {
+    let n = 0;
+    const p = new AgentPool({
+      size: 1,
+      idleSessionMs: 60000,
+      restartDelayMs: 50,
+      recycleAfterSessions: 1,
+      factory: () => new AcpAgent({ command: process.execPath, args: [fake], cwd: tmpdir(), env: n++ > 0 ? { FAKE_START_DELAY: "400" } : {} }),
+    });
+    pools.push(p);
+    await p.start();
+    const a = await p.lease("a", "fake-fast");
+    a.release();
+    const old = a.agent;
+    p.forget("a"); // rảnh → bắt đầu thay (cái mới khởi động chậm)
+    await new Promise((r) => setTimeout(r, 150));
+    const b = await p.lease("b", "fake-fast"); // lượt đến cái cũ giữa chừng
+    expect(b.agent).toBe(old);
+    await waitFor(() => p.alive()[0] !== old, 5000);
+    expect(old.alive).toBe(true); // chưa bị dừng khi còn việc
+    const r = await b.agent.prompt(b.sessionId, [{ type: "text", text: "vẫn chạy" }]);
+    expect(r.text).toContain("vẫn chạy");
+    b.release();
+    p.forget("b");
+    await waitFor(() => !old.alive, 5000);
+    expect(p.stats().alive).toBe(1);
+  });
+});

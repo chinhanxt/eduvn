@@ -59,7 +59,7 @@ export class AcpBackend implements Backend {
         if (input.signal?.aborted) throw clientClosed();
         const r = await lease.agent.prompt(lease.sessionId, toBlocks(input, lease.fresh), onDelta, input.timeoutMs);
         if (input.signal?.aborted) throw clientClosed();
-        return { text: r.text, usage: r.usage, deniedTools: r.deniedTools, toolsRan: r.toolsRan };
+        return { text: r.text, usage: r.usage, deniedTools: r.deniedTools, toolsRan: r.toolsRan, agyBlocked: r.agyBlocked };
       } catch (e) {
         if (input.conversation) this.pool.forget(input.conversation);
         throw toGatewayError(e);

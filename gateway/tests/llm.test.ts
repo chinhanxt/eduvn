@@ -264,3 +264,50 @@ describe("LlmService phạm vi hội thoại, JSON, công cụ, số đo", () =>
     expect(acp.calls[1]!.messages).toEqual([user("x"), { role: "assistant", content: "a" }, user("tiếp")]);
   });
 });
+
+describe("LlmService lịch sử máy khách, giới hạn bản lưu, refusal", () => {
+  const long = (n: number) => Array.from({ length: n }, (_, i) => ({ role: (i % 2 === 0 ? "assistant" : "user") as "assistant" | "user", content: `tin ${i}` }));
+  it("lịch sử 40 tin mở đầu bằng lời chào của trợ lý: các lượt liên tiếp không bỏ phiên; sửa lịch sử thì bỏ", async () => {
+    const acp = new ToolStub("acp", ["a1", "a2", "a3", "a4"], []);
+    const svc = mk(acp);
+    const h1 = long(40);
+    await svc.complete({ model: "default", messages: h1, conversation: "c" });
+    const h2 = [...h1, { role: "assistant" as const, content: "a1" }, user("tiếp")];
+    await svc.complete({ model: "default", messages: h2, conversation: "c" });
+    const h3 = [...h2, { role: "assistant" as const, content: "a2" }, user("nữa")];
+    await svc.complete({ model: "default", messages: h3, conversation: "c" });
+    expect(acp.forgotten).toEqual([]);
+    const edited = [{ role: "assistant" as const, content: "lời chào khác" }, ...h3.slice(1), { role: "assistant" as const, content: "a3" }, user("cuối")];
+    await svc.complete({ model: "default", messages: edited, conversation: "c" });
+    expect(acp.forgotten).toHaveLength(1);
+  });
+  it("trộn tin đơn sau lịch sử máy khách vẫn nhất quán", async () => {
+    const acp = new ToolStub("acp", ["a1", "a2", "a3"], []);
+    const svc = mk(acp);
+    await svc.complete({ model: "default", messages: [user("x")], conversation: "c" });
+    await svc.complete({ model: "default", messages: [user("y")], conversation: "c" });
+    await svc.complete({ model: "default", messages: [user("x"), { role: "assistant", content: "a1" }, user("y"), { role: "assistant", content: "a2" }, user("z")], conversation: "c" });
+    expect(acp.forgotten).toEqual([]);
+  });
+  it("bản lưu hội thoại bị chặn theo maxConversations (bỏ cái cũ nhất)", async () => {
+    const acp = new StubBackend("acp", ["1", "2", "3", "4"]);
+    const svc = mk(acp, { maxConversations: 2 });
+    for (const c of ["a", "b", "c"]) {
+      await svc.complete({ model: "default", messages: [user("x")], conversation: c });
+      await new Promise((r) => setTimeout(r, 3));
+    }
+    expect(svc.conversations()).toBe(2);
+    await svc.complete({ model: "default", messages: [user("lại")], conversation: "a" });
+    expect(acp.calls[3]!.messages).toEqual([user("lại")]); // a đã bị bỏ
+  });
+  it("trống sau khi hỏi lại + có refusal → câu mẫu, refused, đếm", async () => {
+    const t = parseTasks({ defaults: { model: "m", timeoutMs: 1000, backend: "acp" }, tasks: { gs: { model: "m", refusal: "Không hỗ trợ." } } });
+    const acp = new StubBackend("acp", ["", ""]);
+    const svc = new LlmService({ tasks: t, backends: { acp }, limiter: new PriorityLimiter(2), log: () => {} });
+    const deltas: string[] = [];
+    const r = await svc.complete({ model: "gs", messages: [user("x")], onDelta: (d) => deltas.push(d) });
+    expect(r).toMatchObject({ text: "Không hỗ trợ.", refused: true });
+    expect(deltas).toEqual(["Không hỗ trợ."]);
+    expect(svc.metrics().refused).toBe(1);
+  });
+});

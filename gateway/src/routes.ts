@@ -10,6 +10,7 @@ const Task = z.object({
   timeoutMs: z.number().int().min(1000).max(900000).optional(),
   system: z.string().max(8000).default(""),
   json: z.boolean().default(false),
+  refusal: z.string().min(1).max(2000).optional(), // câu trả lời mẫu khi AI bị bộ lọc chặn / không trả lời được
   description: z.string().default(""),
 });
 const File = z.object({
@@ -28,6 +29,7 @@ export type Route = {
   timeoutMs: number;
   system: string;
   json: boolean;
+  refusal?: string;
 };
 
 export const parseTasks = (raw: unknown): TasksFile => File.parse(raw);
@@ -46,6 +48,7 @@ export function resolveRoute(file: TasksFile, name: string, opts: { interactive?
       timeoutMs: t.timeoutMs ?? file.defaults.timeoutMs,
       system: t.system,
       json: t.json,
+      refusal: t.refusal,
     };
   }
   if (name.startsWith("task:")) throw new GatewayError(404, "unknown_task", `Không có tác vụ ${key}`);

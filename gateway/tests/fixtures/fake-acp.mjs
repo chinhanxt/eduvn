@@ -39,6 +39,7 @@ createInterface({ input: process.stdin }).on("line", (line) => {
   switch (m.method) {
     case "initialize":
       if (noInit) return;
+      if (process.env.FAKE_START_DELAY) return void setTimeout(() => reply({ protocolVersion: 1, agentCapabilities: { promptCapabilities: { image: true } } }), Number(process.env.FAKE_START_DELAY));
       return reply({ protocolVersion: 1, agentCapabilities: { promptCapabilities: { image: true } } });
     case "session/new": {
       const id = "s" + ++n;
@@ -105,6 +106,18 @@ async function prompt(id, p) {
     send({ id: rid, method: "session/request_permission", params: { sessionId: p.sessionId, toolCall: { name: "run_command" }, options: [] } });
     const ans = await answered;
     if (ans.result?.outcome?.outcome !== "cancelled") process.stderr.write("CÔNG CỤ ĐÃ ĐƯỢC CHO PHÉP\n");
+    return send({ id, result: { stopReason: "end_turn", usage: { inputTokens: text.length, outputTokens: 0 } } });
+  }
+  if (text.includes("[[agyblock]]")) {
+    // chữ cảnh báo của bộ lọc an toàn agy, cắt giữa "Retries remaining"
+    const parts = [
+      "\n⚠ Your previous response was blocked by content safety filters\nPlease provide a response that complies with content policies, or briefly explain to the user why you cannot help with this request\nRet",
+      "ries remaining: 3\n\n… ⚠ Agent execution terminated due to error.\n",
+    ];
+    for (const part of parts) {
+      send({ method: "session/update", params: { sessionId: p.sessionId, update: { sessionUpdate: "agent_message_chunk", content: { type: "text", text: part } } } });
+      await sleep(5);
+    }
     return send({ id, result: { stopReason: "end_turn", usage: { inputTokens: text.length, outputTokens: 0 } } });
   }
   let out;

@@ -15,7 +15,7 @@ export type BackendInput = {
   priority: 0 | 1; // 0 = tương tác (chat), 1 = theo lô
   signal?: AbortSignal; // huỷ khi người dùng ngắt kết nối
 };
-export type BackendOutput = { text: string; usage?: Usage; deniedTools: number; toolsRan?: number };
+export type BackendOutput = { text: string; usage?: Usage; deniedTools: number; toolsRan?: number; agyBlocked?: number };
 
 export interface Backend {
   readonly name: string;

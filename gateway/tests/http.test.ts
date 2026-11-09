@@ -239,7 +239,10 @@ describe("HTTP cổng AI: hợp đồng OpenAI cho OpenMAIC/DeepTutor", () => {
     const a = await chat({ tools: [{ type: "function", function: { name: "f" } }] });
     expect(a.statusCode).toBe(400);
     expect(a.json().error.code).toBe("tools_unsupported");
-    expect((await chat({ tool_choice: "auto" })).statusCode).toBe(400);
+    expect((await chat({ tool_choice: "required" })).statusCode).toBe(400);
+    expect((await chat({ tool_choice: { type: "function", function: { name: "f" } } })).statusCode).toBe(400);
+    expect((await chat({ tool_choice: "auto" })).statusCode).toBe(200);
+    expect((await chat({ tool_choice: null })).statusCode).toBe(200);
     expect((await chat({ tools: [], tool_choice: "none" })).statusCode).toBe(200);
   });
   it("nhận và bỏ qua max_tokens, temperature…; n>1 → 400", async () => {
@@ -281,5 +284,21 @@ describe("HTTP cổng AI: hợp đồng OpenAI cho OpenMAIC/DeepTutor", () => {
     await hang.started;
     app.abortAll();
     await hang.aborted;
+  });
+});
+
+describe("HTTP refusal", () => {
+  it("eduvn.refused khi AI không trả lời và tác vụ có refusal", async () => {
+    const t2 = parseTasks({ defaults: { model: "m", timeoutMs: 1000, backend: "acp" }, tasks: { gs: { model: "m", refusal: "Không hỗ trợ." } } });
+    class Empty extends EchoBackend {
+      async complete(): Promise<BackendOutput> {
+        return { text: "", deniedTools: 0 };
+      }
+    }
+    const llm = new LlmService({ tasks: t2, backends: { acp: new Empty() }, limiter: new PriorityLimiter(2), log: () => {} });
+    app = buildApp({ llm, jobs: new JobStore(), token: TOKEN, health: () => ({}), models: () => [] });
+    const r = await app.inject({ method: "POST", url: "/v1/chat/completions", headers: auth, payload: { model: "gs", messages: [{ role: "user", content: "x" }] } });
+    expect(r.json().choices[0].message.content).toBe("Không hỗ trợ.");
+    expect(r.json().eduvn.refused).toBe(true);
   });
 });
