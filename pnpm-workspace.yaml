@@ -1,6 +1,7 @@
 packages:
   - server
   - web
+  - gateway
 allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
