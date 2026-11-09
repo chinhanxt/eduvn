@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDUVN — Sơ đồ tư duy &amp; lưu đồ (mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@maxgraph/core@0.25.1/css/common.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.111.4/mathlive-static.css">
+<style>
+  :root {
+    --side: #1e2340; --side-ink: #c9cee6; --side-active: #2f3663;
+    --bg: #f4f6fb; --card: #ffffff; --ink: #1b2033; --muted: #7a8199; --line: #eceef4;
+    --brand: #4f6bed; --blue-bg: #eaeefe;
+    --shadow: 0 1px 2px rgba(20, 28, 60, .06), 0 6px 18px rgba(20, 28, 60, .07);
+    --shadow-hi: 0 2px 4px rgba(20, 28, 60, .08), 0 12px 28px rgba(20, 28, 60, .12);
+    --green: #16a34a; --green-bg: #e6f6ec; --violet: #8b5cf6; --violet-bg: #f1ebfe;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; font: 14px/1.5 "Be Vietnam Pro", system-ui, sans-serif; color: var(--ink); background: var(--bg); overflow: hidden; }
+  svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  button { font: inherit; cursor: pointer; color: inherit; }
+
+  .shell { display: grid; grid-template-columns: 64px 1fr 300px; height: 100vh; }
+
+  /* Thanh công cụ trái */
+  .rail { background: var(--side); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px; }
+  .mark { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; margin-bottom: 14px; }
+  .rail button { width: 42px; height: 42px; border-radius: 12px; border: 0; background: transparent; color: var(--side-ink); display: grid; place-items: center; position: relative; transition: background .2s, color .2s; }
+  .rail button:hover { background: rgba(255,255,255,.06); }
+  .rail button.on { background: var(--side-active); color: #fff; }
+  .rail button.on::before { content: ""; position: absolute; left: -11px; top: 10px; bottom: 10px; width: 3px; border-radius: 3px; background: var(--brand); }
+  .rail button[data-tip]:hover::after { content: attr(data-tip); position: absolute; left: 52px; top: 50%; transform: translateY(-50%); background: #11152b; color: #fff; font-size: 12px; padding: 4px 9px; border-radius: 8px; white-space: nowrap; z-index: 50; }
+  .rail .sep { width: 28px; height: 1px; background: rgba(255,255,255,.08); margin: 6px 0; }
+  .rail .ai { color: #c4b5fd; }
+  .swatches { margin-top: auto; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .sw { width: 16px; height: 16px; border-radius: 50%; border: 0; box-shadow: 0 0 0 2px var(--side); padding: 0; }
+  .sw:hover { box-shadow: 0 0 0 2px var(--side), 0 0 0 4px rgba(255,255,255,.4); }
+
+  /* Cột giữa */
+  .center { display: grid; grid-template-rows: 62px 1fr; min-width: 0; min-height: 0; }
+  .top { display: flex; align-items: center; gap: 10px; padding: 0 20px; }
+  .title { font-weight: 600; font-size: 16px; white-space: nowrap; }
+  .chip { font-size: 12px; color: var(--muted); background: #fff; border-radius: 999px; padding: 3px 10px; box-shadow: var(--shadow); white-space: nowrap; }
+  .tabs { display: flex; gap: 4px; background: #e8ebf3; padding: 4px; border-radius: 12px; margin-left: 12px; }
+  .tabs button { border: 0; background: transparent; padding: 5px 14px; border-radius: 9px; color: var(--muted); font-weight: 500; font-size: 13px; }
+  .tabs button.on { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
+  .sp { flex: 1; }
+  .btn { display: inline-flex; align-items: center; gap: 7px; border: 0; background: #fff; border-radius: 11px; padding: 8px 13px; box-shadow: var(--shadow); font-weight: 500; font-size: 13px; }
+  .btn svg.i { width: 17px; height: 17px; }
+  .btn.sq { padding: 8px; }
+  .btn.pri { background: var(--brand); color: #fff; }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .status { font-size: 12px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+  .status i { width: 7px; height: 7px; border-radius: 50%; background: #e08a00; }
+  .status.ok i { background: var(--green); }
+  .status.ai i { background: var(--violet); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .3; } }
+
+  .canvas { position: relative; margin: 0 20px 20px; border-radius: 18px; background: #fbfcfe; box-shadow: var(--shadow); overflow: hidden;
+    background-image: radial-gradient(#dfe3ee 1.1px, transparent 1.1px); background-size: 22px 22px; }
+  #graph { position: absolute; inset: 0; overflow: hidden; outline: none; cursor: default; }
+  #graph.link { cursor: crosshair; }
+  .float { position: absolute; display: flex; gap: 4px; background: #fff; border-radius: 12px; padding: 4px; box-shadow: var(--shadow-hi); z-index: 5; }
+  .float button { border: 0; background: transparent; width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; }
+  .float button:hover { background: var(--bg); }
+  .zoom { left: 14px; bottom: 14px; align-items: center; }
+  .zoom output { min-width: 46px; text-align: center; font-size: 12px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+  #outline { position: absolute; right: 14px; bottom: 14px; width: 190px; height: 118px; background: #fff; border-radius: 12px; box-shadow: var(--shadow-hi); overflow: hidden; z-index: 5; }
+  .hint { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font-size: 12px; color: var(--muted); background: rgba(255,255,255,.92); padding: 6px 14px; border-radius: 999px; box-shadow: var(--shadow); white-space: nowrap; z-index: 5; }
+  .hint b { color: var(--ink); font-weight: 600; }
+  .aipill { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); display: none; align-items: center; gap: 8px; background: #fff; color: var(--violet); font-weight: 600; font-size: 13px; padding: 7px 16px; border-radius: 999px; box-shadow: var(--shadow-hi); z-index: 6; }
+  .aipill.on { display: inline-flex; }
+
+  /* Nhãn nút trong sơ đồ */
+  .lbl { display: inline-block; font-family: "Be Vietnam Pro", system-ui, sans-serif; line-height: 1.38; white-space: normal; word-wrap: break-word; overflow-wrap: anywhere; text-align: center; padding: 7px 13px; color: var(--ink); }
+  .lbl.d0 { font-size: 19px; font-weight: 700; color: #fff; max-width: 330px; padding: 12px 20px; }
+  .lbl.d1 { font-size: 15.5px; font-weight: 600; max-width: 260px; padding: 8px 15px; }
+  .lbl.d2 { font-size: 14px; font-weight: 400; max-width: 250px; }
+  .lbl.free { font-size: 14px; max-width: 230px; }
+  .lbl.sz-s { font-size: 12.5px; } .lbl.sz-l { font-size: 18px; }
+  .lbl.b { font-weight: 700; }
+  .lbl.onDark { color: #fff; }
+  .lbl .ML__latex { font-size: 1.06em; }
+  .elbl { display: inline-block; white-space: nowrap; font: 500 12px/1.3 "Be Vietnam Pro", system-ui, sans-serif; color: #5b6278; background: #fff; padding: 1px 7px; border-radius: 6px; }
+  #measure { position: absolute; left: -9999px; top: 0; visibility: hidden; }
+
+  /* Cột phải */
+  .panel { background: #fff; box-shadow: -1px 0 0 var(--line); display: flex; flex-direction: column; min-height: 0; }
+  .ph { display: flex; align-items: center; gap: 10px; padding: 18px 18px 6px; font-weight: 600; }
+  .ph .ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--blue-bg); color: var(--brand); }
+  .ph .ic svg.i { width: 16px; height: 16px; }
+  .ph small { margin-left: auto; font-weight: 500; color: var(--muted); font-size: 12px; }
+  .pbody { flex: 1; overflow-y: auto; padding: 4px 18px 18px; display: grid; gap: 16px; align-content: start; }
+  .sec { display: grid; gap: 8px; }
+  .sec > label, .sec > .h { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  textarea { width: 100%; min-height: 64px; resize: vertical; border: 1px solid var(--line); border-radius: 11px; padding: 9px 11px; font: 13.5px/1.5 "Be Vietnam Pro", system-ui, sans-serif; color: var(--ink); background: #fbfcfe; }
+  textarea:focus { outline: 2px solid #c9d2fb; border-color: transparent; }
+  .prev { background: var(--bg); border-radius: 11px; padding: 10px; text-align: center; min-height: 40px; }
+  .prev .lbl { padding: 0; }
+  .shapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .shapes button { border: 1px solid var(--line); background: #fff; border-radius: 10px; height: 54px; display: grid; place-items: center; gap: 0; padding: 4px 0 2px; font-size: 10.5px; color: var(--muted); }
+  .shapes button:hover, .shapes button.on { border-color: #b8c3f7; background: var(--blue-bg); color: var(--brand); }
+  .shapes svg { width: 30px; height: 22px; fill: #fff; stroke: currentColor; stroke-width: 1.5; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg { display: flex; background: var(--bg); border-radius: 10px; padding: 3px; gap: 2px; }
+  .seg button { flex: 1; border: 0; background: transparent; padding: 5px 8px; border-radius: 8px; font-size: 12.5px; color: var(--muted); font-weight: 500; white-space: nowrap; }
+  .seg button.on { background: #fff; color: var(--ink); box-shadow: var(--shadow); }
+  .colors { display: flex; gap: 8px; }
+  .colors button { width: 26px; height: 26px; border-radius: 50%; border: 0; box-shadow: inset 0 0 0 2px rgba(255,255,255,.6); }
+  .colors button.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor; }
+  math-field { width: 100%; border: 1px solid var(--line); border-radius: 11px; padding: 6px 8px; font-size: 18px; background: #fbfcfe; }
+  .qk { display: flex; gap: 5px; flex-wrap: wrap; }
+  .qk button { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 2px 8px; font-size: 13px; min-width: 34px; }
+  .qk button:hover { background: var(--bg); }
+  .tpl { display: grid; gap: 8px; }
+  .tpl button { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 10px 12px; text-align: left; }
+  .tpl button:hover { border-color: #b8c3f7; }
+  .tpl button span { font-weight: 500; }
+  .tpl button small { margin-left: auto; color: var(--muted); font-size: 11px; }
+  .tpl button:disabled { opacity: .5; cursor: default; }
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 5px 10px; font-size: 12.5px; color: var(--muted); }
+  .keys kbd { font: 600 11.5px "Be Vietnam Pro", sans-serif; color: var(--ink); background: var(--bg); border-radius: 6px; padding: 1px 7px; justify-self: start; }
+  .empty { color: var(--muted); font-size: 13px; }
+
+  /* Hộp thoại AI */
+  .modal { position: fixed; inset: 0; background: rgba(20,28,60,.35); display: none; place-items: center; z-index: 60; }
+  .modal.on { display: grid; }
+  .dlg { width: 560px; max-width: 94vw; background: #fff; border-radius: 18px; box-shadow: var(--shadow-hi); padding: 20px 22px; display: grid; gap: 14px; }
+  .dlg-hd { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; }
+  .dlg-hd .ic { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: var(--violet-bg); color: var(--violet); }
+  .dlg textarea { min-height: 120px; }
+  .dlg-ft { display: flex; align-items: center; gap: 8px; }
+  .dlg-ft small { color: var(--muted); font-size: 12px; margin-right: auto; }
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); background: #11152b; color: #fff; padding: 9px 16px; border-radius: 12px; font-size: 13px; opacity: 0; transition: .25s; z-index: 70; pointer-events: none; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  /* maxGraph: viền chọn */
+  #graph svg { overflow: visible; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+  <symbol id="i-pointer" viewBox="0 0 24 24"><path d="M4.04 4.04 10.5 20l2.4-7.1L20 10.5z"/></symbol>
+  <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M7.2 12H10c3 0 3-6 6.8-6M10 12c3 0 3 6 6.8 6"/></symbol>
+  <symbol id="i-sibling" viewBox="0 0 24 24"><rect x="4" y="3" width="12" height="7" rx="2"/><rect x="4" y="14" width="12" height="7" rx="2"/><path d="M20 15v6M17 18h6"/></symbol>
+  <symbol id="i-shapes" viewBox="0 0 24 24"><path d="M8.3 10a.7.7 0 0 1-.63-1.08L11.4 3a.7.7 0 0 1 1.2-.04L16.3 8.9a.7.7 0 0 1-.57 1.1z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><circle cx="5" cy="19" r="2"/><path d="M6.6 17.4C9 11 13 7.5 19 6"/><path d="m15 3.5 4.3 2.4-2.6 4.1"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></symbol>
+  <symbol id="i-fx" viewBox="0 0 24 24"><path d="M18 7V4H6l6 8-6 8h12v-3"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15v4M17 17h4"/></symbol>
+  <symbol id="i-layout" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><path d="M6.5 10v3.5a2.5 2.5 0 0 0 2.5 2.5h5"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3M7 10l5 5 5-5M5 21h14"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7M7 3v4a1 1 0 0 0 1 1h7"/></symbol>
+  <symbol id="i-zin" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6M11 8v6"/></symbol>
+  <symbol id="i-zout" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6"/></symbol>
+  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></symbol>
+  <symbol id="i-flow" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="5" rx="1.5"/><path d="M12 7v3M12 10l4 4-4 4-4-4z"/><path d="M12 18v4"/></symbol>
+  <symbol id="i-mind" viewBox="0 0 24 24"><rect x="8" y="9.5" width="8" height="5" rx="2.5"/><path d="M16 12c2 0 2-5 5-5M16 12c2 0 2 5 5 5M8 12c-2 0-2-5-5-5M8 12c-2 0-2 5-5 5"/></symbol>
+  <symbol id="i-concept" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M7.5 6h9M6.3 8.2l4.4 7.6M17.7 8.2l-4.4 7.6"/></symbol>
+  <symbol id="i-fish" viewBox="0 0 24 24"><path d="M2 12h17l3-3v6l-3-3"/><path d="M6 12 4 7M10 12 8 7M14 12l-2-5M6 12l-2 5M10 12l-2 5M14 12l-2 5"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="mark"><svg class="i"><use href="#i-cap"/></svg></div>
+    <button class="on" id="t-select" data-tip="Chọn, kéo để di chuyển (V)"><svg class="i"><use href="#i-pointer"/></svg></button>
+    <button id="t-child" data-tip="Thêm nhánh con (Tab)"><svg class="i"><use href="#i-branch"/></svg></button>
+    <button id="t-sib" data-tip="Thêm nhánh ngang hàng (Enter)"><svg class="i"><use href="#i-sibling"/></svg></button>
+    <button id="t-link" data-tip="Nối mũi tên giữa hai hình (L)"><svg class="i"><use href="#i-link"/></svg></button>
+    <div class="sep"></div>
+    <button id="t-shape" data-tip="Thêm hình"><svg class="i"><use href="#i-shapes"/></svg></button>
+    <button id="t-text" data-tip="Thêm chữ"><svg class="i"><use href="#i-text"/></svg></button>
+    <button id="t-fx" data-tip="Chèn công thức"><svg class="i"><use href="#i-fx"/></svg></button>
+    <button id="t-img" data-tip="Chèn ảnh minh hoạ"><svg class="i"><use href="#i-image"/></svg></button>
+    <div class="sep"></div>
+    <button id="t-ai" class="ai" data-tip="AI vẽ sơ đồ từ bài học"><svg class="i"><use href="#i-spark"/></svg></button>
+    <button id="t-layout" data-tip="Sắp xếp lại"><svg class="i"><use href="#i-layout"/></svg></button>
+    <div class="swatches" id="railColors"></div>
+  </aside>
+
+  <section class="center">
+    <header class="top">
+      <div class="title" id="docTitle">Hàm số bậc hai</div>
+      <span class="chip">Toán · Lớp 10</span>
+      <div class="tabs" id="tabs">
+        <button class="on" data-mode="mind">Sơ đồ tư duy</button>
+        <button data-mode="flow">Lưu đồ</button>
+      </div>
+      <div class="sp"></div>
+      <span class="status ok" id="status"><i></i><span>Đã lưu</span></span>
+      <button class="btn sq" id="undo" title="Hoàn tác (Ctrl+Z)"><svg class="i"><use href="#i-undo"/></svg></button>
+      <button class="btn sq" id="redo" title="Làm lại (Ctrl+Y)"><svg class="i"><use href="#i-redo"/></svg></button>
+      <button class="btn" id="export"><svg class="i"><use href="#i-download"/></svg>Xuất SVG</button>
+      <button class="btn pri" id="save"><svg class="i"><use href="#i-save"/></svg>Lưu</button>
+    </header>
+    <div class="canvas" id="canvas">
+      <div id="graph" tabindex="0"></div>
+      <div class="aipill" id="aipill"><svg class="i"><use href="#i-spark"/></svg><span>AI đang vẽ sơ đồ…</span></div>
+      <div class="float zoom">
+        <button id="zout" title="Thu nhỏ"><svg class="i"><use href="#i-zout"/></svg></button>
+        <output id="zpct">100%</output>
+        <button id="zin" title="Phóng to"><svg class="i"><use href="#i-zin"/></svg></button>
+        <button id="zfit" title="Vừa khung"><svg class="i"><use href="#i-fit"/></svg></button>
+      </div>
+      <div class="hint" id="hint"></div>
+      <div id="outline"></div>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <div class="ph"><span class="ic"><svg class="i"><use href="#i-shapes"/></svg></span><span id="phTitle">Định dạng</span><small id="phKind"></small></div>
+    <div class="pbody" id="pbody">
+      <!-- Không chọn gì -->
+      <div class="sec" data-show="none">
+        <div class="h">Mẫu sơ đồ</div>
+        <div class="tpl">
+          <button data-tpl="mind"><svg class="i"><use href="#i-mind"/></svg><span>Sơ đồ tư duy</span><small>Tab · Enter</small></button>
+          <button data-tpl="flow"><svg class="i"><use href="#i-flow"/></svg><span>Lưu đồ thuật toán</span><small>hình thoi rẽ nhánh</small></button>
+          <button disabled><svg class="i"><use href="#i-concept"/></svg><span>Bản đồ khái niệm</span><small>sắp có</small></button>
+          <button disabled><svg class="i"><use href="#i-fish"/></svg><span>Sơ đồ xương cá</span><small>sắp có</small></button>
+        </div>
+      </div>
+      <div class="sec" data-show="none">
+        <div class="h">Phím tắt</div>
+        <div class="keys">
+          <kbd>Tab</kbd><span>thêm nhánh con</span>
+          <kbd>Enter</kbd><span>thêm nhánh ngang hàng</span>
+          <kbd>F2</kbd><span>sửa chữ (hoặc nháy đúp)</span>
+          <kbd>$…$</kbd><span>gõ công thức trong chữ</span>
+          <kbd>Space</kbd><span>thu gọn / mở nhánh</span>
+          <kbd>← → ↑ ↓</kbd><span>đi giữa các nhánh</span>
+          <kbd>Del</kbd><span>xoá</span>
+          <kbd>Ctrl Z</kbd><span>hoàn tác</span>
+          <kbd>Kéo nhánh</kbd><span>thả lên nút khác để đổi cha</span>
+          <kbd>Ctrl cuộn</kbd><span>phóng to / thu nhỏ</span>
+        </div>
+      </div>
+
+      <!-- Chọn hình -->
+      <div class="sec" data-show="vertex">
+        <label for="txt">Nội dung</label>
+        <textarea id="txt" spellcheck="false"></textarea>
+        <div class="prev" id="prev"></div>
+      </div>
+      <div class="sec" data-show="vertex">
+        <div class="h">Công thức</div>
+        <math-field id="mf" placeholder="\text{Gõ công thức…}"></math-field>
+        <div class="qk" id="qk"></div>
+        <button class="btn" id="mfInsert" style="justify-self:start"><svg class="i"><use href="#i-fx"/></svg>Chèn vào hình</button>
+      </div>
+      <div class="sec" data-show="vertex">
+        <div class="h">Hình dạng</div>
+        <div class="shapes" id="shapes"></div>
+      </div>
+      <div class="sec" data-show="vertex">
+        <div class="h">Màu</div>
+        <div class="colors" id="colors"></div>
+      </div>
+      <div class="sec" data-show="vertex">
+        <div class="h">Chữ</div>
+        <div class="row">
+          <div class="seg" id="fsize"><button data-v="s">Nhỏ</button><button data-v="m">Vừa</button><button data-v="l">Lớn</button></div>
+          <div class="seg" id="fbold"><button data-v="b"><b>Đậm</b></button></div>
+        </div>
+      </div>
+
+      <!-- Chọn đường nối -->
+      <div class="sec" data-show="edge">
+        <label for="etxt">Chữ trên mũi tên</label>
+        <textarea id="etxt" style="min-height:44px" spellcheck="false"></textarea>
+      </div>
+      <div class="sec" data-show="edge">
+        <div class="h">Kiểu đường</div>
+        <div class="seg" id="eroute"><button data-v="curved">Cong</button><button data-v="ortho">Vuông góc</button><button data-v="straight">Thẳng</button></div>
+      </div>
+      <div class="sec" data-show="edge">
+        <div class="h">Mũi tên</div>
+        <div class="seg" id="earrow"><button data-v="none">Không</button><button data-v="classic">Thường</button><button data-v="open">Rỗng</button><button data-v="diamond">Thoi</button></div>
+      </div>
+      <div class="sec" data-show="edge">
+        <div class="h">Nét</div>
+        <div class="seg" id="edash"><button data-v="solid">Liền</button><button data-v="dash">Đứt</button></div>
+      </div>
+      <div class="sec" data-show="vertex edge">
+        <button class="btn" id="del" style="justify-self:start;color:#b42318"><svg class="i"><use href="#i-trash"/></svg>Xoá</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="lbl" id="measure"></div>
+
+<div class="modal" id="aiModal">
+  <div class="dlg">
+    <div class="dlg-hd"><span class="ic"><svg class="i"><use href="#i-spark"/></svg></span>AI vẽ sơ đồ từ bài học</div>
+    <textarea id="aiText">Bài 2. Dấu của tam thức bậc hai f(x) = ax² + bx + c (a ≠ 0).
+Định lí: Δ < 0 thì f(x) cùng dấu a với mọi x; Δ = 0 thì f(x) cùng dấu a với mọi x ≠ −b/2a; Δ > 0 thì f(x) cùng dấu a ngoài khoảng hai nghiệm, trái dấu a trong khoảng hai nghiệm.
+Ứng dụng: giải bất phương trình bậc hai, tìm m để bất phương trình nghiệm đúng với mọi x.</textarea>
+    <div class="row">
+      <div class="seg" id="aiKind"><button class="on" data-v="mind">Sơ đồ tư duy</button><button data-v="flow">Lưu đồ</button></div>
+      <div class="seg" id="aiDepth"><button data-v="2">2 tầng</button><button class="on" data-v="3">3 tầng</button></div>
+    </div>
+    <div class="dlg-ft">
+      <small>Mô phỏng — bản thật gọi cổng AI của EDUVN</small>
+      <button class="btn" id="aiCancel">Huỷ</button>
+      <button class="btn pri" id="aiRun"><svg class="i"><use href="#i-spark"/></svg>Vẽ sơ đồ</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import * as mx from "https://esm.sh/@maxgraph/core@0.25.1";
+import { convertLatexToMarkup, MathfieldElement } from "https://cdn.jsdelivr.net/npm/mathlive@0.111.4/mathlive.min.mjs";
+
+const { Graph, InternalEvent, Outline, CellOverlay, ImageBox, Point, getDefaultPlugins } = mx;
+MathfieldElement.fontsDirectory = "https://cdn.jsdelivr.net/npm/mathlive@0.111.4/fonts/";
+MathfieldElement.soundsDirectory = null;
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+
+/* ---------- Chữ + công thức $…$ ---------- */
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function splitMath(s) {
+  const out = []; let buf = "", inM = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === "\\" && s[i + 1] === "$") { buf += inM ? "\\$" : "$"; i++; continue; }
+    if (c === "$") { if (buf.trim() || !inM) { if (buf) out.push({ m: inM, v: buf }); } buf = ""; inM = !inM; continue; }
+    buf += c;
+  }
+  if (inM) out.push({ m: false, v: "$" + buf }); else if (buf) out.push({ m: false, v: buf });
+  return out;
+}
+const UNSAFE = /\\(href|url|html\w*|class|cssId|style|data|includegraphics)(?![A-Za-z])/;
+function tex(l) {
+  if (UNSAFE.test(l)) return esc(l);
+  try { return convertLatexToMarkup(l, { defaultMode: "inline-math" }); } catch { return esc(l); }
+}
+const labelHtml = (t) => splitMath(t || "").map((p) => (p.m ? tex(p.v) : esc(p.v).replace(/\n/g, "<br>"))).join("") || "&nbsp;";
+function cleanText(v) {
+  const d = document.createElement("div");
+  d.innerHTML = String(v ?? "").replace(/<br\s*\/?>/gi, "\n").replace(/<\/(div|p)>\s*<(div|p)[^>]*>/gi, "\n");
+  return d.textContent.replace(/ /g, " ").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+/* ---------- Hình, màu ---------- */
+const BRANCH = ["#4f6bed", "#16a34a", "#e08a00", "#8b5cf6", "#ef4444", "#0ea5e9"];
+const SHAPES = [
+  { k: "round", n: "Bo góc", svg: '<rect x="3" y="4" width="24" height="14" rx="6"/>' },
+  { k: "rectangle", n: "Chữ nhật", svg: '<rect x="3" y="4" width="24" height="14"/>' },
+  { k: "ellipse", n: "Elip", svg: '<ellipse cx="15" cy="11" rx="12" ry="7"/>' },
+  { k: "rhombus", n: "Thoi", svg: '<path d="M15 2 27 11 15 20 3 11z"/>' },
+  { k: "hexagon", n: "Lục giác", svg: '<path d="M8 3h14l5 8-5 8H8l-5-8z"/>' },
+  { k: "triangle", n: "Tam giác", svg: '<path d="M15 2 27 20H3z"/>' },
+  { k: "cloud", n: "Đám mây", svg: '<path d="M9 19a5 5 0 0 1-.6-10A7 7 0 0 1 22 8a5.5 5.5 0 0 1 0 11z"/>' },
+  { k: "cylinder", n: "Trụ", svg: '<path d="M5 6c0-4 20-4 20 0v10c0 4-20 4-20 0z"/><path d="M5 6c0 4 20 4 20 0"/>' },
+  { k: "doubleEllipse", n: "Tròn đôi", svg: '<ellipse cx="15" cy="11" rx="12" ry="8"/><ellipse cx="15" cy="11" rx="9" ry="5"/>' },
+  { k: "actor", n: "Người", svg: '<circle cx="15" cy="5" r="3"/><path d="M15 8v7M9 11h12M15 15l-4 6M15 15l4 6"/>' },
+  { k: "arrow", n: "Mũi tên", svg: '<path d="M3 8h16V4l8 7-8 7v-4H3z"/>' },
+  { k: "note", n: "Ghi chú", svg: '<path d="M4 3h22v12l-6 6H4z" fill="#fff4c2"/><path d="M26 15h-6v6"/>' },
+];
+const PERIM = { ellipse: "ellipsePerimeter", doubleEllipse: "ellipsePerimeter", cloud: "ellipsePerimeter", rhombus: "rhombusPerimeter", hexagon: "hexagonPerimeter", triangle: "trianglePerimeter" };
+const FACTOR = { rhombus: [1.75, 1.75], ellipse: [1.28, 1.35], doubleEllipse: [1.38, 1.5], cloud: [1.45, 1.6], hexagon: [1.25, 1.15], triangle: [1.9, 1.9], cylinder: [1.05, 1.55], actor: [1, 1], arrow: [1.5, 1.4] };
+function tint(hex, k) {
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const m = (c) => Math.round(c + (255 - c) * k);
+  return "#" + ((1 << 24) | (m(r) << 16) | (m(g) << 8) | m(b)).toString(16).slice(1);
+}
+const svgB64 = (x) => "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(x)));
+const PARABOLA = svgB64(`<svg xmlns="http://www.w3.org/2000/svg" width="168" height="112" viewBox="0 0 168 112"><rect x=".5" y=".5" width="167" height="111" rx="12" fill="#fbfcfe" stroke="#dfe3ee"/><path d="M14 86h140M84 10v96" stroke="#b9bfd0" stroke-width="1.2"/><path d="M30 18Q84 150 138 18" fill="none" stroke="#ff7a6b" stroke-width="3" stroke-linecap="round"/><path d="M84 84" /><circle cx="84" cy="84" r="4" fill="#4f6bed"/><text x="92" y="80" font-family="sans-serif" font-size="12" fill="#4f6bed">I</text><path d="M84 18v66" stroke="#4f6bed" stroke-dasharray="3 3"/><text x="88" y="26" font-family="sans-serif" font-size="11" fill="#7a8199">x = −b/2a</text></svg>`);
+
+/* ---------- Dữ liệu ---------- */
+let seq = 100;
+const nid = () => "n" + ++seq;
+const N = (text, children = [], extra = {}) => ({ id: nid(), text, children, ...extra });
+
+function mindSample() {
+  const root = N("Hàm số bậc hai\n$y=ax^2+bx+c\\ (a\\neq 0)$", [
+    N("Đồ thị", [
+      N("Parabol, đỉnh $I\\left(-\\dfrac{b}{2a};-\\dfrac{\\Delta}{4a}\\right)$"),
+      N("Trục đối xứng $x=-\\dfrac{b}{2a}$"),
+      N("", [], { img: PARABOLA, w: 168, h: 112 }),
+    ]),
+    N("Sự biến thiên", [
+      N("$a>0$: nghịch biến trên $\\left(-\\infty;-\\dfrac{b}{2a}\\right)$"),
+      N("Giá trị nhỏ nhất $-\\dfrac{\\Delta}{4a}$ tại $x=-\\dfrac{b}{2a}$"),
+    ]),
+    N("Phương trình $ax^2+bx+c=0$", [
+      N("$\\Delta=b^2-4ac$"),
+      N("$x_{1,2}=\\dfrac{-b\\pm\\sqrt{\\Delta}}{2a}$"),
+      N("Hệ thức Vi-ét", [N("$x_1+x_2=-\\dfrac{b}{a}$"), N("$x_1x_2=\\dfrac{c}{a}$")]),
+    ]),
+    N("Dấu tam thức", [N("$\\Delta<0$: $f(x)$ cùng dấu $a$"), N("$\\Delta>0$: trong trái, ngoài cùng")], { collapsed: true }),
+    N("Ứng dụng", [N("Bài toán diện tích lớn nhất"), N("Quỹ đạo ném xiên")]),
+  ]);
+  const byText = (t) => { let f = null; walk(root, (n) => { if (!f && n.text.startsWith(t)) f = n; }); return f; };
+  const cloud = { id: nid(), text: "Mẹo: đỉnh luôn nằm\ntrên trục đối xứng", shape: "cloud", x: -115, y: -250, color: "#0ea5e9" };
+  return {
+    root,
+    free: [cloud],
+    links: [
+      { id: nid(), from: byText("Giá trị nhỏ nhất").id, to: byText("Parabol").id, label: "là tung độ đỉnh", route: "curved", arrow: "classic", dash: true },
+      { id: nid(), from: cloud.id, to: root.id, label: "", route: "curved", arrow: "open", dash: true },
+    ],
+  };
+}
+function flowSample() {
+  // Toạ độ là tâm hình: trục chính giữa, nhánh "Có" rẽ phải, kết quả gom về "Kết thúc" theo làn bên phải
+  const f = (text, shape, cx, cy, extra = {}) => ({ id: nid(), text, shape, cx, cy, ...extra });
+  const s = f("Bắt đầu", "ellipse", 0, 0, { color: "#16a34a" });
+  const a = f("Nhập $a\\neq0,\\ b,\\ c$", "hexagon", 0, 95);
+  const d = f("$\\Delta=b^2-4ac$", "rectangle", 0, 185);
+  const q1 = f("$\\Delta<0$ ?", "rhombus", 0, 300, { color: "#e08a00" });
+  const r1 = f("Phương trình vô nghiệm", "round", 290, 300, { color: "#ef4444" });
+  const q2 = f("$\\Delta=0$ ?", "rhombus", 0, 440, { color: "#e08a00" });
+  const r2 = f("Nghiệm kép $x=-\\dfrac{b}{2a}$", "round", 290, 440);
+  const r3 = f("Hai nghiệm $x_{1,2}=\\dfrac{-b\\pm\\sqrt{\\Delta}}{2a}$", "round", 0, 570);
+  const e = f("Kết thúc", "ellipse", 0, 690, { color: "#16a34a" });
+  const tip = f("Mẹo: $b$ chẵn thì dùng\n$\\Delta'=b'^2-ac$", "note", -300, 185);
+  const L = (from, to, label = "", extra = {}) => ({ id: nid(), from: from.id, to: to.id, label, route: "ortho", arrow: "classic", dash: false, ...extra });
+  const right = { ex: 1, ey: 0.5, nx: 1, ny: 0.5 };
+  return {
+    root: null,
+    free: [s, a, d, q1, r1, q2, r2, r3, e, tip],
+    links: [L(s, a), L(a, d), L(d, q1), L(q1, r1, "Có", { ex: 1, ey: 0.5, nx: 0, ny: 0.5 }), L(q1, q2, "Không"), L(q2, r2, "Có", { ex: 1, ey: 0.5, nx: 0, ny: 0.5 }), L(q2, r3, "Không"),
+      L(r1, e, "", right), L(r2, e, "", right), L(r3, e), L(tip, d, "", { route: "straight", arrow: "none", dash: true })],
+  };
+}
+const docs = { mind: mindSample(), flow: flowSample() };
+const hist = { mind: { undo: [], redo: [] }, flow: { undo: [], redo: [] } };
+let mode = "mind";
+const cur = () => docs[mode];
+
+function walk(n, fn, parent = null, depth = 0) { fn(n, parent, depth); n.children.forEach((c) => walk(c, fn, n, depth + 1)); }
+function findTree(id) {
+  let hit = null; if (!cur().root) return null;
+  walk(cur().root, (n, p, d) => { if (n.id === id) hit = { n, p, d }; });
+  return hit;
+}
+const findFree = (id) => cur().free.find((f) => f.id === id);
+const findLink = (id) => cur().links.find((l) => l.id === id);
+const isDesc = (a, b) => { let r = false; walk(a, (n) => { if (n.id === b.id) r = true; }); return r; };
+
+/* ---------- Đo kích thước nhãn ---------- */
+const M = $("#measure"); const mcache = new Map();
+function measure(text, cls, shape, fixed) {
+  const key = cls + "|" + shape + "|" + text;
+  let r = mcache.get(key);
+  if (!r) {
+    M.className = "lbl " + cls; M.innerHTML = labelHtml(text);
+    const b = M.getBoundingClientRect();
+    r = { w: Math.ceil(b.width) + 2, h: Math.ceil(b.height) + 2 };
+    mcache.set(key, r);
+  }
+  if (fixed) return fixed;
+  const f = FACTOR[shape] || [1, 1];
+  return { w: Math.round(Math.max(r.w * f[0], 56)), h: Math.round(Math.max(r.h * f[1], 34)) };
+}
+const clsOf = (o, depth) => [depth === undefined ? "free" : "d" + Math.min(depth, 2), o.size && o.size !== "m" ? "sz-" + o.size : "", o.bold ? "b" : ""].join(" ").trim();
+
+/* ---------- maxGraph ---------- */
+const container = $("#graph");
+InternalEvent.disableContextMenu(container);
+const graph = new Graph(container, undefined, getDefaultPlugins());
+const parent = graph.getDefaultParent();
+const model = graph.getDataModel();
+graph.setHtmlLabels(true);
+graph.setPanning(true);
+graph.setAllowDanglingEdges(false);
+graph.setTooltips(false);
+const panning = graph.getPlugin("PanningHandler");
+panning.useLeftButtonForPanning = true;
+const connector = graph.getPlugin("ConnectionHandler");
+Object.assign(graph.getStylesheet().getDefaultEdgeStyle(), { strokeColor: "#7a8199", strokeWidth: 1.6, endArrow: "classic", fontFamily: "Be Vietnam Pro", fontSize: 12, fontColor: "#7a8199", labelBackgroundColor: "#ffffff" });
+Object.assign(graph.getStylesheet().getDefaultVertexStyle(), { fontFamily: "Be Vietnam Pro", whiteSpace: "wrap", spacing: 0 });
+
+const meta = new Map(); // cell id → { kind: "tree" | "free" | "link" | "tedge", side, depth }
+graph.isCellFoldable = () => false;
+graph.isCellSelectable = (c) => meta.get(c.id)?.kind !== "tedge";
+graph.isCellResizable = (c) => meta.get(c.id)?.kind === "free";
+graph.isCellEditable = (c) => meta.get(c.id)?.kind !== "tedge" && !meta.get(c.id)?.img;
+graph.getEditingValue = (c) => esc(String(c.value ?? ""));
+graph.getLabel = (c) => {
+  const m = meta.get(c.id);
+  if (!m || m.kind === "tedge" || m.img) return "";
+  if (m.kind === "link") return c.value ? `<span class="elbl">${labelHtml(String(c.value))}</span>` : "";
+  return `<div class="lbl ${m.cls}">${labelHtml(String(c.value ?? ""))}</div>`;
+};
+
+let building = false;
+let lastDoc = "";
+
+function vstyle(o, depth, color) {
+  const shape = o.shape || "round";
+  const base = { shape: shape === "round" || shape === "note" ? "rectangle" : shape, rounded: shape === "round" || shape === "note", arcSize: 22, perimeter: PERIM[shape] || "rectanglePerimeter", verticalAlign: "middle", align: "center", whiteSpace: "wrap", spacing: 0 };
+  if (o.img) return { shape: "image", image: o.img, imageWidth: o.w, imageHeight: o.h, verticalAlign: "middle", perimeter: "rectanglePerimeter" };
+  if (depth === 0) return { ...base, fillColor: color, strokeColor: "none", shadow: true, fontColor: "#ffffff" };
+  if (shape === "note") return { ...base, arcSize: 6, fillColor: "#fff6cc", strokeColor: "#f0d264", strokeWidth: 1.2 };
+  if (depth === 1) return { ...base, fillColor: tint(color, 0.87), strokeColor: color, strokeWidth: 2 };
+  if (depth === undefined) return { ...base, fillColor: o.color ? tint(o.color, 0.9) : "#ffffff", strokeColor: o.color || "#9aa3bd", strokeWidth: 1.6 };
+  return { ...base, fillColor: "#ffffff", strokeColor: tint(color, 0.35), strokeWidth: 1.3 };
+}
+
+function badge(text, color) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><circle cx="10" cy="10" r="9" fill="#fff" stroke="${color}" stroke-width="1.6"/><text x="10" y="14" font-family="sans-serif" font-size="${text.length > 1 ? 9.5 : 13}" font-weight="700" text-anchor="middle" fill="${color}">${text}</text></svg>`;
+  return new ImageBox("data:image/svg+xml;utf8," + encodeURIComponent(svg), 20, 20);
+}
+
+function layoutTree(root) {
+  const pos = new Map();
+  const kids = (n) => (n.collapsed ? [] : n.children);
+  walk(root, (n, p, d) => { const s = n.img ? { w: n.w, h: n.h } : measure(n.text, clsOf(n, d), n.shape, null); n._w = s.w; n._h = s.h; n._d = d; });
+  const GY = 14, GAP = [0, 64, 44, 36];
+  const sh = (n) => { const k = kids(n); if (!k.length) return n._h; return Math.max(n._h, k.reduce((a, c) => a + sh(c), 0) + GY * (k.length - 1)); };
+  const L1 = root.children; let right = 0, left = 0;
+  for (const c of L1) {
+    const h = sh(c) + GY * 2;
+    if (c.side === "left" || (!c.side && left < right)) { c._side = "left"; left += h; } else { c._side = "right"; right += h; }
+  }
+  pos.set(root.id, { x: -root._w / 2, y: -root._h / 2, w: root._w, h: root._h, side: "root" });
+  function place(n, side, edgeX, cy) {
+    const x = side === "right" ? edgeX : edgeX - n._w;
+    pos.set(n.id, { x, y: cy - n._h / 2, w: n._w, h: n._h, side });
+    const k = kids(n); if (!k.length) return;
+    const gap = GAP[Math.min(n._d + 1, 3)];
+    const nx = side === "right" ? x + n._w + gap : x - gap;
+    let y = cy - (k.reduce((a, c) => a + sh(c), 0) + GY * (k.length - 1)) / 2;
+    for (const c of k) { const h = sh(c); place(c, side, nx, y + h / 2); y += h + GY; }
+  }
+  for (const side of ["right", "left"]) {
+    const g = L1.filter((c) => c._side === side);
+    let y = -(g.reduce((a, c) => a + sh(c), 0) + GY * 2 * (g.length - 1)) / 2;
+    for (const c of g) { const h = sh(c); place(c, side, side === "right" ? root._w / 2 + GAP[1] : -root._w / 2 - GAP[1], y + h / 2); y += h + GY * 2; }
+  }
+  return pos;
+}
+
+function render({ fit = false } = {}) {
+  const sel = graph.getSelectionCells().map((c) => c.id);
+  building = true;
+  meta.clear();
+  const d = cur();
+  const cells = new Map();
+  graph.batchUpdate(() => {
+    graph.removeCells(graph.getChildCells(parent, true, true), true);
+    if (d.root) {
+      const pos = layoutTree(d.root);
+      walk(d.root, (n, p, depth) => {
+        if (!pos.has(n.id)) return;
+        const b = pos.get(n.id);
+        const l1 = depth === 0 ? null : depth === 1 ? n : ancestorL1(n);
+        const color = depth === 0 ? "#4f6bed" : n.color || l1.color || BRANCH[d.root.children.indexOf(l1) % BRANCH.length];
+        n._color = color;
+        meta.set(n.id, { kind: "tree", side: b.side, depth, cls: clsOf(n, depth) + (depth === 0 ? " onDark" : ""), img: !!n.img });
+        const v = graph.insertVertex({ parent, id: n.id, value: n.text, position: [b.x, b.y], size: [b.w, b.h], style: vstyle(n, depth, color) });
+        cells.set(n.id, v);
+        if (p) {
+          const pb = pos.get(p.id), right = b.side === "right";
+          const sx = right ? pb.x + pb.w : pb.x, sy = pb.y + pb.h / 2;
+          const tx = right ? b.x : b.x + b.w, ty = b.y + b.h / 2, mx2 = (sx + tx) / 2;
+          const eid = "e" + n.id;
+          meta.set(eid, { kind: "tedge" });
+          const e = graph.insertEdge({ parent, id: eid, value: "", source: cells.get(p.id), target: v, style: { endArrow: "none", curved: true, strokeColor: color, strokeWidth: depth === 1 ? 3.6 : depth === 2 ? 2.3 : 1.7, exitX: right ? 1 : 0, exitY: 0.5, entryX: right ? 0 : 1, entryY: 0.5, movable: false, editable: false } });
+          const g = e.getGeometry().clone(); g.points = [new Point(mx2, sy), new Point(mx2, ty)]; model.setGeometry(e, g);
+        }
+        if (depth > 0 && n.children.length) {
+          const ov = new CellOverlay(badge(n.collapsed ? String(countDesc(n)) : "−", color), n.collapsed ? "Mở nhánh" : "Thu gọn", b.side === "right" ? "right" : "left", "middle", new Point(b.side === "right" ? 12 : -12, 0), "pointer");
+          ov.addListener(InternalEvent.CLICK, () => mutate(() => { n.collapsed = !n.collapsed; }));
+          graph.addCellOverlay(v, ov);
+        }
+      });
+    }
+    for (const f of d.free) {
+      const s = measure(f.text, clsOf(f), f.shape, f.w && f.h && f.fixed ? { w: f.w, h: f.h } : null);
+      f.w = s.w; f.h = s.h;
+      if (f.cx !== undefined) { f.x = Math.round(f.cx - s.w / 2); f.y = Math.round(f.cy - s.h / 2); delete f.cx; delete f.cy; }
+      meta.set(f.id, { kind: "free", cls: clsOf(f), img: !!f.img });
+      cells.set(f.id, graph.insertVertex({ parent, id: f.id, value: f.text, position: [f.x, f.y], size: [s.w, s.h], style: vstyle(f, undefined, f.color) }));
+    }
+    for (const l of d.links) {
+      const a = cells.get(l.from), b = cells.get(l.to);
+      if (!a || !b) continue;
+      meta.set(l.id, { kind: "link" });
+      const route = l.route === "ortho" ? { edgeStyle: "orthogonalEdgeStyle", rounded: true, curved: false } : l.route === "curved" ? { curved: true } : {};
+      graph.insertEdge({ parent, id: l.id, value: l.label, source: a, target: b, style: { ...route, ...(l.ex !== undefined ? { exitX: l.ex, exitY: l.ey, entryX: l.nx, entryY: l.ny } : {}), whiteSpace: "nowrap", labelBackgroundColor: "none", endArrow: l.arrow, endFill: l.arrow !== "open", dashed: l.dash, strokeColor: l.dash ? "#8b93ab" : "#5b6278", strokeWidth: 1.6 } });
+    }
+  });
+  building = false;
+  const again = sel.map((id) => model.getCell(id)).filter(Boolean);
+  graph.setSelectionCells(again);
+  lastDoc = JSON.stringify(d);
+  if (fit) fitAll();
+  updatePanel(); updateHistoryButtons();
+}
+const ancestorL1 = (n) => { let hit = null; walk(cur().root, (x, p, d) => { if (d === 1 && isDesc(x, n)) hit = x; }); return hit; };
+const countDesc = (n) => { let c = -1; walk(n, () => c++); return c; };
+
+/* ---------- Sửa đổi + lịch sử ---------- */
+function mutate(fn, { fit = false } = {}) {
+  const h = hist[mode]; h.undo.push(lastDoc || JSON.stringify(cur())); if (h.undo.length > 80) h.undo.shift(); h.redo = [];
+  fn(); dirty(); render({ fit });
+}
+function undo() { const h = hist[mode]; if (!h.undo.length) return; h.redo.push(JSON.stringify(cur())); docs[mode] = JSON.parse(h.undo.pop()); dirty(); render(); }
+function redo() { const h = hist[mode]; if (!h.redo.length) return; h.undo.push(JSON.stringify(cur())); docs[mode] = JSON.parse(h.redo.pop()); dirty(); render(); }
+function updateHistoryButtons() { $("#undo").disabled = !hist[mode].undo.length; $("#redo").disabled = !hist[mode].redo.length; }
+function dirty() { const s = $("#status"); s.className = "status"; s.lastChild.textContent = "Chưa lưu"; }
+
+function selected() { const c = graph.getSelectionCell(); return c ? { cell: c, m: meta.get(c.id) } : null; }
+function selectId(id, edit = false) {
+  const c = model.getCell(id); if (!c) return;
+  graph.setSelectionCell(c); scrollTo(c);
+  if (edit) setTimeout(() => graph.startEditingAtCell(c), 30);
+}
+function scrollTo(c) {
+  const st = graph.getView().getState(c); if (!st) return;
+  const W = container.clientWidth, H = container.clientHeight, s = graph.getView().scale, t = graph.getView().translate;
+  let dx = 0, dy = 0;
+  if (st.x < 30) dx = 30 - st.x; else if (st.x + st.width > W - 230) dx = W - 230 - st.x - st.width;
+  if (st.y < 30) dy = 30 - st.y; else if (st.y + st.height > H - 70) dy = H - 70 - st.y - st.height;
+  if (dx || dy) graph.getView().setTranslate(t.x + dx / s, t.y + dy / s);
+}
+
+function addChild() {
+  const s = selected(); const d = cur();
+  if (!d.root) return addFree("round", "Bước mới");
+  const host = s?.m?.kind === "tree" ? findTree(s.cell.id).n : d.root;
+  const n = N(host === d.root ? "Nhánh mới" : "Ý mới");
+  mutate(() => { host.collapsed = false; host.children.push(n); });
+  selectId(n.id, true);
+}
+function addSibling() {
+  const s = selected(); const d = cur();
+  if (!d.root || s?.m?.kind !== "tree") return addChild();
+  const t = findTree(s.cell.id); if (!t.p) return addChild();
+  const n = N(t.d === 1 ? "Nhánh mới" : "Ý mới", [], t.d === 1 ? { side: t.n._side } : {});
+  mutate(() => { t.p.children.splice(t.p.children.indexOf(t.n) + 1, 0, n); });
+  selectId(n.id, true);
+}
+function viewCenter() {
+  const v = graph.getView(), s = v.scale, t = v.translate;
+  return [Math.round(container.clientWidth / 2 / s - t.x), Math.round(container.clientHeight / 2 / s - t.y)];
+}
+function addFree(shape, text, extra = {}) {
+  const [cx, cy] = viewCenter();
+  const f = { id: nid(), text, shape, x: cx - 70 + Math.round(Math.random() * 60), y: cy - 30 + Math.round(Math.random() * 40), ...extra };
+  mutate(() => cur().free.push(f));
+  selectId(f.id, !f.img);
+}
+function removeSelected() {
+  const cells = graph.getSelectionCells(); if (!cells.length) return;
+  mutate(() => {
+    const d = cur(); const gone = new Set();
+    for (const c of cells) {
+      const m = meta.get(c.id);
+      if (m?.kind === "tree") { const t = findTree(c.id); if (t?.p) { walk(t.n, (x) => gone.add(x.id)); t.p.children.splice(t.p.children.indexOf(t.n), 1); } }
+      else if (m?.kind === "free") { gone.add(c.id); d.free = d.free.filter((f) => f.id !== c.id); }
+      else if (m?.kind === "link") d.links = d.links.filter((l) => l.id !== c.id);
+    }
+    d.links = d.links.filter((l) => !gone.has(l.from) && !gone.has(l.to));
+  });
+}
+function setText(id, text) {
+  const t = findTree(id); if (t) t.n.text = text;
+  const f = findFree(id); if (f) { f.text = text; f.fixed = false; }
+  const l = findLink(id); if (l) l.label = text;
+}
+
+/* ---------- Sự kiện đồ thị ---------- */
+graph.addListener(InternalEvent.LABEL_CHANGED, (s, evt) => {
+  if (building) return;
+  const c = evt.getProperty("cell"); const v = cleanText(c.value);
+  setTimeout(() => mutate(() => setText(c.id, v)), 0);
+});
+graph.addListener(InternalEvent.CELLS_MOVED, (s, evt) => {
+  if (building) return;
+  const cells = evt.getProperty("cells");
+  setTimeout(() => mutate(() => {
+    for (const c of cells) {
+      const m = meta.get(c.id), g = c.getGeometry();
+      if (m?.kind === "free") { const f = findFree(c.id); f.x = Math.round(g.x); f.y = Math.round(g.y); continue; }
+      if (m?.kind !== "tree" || m.depth === 0) continue;
+      const t = findTree(c.id), cx = g.x + g.width / 2, cy = g.y + g.height / 2;
+      let target = null;
+      for (const [id, mm] of meta) {
+        if (mm.kind !== "tree" || id === c.id) continue;
+        const o = model.getCell(id).getGeometry();
+        if (cx > o.x && cx < o.x + o.width && cy > o.y && cy < o.y + o.height) { target = findTree(id).n; break; }
+      }
+      if (target && !isDesc(t.n, target) && target !== t.p) {
+        t.p.children.splice(t.p.children.indexOf(t.n), 1); target.collapsed = false; target.children.push(t.n);
+        delete t.n.side; if (target === cur().root) t.n.side = cx < 0 ? "left" : "right";
+      } else if (t.d === 1) t.n.side = cx < 0 ? "left" : "right";
+    }
+  }), 0);
+});
+graph.addListener(InternalEvent.CELLS_RESIZED, (s, evt) => {
+  if (building) return;
+  const cells = evt.getProperty("cells");
+  setTimeout(() => mutate(() => { for (const c of cells) { const f = findFree(c.id); if (f) { const g = c.getGeometry(); Object.assign(f, { x: g.x, y: g.y, w: g.width, h: g.height, fixed: true }); } } }), 0);
+});
+connector.addListener(InternalEvent.CONNECT, (s, evt) => {
+  const e = evt.getProperty("cell"); if (!e) return;
+  const from = e.source?.id, to = e.target?.id;
+  setTimeout(() => { if (from && to && from !== to) mutate(() => cur().links.push({ id: nid(), from, to, label: "", route: mode === "flow" ? "ortho" : "curved", arrow: "classic", dash: false })); else render(); setTool("select"); }, 0);
+});
+graph.getSelectionModel().addListener(InternalEvent.CHANGE, () => { if (!building) updatePanel(); });
+const view = graph.getView();
+const onScale = () => { $("#zpct").textContent = Math.round(view.scale * 100) + "%"; };
+view.addListener(InternalEvent.SCALE, onScale); view.addListener(InternalEvent.SCALE_AND_TRANSLATE, onScale);
+
+container.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  if (e.ctrlKey || e.metaKey) { e.deltaY < 0 ? graph.zoomIn() : graph.zoomOut(); return; }
+  const s = view.scale, t = view.translate; view.setTranslate(t.x - e.deltaX / s, t.y - e.deltaY / s);
+}, { passive: false });
+
+function fitAll() {
+  const b = graph.getGraphBounds(), s0 = view.scale, t = view.translate;
+  const bx = b.x / s0 - t.x, by = b.y / s0 - t.y, bw = b.width / s0, bh = b.height / s0;
+  const W = container.clientWidth - 260, H = container.clientHeight - 110;
+  const s = Math.max(0.35, Math.min(1, W / bw, H / bh));
+  view.scaleAndTranslate(s, (W / s - bw) / 2 - bx + 30 / s, (H / s - bh) / 2 - by + 24 / s);
+}
+
+/* ---------- Công cụ ---------- */
+let tool = "select";
+function setTool(t) {
+  tool = t;
+  $$(".rail button").forEach((b) => b.classList.remove("on"));
+  $(t === "link" ? "#t-link" : "#t-select").classList.add("on");
+  graph.setConnectable(t === "link"); graph.setCellsMovable(t !== "link");
+  container.classList.toggle("link", t === "link");
+  hint();
+}
+function hint() {
+  $("#hint").innerHTML = tool === "link"
+    ? "<b>Nối:</b> kéo từ một hình sang hình khác · <b>Esc</b> thôi nối"
+    : mode === "mind"
+      ? "<b>Tab</b> nhánh con · <b>Enter</b> ngang hàng · <b>F2</b> sửa · gõ <b>$…$</b> ra công thức · <b>Space</b> thu gọn"
+      : "Kéo để sắp xếp · <b>L</b> nối mũi tên · nháy đúp sửa chữ · gõ <b>$…$</b> ra công thức";
+}
+$("#t-select").onclick = () => setTool("select");
+$("#t-link").onclick = () => setTool(tool === "link" ? "select" : "link");
+$("#t-child").onclick = addChild;
+$("#t-sib").onclick = addSibling;
+$("#t-shape").onclick = () => addFree(mode === "flow" ? "rectangle" : "cloud", mode === "flow" ? "Bước xử lí" : "Ghi chú");
+$("#t-text").onclick = () => addFree("round", "Chữ", { color: "#7a8199" });
+$("#t-img").onclick = () => addFree("round", "", { img: PARABOLA, w: 168, h: 112, fixed: true });
+$("#t-fx").onclick = () => {
+  const s = selected();
+  if (!s || s.m?.kind === "link" || s.m?.kind === "tedge" || s.m?.img) addFree(mode === "flow" ? "rectangle" : "round", "$\\sqrt{x}$");
+  setTimeout(() => $("#mf").focus(), 60);
+};
+$("#t-layout").onclick = () => { if (cur().root) mutate(() => walk(cur().root, (n, p, d) => { if (d === 1) delete n.side; }), { fit: true }); else { fitAll(); toast("Lưu đồ: kéo thả tự do · tự dàn trang có ở bản thật"); } };
+$("#t-ai").onclick = () => $("#aiModal").classList.add("on");
+$("#zin").onclick = () => graph.zoomIn();
+$("#zout").onclick = () => graph.zoomOut();
+$("#zfit").onclick = fitAll;
+$("#undo").onclick = undo; $("#redo").onclick = redo;
+$("#del").onclick = removeSelected;
+$("#save").onclick = () => { const s = $("#status"); s.className = "status ok"; s.lastChild.textContent = "Đã lưu"; toast("Đã lưu sơ đồ vào bài giảng"); };
+$("#export").onclick = () => {
+  const svg = container.querySelector("svg").cloneNode(true);
+  const b = graph.getGraphBounds();
+  svg.setAttribute("viewBox", `${b.x - 20} ${b.y - 20} ${b.width + 40} ${b.height + 40}`);
+  svg.setAttribute("width", b.width + 40); svg.setAttribute("height", b.height + 40);
+  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: "image/svg+xml" }));
+  a.download = (mode === "mind" ? "so-do-tu-duy" : "luu-do") + ".svg"; a.click();
+  toast("Đã xuất SVG · PNG/PDF có ở bản thật");
+};
+$$("#tabs button").forEach((b) => (b.onclick = () => switchMode(b.dataset.mode)));
+$$(".tpl button[data-tpl]").forEach((b) => (b.onclick = () => switchMode(b.dataset.tpl)));
+function switchMode(m) {
+  if (m === mode) return;
+  graph.clearSelection(); mode = m;
+  $$("#tabs button").forEach((x) => x.classList.toggle("on", x.dataset.mode === m));
+  $("#docTitle").textContent = m === "mind" ? "Hàm số bậc hai" : "Giải phương trình bậc hai";
+  setTool("select"); render({ fit: true });
+}
+
+/* ---------- Bàn phím ---------- */
+document.addEventListener("keydown", (e) => {
+  const tag = document.activeElement?.tagName;
+  if (graph.isEditing() || tag === "TEXTAREA" || tag === "MATH-FIELD" || tag === "INPUT") {
+    if (e.key === "Escape" && graph.isEditing()) graph.stopEditing(true);
+    return;
+  }
+  const s = selected(), mod = e.ctrlKey || e.metaKey;
+  if (mod && e.key.toLowerCase() === "z") { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if (mod && e.key.toLowerCase() === "y") { e.preventDefault(); redo(); return; }
+  if (mod) return;
+  if (e.key === "Tab") { e.preventDefault(); addChild(); }
+  else if (e.key === "Enter") { e.preventDefault(); addSibling(); }
+  else if (e.key === "F2" && s) { e.preventDefault(); graph.startEditingAtCell(s.cell); }
+  else if ((e.key === "Delete" || e.key === "Backspace") && s) { e.preventDefault(); removeSelected(); }
+  else if (e.key === " " && s?.m?.kind === "tree") { e.preventDefault(); const t = findTree(s.cell.id); if (t.n.children.length && t.d > 0) mutate(() => { t.n.collapsed = !t.n.collapsed; }); }
+  else if (e.key === "Escape") { setTool("select"); graph.clearSelection(); }
+  else if (e.key.toLowerCase() === "l") setTool(tool === "link" ? "select" : "link");
+  else if (e.key.toLowerCase() === "v") setTool("select");
+  else if (e.key.startsWith("Arrow") && s?.m?.kind === "tree") { e.preventDefault(); nav(e.key, findTree(s.cell.id)); }
+});
+function nav(key, t) {
+  const side = t.d === 0 ? (key === "ArrowLeft" ? "left" : "right") : t.n._side;
+  const out = (side === "right" && key === "ArrowRight") || (side === "left" && key === "ArrowLeft");
+  const back = (side === "right" && key === "ArrowLeft") || (side === "left" && key === "ArrowRight");
+  let go = null;
+  if (out) { const k = t.d === 0 ? t.n.children.filter((c) => c._side === side) : t.n.collapsed ? [] : t.n.children; go = k[0]; }
+  else if (back && t.p) go = t.p;
+  else if ((key === "ArrowUp" || key === "ArrowDown") && t.p) {
+    const sib = t.d === 1 ? t.p.children.filter((c) => c._side === t.n._side) : t.p.children;
+    go = sib[sib.indexOf(t.n) + (key === "ArrowUp" ? -1 : 1)];
+  }
+  if (go) selectId(go.id);
+}
+
+/* ---------- Cột định dạng ---------- */
+const QK = [["a/b", "\\frac{#?}{#?}", "phân số"], ["√", "\\sqrt{#?}"], ["x²", "#?^{2}"], ["xₙ", "#?_{#?}"], ["Δ", "\\Delta"], ["π", "\\pi"], ["≤", "\\le"], ["≥", "\\ge"], ["≠", "\\neq"], ["∞", "\\infty"], ["∈", "\\in"], ["→", "\\to"]];
+$("#qk").innerHTML = QK.map((q, i) => `<button data-i="${i}" title="${q[2] || ""}">${q[0]}</button>`).join("");
+$$("#qk button").forEach((b) => (b.onmousedown = (e) => { e.preventDefault(); $("#mf").executeCommand(["insert", QK[+b.dataset.i][1], { selectionMode: "placeholder" }]); $("#mf").focus(); }));
+$("#shapes").innerHTML = SHAPES.map((s) => `<button data-k="${s.k}" title="${s.n}"><svg viewBox="0 0 30 22">${s.svg}</svg>${s.n}</button>`).join("");
+$$("#shapes button").forEach((b) => (b.onclick = () => {
+  const s = selected(); if (!s) return;
+  const t = findTree(s.cell.id), f = findFree(s.cell.id), k = b.dataset.k;
+  mutate(() => { if (t) t.n.shape = k; if (f) { f.shape = k; f.fixed = false; } });
+}));
+const colorsHtml = BRANCH.map((c) => `<button data-c="${c}" style="background:${c};color:${c}" title="Đổi màu"></button>`).join("");
+$("#colors").innerHTML = colorsHtml;
+$("#railColors").innerHTML = BRANCH.slice(0, 4).map((c) => `<button class="sw" data-c="${c}" style="background:${c}" title="Màu nhánh"></button>`).join("");
+$$("#colors button, #railColors button").forEach((b) => (b.onclick = () => {
+  const s = selected(); if (!s) return toast("Chọn một nhánh hoặc một hình trước");
+  const t = findTree(s.cell.id), f = findFree(s.cell.id);
+  mutate(() => { if (t && t.d > 0) t.n.color = b.dataset.c; if (f) f.color = b.dataset.c; });
+}));
+$$("#fsize button").forEach((b) => (b.onclick = () => styleText({ size: b.dataset.v })));
+$("#fbold button").onclick = () => { const o = selObj(); styleText({ bold: !o?.bold }); };
+function selObj() { const s = selected(); if (!s) return null; return findTree(s.cell.id)?.n || findFree(s.cell.id) || null; }
+function styleText(p) { const o = selObj(); if (!o) return; mutate(() => { Object.assign(o, p); if ("fixed" in o) o.fixed = false; }); }
+for (const [id, key] of [["#eroute", "route"], ["#earrow", "arrow"]]) $$(id + " button").forEach((b) => (b.onclick = () => { const l = findLink(graph.getSelectionCell()?.id); if (l) mutate(() => { l[key] = b.dataset.v; }); }));
+$$("#edash button").forEach((b) => (b.onclick = () => { const l = findLink(graph.getSelectionCell()?.id); if (l) mutate(() => { l.dash = b.dataset.v === "dash"; }); }));
+
+let txtTimer = 0;
+$("#txt").oninput = () => {
+  const v = $("#txt").value; $("#prev").innerHTML = `<div class="lbl d2">${labelHtml(v)}</div>`;
+  clearTimeout(txtTimer); const id = graph.getSelectionCell()?.id;
+  txtTimer = setTimeout(() => { if (id) mutate(() => setText(id, v)); $("#txt").focus(); }, 450);
+};
+$("#etxt").oninput = () => { clearTimeout(txtTimer); const id = graph.getSelectionCell()?.id; const v = $("#etxt").value; txtTimer = setTimeout(() => { if (id) mutate(() => setText(id, v)); $("#etxt").focus(); }, 450); };
+$("#mfInsert").onclick = () => {
+  const latex = $("#mf").value.trim(); const o = selObj();
+  if (!latex) return toast("Gõ công thức trước");
+  if (!o) return addFree(mode === "flow" ? "rectangle" : "round", `$${latex}$`);
+  mutate(() => { o.text = (o.text ? o.text + " " : "") + `$${latex}$`; if ("fixed" in o) o.fixed = false; });
+  $("#mf").value = ""; toast("Đã chèn công thức");
+};
+
+function updatePanel() {
+  const s = selected();
+  const kind = !s ? "none" : s.m?.kind === "link" ? "edge" : s.m ? "vertex" : "none";
+  $$("#pbody .sec").forEach((x) => (x.style.display = x.dataset.show.split(" ").includes(kind) ? "" : "none"));
+  $("#phTitle").textContent = kind === "none" ? (mode === "mind" ? "Sơ đồ tư duy" : "Lưu đồ") : kind === "edge" ? "Mũi tên" : "Định dạng";
+  $("#phKind").textContent = kind === "vertex" ? (s.m.kind === "tree" ? (s.m.depth === 0 ? "chủ đề chính" : "nhánh tầng " + s.m.depth) : "hình tự do") : "";
+  if (kind === "vertex") {
+    const o = selObj();
+    if (document.activeElement !== $("#txt")) $("#txt").value = o?.text ?? "";
+    $("#prev").innerHTML = `<div class="lbl d2">${labelHtml(o?.text ?? "")}</div>`;
+    $$("#shapes button").forEach((b) => b.classList.toggle("on", (o?.shape || "round") === b.dataset.k));
+    $$("#colors button").forEach((b) => b.classList.toggle("on", (o?.color || o?._color) === b.dataset.c));
+    $$("#fsize button").forEach((b) => b.classList.toggle("on", (o?.size || "m") === b.dataset.v));
+    $("#fbold button").classList.toggle("on", !!o?.bold);
+  }
+  if (kind === "edge") {
+    const l = findLink(s.cell.id);
+    if (document.activeElement !== $("#etxt")) $("#etxt").value = l?.label ?? "";
+    $$("#eroute button").forEach((b) => b.classList.toggle("on", l?.route === b.dataset.v));
+    $$("#earrow button").forEach((b) => b.classList.toggle("on", l?.arrow === b.dataset.v));
+    $$("#edash button").forEach((b) => b.classList.toggle("on", (l?.dash ? "dash" : "solid") === b.dataset.v));
+  }
+}
+
+/* ---------- AI vẽ sơ đồ (mô phỏng) ---------- */
+for (const id of ["#aiKind", "#aiDepth"]) $$(id + " button").forEach((b) => (b.onclick = () => $$(id + " button").forEach((x) => x.classList.toggle("on", x === b))));
+$("#aiCancel").onclick = () => $("#aiModal").classList.remove("on");
+$("#aiRun").onclick = async () => {
+  $("#aiModal").classList.remove("on");
+  const kind = $("#aiKind .on").dataset.v, deep = $("#aiDepth .on").dataset.v === "3";
+  if (kind === "flow") { switchMode("flow"); toast("Bản thật: AI sinh lưu đồ từ đoạn bài học"); return; }
+  if (mode !== "mind") switchMode("mind");
+  const plan = [
+    ["Định lí về dấu", ["$\\Delta<0$: $f(x)$ cùng dấu $a,\\ \\forall x$", "$\\Delta=0$: cùng dấu $a,\\ \\forall x\\neq-\\dfrac{b}{2a}$", "$\\Delta>0$: trong trái, ngoài cùng"]],
+    ["Cách xét dấu", ["Tính $\\Delta$, tìm nghiệm", "Lập bảng xét dấu"]],
+    ["Bất phương trình bậc hai", ["$ax^2+bx+c>0$", "Lấy khoảng theo bảng dấu"]],
+    ["Tìm $m$", ["$f(x)>0\\ \\forall x \\iff \\begin{cases}a>0\\\\ \\Delta<0\\end{cases}$"]],
+  ];
+  hist.mind.undo.push(JSON.stringify(cur())); hist.mind.redo = [];
+  const root = N("Dấu của tam thức bậc hai\n$f(x)=ax^2+bx+c$");
+  docs.mind = { root, free: [], links: [] };
+  $("#docTitle").textContent = "Dấu của tam thức bậc hai";
+  const pill = $("#aipill"); pill.classList.add("on");
+  const s = $("#status"); s.className = "status ai"; s.lastChild.textContent = "AI đang vẽ";
+  render({ fit: true });
+  const total = plan.length + (deep ? plan.reduce((a, p) => a + p[1].length, 0) : 0); let k = 0;
+  for (const [title, kids] of plan) {
+    const b = N(title); root.children.push(b); k++; pill.lastChild.textContent = `AI đang vẽ sơ đồ… ${k}/${total}`; render({ fit: true });
+    await new Promise((r) => setTimeout(r, 380));
+    if (deep) for (const t of kids) { b.children.push(N(t)); k++; pill.lastChild.textContent = `AI đang vẽ sơ đồ… ${k}/${total}`; render({ fit: true }); await new Promise((r) => setTimeout(r, 260)); }
+  }
+  pill.classList.remove("on"); dirty(); render({ fit: true }); toast("Xong — sửa trực tiếp hoặc Ctrl+Z để quay lại");
+};
+
+let toastT = 0;
+function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2200); }
+
+/* ---------- Khởi động ---------- */
+new Outline(graph, $("#outline"));
+// Tải trước phông (đậm/nhạt + phông công thức) rồi mới đo, nếu không nút sẽ bị đo hẹp
+for (const c of ["d0", "d1", "d2", "free b"]) { M.className = "lbl " + c; M.innerHTML = labelHtml("Aă Ệ $\\dfrac{a}{b}\\sqrt{\\Delta}x^2_1\\left(-\\infty\\right)\\begin{cases}a\\\\b\\end{cases}$"); M.getBoundingClientRect(); }
+await Promise.all(["400", "500", "600", "700"].map((w) => document.fonts.load(`${w} 16px "Be Vietnam Pro"`, "Aă")).concat(["16px KaTeX_Main", "italic 16px KaTeX_Math", "16px KaTeX_Size1", "16px KaTeX_Size2", "16px KaTeX_AMS"].map((f) => document.fonts.load(f, "a"))));
+await document.fonts.ready;
+mcache.clear();
+document.fonts.addEventListener("loadingdone", () => { mcache.clear(); if (!building) render(); });
+setTool("select");
+render({ fit: true });
+container.focus();
+window.__ready = true;
+</script>
+</body>
+</html>
