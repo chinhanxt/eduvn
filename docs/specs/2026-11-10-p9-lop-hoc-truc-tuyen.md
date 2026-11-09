@@ -87,6 +87,7 @@ Ràng buộc: unique `(assignment_id, student_id, attempt)`.
   - dấu phẩy thập phân bằng dấu chấm;
   - so số với sai số tương đối 1e-9;
   - chấp nhận nhiều đáp án tách bằng `|`.
+  - Số: dấu phẩy là thập phân; dấu chấm theo nhóm 3 chữ số là phân cách hàng nghìn; đơn vị/phần trăm chỉ khớp khi đáp án có ghi.
 - **Kết quả cho HS:** điểm, từng câu đúng/sai, lời giải và đáp án theo `show_solution`.
 - **Thống kê cho GV** (SQL trên `answer_items`):
   - tỉ lệ nộp;

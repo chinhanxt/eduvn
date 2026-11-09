@@ -36,15 +36,31 @@ function unwrap(s: string): string {
 }
 
 export function normalizeAnswer(raw: string): string {
-  let s = raw.normalize("NFC").replace(/\$/g, "").replace(/\{,\}/g, ".");
+  let s = raw.normalize("NFC").replace(/\$/g, "").replace(/\{,\}/g, ",");
   for (const [re, to] of LATEX_WORDS) s = s.replace(re, to);
   s = unwrap(s);
-  return s
-    .replace(/[−–]/g, "-")
+  s = s
+    .replace(/[−–‐‑]/g, "-")
+    .replace(/√\(([^()]*)\)/g, "sqrt($1)")
+    .replace(/√(\d+(?:[.,]\d+)?|[a-zA-Z])/g, "sqrt($1)")
+    .replace(/√\(/g, "sqrt(")
     .toLowerCase()
     .replace(/\s+/g, "")
-    .replace(/,/g, ".")
     .replace(/[{}]/g, "");
+  // Quy ước Việt Nam: dấu phẩy là thập phân; dấu chấm là phân cách hàng nghìn CHỈ khi cả số dạng 1.250.000 / 1.250,5.
+  if (/^[+-]?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, "");
+  return s.replace(/,/g, ".");
+}
+
+/** Bỏ ngoặc bọc thừa (không phải ngoặc hàm, không chứa phép/dấu tách) để "sqrt(3)/2" == "(sqrt(3))/(2)". */
+function canon(s: string): string {
+  let prev = "";
+  let cur = s;
+  while (prev !== cur) {
+    prev = cur;
+    cur = cur.replace(/(^|[^a-z])\(((?:[^()+\-*/,;<>=]|[a-z]+\([^()]*\))*)\)/g, "$1$2");
+  }
+  return cur;
 }
 
 const NUM = String.raw`[+-]?(?:\d+(?:\.\d+)?|\.\d+)`;
@@ -53,6 +69,7 @@ const FRACTION = new RegExp(`^([+-]?)\\(?(${NUM})\\)?/\\(?(${NUM})\\)?$`);
 
 /** Chuỗi đã chuẩn hoá → số (thập phân hoặc phân số), không phải số → null. */
 export function parseNumber(s: string): number | null {
+  if (s.split("(").length !== s.split(")").length) return null;
   if (PLAIN.test(s)) return Number(s);
   const m = FRACTION.exec(s);
   if (!m) return null;
@@ -62,19 +79,21 @@ export function parseNumber(s: string): number | null {
   return m[1] === "-" ? -v : v;
 }
 
+/** Tách bằng "|"; "\\|" là dấu | nguyên văn. */
 export const acceptedAnswers = (key: string): string[] =>
   key
+    .replace(/\\\|/g, "\u0000")
     .split("|")
-    .map((k) => k.trim())
+    .map((k) => k.replaceAll("\u0000", "|").trim())
     .filter(Boolean);
 
 function equalsOne(response: string, accepted: string): boolean {
   const x = normalizeAnswer(response);
   const y = normalizeAnswer(accepted);
   if (x === "" || y === "") return false;
-  if (x === y) return true;
-  const a = parseNumber(x);
-  const b = parseNumber(y);
+  if (x === y || canon(x) === canon(y)) return true;
+  const a = parseNumber(canon(x));
+  const b = parseNumber(canon(y));
   return a !== null && b !== null && Math.abs(a - b) <= REL_TOL * Math.max(1, Math.abs(a), Math.abs(b));
 }
 

@@ -57,6 +57,24 @@ describe("matchShortAnswer", () => {
     expect(matchShortAnswer("", "x=3|3")).toBe(false);
     expect(matchShortAnswer("   ", "")).toBe(false);
   });
+  it("quy ước số Việt Nam: chấm = hàng nghìn khi đúng nhóm 3", () => {
+    expect(matchShortAnswer("2.000", "2000")).toBe(true);
+    expect(matchShortAnswer("2.000", "2")).toBe(false);
+    expect(matchShortAnswer("1.250.000", "1250000")).toBe(true);
+    expect(matchShortAnswer("1 000", "1000")).toBe(true);
+    expect(matchShortAnswer("2,5", "2.5")).toBe(true);
+    expect(matchShortAnswer("1.250,5", "1250.5")).toBe(true);
+    expect(matchShortAnswer("0.25", "0,25")).toBe(true);
+  });
+  it("căn: √3/2, sqrt(3)/2, \\frac{\\sqrt3}{2} như nhau; ngoặc lệch không là số; \\| là dấu |", () => {
+    expect(matchShortAnswer("√3/2", "\\frac{\\sqrt3}{2}")).toBe(true);
+    expect(matchShortAnswer("sqrt(3)/2", "\\frac{\\sqrt{3}}{2}")).toBe(true);
+    expect(matchShortAnswer("√(3)/2", "sqrt(3)/2")).toBe(true);
+    expect(matchShortAnswer("‐4", "-4")).toBe(true);
+    expect(parseNumber("(3/2")).toBeNull();
+    expect(acceptedAnswers("\\|x\\|=2|x=±2")).toEqual(["|x|=2", "x=±2"]);
+    expect(matchShortAnswer("|x|=2", "\\|x\\|=2|x=±2")).toBe(true);
+  });
   it("scoreItem dùng luật mới", () => {
     expect(scoreItem(short({ answer: "$\\frac{3}{2}$|1,5" }), "\\frac{3}{2}", MATH_RULES)).toBe(0.5);
     expect(scoreItem(short({ answer: "1,5" }), "3/2", MATH_RULES)).toBe(0.5);

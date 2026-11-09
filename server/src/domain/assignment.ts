@@ -154,7 +154,8 @@ export function isAnswered(v: AnswerValue | undefined): boolean {
   if (Array.isArray(v)) return v.every((x) => x !== null);
   return v.trim() !== "";
 }
-export const answeredCount = (a: Answers): number => Object.values(a).filter(isAnswered).length;
+/** Chỉ đếm khoá là số câu của mã đề. */
+export const answeredCount = (a: Answers, v: Variant): number => v.items.filter((i) => isAnswered(a[String(i.no)])).length;
 
 export type ItemResult = {
   no: number;
@@ -217,7 +218,7 @@ export type ResultLevel = "full" | "marks" | "score";
 export function resultLevel(show: ShowSolution, dueAt: Date, now: Date): ResultLevel {
   if (show === "never") return "score";
   if (show === "after_submit") return "full";
-  return now.getTime() >= dueAt.getTime() ? "full" : "marks";
+  return now.getTime() > dueAt.getTime() + GRACE_MS ? "full" : "marks";
 }
 
 export type ReviewItem = PublicItem & { response: AnswerValue | null; points: number | null; correct: boolean | null; key?: string; explanation?: string; rubric?: string };
@@ -248,13 +249,19 @@ export function reviewItems(
 
 export type StudentState = "chua_mo" | "chua_lam" | "dang_lam" | "da_nop" | "qua_han";
 
+/** Hợp đồng: nơi gọi phải chốt (nộp tự động) các lượt đã hết giờ trước; với lượt in_progress còn sót mà bài đã đóng/chưa đăng
+ *  hoặc quá hạn lượt (deadlineAt, mặc định dueAt) + ân hạn thì trả qua_han, canStart=false. */
 export function studentState(
   a: { opensAt: Date; dueAt: Date; status: AssignmentStatus; attemptsAllowed: number },
-  subs: readonly { status: SubmissionStatus }[],
+  subs: readonly { status: SubmissionStatus; deadlineAt?: Date }[],
   now: Date,
 ): { state: StudentState; canStart: boolean } {
   const open = a.status === "published" && now.getTime() >= a.opensAt.getTime() && now.getTime() < a.dueAt.getTime();
-  if (subs.some((s) => s.status === "in_progress")) return { state: "dang_lam", canStart: true };
+  const live = subs.find((s) => s.status === "in_progress");
+  if (live) {
+    const alive = a.status === "published" && !isExpired(live.deadlineAt ?? a.dueAt, now);
+    return alive ? { state: "dang_lam", canStart: true } : { state: "qua_han", canStart: false };
+  }
   if (subs.length > 0) return { state: "da_nop", canStart: open && subs.length < a.attemptsAllowed };
   if (a.status === "published" && now.getTime() < a.opensAt.getTime()) return { state: "chua_mo", canStart: false };
   if (!open) return { state: "qua_han", canStart: false };

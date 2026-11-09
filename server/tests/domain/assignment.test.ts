@@ -112,7 +112,7 @@ describe("chấm bài nộp", () => {
     const m2 = key(2);
     expect(byNo.get(2)!.choice).toBe(m2.type === "mcq" ? m2.options[3] : "");
     expect(g.score).toBe(g.items.reduce((s, i) => s + (i.points ?? 0), 0));
-    expect(answeredCount(answers)).toBe(4);
+    expect(answeredCount({ ...answers, "99": 1 }, V1!)).toBe(4);
     expect(toScore10(g.score, g.maxScore)).toBe(Math.round((g.score / 3.25) * 1000) / 100);
     expect(toScore10(1, 0)).toBeNull();
   });
@@ -129,7 +129,9 @@ describe("phần HS được xem", () => {
   it("mức xem theo show_solution", () => {
     expect(resultLevel("after_submit", due, NOW)).toBe("full");
     expect(resultLevel("after_due", due, NOW)).toBe("marks");
-    expect(resultLevel("after_due", due, due)).toBe("full");
+    expect(resultLevel("after_due", due, due)).toBe("marks");
+    expect(resultLevel("after_due", due, new Date(due.getTime() + 30_000))).toBe("marks");
+    expect(resultLevel("after_due", due, new Date(due.getTime() + 30_001))).toBe("full");
     expect(resultLevel("never", due, due)).toBe("score");
   });
   it("reviewItems: full có đáp án + lời giải; marks không; rubric chỉ cho GV", () => {
@@ -161,5 +163,9 @@ describe("trạng thái bài của HS", () => {
     ["đã nộp, hết lượt", a, [{ status: "submitted" }, { status: "auto_submitted" }], { state: "da_nop", canStart: false }],
     ["quá hạn", { ...a, dueAt: new Date("2026-11-10T06:30:00Z") }, [], { state: "qua_han", canStart: false }],
     ["đã đóng", { ...a, status: "closed" as const }, [], { state: "qua_han", canStart: false }],
+    ["đang làm nhưng bài đã đóng", { ...a, status: "closed" as const }, [{ status: "in_progress" }], { state: "qua_han", canStart: false }],
+    ["đang làm nhưng bài nháp", { ...a, status: "draft" as const }, [{ status: "in_progress" }], { state: "qua_han", canStart: false }],
+    ["đang làm, quá hạn lượt + ân hạn", a, [{ status: "in_progress", deadlineAt: new Date("2026-11-10T06:59:29Z") }], { state: "qua_han", canStart: false }],
+    ["đang làm, trong ân hạn", a, [{ status: "in_progress", deadlineAt: new Date("2026-11-10T06:59:31Z") }], { state: "dang_lam", canStart: true }],
   ] as const)("%s", (_n, asg, subs, out) => expect(studentState(asg, subs, NOW)).toEqual(out));
 });
