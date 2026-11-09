@@ -1,3 +1,4 @@
+import type { ServerClock } from "./clock";
 import type { SendResult, Sender } from "./syncQueue";
 import type { Answers, StudentSession } from "./types";
 
@@ -76,20 +77,30 @@ export async function hsJson<T>(path: string, init: Init = {}): Promise<T> {
 export const errMsg = (e: unknown): string => (e instanceof StudentApiError ? e.message : e instanceof TypeError ? "Mất mạng – em kiểm tra kết nối rồi thử lại" : "Có lỗi, em thử lại nhé");
 
 /**
- * Bộ gửi tự lưu cho AnswerSync. 401 → xoá phiên và trả "unauthorized" (AnswerSync báo sự kiện cho UI);
- * 409/410/423 hoặc body.status đã nộp → "closed"; 429/503 → "retry"; lỗi mạng → "offline".
+ * Bộ gửi tự lưu cho AnswerSync. Phản hồi OK là SaveResult { ok, seq, serverNow, deadlineAt }: seq máy chủ xác nhận
+ * được trả về, serverNow nạp vào ServerClock (clock.sample với mốc đơn điệu lúc gửi/nhận).
+ * 401 → xoá phiên, "unauthorized"; 409/410/423 hoặc body.status đã nộp → "closed"; 400/404/413 → "rejected" (dứt khoát, không gửi lại);
+ * 429/503 → "retry"; còn lại / lỗi mạng → "offline".
  */
-export function autosaveSender(path: string, method = "PUT"): Sender {
+export function autosaveSender(path: string, opts: { method?: string; clock?: ServerClock; mono?: () => number } = {}): Sender {
+  const mono = opts.mono ?? (() => performance.now());
   return async (seq: number, answers: Answers, { keepalive }): Promise<SendResult> => {
     try {
-      const res = await hsFetch(path, { method, body: { seq, answers }, keepalive, retries: 0 });
-      if (res.ok) return { kind: "ok", seq };
+      const sentAt = mono();
+      const res = await hsFetch(path, { method: opts.method ?? "PUT", body: { seq, answers }, keepalive, retries: 0 });
+      const receivedAt = mono();
+      if (res.ok) {
+        const body = (await res.json().catch(() => null)) as { seq?: number; serverNow?: string } | null;
+        if (body?.serverNow && opts.clock) opts.clock.sample(body.serverNow, sentAt, receivedAt);
+        return { kind: "ok", seq: typeof body?.seq === "number" ? body.seq : seq };
+      }
       if (res.status === 401) {
         clearSession();
         return { kind: "unauthorized" };
       }
       const body = (await res.json().catch(() => null)) as { status?: string } | null;
       if ([409, 410, 423].includes(res.status) || body?.status === "submitted" || body?.status === "auto_submitted") return { kind: "closed", status: body?.status ?? "submitted" };
+      if ([400, 404, 413].includes(res.status)) return { kind: "rejected", status: res.status };
       if (res.status === 429 || res.status === 503) return { kind: "retry", afterMs: retryAfterMs(res.headers.get("retry-after"), 0) };
       return { kind: "offline" };
     } catch {

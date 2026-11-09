@@ -66,14 +66,13 @@ describe("AnswerSync: nhiều tab, kho hỏng, pagehide", () => {
     expect(s.readonly && ev.includes("readonly")).toBe(true);
   });
 
-  it("seq lấy max(trong bộ nhớ, đã ghi máy)+1", async () => {
+  it("seq = max(bản hiện tại, sàn lúc mở)+1", async () => {
     const store = memoryStore();
-    const s = await AnswerSync.open(store, "a", { seq: 0, answers: {} }, noSend);
-    await s.set(1, 1);
-    await store.put({ ...(await store.get("a"))!, seq: 10 }); // tab khác đã ghi tới 10
+    await store.put({ submissionId: "a", seq: 10, syncedSeq: 3, answers: { "1": 1 }, flags: [], updatedAt: 0 }); // bản máy cũ ghi tới 10
+    const s = await AnswerSync.open(store, "a", { seq: 20, answers: {} }, noSend);
     await s.set(1, 2);
-    expect(s.seq).toBe(11);
-    expect((await s.forSubmit()).seq).toBe(12);
+    expect(s.seq).toBe(21);
+    expect((await s.forSubmit()).seq).toBe(22);
   });
 
   it("keepalive bỏ qua giờ chờ và lần gửi đang chạy", async () => {
@@ -277,5 +276,80 @@ describe("studentApi nhỏ", () => {
     expect(loadSession()).toBeNull();
     expect(store.size).toBe(0);
     vi.unstubAllGlobals();
+  });
+});
+
+describe("vòng 2", () => {
+  it("hai set() song song + flush xen giữa: không trùng seq, máy chủ giữ đủ cả hai đáp án", async () => {
+    const m = new Map<string, Draft>();
+    const slow: DraftStore = { get: async (id) => m.get(id), put: async (d) => { await new Promise((r) => setTimeout(r, 5)); m.set(d.submissionId, d); } };
+    const server = { seq: 0, answers: {} as Record<string, unknown> };
+    const log: number[] = [];
+    const send = async (seq: number, answers: Record<string, unknown>) => {
+      log.push(seq);
+      if (seq > server.seq) { server.seq = seq; server.answers = answers; } // trùng/cũ bị bỏ như máy chủ thật
+      return ok(seq);
+    };
+    const s = await AnswerSync.open(slow, "a", { seq: 0, answers: {} }, send);
+    const p1 = s.set(1, "A");
+    const p2 = s.set(2, "B");
+    await new Promise((r) => setTimeout(r, 7)); // set(1) đã ghi xong, set(2) đang ghi
+    await s.flush();
+    await Promise.all([p1, p2]);
+    await s.flush();
+    expect(server.answers).toEqual({ "1": "A", "2": "B" });
+    expect(log).toEqual([...log].sort((a, b) => a - b));
+    expect(new Set(log).size).toBe(log.length);
+    expect(server.seq).toBe(2);
+    expect(s.dirty).toBe(false);
+  });
+
+  it("rejected: ngừng gửi, báo sự kiện kèm mã, giữ bản nháp", async () => {
+    const ev: [string, number | undefined][] = [];
+    const sent: number[] = [];
+    const store = memoryStore();
+    const s = await AnswerSync.open(store, "a", { seq: 0, answers: {} }, async (q) => (sent.push(q), { kind: "rejected", status: 413 }), undefined, undefined, { onEvent: (e, d) => ev.push([e, d]) });
+    await s.set(1, 1);
+    await s.flush();
+    await s.flush(true);
+    expect(sent).toEqual([1]);
+    expect(ev).toEqual([["rejected", 413]]);
+    expect((await store.get("a"))?.answers).toEqual({ "1": 1 });
+  });
+
+  describe("autosaveSender", () => {
+    const send = (status: number, body: unknown = {}, headers: Record<string, string> = {}) => {
+      vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify(body), { status, headers })));
+      return autosaveSender("/api/x")(3, {}, { keepalive: false });
+    };
+    it.each([
+      [400, { kind: "rejected", status: 400 }],
+      [404, { kind: "rejected", status: 404 }],
+      [413, { kind: "rejected", status: 413 }],
+      [409, { kind: "closed", status: "submitted" }],
+      [500, { kind: "offline" }],
+    ])("HTTP %s", async (status, want) => {
+      expect(await send(status)).toEqual(want);
+      vi.unstubAllGlobals();
+    });
+    it("429/503 → retry theo Retry-After", async () => {
+      expect(await send(429, {}, { "retry-after": "2" })).toMatchObject({ kind: "retry" });
+      expect(await send(503)).toMatchObject({ kind: "retry" });
+      vi.unstubAllGlobals();
+    });
+    it("lỗi mạng → offline", async () => {
+      vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("x"); }));
+      expect(await autosaveSender("/api/x")(1, {}, { keepalive: false })).toEqual({ kind: "offline" });
+      vi.unstubAllGlobals();
+    });
+    it("200: dùng seq của máy chủ và nạp serverNow vào ServerClock", async () => {
+      let m = 1000;
+      const clock = new ServerClock(() => m);
+      vi.stubGlobal("fetch", vi.fn(async () => { m += 100; return new Response(JSON.stringify({ ok: true, seq: 7, serverNow: new Date(5_050).toISOString(), deadlineAt: "x" }), { status: 200 }); }));
+      const r = await autosaveSender("/api/x", { clock, mono: () => m })(7, {}, { keepalive: false });
+      expect(r).toEqual({ kind: "ok", seq: 7 });
+      expect(clock.now()).toBe(5100); // offset = 5050 - (1000+50) = 4000; now = 1100 + 4000
+      vi.unstubAllGlobals();
+    });
   });
 });
