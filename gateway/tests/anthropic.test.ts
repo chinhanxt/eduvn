@@ -29,6 +29,8 @@ describe("AnthropicBackend", () => {
   it("bỏ hậu tố effort; model Gemini chạy dự phòng thì dùng Claude Sonnet 5.5", () => {
     expect(apiModel("claude-sonnet-5-5-low")).toBe("claude-sonnet-5-5");
     expect(apiModel("claude-opus-5-5")).toBe("claude-opus-5-5");
+    expect(apiModel("claude-opus-4-6-thinking")).toBe("claude-opus-4-6");
+    expect(apiModel("claude-sonnet-4-6")).toBe("claude-sonnet-4-6");
     expect(apiModel("gemini-3.8-flash-low")).toBe("claude-sonnet-5-5");
   });
   it("stream chữ, đọc usage, gửi đúng định dạng", async () => {

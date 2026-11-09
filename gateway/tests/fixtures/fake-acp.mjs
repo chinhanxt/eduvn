@@ -8,10 +8,9 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 
-const MODELS = [
-  { modelId: "fake-fast", name: "Fake Fast" },
-  { modelId: "fake-smart", name: "Fake Smart" },
-];
+// FAKE_MODELS: danh sách id (phẩy) giả lập kho model; FAKE_REJECT: id có trong kho nhưng set_model từ chối.
+const MODELS = (process.env.FAKE_MODELS ?? "fake-fast,fake-smart").split(",").map((id) => ({ modelId: id, name: id }));
+const REJECT = (process.env.FAKE_REJECT ?? "").split(",").filter(Boolean);
 const dataDir = process.env.FAKE_DATA_DIR; // giả lập nơi agy ghi dữ liệu phiên
 const sessions = new Map();
 const waiting = new Map();
@@ -43,7 +42,7 @@ createInterface({ input: process.stdin }).on("line", (line) => {
       return reply({ protocolVersion: 1, agentCapabilities: { promptCapabilities: { image: true } } });
     case "session/new": {
       const id = "s" + ++n;
-      sessions.set(id, { model: "fake-fast", turns: 0, cancelled: false });
+      sessions.set(id, { model: MODELS[0].modelId, turns: 0, cancelled: false });
       if (dataDir) {
         mkdirSync(join(dataDir, "conversations"), { recursive: true });
         writeFileSync(join(dataDir, "conversations", `${id}.db`), "x");
@@ -51,12 +50,12 @@ createInterface({ input: process.stdin }).on("line", (line) => {
         writeFileSync(join(dataDir, "conversations", `${id}.db-shm`), "x");
         mkdirSync(join(dataDir, "brain", id), { recursive: true });
       }
-      return reply({ sessionId: id, models: { availableModels: MODELS, currentModelId: "fake-fast" } });
+      return reply({ sessionId: id, models: { availableModels: MODELS, currentModelId: MODELS[0].modelId } });
     }
     case "session/set_model": {
       const s = sessions.get(p.sessionId);
       if (!s) return fail(-32602, "Unknown session");
-      if (!MODELS.some((x) => x.modelId === p.modelId)) return fail(-32602, `Unknown model ID: ${p.modelId}`);
+      if (REJECT.includes(p.modelId) || !MODELS.some((x) => x.modelId === p.modelId)) return fail(-32602, `Unknown model ID: ${p.modelId}`);
       s.model = p.modelId;
       return reply({});
     }

@@ -244,3 +244,61 @@ describe("AgentPool thay mới có lượt đến giữa chừng", () => {
     expect(p.stats().alive).toBe(1);
   });
 });
+
+describe("AgentPool danh sách model ưu tiên và tiến trình hỏng", () => {
+  const mkEnv = (env: Record<string, string>, extra: Partial<ConstructorParameters<typeof AgentPool>[0]> = {}) => {
+    const p = new AgentPool({ size: 1, idleSessionMs: 60000, restartDelayMs: 50, factory: () => new AcpAgent({ command: process.execPath, args: [fake], cwd: tmpdir(), env }), ...extra });
+    pools.push(p);
+    return p;
+  };
+  it("chọn model đầu tiên có trong kho; báo model đã chọn", async () => {
+    const p = mkEnv({ FAKE_MODELS: "gem-a,son-4" });
+    await p.start();
+    const l = await p.lease(undefined, ["son-5", "son-4", "gem-a"]);
+    expect(l.model).toBe("son-4");
+    l.release();
+  });
+  it("set_model từ chối (Unknown model ID) thì thử model kế", async () => {
+    const p = mkEnv({ FAKE_MODELS: "m1,m2", FAKE_REJECT: "m1" });
+    await p.start();
+    const l = await p.lease("k", ["m1", "m2"]);
+    expect(l.model).toBe("m2");
+    l.release();
+    expect((await p.lease("k", ["m1", "m2"])).fresh).toBe(false); // phiên đang dùng model trong danh sách → giữ
+  });
+  it("không model nào dùng được thì lỗi -32602", async () => {
+    const p = mkEnv({ FAKE_MODELS: "m1" });
+    await p.start();
+    await expect(p.lease(undefined, ["x1", "x2"])).rejects.toMatchObject({ code: -32602 });
+    expect(p.stats().sessions).toBe(0);
+  });
+  it("3 lần trả lời trống liền thì cho nghỉ và thay bằng tiến trình mới", async () => {
+    const logs: string[] = [];
+    const p = mkEnv({}, { onLog: (m) => logs.push(m) });
+    await p.start();
+    const old = p.alive()[0]!;
+    for (let i = 0; i < 3; i++) {
+      const l = await p.lease(undefined, "fake-fast");
+      const r = await l.agent.prompt(l.sessionId, [{ type: "text", text: "[[agyblock]]" }]);
+      expect(r.text).toBe("");
+      l.release();
+    }
+    await waitFor(() => !old.alive && p.stats().alive === 1, 5000);
+    expect(p.alive()[0]).not.toBe(old);
+    expect(p.stats().unhealthyRecycles).toBe(1);
+    expect(logs.join("\n")).toContain("3 lần liền");
+  });
+  it("một câu trả lời tốt xen giữa thì đếm lại từ đầu", async () => {
+    const p = mkEnv({});
+    await p.start();
+    const old = p.alive()[0]!;
+    for (const t of ["[[agyblock]]", "[[agyblock]]", "tốt", "[[agyblock]]", "[[agyblock]]"]) {
+      const l = await p.lease(undefined, "fake-fast");
+      await l.agent.prompt(l.sessionId, [{ type: "text", text: t }]);
+      l.release();
+    }
+    await new Promise((r) => setTimeout(r, 200));
+    expect(old.alive).toBe(true);
+    expect(p.stats().unhealthyRecycles).toBe(0);
+  });
+});

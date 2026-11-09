@@ -3,8 +3,10 @@ import { z } from "zod";
 import { GatewayError } from "./types";
 
 const Backend = z.enum(["acp", "anthropic"]);
+// `model` là một id hoặc danh sách ưu tiên (kho model của agy đổi theo tài khoản proxy đang dùng).
+const ModelPref = z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]);
 const Task = z.object({
-  model: z.string().min(1),
+  model: ModelPref,
   backend: Backend.optional(),
   priority: z.enum(["interactive", "batch"]).default("batch"),
   timeoutMs: z.number().int().min(1000).max(900000).optional(),
@@ -14,7 +16,7 @@ const Task = z.object({
   description: z.string().default(""),
 });
 const File = z.object({
-  defaults: z.object({ model: z.string().min(1), timeoutMs: z.number().int().min(1000).max(900000), backend: Backend }),
+  defaults: z.object({ model: ModelPref, timeoutMs: z.number().int().min(1000).max(900000), backend: Backend }),
   tasks: z
     .record(z.string().regex(/^[a-z][a-z0-9_]*$/), Task)
     .refine((t) => !Object.hasOwn(t, "default"), { message: "tên tác vụ 'default' đã dành riêng" }),
@@ -23,7 +25,8 @@ export type TaskConfig = z.infer<typeof Task>;
 export type TasksFile = z.infer<typeof File>;
 export type Route = {
   task: string | null;
-  model: string;
+  model: string; // lựa chọn đầu tiên
+  models: string[]; // danh sách ưu tiên
   backend: "acp" | "anthropic";
   priority: 0 | 1;
   timeoutMs: number;
@@ -32,6 +35,7 @@ export type Route = {
   refusal?: string;
 };
 
+const list = (m: string | string[]): string[] => (Array.isArray(m) ? m : [m]);
 export const parseTasks = (raw: unknown): TasksFile => File.parse(raw);
 export const loadTasks = (path: string): TasksFile => parseTasks(JSON.parse(readFileSync(path, "utf8")));
 
@@ -42,7 +46,8 @@ export function resolveRoute(file: TasksFile, name: string, opts: { interactive?
   if (t) {
     return {
       task: key,
-      model: t.model,
+      model: list(t.model)[0]!,
+      models: list(t.model),
       backend: t.backend ?? file.defaults.backend,
       priority: t.priority === "interactive" ? 0 : 1,
       timeoutMs: t.timeoutMs ?? file.defaults.timeoutMs,
@@ -52,9 +57,11 @@ export function resolveRoute(file: TasksFile, name: string, opts: { interactive?
     };
   }
   if (name.startsWith("task:")) throw new GatewayError(404, "unknown_task", `Không có tác vụ ${key}`);
+  const models = name === "default" ? list(file.defaults.model) : [name];
   return {
     task: null,
-    model: name === "default" ? file.defaults.model : name,
+    model: models[0]!,
+    models,
     backend: file.defaults.backend,
     priority: opts.interactive ? 0 : 1,
     timeoutMs: file.defaults.timeoutMs,

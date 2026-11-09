@@ -90,6 +90,7 @@ export class AcpAgent extends EventEmitter {
   private endFn: ((reason: Error) => void) | null = null;
   private active = 0;
   private up = false;
+  private badStreak = 0;
   private stderrTail: string[] = [];
   private stderrPart = "";
   models: ModelInfo[] = [];
@@ -228,6 +229,12 @@ export class AcpAgent extends EventEmitter {
         }),
       ]);
       feed(c, "", true);
+      // Theo dõi sức khoẻ: câu trả lời trống (kể cả bị bộ lọc chặn) hoặc dừng bất thường liên tiếp → báo để thay tiến trình.
+      if (res.stopReason !== "cancelled") {
+        const bad = !c.text.trim() || res.stopReason !== "end_turn";
+        this.badStreak = bad ? this.badStreak + 1 : 0;
+        if (this.badStreak === 3) this.emit("unhealthy", this.badStreak);
+      }
       const u = res.usage;
       return {
         text: c.text,

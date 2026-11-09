@@ -10,7 +10,7 @@ type Event = {
 };
 
 /** Tên model agy → tên model API: bỏ hậu tố effort; tác vụ dùng Gemini khi chạy dự phòng qua khoá Anthropic thì dùng Claude Sonnet 5.5. */
-export const apiModel = (id: string): string => (id.startsWith("claude-") ? id.replace(/-(low|medium|high)$/, "") : "claude-sonnet-5-5");
+export const apiModel = (id: string): string => (id.startsWith("claude-") ? id.replace(/-thinking$/, "").replace(/-(low|medium|high)$/, "") : "claude-sonnet-5-5");
 
 function toAnthropic(m: ChatMessage) {
   return {
@@ -78,7 +78,7 @@ export class AnthropicBackend implements Backend {
         signal: ctrl.signal,
         headers: { "content-type": "application/json", "x-api-key": this.o.apiKey, "anthropic-version": "2023-06-01" },
         body: JSON.stringify({
-          model: apiModel(input.model),
+          model: apiModel((input.models ?? [input.model]).find((m) => m.startsWith("claude-")) ?? input.model),
           max_tokens: this.o.maxTokens ?? 8192,
           system: input.system,
           stream: true,

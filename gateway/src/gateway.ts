@@ -100,7 +100,7 @@ export async function buildGateway(cfg: GatewayConfig, over: { agentOptions?: (s
         conversations: llm.conversations(),
         limiter: { active: limiter.active, queued: limiter.queued },
         backends: Object.keys(backends),
-        metrics: { ...llm.metrics(), restarts: ps.restarts },
+        metrics: { ...llm.metrics(), restarts: ps.restarts, unhealthyRecycles: ps.unhealthyRecycles },
       };
     },
   });

@@ -181,7 +181,7 @@ export class LlmService {
     let messages = req.messages.filter((m) => m.role !== "system");
     if (!messages.some((m) => m.role === "user")) throw new GatewayError(400, "no_user_message", "Thiếu tin nhắn của người dùng");
     let histHash = "";
-    const sig = `${r.model}|${createHash("sha1").update(system).digest("hex")}`;
+    const sig = `${r.models.join(",")}|${createHash("sha1").update(system).digest("hex")}`;
     if (key) {
       const stored = this.transcripts.get(key);
       const past = stored?.messages ?? [];
@@ -204,7 +204,7 @@ export class LlmService {
       let used = primary!;
       const call = async (msgs: ChatMessage[], onDelta?: (t: string) => void, ephemeral = false): Promise<BackendOutput> => {
         if (signal?.aborted) throw clientClosed();
-        const input = { model: r.model, system, messages: msgs, conversation: ephemeral ? undefined : key, sig, timeoutMs: r.timeoutMs, priority: r.priority, signal };
+        const input = { model: r.model, models: r.models, system, messages: msgs, conversation: ephemeral ? undefined : key, sig, timeoutMs: r.timeoutMs, priority: r.priority, signal };
         let emitted = false;
         const track = onDelta && ((t: string) => {
           emitted = true;
@@ -257,7 +257,7 @@ export class LlmService {
           this.warn(`Cổng AI: AI không trả lời được (tác vụ ${r.task}); dùng câu từ chối mẫu`);
           req.onDelta?.(r.refusal);
           if (key) this.store(key, cap(stripImages([...messages, { role: "assistant", content: r.refusal }])), chain(histHash, [{ role: "assistant", content: r.refusal }]));
-          return { text: r.refusal, model: r.model, task: r.task, backend: used.name, ms: Date.now() - started, usage: out.usage, retried, refused: true };
+          return { text: r.refusal, model: out.model ?? r.model, task: r.task, backend: used.name, ms: Date.now() - started, usage: out.usage, retried, refused: true };
         }
         throw new GatewayError(502, "empty_answer", "AI không trả lời");
       }
@@ -276,7 +276,7 @@ export class LlmService {
       const text = wantJson ? JSON.stringify(json) : out.text;
       if (wantJson) req.onDelta?.(text);
       if (key) this.store(key, cap(stripImages([...messages, { role: "assistant", content: text }])), chain(histHash, [{ role: "assistant", content: text }]));
-      return { text, json, model: r.model, task: r.task, backend: used.name, ms: Date.now() - started, usage: out.usage, retried };
+      return { text, json, model: out.model ?? r.model, task: r.task, backend: used.name, ms: Date.now() - started, usage: out.usage, retried };
     }, signal);
   }
 

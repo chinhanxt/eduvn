@@ -159,3 +159,28 @@ describe("AcpBackend + LlmService với chữ cảnh báo agy", () => {
     await expect(svc.complete({ model: "default", messages: [{ role: "user", content: "[[agyblock]] hỏi" }] })).rejects.toMatchObject({ code: "empty_answer" });
   });
 });
+
+describe("AcpBackend danh sách model", () => {
+  async function mkWith(env: Record<string, string>) {
+    const pool = new AgentPool({ size: 1, idleSessionMs: 60000, restartDelayMs: 50, factory: () => new AcpAgent({ command: process.execPath, args: [fake], cwd: tmpdir(), env }) });
+    pools.push(pool);
+    await pool.start();
+    return new AcpBackend(pool);
+  }
+  it("dùng model ưu tiên có sẵn và báo lại trong kết quả", async () => {
+    const backend = await mkWith({ FAKE_MODELS: "gemini-a,claude-4" });
+    const r = await backend.complete(input({ model: "claude-5", models: ["claude-5", "claude-4", "gemini-a"] }));
+    expect(r.model).toBe("claude-4");
+    expect(r.text).toContain("[claude-4#1]");
+  });
+  it("tất cả model đều không có thì 400 bad_model", async () => {
+    const backend = await mkWith({ FAKE_MODELS: "gemini-a" });
+    await expect(backend.complete(input({ model: "x", models: ["x", "y"] }))).rejects.toMatchObject({ status: 400, code: "bad_model" });
+  });
+  it("LlmService báo model thực dùng", async () => {
+    const backend = await mkWith({ FAKE_MODELS: "fake-smart" });
+    const t = parseTasks({ defaults: { model: "fake-fast", timeoutMs: 5000, backend: "acp" }, tasks: { gs: { model: ["fake-fast", "fake-smart"] } } });
+    const svc = new LlmService({ tasks: t, backends: { acp: backend }, limiter: new PriorityLimiter(2), log: () => {} });
+    expect((await svc.complete({ model: "gs", messages: [{ role: "user", content: "chào" }] })).model).toBe("fake-smart");
+  });
+});

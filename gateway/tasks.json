@@ -1,8 +1,12 @@
 {
-  "defaults": { "model": "claude-sonnet-5-5-low", "timeoutMs": 180000, "backend": "acp" },
+  "defaults": {
+    "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-low"],
+    "timeoutMs": 180000,
+    "backend": "acp"
+  },
   "tasks": {
     "gia_su_chat": {
-      "model": "claude-sonnet-5-5-low",
+      "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-low"],
       "priority": "interactive",
       "timeoutMs": 60000,
       "refusal": "Câu này mình không hỗ trợ được. Em hỏi mình về bài học nhé — ví dụ nhờ giải thích một khái niệm hoặc gợi ý cách làm một bài tập.",
@@ -10,20 +14,60 @@
       "system": "Bạn là gia sư kiên nhẫn của EDUVN cho học sinh phổ thông và sinh viên Việt Nam. Trả lời bằng tiếng Việt có dấu, ngắn gọn, đúng trình độ người học. Gợi mở từng bước; với bài tập được giao, không đưa ngay đáp án cuối cùng mà hỏi lại để người học tự làm, chỉ giải đầy đủ khi người học đã thử hoặc xin xem lời giải. Viết công thức bằng LaTeX trong cặp $…$."
     },
     "so_do_tu_duy": {
-      "model": "gemini-3.8-flash-medium",
+      "model": ["gemini-3.8-flash-medium", "gemini-4-argon-medium", "claude-sonnet-4-6"],
       "json": true,
       "description": "Sơ đồ tư duy từ đoạn bài học",
       "system": "Tạo sơ đồ tư duy tiếng Việt có dấu từ nội dung được cho. Trả về đúng JSON dạng {\"root\":{\"text\":string,\"children\":[...]}}; mỗi nút chỉ có \"text\" và \"children\"; chữ ngắn gọn (tối đa 12 từ); công thức viết LaTeX trong $…$; tối đa 3 tầng dưới gốc và 6 nhánh mỗi tầng."
     },
-    "soan_giao_an": { "model": "claude-sonnet-5-5-high", "timeoutMs": 600000, "description": "Soạn giáo án theo CV 5512" },
-    "giao_trinh_chuong": { "model": "claude-sonnet-5-5-high", "timeoutMs": 600000, "description": "Viết một chương giáo trình" },
-    "de_cuong_hoc_phan": { "model": "claude-sonnet-5-5-high", "timeoutMs": 600000, "description": "Soạn đề cương học phần đại học" },
-    "slide_dan_y": { "model": "claude-sonnet-5-5-medium", "json": true, "description": "Dàn ý bài giảng nhiều cảnh (OpenMAIC)" },
-    "slide_noi_dung": { "model": "gemini-3.8-flash-medium", "json": true, "description": "Nội dung một cảnh slide (OpenMAIC)" },
-    "loi_giang": { "model": "gemini-3.8-flash-low", "description": "Lời giảng đọc kèm slide" },
-    "sinh_cau_hoi": { "model": "gemini-3.8-flash-medium", "json": true, "description": "Sinh câu hỏi theo yêu cầu cần đạt" },
-    "cham_tu_luan": { "model": "claude-sonnet-5-5-high", "timeoutMs": 300000, "json": true, "description": "Chấm bài tự luận theo rubric" },
-    "doc_anh_bai_lam": { "model": "gemini-3.8-flash-low", "timeoutMs": 120000, "description": "Đọc chữ từ ảnh bài làm" },
-    "giam_khao": { "model": "claude-sonnet-5-5-low", "json": true, "description": "Kiểm chất lượng nội dung AI sinh ra" }
+    "soan_giao_an": {
+      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "timeoutMs": 600000,
+      "description": "Soạn giáo án theo CV 5512"
+    },
+    "giao_trinh_chuong": {
+      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "timeoutMs": 600000,
+      "description": "Viết một chương giáo trình"
+    },
+    "de_cuong_hoc_phan": {
+      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "timeoutMs": 600000,
+      "description": "Soạn đề cương học phần đại học"
+    },
+    "slide_dan_y": {
+      "model": ["claude-sonnet-5-5-medium", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
+      "json": true,
+      "description": "Dàn ý bài giảng nhiều cảnh (OpenMAIC)"
+    },
+    "slide_noi_dung": {
+      "model": ["gemini-3.8-flash-medium", "gemini-4-argon-medium", "claude-sonnet-4-6"],
+      "json": true,
+      "description": "Nội dung một cảnh slide (OpenMAIC)"
+    },
+    "loi_giang": {
+      "model": ["gemini-3.8-flash-low", "gemini-4-argon-low", "claude-sonnet-4-6"],
+      "description": "Lời giảng đọc kèm slide"
+    },
+    "sinh_cau_hoi": {
+      "model": ["gemini-3.8-flash-medium", "gemini-4-argon-medium", "claude-sonnet-4-6"],
+      "json": true,
+      "description": "Sinh câu hỏi theo yêu cầu cần đạt"
+    },
+    "cham_tu_luan": {
+      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "timeoutMs": 300000,
+      "json": true,
+      "description": "Chấm bài tự luận theo rubric"
+    },
+    "doc_anh_bai_lam": {
+      "model": ["gemini-3.8-flash-low", "gemini-4-argon-low", "claude-sonnet-4-6"],
+      "timeoutMs": 120000,
+      "description": "Đọc chữ từ ảnh bài làm"
+    },
+    "giam_khao": {
+      "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
+      "json": true,
+      "description": "Kiểm chất lượng nội dung AI sinh ra"
+    }
   }
 }

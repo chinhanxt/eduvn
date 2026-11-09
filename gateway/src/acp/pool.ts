@@ -1,5 +1,6 @@
 import { GatewayError } from "../types";
 import type { AcpAgent, ModelInfo } from "./agent";
+import { RpcError } from "./rpc";
 
 export type PoolOptions = {
   size: number;
@@ -12,7 +13,7 @@ export type PoolOptions = {
   recycleAfterSessions?: number;
   onLog?: (msg: string) => void;
 };
-export type Lease = { agent: AcpAgent; sessionId: string; fresh: boolean; release: () => void };
+export type Lease = { agent: AcpAgent; sessionId: string; model: string; fresh: boolean; release: () => void };
 type Conversation = { agent: AcpAgent; sessionId: string; model: string; sig: string; lastUsed: number; busy: number };
 
 /** Vài tiến trình `agy acp` chạy sẵn + phiên bám theo hội thoại. */
@@ -28,6 +29,7 @@ export class AgentPool {
   private readonly draining = new Set<AcpAgent>();
   private readonly retired = new Set<AcpAgent>();
   private restartCount = 0;
+  private unhealthyCount = 0;
   private recycling = false;
   private readonly lingering = new Set<AcpAgent>(); // đã bị thay nhưng còn lượt dở
 
@@ -74,6 +76,15 @@ export class AgentPool {
       this.timers.add(t);
     };
     agent.once("exit", onLost);
+    agent.on("unhealthy", () => {
+      if (this.stopped || this.retired.has(agent) || this.draining.has(agent)) return;
+      this.unhealthyCount++;
+      this.draining.add(agent);
+      this.log(`Tiến trình AI #${slot} trả lời trống/lỗi 3 lần liền: cho nghỉ và thay mới`);
+      // hội thoại rảnh trên tiến trình này sang tiến trình khác (lịch sử còn trong bản lưu của LlmService)
+      for (const [k, c] of this.conversations) if (c.agent === agent && !c.busy) this.forget(k);
+      this.recycleIdle();
+    });
     try {
       await agent.start();
     } catch (e) {
@@ -110,15 +121,35 @@ export class AgentPool {
     return pool.reduce((best, a) => (load(a) < load(best) ? a : best));
   }
 
-  private async open(model: string): Promise<{ agent: AcpAgent; sessionId: string }> {
+  /** Thứ tự thử: model có trong kho hiện tại của agent trước (theo ưu tiên), rồi phần còn lại (kho có thể đã cũ). */
+  private order(agent: AcpAgent, models: string[]): string[] {
+    const have = new Set(agent.models.map((m) => m.id));
+    if (!have.size) return models;
+    return [...models.filter((m) => have.has(m)), ...models.filter((m) => !have.has(m))];
+  }
+
+  private async open(models: string[]): Promise<{ agent: AcpAgent; sessionId: string; model: string }> {
     const agent = this.pick();
     this.pending.set(agent, (this.pending.get(agent) ?? 0) + 1);
     try {
-      const sessionId = await agent.newSession(model);
+      let sessionId = "";
+      let model = "";
+      let lastErr: unknown;
+      for (const m of this.order(agent, models)) {
+        try {
+          sessionId = await agent.newSession(m);
+          model = m;
+          break;
+        } catch (e) {
+          if (!(e instanceof RpcError) || e.code !== -32602) throw e; // chỉ "Unknown model ID" thì thử model kế
+          lastErr = e;
+        }
+      }
+      if (!sessionId) throw lastErr ?? new RpcError(-32602, `Không có model nào dùng được: ${models.join(", ")}`);
       const n = (this.opened.get(agent) ?? 0) + 1;
       this.opened.set(agent, n);
       if (n >= (this.opts.recycleAfterSessions ?? 150)) this.draining.add(agent);
-      return { agent, sessionId };
+      return { agent, sessionId, model };
     } finally {
       this.pending.set(agent, (this.pending.get(agent) ?? 1) - 1);
     }
@@ -131,6 +162,7 @@ export class AgentPool {
     return {
       agent: c.agent,
       sessionId: c.sessionId,
+      model: c.model,
       fresh,
       release: () => {
         if (done) return;
@@ -143,16 +175,18 @@ export class AgentPool {
   }
 
   /** Lấy phiên: có `key` thì dùng lại phiên của hội thoại; không thì mở phiên tạm, trả lại là đóng. */
-  async lease(key: string | undefined, model: string, sig: string = model): Promise<Lease> {
+  async lease(key: string | undefined, want: string | string[], sig?: string): Promise<Lease> {
+    const models = Array.isArray(want) ? want : [want];
+    sig ??= models.join(",");
     if (key) {
       const inflight = this.creating.get(key);
       if (inflight) await inflight.catch(() => {});
       const c = this.conversations.get(key);
-      if (c && c.model === model && c.sig === sig && c.agent.alive) return this.use(c, false);
+      if (c && models.includes(c.model) && c.sig === sig && c.agent.alive) return this.use(c, false);
       if (c) this.forget(key);
       else this.evictOverflow();
-      const p = this.open(model).then(({ agent, sessionId }) => {
-        const entry: Conversation = { agent, sessionId, model, sig, lastUsed: Date.now(), busy: 0 };
+      const p = this.open(models).then(({ agent, sessionId, model }) => {
+        const entry: Conversation = { agent, sessionId, model, sig: sig!, lastUsed: Date.now(), busy: 0 };
         this.conversations.set(key, entry);
         return entry;
       });
@@ -163,8 +197,8 @@ export class AgentPool {
         if (this.creating.get(key) === p) this.creating.delete(key);
       }
     }
-    const { agent, sessionId } = await this.open(model);
-    return { agent, sessionId, fresh: true, release: () => void agent.closeSession(sessionId).finally(() => this.recycleIdle()) };
+    const { agent, sessionId, model } = await this.open(models);
+    return { agent, sessionId, model, fresh: true, release: () => void agent.closeSession(sessionId).finally(() => this.recycleIdle()) };
   }
 
   /** Quá `maxConversations`: bỏ hội thoại rảnh lâu nhất để chỗ cho hội thoại mới. */
@@ -233,7 +267,7 @@ export class AgentPool {
     this.recycleIdle();
   }
 
-  stats(): { size: number; alive: number; sessions: number; conversations: number; active: number; restarts: number; draining: number } {
+  stats(): { size: number; alive: number; sessions: number; conversations: number; active: number; restarts: number; draining: number; unhealthyRecycles: number } {
     const live = this.alive();
     return {
       size: this.agents.length,
@@ -242,6 +276,7 @@ export class AgentPool {
       conversations: this.conversations.size,
       active: live.reduce((s, a) => s + a.activePrompts, 0),
       restarts: this.restartCount,
+      unhealthyRecycles: this.unhealthyCount,
       draining: live.filter((a) => this.draining.has(a)).length,
     };
   }

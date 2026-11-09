@@ -50,7 +50,7 @@ export class AcpBackend implements Backend {
 
   complete(input: BackendInput, onDelta?: (t: string) => void): Promise<BackendOutput> {
     const run = async (): Promise<BackendOutput> => {
-      const lease = await this.pool.lease(input.conversation, input.model, input.sig).catch((e: unknown) => {
+      const lease = await this.pool.lease(input.conversation, input.models ?? [input.model], input.sig).catch((e: unknown) => {
         throw toGatewayError(e);
       });
       const onAbort = () => lease.agent.cancel(lease.sessionId);
@@ -59,7 +59,7 @@ export class AcpBackend implements Backend {
         if (input.signal?.aborted) throw clientClosed();
         const r = await lease.agent.prompt(lease.sessionId, toBlocks(input, lease.fresh), onDelta, input.timeoutMs);
         if (input.signal?.aborted) throw clientClosed();
-        return { text: r.text, usage: r.usage, deniedTools: r.deniedTools, toolsRan: r.toolsRan, agyBlocked: r.agyBlocked };
+        return { text: r.text, usage: r.usage, deniedTools: r.deniedTools, toolsRan: r.toolsRan, agyBlocked: r.agyBlocked, model: lease.model };
       } catch (e) {
         if (input.conversation) this.pool.forget(input.conversation);
         throw toGatewayError(e);

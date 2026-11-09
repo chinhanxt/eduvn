@@ -6,7 +6,8 @@ export type Usage = { inputTokens?: number; outputTokens?: number; cachedReadTok
 
 /** Một lần gọi AI đã định tuyến xong. */
 export type BackendInput = {
-  model: string; // id model cụ thể, vd "claude-sonnet-5-5-low"
+  model: string; // id model ưu tiên đầu tiên, vd "claude-sonnet-5-5-low"
+  models?: string[]; // danh sách ưu tiên đầy đủ (mặc định chỉ `model`)
   system: string; // lời dặn hệ thống đã gộp (chốt an toàn + tác vụ + system của người gọi)
   messages: ChatMessage[]; // không chứa role "system"; phần tử cuối là tin của người dùng
   conversation?: string; // khoá hội thoại đầy đủ (`tác-vụ:khách`): giữ phiên để tận dụng ngữ cảnh + cache
@@ -15,7 +16,7 @@ export type BackendInput = {
   priority: 0 | 1; // 0 = tương tác (chat), 1 = theo lô
   signal?: AbortSignal; // huỷ khi người dùng ngắt kết nối
 };
-export type BackendOutput = { text: string; usage?: Usage; deniedTools: number; toolsRan?: number; agyBlocked?: number };
+export type BackendOutput = { text: string; usage?: Usage; deniedTools: number; toolsRan?: number; agyBlocked?: number; model?: string };
 
 export interface Backend {
   readonly name: string;
