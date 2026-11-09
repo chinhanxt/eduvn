@@ -14,7 +14,9 @@ const Task = z.object({
 });
 const File = z.object({
   defaults: z.object({ model: z.string().min(1), timeoutMs: z.number().int().min(1000).max(900000), backend: Backend }),
-  tasks: z.record(z.string().regex(/^[a-z][a-z0-9_]*$/), Task),
+  tasks: z
+    .record(z.string().regex(/^[a-z][a-z0-9_]*$/), Task)
+    .refine((t) => !Object.hasOwn(t, "default"), { message: "tên tác vụ 'default' đã dành riêng" }),
 });
 export type TaskConfig = z.infer<typeof Task>;
 export type TasksFile = z.infer<typeof File>;

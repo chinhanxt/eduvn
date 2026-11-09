@@ -8,21 +8,25 @@ export function toGatewayError(e: unknown): Error {
   if (!(e instanceof RpcError)) return new GatewayError(502, "upstream_error", (e as Error).message);
   if (e.code === -32000) return new GatewayError(504, "timeout", e.message);
   if (e.code === -32001) return new GatewayError(503, "ai_unavailable", e.message);
+  if (e.code === -32002) return new GatewayError(409, "busy", e.message);
   if (e.code === -32602) return new GatewayError(400, "bad_model", e.message);
   return new GatewayError(502, "upstream_error", e.message);
 }
 
+const neutralize = (t: string): string => t.replace(/<(\/?(?:he_thong|hoi_thoai_truoc))/gi, "‹$1");
+const safeParts = (parts: ContentPart[]): ContentPart[] => parts.map((p) => (p.type === "text" ? { ...p, text: neutralize(p.text) } : p));
+
 /** ACP không có vai "system": phiên mới nhận lời dặn + lịch sử ở khối đầu; phiên cũ chỉ cần tin mới nhất. */
 export function toBlocks(input: BackendInput, fresh: boolean): ContentPart[] {
   const last = input.messages[input.messages.length - 1]!;
-  const lastParts: ContentPart[] = typeof last.content === "string" ? [{ type: "text", text: last.content }] : last.content;
+  const lastParts: ContentPart[] = safeParts(typeof last.content === "string" ? [{ type: "text", text: last.content }] : last.content);
   if (!fresh) return lastParts;
   const head = [`<he_thong>\n${input.system}\n</he_thong>`];
   const history = input.messages.slice(0, -1);
   if (history.length) {
     head.push(
       "<hoi_thoai_truoc>\n" +
-        history.map((m) => `${m.role === "assistant" ? "Trợ lý" : "Người dùng"}: ${textOf(m.content)}`).join("\n") +
+        history.map((m) => `${m.role === "assistant" ? "Trợ lý" : "Người dùng"}: ${neutralize(textOf(m.content))}`).join("\n") +
         "\n</hoi_thoai_truoc>",
     );
   }

@@ -35,20 +35,48 @@ export function extractJson(text: string): unknown {
   } catch {
     // tìm khối { … } hoặc [ … ] trong chữ
   }
-  const starts = [body.indexOf("{"), body.indexOf("[")].filter((i) => i >= 0);
-  if (!starts.length) throw new GatewayError(502, "bad_json", "AI không trả JSON");
-  const a = Math.min(...starts);
-  const b = body.lastIndexOf(body[a] === "{" ? "}" : "]");
-  try {
-    return JSON.parse(body.slice(a, b + 1));
-  } catch {
-    throw new GatewayError(502, "bad_json", "AI trả JSON hỏng");
+  for (let i = 0; i < body.length; i++) {
+    if (body[i] !== "{" && body[i] !== "[") continue;
+    const end = balancedEnd(body, i);
+    if (end < 0) continue;
+    try {
+      return JSON.parse(body.slice(i, end + 1));
+    } catch {
+      // thử vị trí mở tiếp theo
+    }
   }
+  throw new GatewayError(502, "bad_json", "AI không trả JSON hợp lệ");
 }
+
+function balancedEnd(s: string, start: number): number {
+  let depth = 0;
+  let inStr = false;
+  for (let i = start; i < s.length; i++) {
+    const c = s[i]!;
+    if (inStr) {
+      if (c === "\\") i++;
+      else if (c === '"') inStr = false;
+    } else if (c === '"') inStr = true;
+    else if (c === "{" || c === "[") depth++;
+    else if ((c === "}" || c === "]") && --depth === 0) return i;
+  }
+  return -1;
+}
+
+const MAX_MSGS = 30;
+const MAX_CHARS = 24000;
+const cap = (msgs: ChatMessage[]): ChatMessage[] => {
+  const out = [...msgs];
+  let chars = out.reduce((n, m) => n + textOf(m.content).length, 0);
+  while (out.length > 1 && (out.length > MAX_MSGS || chars > MAX_CHARS)) chars -= textOf(out.shift()!.content).length;
+  return out;
+};
 
 const note = (messages: ChatMessage[], text: string): ChatMessage[] => [...messages, { role: "user", content: text }];
 
 export class LlmService {
+  private readonly transcripts = new Map<string, { messages: ChatMessage[]; lastUsed: number }>();
+
   constructor(
     private readonly deps: {
       tasks: TasksFile;
@@ -62,6 +90,14 @@ export class LlmService {
     return resolveRoute(this.deps.tasks, model, { interactive });
   }
 
+  conversations(): number {
+    return this.transcripts.size;
+  }
+
+  sweep(now = Date.now(), idleMs = 900000): void {
+    for (const [k, t] of this.transcripts) if (now - t.lastUsed > idleMs) this.transcripts.delete(k);
+  }
+
   taskNames(): string[] {
     return Object.keys(this.deps.tasks.tasks);
   }
@@ -72,17 +108,29 @@ export class LlmService {
     const system = [GUARD, r.system, ...req.messages.filter((m) => m.role === "system").map((m) => textOf(m.content))]
       .filter(Boolean)
       .join("\n\n");
-    const messages = req.messages.filter((m) => m.role !== "system");
+    let messages = req.messages.filter((m) => m.role !== "system");
     if (!messages.some((m) => m.role === "user")) throw new GatewayError(400, "no_user_message", "Thiếu tin nhắn của người dùng");
+    const key = req.conversation;
+    if (key) {
+      const past = this.transcripts.get(key)?.messages ?? [];
+      // Một tin duy nhất: ghép với lịch sử đã lưu; nhiều tin: máy khách tự giữ lịch sử.
+      messages = messages.length === 1 ? cap([...past, ...messages]) : cap(messages);
+    }
     const started = Date.now();
     return this.deps.limiter.run(r.priority, async () => {
       const [primary, backup] = this.pickBackends(r.backend);
       let used = primary!;
       const call = async (msgs: ChatMessage[], onDelta?: (t: string) => void): Promise<BackendOutput> => {
         const input = { model: r.model, system, messages: msgs, conversation: req.conversation, timeoutMs: r.timeoutMs, priority: r.priority };
+        let emitted = false;
+        const track = onDelta && ((t: string) => {
+          emitted = true;
+          onDelta(t);
+        });
         try {
-          return await used.complete(input, onDelta);
+          return await used.complete(input, track);
         } catch (e) {
+          if (emitted) throw e instanceof GatewayError ? e : new GatewayError(502, "upstream_error", (e as Error).message);
           // Lỗi phía AI (tài khoản agy bị khoá, mạng, quá giờ…): chuyển sang backend dự phòng nếu có.
           if (!backup || used === backup || (e instanceof GatewayError && e.status < 500)) throw e;
           used = backup;
@@ -108,6 +156,7 @@ export class LlmService {
         }
         req.onDelta?.(out.text);
       }
+      if (key) this.transcripts.set(key, { messages: cap([...messages, { role: "assistant", content: out.text }]), lastUsed: Date.now() });
       return { text: out.text, json, model: r.model, task: r.task, backend: used.name, ms: Date.now() - started, usage: out.usage, retried };
     });
   }

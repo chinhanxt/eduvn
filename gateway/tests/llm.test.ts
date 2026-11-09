@@ -102,4 +102,50 @@ describe("LlmService", () => {
   it("liệt kê tên tác vụ", () => {
     expect(mk(new StubBackend("acp", [])).taskNames()).toEqual(["gia_su_chat", "sinh_cau_hoi"]);
   });
+  it("hội thoại có khoá: backend dự phòng nhận đủ lịch sử", async () => {
+    const acp = new StubBackend("acp", ["lượt một", new Error("503 hỏng")]);
+    const api = new StubBackend("anthropic", ["lượt hai"]);
+    const svc = new LlmService({ tasks, backends: { acp, anthropic: api }, limiter: new PriorityLimiter(2), fallback: "anthropic" });
+    await svc.complete({ model: "default", messages: [user("một")], conversation: "c" });
+    const r = await svc.complete({ model: "default", messages: [user("hai")], conversation: "c" });
+    expect(r.backend).toBe("anthropic");
+    expect(api.calls[0]!.messages).toEqual([user("một"), { role: "assistant", content: "lượt một" }, user("hai")]);
+  });
+  it("máy khách gửi cả lịch sử thì dùng nguyên và thay bản lưu", async () => {
+    const acp = new StubBackend("acp", ["a", "b"]);
+    const svc = mk(acp);
+    await svc.complete({ model: "default", messages: [user("x")], conversation: "c" });
+    const hist = [user("p"), { role: "assistant" as const, content: "q" }, user("r")];
+    await svc.complete({ model: "default", messages: hist, conversation: "c" });
+    expect(acp.calls[1]!.messages).toEqual(hist);
+  });
+  it("sweep xoá lịch sử hội thoại nhàn rỗi", async () => {
+    const svc = mk(new StubBackend("acp", ["a"]));
+    await svc.complete({ model: "default", messages: [user("x")], conversation: "c" });
+    expect(svc.conversations()).toBe(1);
+    svc.sweep(Date.now() + 1000, 900000);
+    expect(svc.conversations()).toBe(1);
+    svc.sweep(Date.now() + 1000000, 900000);
+    expect(svc.conversations()).toBe(0);
+  });
+  it("đã stream chữ rồi mới lỗi thì không chuyển dự phòng", async () => {
+    class Half extends StubBackend {
+      async complete(input: BackendInput, onDelta?: (t: string) => void): Promise<BackendOutput> {
+        this.calls.push(input);
+        onDelta?.("nửa");
+        throw new Error("đứt");
+      }
+    }
+    const acp = new Half("acp", []);
+    const api = new StubBackend("anthropic", ["x"]);
+    const deltas: string[] = [];
+    await expect(
+      new LlmService({ tasks, backends: { acp, anthropic: api }, limiter: new PriorityLimiter(2), fallback: "anthropic" }).complete({ model: "default", messages: [user("x")], onDelta: (t) => deltas.push(t) }),
+    ).rejects.toMatchObject({ status: 502, code: "upstream_error" });
+    expect(api.calls).toHaveLength(0);
+    expect(deltas).toEqual(["nửa"]);
+  });
+  it("extractJson bỏ qua {…} không phải JSON", () => {
+    expect(extractJson('Dùng {x} như sau: {"a":1}')).toEqual({ a: 1 });
+  });
 });

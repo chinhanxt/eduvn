@@ -33,4 +33,7 @@ describe("resolveRoute", () => {
     expect(Object.keys(t.tasks)).toContain("gia_su_chat");
     expect(resolveRoute(t, "gia_su_chat").priority).toBe(0);
   });
+  it("không cho đặt tên tác vụ default", () => {
+    expect(() => parseTasks({ defaults: { model: "m", timeoutMs: 1000, backend: "acp" }, tasks: { default: { model: "m" } } })).toThrow(/dành riêng/);
+  });
 });
