@@ -39,7 +39,10 @@ export class JsonRpcPeer {
     input: Readable,
     private readonly output: Writable,
   ) {
-    createInterface({ input }).on("line", (line) => this.onLine(line));
+    output.on("error", (e) => this.close(new Error(`Kết nối AI lỗi: ${e.message}`)));
+    createInterface({ input })
+      .on("line", (line) => this.onLine(line))
+      .on("close", () => this.close(new Error("Kết nối AI đã đóng")));
   }
 
   get pendingCount(): number {
@@ -66,7 +69,13 @@ export class JsonRpcPeer {
         }, timeoutMs);
       }
       this.pending.set(id, p);
-      this.write({ jsonrpc: "2.0", id, method, params });
+      try {
+        this.write({ jsonrpc: "2.0", id, method, params });
+      } catch (e) {
+        this.pending.delete(id);
+        clearTimeout(p.timer);
+        reject(e as Error);
+      }
     });
   }
 
@@ -85,7 +94,16 @@ export class JsonRpcPeer {
   }
 
   private write(m: RpcMessage): void {
+    if (this.closed) return;
     this.output.write(JSON.stringify(m) + "\n");
+  }
+
+  private safeWrite(m: RpcMessage): void {
+    try {
+      this.write(m);
+    } catch {
+      // đầu ra hỏng: sự kiện 'error' sẽ đóng kết nối
+    }
   }
 
   private onLine(line: string): void {
@@ -97,30 +115,36 @@ export class JsonRpcPeer {
     } catch {
       return;
     }
-    if (m.method === undefined && m.id !== undefined) {
-      const id = Number(m.id);
-      const p = this.pending.get(id);
+    if (m.method === undefined && typeof m.id === "number") {
+      const p = this.pending.get(m.id);
       if (!p) return;
-      this.pending.delete(id);
+      this.pending.delete(m.id);
       clearTimeout(p.timer);
       if (m.error) p.reject(new RpcError(m.error.code, m.error.message, m.error.data));
       else p.resolve(m.result);
       return;
     }
-    if (m.method !== undefined && m.id !== undefined) {
-      void this.answer(m.id, m.method, m.params);
+    if (m.method === undefined) return;
+    if (m.id === undefined) {
+      try {
+        this.notificationHandler(m.method, m.params);
+      } catch {
+        // bỏ qua lỗi của bộ xử lý thông báo
+      }
       return;
     }
-    if (m.method !== undefined) this.notificationHandler(m.method, m.params);
+    if (typeof m.id === "number" || (typeof m.id === "string" && m.id !== "")) {
+      void this.answer(m.id, m.method, m.params);
+    }
   }
 
   private async answer(id: number | string, method: string, params: unknown): Promise<void> {
     try {
       const result = await this.requestHandler(method, params);
-      if (!this.closed) this.output.write(JSON.stringify({ jsonrpc: "2.0", id, result: result ?? null }) + "\n");
+      this.safeWrite({ jsonrpc: "2.0", id, result: result ?? null });
     } catch (e) {
       const err = e instanceof RpcError ? e : new RpcError(-32603, (e as Error).message);
-      if (!this.closed) this.output.write(JSON.stringify({ jsonrpc: "2.0", id, error: { code: err.code, message: err.message } }) + "\n");
+      this.safeWrite({ jsonrpc: "2.0", id, error: { code: err.code, message: err.message } });
     }
   }
 }
