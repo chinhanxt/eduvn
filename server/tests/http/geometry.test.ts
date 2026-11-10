@@ -4,6 +4,7 @@ import { createVerifier } from "../../src/auth/verify";
 import { buildApp } from "../../src/http/app";
 import type { Ai, AiMessage } from "../../src/services/ai";
 import fixtures from "../fixtures/dung-hinh.json";
+import { STUDENT_SECRET } from "../helpers/app";
 import { testDb } from "../helpers/db";
 import { AUDIENCE, ISSUER, makeIssuer } from "../helpers/tokens";
 
@@ -13,7 +14,7 @@ const seen: { task: string; messages: AiMessage[] }[] = [];
 
 async function boot(ai?: Ai) {
   const kc = await makeIssuer();
-  app = buildApp({ db: await testDb(), verify: createVerifier({ issuer: ISSUER, audience: AUDIENCE, keys: kc.keys }), issuer: ISSUER, publicUrl: "http://eduvn.test", downloadSecret: "test-secret-test-secret-test-secret!", ai });
+  app = buildApp({ db: await testDb(), verify: createVerifier({ issuer: ISSUER, audience: AUDIENCE, keys: kc.keys }), issuer: ISSUER, publicUrl: "http://eduvn.test", downloadSecret: "test-secret-test-secret-test-secret!", studentSecret: STUDENT_SECRET, ai });
   auth = { authorization: `Bearer ${await kc.sign({ sub: "gv-1", name: "Cô Lan" })}` };
 }
 afterEach(async () => {
