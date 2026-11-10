@@ -3,7 +3,7 @@
   "task": "soan_giao_an",
   "common": [
     "Đầu ra là JSON hợp lệ đúng cấu trúc của chế độ được yêu cầu.",
-    "Không trường chữ nào rỗng; có đủ a) mục tiêu, b) nội dung, c) sản phẩm, d) bốn bước với phân vai GV và HS.",
+    "Nếu chế độ là hoạt động hoặc toàn bộ: không trường chữ nào rỗng, mỗi hoạt động đủ a) mục tiêu, b) nội dung, c) sản phẩm, d) bốn bước với phân vai GV và HS (chế độ khung chỉ cần các trường của khung).",
     "Mục tiêu, năng lực, phẩm chất cụ thể (không khẩu hiệu), sản phẩm khớp mục tiêu."
   ],
   "cases": [

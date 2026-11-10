@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
-import { api, errText, exportLesson, type LessonBody, type LessonDetail, type LessonSummary } from "../api";
+import { Link, useNavigate, useParams } from "react-router";
+import { aiSkill, api, errText, exportLesson, type LessonBody, type LessonDetail, type LessonSummary } from "../api";
 import { Icon } from "../Icon";
 
 const TITLES = ["Mở đầu (Xác định vấn đề/nhiệm vụ học tập)", "Hình thành kiến thức mới", "Luyện tập", "Vận dụng"];
@@ -10,6 +10,7 @@ const gradeLabel = (g: number) => (g <= 12 ? `Lớp ${g}` : `Năm ${g - 12}`);
 export function Lessons() {
   const [rows, setRows] = useState<LessonSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [ai, setAi] = useState(false);
   const load = useCallback(() => {
     api<LessonSummary[]>("/api/lessons").then(setRows).catch((e: unknown) => setError(errText(e)));
   }, []);
@@ -17,6 +18,11 @@ export function Lessons() {
   return (
     <>
       <h1>Giáo án</h1>
+      <div className="bar">
+        <span className="sp" />
+        <button className="btn" onClick={() => setAi((a) => !a)} data-testid="ai-lesson-open"><Icon name="spark" size={18} />AI soạn giáo án 5512</button>
+      </div>
+      {ai && <AiLessonForm onError={setError} />}
       {error && <div className="err">{error}</div>}
       {rows?.length === 0 && <div className="card"><div className="empty">—</div></div>}
       <div className="cards" data-testid="lesson-cards">
@@ -29,6 +35,39 @@ export function Lessons() {
         ))}
       </div>
     </>
+  );
+}
+
+function AiLessonForm({ onError }: { onError: (e: string | null) => void }) {
+  const nav = useNavigate();
+  const [f, setF] = useState({ subject: "Toán", grade: 10, title: "", periods: 2, note: "" });
+  const [busy, setBusy] = useState(false);
+  const run = async () => {
+    setBusy(true);
+    onError(null);
+    try {
+      const r = await aiSkill<{ id: string }>("giao-an", { ...f, note: f.note.trim() || undefined });
+      nav(`/giao-an/${r.id}`);
+    } catch (e) {
+      onError(errText(e));
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="card" style={{ marginBottom: 16 }} data-testid="ai-lesson-form">
+      <div className="formrow">
+        <label className="lbl">Môn<input className="inp w-m" value={f.subject} onChange={(e) => setF({ ...f, subject: e.target.value })} /></label>
+        <label className="lbl">Lớp<input className="inp w-s" type="number" min={1} max={16} value={f.grade} onChange={(e) => setF({ ...f, grade: Number(e.target.value) })} /></label>
+        <label className="lbl">Tên bài / chủ đề<input className="inp w-m" style={{ width: 240 }} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="ai-lesson-title" /></label>
+        <label className="lbl">Số tiết<input className="inp w-s" type="number" min={1} max={20} value={f.periods} onChange={(e) => setF({ ...f, periods: Number(e.target.value) })} /></label>
+        <label className="lbl">Ghi chú (tuỳ chọn)<input className="inp" style={{ width: 260 }} value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} /></label>
+      </div>
+      <div className="bar" style={{ marginBottom: 0 }}>
+        <span className="sp" />
+        {busy && <span className="tag violet">AI đang soạn từng mục, khoảng 1–3 phút…</span>}
+        <button className="btn" disabled={busy || !f.title.trim() || !f.subject.trim()} onClick={() => void run()} data-testid="ai-lesson-run"><Icon name="spark" size={18} />Soạn</button>
+      </div>
+    </div>
   );
 }
 

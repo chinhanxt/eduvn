@@ -26,6 +26,7 @@ import { createGameService } from "../services/games";
 import { createSlideService } from "../services/slides";
 import type { AiLessonsCfg } from "../services/aiLessons/service";
 import { registerAiLessonRoutes } from "./routes/aiLessons";
+import { registerAiSkillRoutes } from "./routes/aiSkills";
 import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
@@ -346,6 +347,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   });
 
   registerAiLessonRoutes(app, { db: deps.db, ai: deps.ai, cfg: deps.aiLessons ?? { dataDir: "./data" }, service, authenticate });
+  registerAiSkillRoutes(app, { ai: deps.ai, lessons, classes, authenticate });
   registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
 
   app.post("/mcp", async (req, reply) => {

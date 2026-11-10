@@ -14,6 +14,7 @@ import type { GameService } from "../services/games";
 import type { SlideService } from "../services/slides";
 import { registerGameTools } from "./games";
 import { registerSlideTools } from "./slides";
+import { registerSkillTools } from "./skills";
 
 export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks>;
   classes: ClassService;
@@ -131,6 +132,7 @@ export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLi
   registerSlideTools(server, { slides, actor, makeSlideLink });
   registerGameTools(server, { games, actor, makeGameLink });
   registerClassTools(server, { classes, actor, makeClassLink });
+  registerSkillTools(server);
 
   return server;
 }

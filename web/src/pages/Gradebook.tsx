@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
-import { LEVELS, api, errText, exportClass, vn, type AttStatus, type ClassSummary, type Gradebook as Gb } from "../api";
+import { LEVELS, aiSkill, api, errText, exportClass, vn, type AttStatus, type ClassSummary, type Gradebook as Gb } from "../api";
 import { Icon } from "../Icon";
 
 type Tab = "diem" | "diem-danh" | "nhan-xet";
@@ -167,6 +167,25 @@ function Comments({ gb, term, setTerm, reload, setError }: P & { term: "HK1" | "
   const levels = LEVELS[gb.class.scale];
   const [draft, setDraft] = useState<Record<string, { text: string; level: string }>>({});
   const [saved, setSaved] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiNote, setAiNote] = useState<string | null>(null);
+  const suggest = async () => {
+    setAiBusy(true);
+    setAiNote(null);
+    try {
+      const empty = gb.students.filter((s) => (draft[s.id]?.text ?? "").trim() === "").map((s) => s.id);
+      const r = await aiSkill<{ items: { student: string; text: string; level: string; issues: string[] }[] }>("nhan-xet", { classId: gb.class.id, term, students: empty.length ? empty : undefined });
+      setDraft((d) => ({ ...d, ...Object.fromEntries(r.items.map((x) => [x.student, { text: x.text, level: x.level }])) }));
+      setSaved(false);
+      setError(null);
+      const bad = r.items.filter((x) => x.issues.length).length;
+      setAiNote(`AI đã gợi ý ${r.items.length} nhận xét${bad ? `, ${bad} cái cần xem lại (độ dài/lộ tên)` : ""}. Sửa trước khi lưu.`);
+    } catch (e) {
+      setError(errText(e));
+    } finally {
+      setAiBusy(false);
+    }
+  };
   useEffect(() => {
     setDraft(Object.fromEntries(gb.students.map((s) => [s.id, s.comments[term] ?? { text: "", level: levels[0] }])));
     setSaved(false);
@@ -194,8 +213,10 @@ function Comments({ gb, term, setTerm, reload, setError }: P & { term: "HK1" | "
         <span className="tag violet">{gb.class.scale}</span>
         <span className="sp" />
         {saved && <span className="tag green">Đã lưu</span>}
+        <button className="btn ghost" disabled={aiBusy} onClick={() => void suggest()} data-testid="cm-ai"><Icon name="spark" size={18} />{aiBusy ? "AI đang viết…" : "AI gợi ý nhận xét"}</button>
         <button className="btn" onClick={() => void save()} data-testid="cm-save"><Icon name="check" size={18} />Lưu</button>
       </div>
+      {aiNote && <div className="warn" data-testid="cm-ai-note">{aiNote}</div>}
       <table data-testid="cm-table">
         <thead><tr><th>STT</th><th>Họ và tên</th>{gb.class.scale !== "TT27" && <th>ĐTB</th>}<th>Nhận xét (20–400 ký tự)</th><th>Mức</th></tr></thead>
         <tbody>

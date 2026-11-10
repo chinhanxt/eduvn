@@ -16,6 +16,7 @@ const ClassDetailPage = lazy(() => import("./pages/Classes").then((m) => ({ defa
 const Gradebook = lazy(() => import("./pages/Gradebook").then((m) => ({ default: m.Gradebook })));
 const LessonDetailPage = lazy(() => import("./pages/Lessons").then((m) => ({ default: m.LessonDetailPage })));
 const Lessons = lazy(() => import("./pages/Lessons").then((m) => ({ default: m.Lessons })));
+const DeCuong = lazy(() => import("./pages/DeCuong").then((m) => ({ default: m.DeCuong })));
 const VanBan = lazy(() => import("./pages/VanBan").then((m) => ({ default: m.VanBan })));
 const Slides = lazy(() => import("./pages/Slides").then((m) => ({ default: m.Slides })));
 const AiLessons = lazy(() => import("./pages/AiLessons").then((m) => ({ default: m.AiLessons })));
@@ -61,6 +62,7 @@ export function App() {
           <Route path="so-diem" element={<Gradebook />} />
           <Route path="giao-an" element={<Lessons />} />
           <Route path="giao-an/:id" element={<LessonDetailPage />} />
+          <Route path="de-cuong" element={<DeCuong />} />
           <Route path="slide" element={<Slides />} />
           <Route path="bai-giang-ai" element={<AiLessons />} />
           <Route path="bai-giang-ai/:id" element={<AiLessonPage />} />

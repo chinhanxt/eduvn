@@ -80,6 +80,18 @@
       "timeoutMs": 180000,
       "description": "Lộ trình thành thạo và dựng giáo trình: chẩn đoán, giải thích, luyện, chẩn lỗi, dàn chương, khối nội dung (JSON khi gọi với json=true)"
     },
+    "ma_tran_7991": {
+      "model": ["claude-sonnet-5-5-medium", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "json": true,
+      "timeoutMs": 300000,
+      "description": "Lập ma trận + bản đặc tả đề theo CV 7991"
+    },
+    "nhan_xet_hs": {
+      "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
+      "json": true,
+      "timeoutMs": 300000,
+      "description": "Gợi ý nhận xét học sinh theo TT22/TT27"
+    },
     "giam_khao": {
       "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
       "json": true,

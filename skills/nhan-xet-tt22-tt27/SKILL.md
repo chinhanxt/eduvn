@@ -18,7 +18,7 @@ Chỉ dùng `id` để định danh; đầu vào không có tên học sinh.
 2. **Điểm mạnh** — một nhận định có bằng chứng từ dữ liệu (một cột điểm cao, tiến bộ, chuyên cần tốt, điều GV ghi). Không bịa sự kiện không có trong dữ liệu.
 3. **Điều cần cải thiện** — một việc cụ thể, nói mềm, theo mức: mức cao thì nêu thách thức nâng cao; mức Chưa đạt/Chưa hoàn thành thì nêu đúng kiến thức/kĩ năng còn hổng, không quy chụp.
 4. **Bước tiếp theo** — một hành động cụ thể em làm được trong học kì tới (làm lại dạng bài, đọc thêm, nhờ bạn/GV hỗ trợ), kèm sự phối hợp của gia đình nếu cần.
-5. **Độ dài** 40–300 ký tự (giới hạn hệ thống 20–400), 2–3 câu, xưng "Em" hoặc nói chủ ngữ ẩn; văn phong tôn trọng, tích cực nhưng trung thực.
+5. **Độ dài** 40–300 ký tự (giới hạn hệ thống 20–400), đúng 2–3 câu (nhắc phối hợp gia đình, nếu cần, gộp vào câu bước tiếp theo, không thêm câu thứ tư), xưng "Em" hoặc nói chủ ngữ ẩn; văn phong tôn trọng, tích cực nhưng trung thực.
 6. **Tránh**: tên riêng, so sánh với bạn khác, nhãn tính cách ("lười", "kém"), câu chung chung có thể áp cho mọi học sinh ("Em ngoan, cần cố gắng hơn"), lặp nguyên một mẫu cho nhiều học sinh (mỗi nhận xét khác nhau về chi tiết và cấu trúc câu), nhắc đến chẩn đoán y tế/hoàn cảnh gia đình.
 7. **Tự kiểm**: mức đúng thang; có đủ ba thành phần; không tên; không hai nhận xét giống nhau quá 60% từ.
 
