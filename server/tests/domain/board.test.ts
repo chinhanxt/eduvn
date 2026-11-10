@@ -35,6 +35,8 @@ describe("validateBoard", () => {
     const shape = { type: "shape", id: "h1", kind: "arrow", color: "#ff7a6b", width: 3, fill: false, pts: [10, 10, 200, 120] };
     const text = { type: "text", id: "t1", x: 100, y: 80, size: 32, color: "#f3f0e6", text: "$x^2+1=0$" };
     expect(validateBoard({ ...meta, doc: page([shape, text]) }, "save").ok).toBe(true);
+    expect(validateBoard({ ...meta, doc: page([{ ...text, w: 212, h: 64 }]) }, "save").ok).toBe(true); // kích thước đo thật
+    expect(validateBoard({ ...meta, doc: page([{ ...text, w: 0 }]) }, "save").ok).toBe(false);
     expect(validateBoard({ ...meta, doc: page([{ ...shape, kind: "star" }]) }, "save").ok).toBe(false);
     expect(validateBoard({ ...meta, doc: page([{ ...shape, pts: [1, 2] }]) }, "save").ok).toBe(false);
     expect(validateBoard({ ...meta, doc: page([{ ...text, text: "" }]) }, "save").ok).toBe(false);

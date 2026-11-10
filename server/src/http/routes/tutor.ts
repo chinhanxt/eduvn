@@ -32,6 +32,7 @@ export function registerTutorRoutes(app: FastifyInstance, { tutor, authenticate 
     await tutor.kb.removeDocument(await authenticate(req), req.params.id, req.params.docId);
     return reply.code(204).send();
   });
+  app.get("/api/tutor/kbs/:id/ocr", async (req) => ({ ocr: await tutor.kb.progress(await authenticate(req), Id(req)) }));
   app.get<{ Params: { id: string }; Querystring: { q?: string; k?: string } }>("/api/tutor/kbs/:id/search", async (req) => {
     const actor = await authenticate(req);
     const hits = await tutor.kb.search(actor, req.params.id, req.query.q ?? "", Math.min(10, Number(req.query.k) || 5));

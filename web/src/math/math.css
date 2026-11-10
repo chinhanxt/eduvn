@@ -46,3 +46,7 @@ math-field::part(menu-toggle), math-field::part(virtual-keyboard-toggle) { displ
 .kb-key.small .ML__latex { font-size: 13px; }
 .kb-del { grid-column: span 2; }
 .kb-done { grid-column: span 2; grid-row: span 2; height: auto; background: var(--brand); color: #fff; font-weight: 600; }
+.me-ink { margin-top: 8px; border: 1px solid var(--line, #d9dce8); border-radius: 12px; padding: 8px; background: #fff; }
+.me-ink-svg { width: 100%; height: 150px; background: #fff; border-radius: 8px; touch-action: none; cursor: crosshair; display: block; box-shadow: inset 0 0 0 1px #e4e6f0; }
+.me-ink-bar { display: flex; gap: 6px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.me-ink-out { flex: 1; min-width: 120px; font-size: 14px; color: #444; }

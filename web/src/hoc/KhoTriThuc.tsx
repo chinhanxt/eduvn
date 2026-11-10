@@ -24,6 +24,7 @@ export function KhoTriThuc() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const [ocr, setOcr] = useState<{ name: string; done: number; total: number } | null>(null);
 
   const loadKbs = useCallback(() => tutorApi<Kb[]>("/kbs").then(setKbs).catch((e: unknown) => setError(errText(e))), []);
   const loadDrafts = useCallback(() => tutorApi<Draft[]>("/drafts").then(setDrafts).catch(() => {}), []);
@@ -33,6 +34,14 @@ export function KhoTriThuc() {
     void loadDrafts();
     import("../api").then(({ api }) => api<LessonRow[]>("/api/lessons").then(setLessons)).catch(() => {});
   }, [loadKbs, loadDrafts]);
+
+  // Đang nạp tài liệu: hỏi tiến độ OCR (PDF scan) mỗi giây.
+  useEffect(() => {
+    if (busy !== "up" || !kb) return setOcr(null);
+    const id = kb.id;
+    const t = setInterval(() => void tutorApi<{ ocr: { name: string; done: number; total: number } | null }>(`/kbs/${id}/ocr`).then((r) => setOcr(r.ocr)).catch(() => {}), 1000);
+    return () => clearInterval(t);
+  }, [busy, kb?.id]);
 
   const run = async (label: string, f: () => Promise<unknown>) => {
     setBusy(label);
@@ -146,8 +155,9 @@ export function KhoTriThuc() {
                   </div>
                 ))}
                 {kb.docs.length === 0 && <div className="empty">Kho chưa có tài liệu.</div>}
+                {ocr && <div className="ok-box" data-testid="kb-ocr">PDF scan “{ocr.name}”: đã đọc {ocr.done}/{ocr.total} trang bằng AI (OCR)…</div>}
                 <div className="bar" style={{ marginTop: 14 }}>
-                  <label className="btn" style={{ cursor: "pointer" }}><Icon name="upload" size={18} />{busy === "up" ? "Đang lập chỉ mục…" : "Tải PDF / DOCX / TXT / MD"}<input type="file" hidden multiple accept=".pdf,.docx,.txt,.md" onChange={(e) => void upload(e.target.files)} data-testid="kb-upload" /></label>
+                  <label className="btn" style={{ cursor: "pointer" }}><Icon name="upload" size={18} />{busy === "up" ? (ocr ? `Đang đọc ảnh ${ocr.done}/${ocr.total} trang…` : "Đang lập chỉ mục…") : "Tải PDF / DOCX / TXT / MD"}<input type="file" hidden multiple accept=".pdf,.docx,.txt,.md" onChange={(e) => void upload(e.target.files)} data-testid="kb-upload" /></label>
                   {lessons.length > 0 && (
                     <select className="inp" value="" onChange={(e) => e.target.value && void addLesson(e.target.value)} aria-label="Thêm giáo án">
                       <option value="">+ Thêm giáo án EDUVN…</option>

@@ -60,6 +60,18 @@ export function useBoard(id: string) {
     updateObj: (oid: string, patch: Partial<BoardObj>, live = false) =>
       change((p) => ({ ...p, objects: p.objects.map((o) => (o.id === oid ? ({ ...o, ...patch } as BoardObj) : o)) }), live),
     addObj: (o: BoardObj) => change((p) => ({ ...p, objects: [...p.objects, o] })),
+    /** Thêm `final` (vd hình đã làm đẹp) thay cho `raw` (nét gốc): Hoàn tác lần 1 trả lại nét gốc, lần 2 xoá hẳn. */
+    addWithRaw: (raw: BoardObj, final: BoardObj) => {
+      const d = docRef.current;
+      if (!d) return;
+      const withObj = (o: BoardObj): BoardDoc => ({ ...d, pages: d.pages.map((p, i) => (i === page ? { ...p, objects: [...p.objects, o] } : p)) });
+      hist.current.push(d, withObj(raw));
+      while (hist.current.length > 60) hist.current.shift();
+      setDoc(withObj(final));
+      setDirty(true);
+    },
+    /** Thay các đối tượng `ids` bằng `o` (một bước hoàn tác). */
+    replaceObjs: (ids: string[], o: BoardObj) => change((p) => ({ ...p, objects: [...p.objects.filter((x) => !ids.includes(x.id)), o] })),
     removeObjs: (ids: string[], live = false) => change((p) => ({ ...p, objects: p.objects.filter((o) => !ids.includes(o.id)) }), live),
     undo: () => {
       const prev = hist.current.pop();

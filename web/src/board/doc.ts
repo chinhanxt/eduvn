@@ -14,7 +14,7 @@ export const SHAPE_KINDS = ["line", "arrow", "rect", "triangle", "circle", "poly
 export type ShapeKind = (typeof SHAPE_KINDS)[number];
 /** line/arrow/rect/triangle/circle: pts = [x1,y1,x2,y2] (khung bao / hai đầu); polygon: danh sách đỉnh. */
 export type ShapeObj = { type: "shape"; id: string; kind: ShapeKind; color: string; width: number; fill: boolean; pts: number[] };
-export type TextObj = { type: "text"; id: string; x: number; y: number; size: number; color: string; text: string };
+export type TextObj = { type: "text"; id: string; x: number; y: number; size: number; color: string; text: string; w?: number; h?: number };
 export type BoardObj = Stroke | GraphObj | SolidObj | ShapeObj | TextObj;
 export type BoardPageDoc = { id: string; objects: BoardObj[] };
 export type BoardDoc = { version: 1; pages: BoardPageDoc[] };
@@ -105,6 +105,7 @@ export function arrowHead(o: ShapeObj): string {
   return `M${p(0.45)}L${x2} ${y2}L${p(-0.45)}`;
 }
 export const textBox = (o: TextObj): { w: number; h: number } => {
+  if (o.w && o.h) return { w: o.w, h: o.h }; // kích thước đo thật (TextView đo sau khi hiển thị)
   const lines = o.text.split("\n");
   const w = Math.max(...lines.map((l) => l.replace(/\\[a-zA-Z]+/g, "x").replace(/[${}\\^_]/g, "").length)) * o.size * 0.6 + 24;
   const h = lines.reduce((a, l) => a + (/\\d?frac|\\sqrt/.test(l) ? o.size * 2.2 : o.size * 1.5), 0) + 8;

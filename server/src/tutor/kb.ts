@@ -9,6 +9,8 @@ import { type Role, assertCan } from "../domain/authz";
 import { type LessonPlan } from "../domain/lesson";
 import { Bm25, chunkPages } from "../domain/tutorSearch";
 import { NotFoundError, ValidationError } from "../errors";
+import type { Ai } from "../services/ai";
+import type { OcrProgress } from "./ocr";
 import { extractPages, lessonPlanPages } from "./extract";
 
 export type Actor = { userId: string; orgId: string; role: Role };
@@ -23,7 +25,9 @@ export type DocInput =
   | { name: string; text: string }
   | { lessonPlanId: string };
 
-export function createKbService(db: Db) {
+export function createKbService(db: Db, ai?: Ai) {
+  /** Tiến độ OCR đang chạy theo kho (hiển thị ở trang Kho tri thức). */
+  const ocr = new Map<string, OcrProgress & { name: string }>();
   const indexes = new Map<string, { index: Bm25<Passage>; docs: Map<string, string> }>();
 
   async function loadKb(orgId: string, id: string) {
@@ -81,7 +85,11 @@ export function createKbService(db: Db) {
       name = input.name.trim();
       if (!name) throw new ValidationError(["Thiếu tên file"]);
       source = "upload";
-      pages = await extractPages(name, Buffer.from(input.contentBase64, "base64"));
+      try {
+        pages = await extractPages(name, Buffer.from(input.contentBase64, "base64"), { ai, onProgress: (p) => ocr.set(kb.id, { ...p, name }) });
+      } finally {
+        ocr.delete(kb.id);
+      }
     }
     const chunks = chunkPages(pages);
     if (!chunks.length) throw new ValidationError(["Tài liệu không có đoạn chữ nào đủ dài để lập chỉ mục"]);
@@ -105,6 +113,12 @@ export function createKbService(db: Db) {
     const del = await db.delete(tutorDocs).where(and(eq(tutorDocs.id, docId), eq(tutorDocs.kbId, kb.id))).returning({ id: tutorDocs.id });
     if (!del.length) throw new NotFoundError("Không tìm thấy tài liệu");
     indexes.delete(kb.id);
+  }
+
+  /** Tiến độ OCR của tài liệu đang nạp (null nếu không có). */
+  async function progress(actor: Actor, kbId: string) {
+    await loadKb(actor.orgId, kbId);
+    return ocr.get(kbId) ?? null;
   }
 
   async function indexOf(kbId: string) {
@@ -154,6 +168,6 @@ export function createKbService(db: Db) {
     return out;
   }
 
-  return { create, list, get, remove, addDocument, removeDocument, search, toCitations, docNames, overview, loadKb: (actor: Actor, id: string) => loadKb(actor.orgId, id) };
+  return { create, list, get, remove, addDocument, removeDocument, progress, search, toCitations, docNames, overview, loadKb: (actor: Actor, id: string) => loadKb(actor.orgId, id) };
 }
 export type KbService = ReturnType<typeof createKbService>;
