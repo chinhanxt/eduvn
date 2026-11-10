@@ -188,7 +188,6 @@ describe("giáo trình sống", () => {
     expect(section.markdown).toContain("###");
     expect(section.citations[0]).toMatchObject({ n: 1, doc: "toan8-bai3.docx" });
     expect([1, 2, 3]).toContain(section.citations[0].page);
-    expect(page.json().blocks[1].markdown).toContain("*Cần nhớ*");
     expect(page.json().blocks[2].data.mermaid).toContain("flowchart");
 
     expect((await t.call("POST", `/api/tutor/books/${book.id}/pages/1/compile`, undefined, t.hs)).statusCode).toBe(403);

@@ -23,7 +23,10 @@ export type Block =
   | { kind: "ul"; items: string[] }
   | { kind: "ol"; items: string[] }
   | { kind: "code"; lang: string; code: string }
-  | { kind: "math"; tex: string };
+  | { kind: "math"; tex: string }
+  | { kind: "hr" }
+  | { kind: "quote"; text: string }
+  | { kind: "table"; head: string[]; rows: string[][] };
 
 /** Markdown tối giản đủ cho câu trả lời gia sư và trang giáo trình. */
 export function parseBlocks(src: string): Block[] {
@@ -64,6 +67,29 @@ export function parseBlocks(src: string): Block[] {
       out.push({ kind: "math", tex: body });
       continue;
     }
+    if (/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+      flush();
+      out.push({ kind: "hr" });
+      i++;
+      continue;
+    }
+    if (/^\s*>/.test(line)) {
+      flush();
+      const q: string[] = [];
+      while (i < lines.length && /^\s*>/.test(lines[i]!)) q.push(lines[i++]!.replace(/^\s*>\s?/, ""));
+      out.push({ kind: "quote", text: q.join(" ") });
+      continue;
+    }
+    if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1]!)) {
+      flush();
+      const cells = (l: string) => l.trim().replace(/^\||\|$/g, "").split("|").map((c) => c.trim());
+      const head = cells(line);
+      i += 2;
+      const rows: string[][] = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i]!)) rows.push(cells(lines[i++]!));
+      out.push({ kind: "table", head, rows });
+      continue;
+    }
     const h = /^(#{1,3})\s+(.*)$/.exec(line);
     if (h) {
       flush();
@@ -89,12 +115,12 @@ export function parseBlocks(src: string): Block[] {
   return out;
 }
 
-export type Inline = { kind: "text" | "bold" | "cite" | "code"; text: string; n?: number };
+export type Inline = { kind: "text" | "bold" | "em" | "cite" | "code"; text: string; n?: number };
 
 /** Tách **đậm**, `mã` và trích dẫn [n] (chỉ những số có trong danh sách hợp lệ); công thức $…$ để MathText xử lý. */
 export function parseInline(src: string, validCites: readonly number[]): Inline[] {
   const out: Inline[] = [];
-  const re = /\*\*([^*]+)\*\*|`([^`]+)`|\[(\d{1,2})\]/g;
+  const re = /\*\*([^*]+)\*\*|`([^`]+)`|\[(\d{1,2})\]|\*([^*\s][^*]*)\*/g;
   let last = 0;
   for (const m of src.matchAll(re)) {
     const at = m.index!;
@@ -102,6 +128,7 @@ export function parseInline(src: string, validCites: readonly number[]): Inline[
     if (at > last) out.push({ kind: "text", text: src.slice(last, at) });
     if (m[1] !== undefined) out.push({ kind: "bold", text: m[1] });
     else if (m[2] !== undefined) out.push({ kind: "code", text: m[2] });
+    else if (m[4] !== undefined) out.push({ kind: "em", text: m[4] });
     else out.push({ kind: "cite", text: m[0], n: Number(m[3]) });
     last = at + m[0].length;
   }

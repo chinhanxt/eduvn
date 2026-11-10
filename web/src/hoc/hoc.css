@@ -73,3 +73,8 @@
 .fc.flip { background: var(--green-bg); }
 .mini-chat { display: flex; flex-direction: column; height: 520px; position: sticky; top: 12px; }
 .mini-chat .chat-log { padding: 10px; }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
+.md blockquote { margin: 0 0 8px; padding: 6px 12px; border-left: 4px solid var(--amber); background: var(--amber-bg); border-radius: 0 10px 10px 0; }
+.md-table { margin: 8px 0; font-size: 13px; } .md-table th, .md-table td { padding: 6px 10px; border: 1px solid var(--line); }
+.back { background: transparent; border: 0; padding: 0; margin: 0 0 4px; }
+.item.qdraft { flex-wrap: wrap; }

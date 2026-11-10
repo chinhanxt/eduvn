@@ -20,10 +20,17 @@ describe("Markdown gia sư", () => {
     expect(b[5]).toMatchObject({ tex: "a^2+b^2" });
     expect(b[6]).toMatchObject({ tex: "x" });
   });
+  it("đường kẻ, trích dẫn >, bảng", () => {
+    const b = parseBlocks("Mở đầu\n---\n> ⚠️ Lưu ý\n> hai dòng\n\n| A | B |\n|---|---|\n| 1 | $x$ |\n| 2 | 3 |");
+    expect(b.map((x) => x.kind)).toEqual(["p", "hr", "quote", "table"]);
+    expect(b[2]).toMatchObject({ text: "⚠️ Lưu ý hai dòng" });
+    expect(b[3]).toMatchObject({ head: ["A", "B"], rows: [["1", "$x$"], ["2", "3"]] });
+  });
   it("trích dẫn [n] chỉ thành nút khi số hợp lệ; đậm và mã", () => {
     const p = parseInline("Theo **định nghĩa** [1] và [7], dùng `x` [2]", [1, 2]);
     expect(p.filter((x) => x.kind === "cite").map((x) => x.n)).toEqual([1, 2]);
     expect(p.find((x) => x.kind === "bold")?.text).toBe("định nghĩa");
     expect(p.map((x) => x.text).join("")).toContain("[7]");
+    expect(parseInline("*Cần nhớ* và 2*3*4", []).filter((x) => x.kind === "em").map((x) => x.text)).toEqual(["Cần nhớ", "3"]);
   });
 });

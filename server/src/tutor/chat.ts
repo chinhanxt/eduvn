@@ -35,6 +35,9 @@ export type ChatEvent =
 const HISTORY_WINDOW = 16;
 const KEEP_AFTER_SUMMARY = 6;
 const SUMMARY_TRIGGER_CHARS = 6000;
+/** Ngân sách (ms) cho việc viết lại truy vấn bằng AI trước khi gia sư trả lời. Mặc định 0 = tắt: dùng ngay bản ghép từ khoá của câu trước
+ *  để chữ đầu của gia sư không bị chậm thêm một lượt gọi AI (đặt TUTOR_REWRITE_BUDGET_MS=2000 để bật). Quá hạn thì cũng rơi về bản ghép. */
+const rewriteBudget = () => Number(process.env.TUTOR_REWRITE_BUDGET_MS ?? 0);
 const ANAPHORA = new Set("no do nay kia vay the tiep con ay day".split(" "));
 
 export function isFollowUp(message: string, hasHistory: boolean): boolean {
@@ -80,9 +83,11 @@ export function createChatService(deps: { db: Db; ai: Ai; kb: KbService }) {
     if (!isFollowUp(message, hist.length > 0)) return message;
     const lastUser = [...hist].reverse().find((m) => m.role === "user")?.content ?? "";
     const fallback = `${lastUser} ${message}`.trim();
+    const budget = rewriteBudget();
+    if (budget <= 0) return fallback;
     try {
       const tail = hist.slice(-4).map((m) => `${m.role === "user" ? "Học sinh" : "Gia sư"}: ${m.content.slice(0, 500)}`).join("\n");
-      const raw = await ai.chat(TASK.aux, [{ role: "system", content: REWRITE_SYSTEM }, { role: "user", content: `Hội thoại gần đây:\n${tail}\n\nCâu hỏi mới: ${message}\n\nCâu truy vấn độc lập:` }], { signal: AbortSignal.timeout(3500) });
+      const raw = await ai.chat(TASK.aux, [{ role: "system", content: REWRITE_SYSTEM }, { role: "user", content: `Hội thoại gần đây:\n${tail}\n\nCâu hỏi mới: ${message}\n\nCâu truy vấn độc lập:` }], { signal: AbortSignal.timeout(budget) });
       return clean(raw) || fallback;
     } catch {
       return fallback;

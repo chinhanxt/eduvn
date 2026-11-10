@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { errText } from "../api";
 import { Icon } from "../Icon";
+import { MathText } from "../math/MathText";
 import { Markdown } from "./Markdown";
 import { type Citation, type Msg, fileToDataUrl, streamChat, tutorApi } from "./client";
 
@@ -109,7 +110,7 @@ export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starter
         )}
         {msgs.map((m, i) => (
           <div key={i} className={`bub ${m.role}${busy && i === msgs.length - 1 && m.role === "assistant" ? " typing" : ""}`} data-testid={`msg-${m.role}`}>
-            {m.role === "user" ? m.content : <Markdown text={m.content} cites={cited(m)} onCite={setPop} />}
+            {m.role === "user" ? <MathText value={m.content} /> : <Markdown text={m.content} cites={cited(m)} onCite={setPop} />}
             {m.role === "assistant" && m.citations.length > 0 && !busy && (
               <div className="srcs">
                 Nguồn: {m.citations.map((c) => <button key={c.n} onClick={() => setPop(c)}>[{c.n}] {c.doc}, trang {c.page}</button>)}

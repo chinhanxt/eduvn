@@ -94,6 +94,7 @@ export function createKbService(db: Db) {
       return d!;
     });
     indexes.delete(kb.id);
+    void indexOf(kb.id).catch(() => {}); // dựng sẵn chỉ mục để câu hỏi đầu tiên không phải chờ
     return { ...doc, chunks: chunks.length };
   }
 

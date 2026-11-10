@@ -161,11 +161,16 @@ export function createMasteryService(deps: { db: Db; ai: Ai; kb: KbService }) {
         if (wrong.length) {
           try {
             const out = await ai.chat(TASK.learn, [{ role: "system", content: ERROR_DIAGNOSIS_SYSTEM }, { role: "user", content: JSON.stringify(wrong.map((w, index) => ({ index, question: w.it.question, expected: w.it.answer, studentAnswer: w.answer }))) }], { json: true });
-            const ds = obj<{ diagnoses?: { index?: number; error_type?: string; ai_confirmation?: string; remediation?: string }[] }>(out).diagnoses ?? [];
-            diagnoses = ds.filter((d) => typeof d.index === "number" && wrong[d.index]).map((d) => ({ question: wrong[d.index!]!.it.question, errorType: String(d.error_type ?? "application"), why: String(d.ai_confirmation ?? ""), remediation: String(d.remediation ?? "") }));
-            b = { ...b, errors: [...b.errors, ...ds.filter((d) => typeof d.index === "number" && wrong[d.index]).map((d) => ({ pointId: wrong[d.index!]!.it.pointId, question: wrong[d.index!]!.it.question, errorType: String(d.error_type ?? "application"), remediation: String(d.remediation ?? ""), at: now }))].slice(-30) };
-          } catch {
+            const ds = obj<{ diagnoses?: { index?: number | string; error_type?: string; ai_confirmation?: string; remediation?: string }[] }>(out).diagnoses ?? [];
+            const found = ds.flatMap((d) => {
+              const w = wrong[Number(d.index)];
+              return w ? [{ w, errorType: String(d.error_type ?? "application"), why: String(d.ai_confirmation ?? ""), remediation: String(d.remediation ?? "") }] : [];
+            });
+            diagnoses = found.map((f) => ({ question: f.w.it.question, errorType: f.errorType, why: f.why, remediation: f.remediation }));
+            b = { ...b, errors: [...b.errors, ...found.map((f) => ({ pointId: f.w.it.pointId, question: f.w.it.question, errorType: f.errorType, remediation: f.remediation, at: now }))].slice(-30) };
+          } catch (e) {
             // Chẩn lỗi là phần phụ: cổng AI bận thì vẫn trả kết quả chấm.
+            console.warn("tutor: chẩn lỗi không thực hiện được:", (e as Error).message);
           }
         }
         b = { ...b, pending: null };

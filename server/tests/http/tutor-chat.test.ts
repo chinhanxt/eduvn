@@ -78,16 +78,23 @@ describe("gia sư chat (SSE)", () => {
     expect((await t.call("GET", "/api/tutor/sessions", undefined, t.hs)).json()).toHaveLength(1);
   });
 
-  it("câu nối tiếp được viết lại truy vấn và có lịch sử", async () => {
+  it("câu nối tiếp mặc định ghép từ khoá câu trước (không gọi AI thêm); bật ngân sách thì AI viết lại", async () => {
     const { kb } = await makeKb(t);
     const first = parseSse((await chat({ kbId: kb.id, message: "Bình phương của một tổng là gì?" })).body);
     const sessionId = (first[0] as { sessionId: string }).sessionId;
     t.fake.calls.length = 0;
+    const plain = parseSse((await chat({ sessionId, message: "Còn nếu là hiệu thì sao?" })).body);
+    expect((plain[0] as { query: string }).query).toBe("Bình phương của một tổng là gì? Còn nếu là hiệu thì sao?");
+    expect(t.fake.calls.some((c) => c.task === "gia_su_phu")).toBe(false);
+    process.env.TUTOR_REWRITE_BUDGET_MS = "2000";
+    t.fake.calls.length = 0;
     const res = parseSse((await chat({ sessionId, message: "Còn nếu là hiệu thì sao?" })).body);
+    delete process.env.TUTOR_REWRITE_BUDGET_MS;
     expect((res[0] as { query: string }).query).toBe("hằng đẳng thức bình phương của một tổng");
     const call = t.fake.calls.find((c) => c.task === "gia_su_chat")!;
     const roles = call.messages.map((m) => m.role);
     expect(roles.slice(-3)).toEqual(["user", "assistant", "user"]);
+    expect(roles.filter((r) => r === "user").length).toBeGreaterThanOrEqual(3);
   });
 
   it("chế độ gợi ý Socratic dùng prompt riêng và mức gợi ý", async () => {

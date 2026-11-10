@@ -116,12 +116,12 @@ export function Paths() {
       {error && <div className="err">{error}</div>}
       <div className="card">
         <h1 style={{ margin: 0 }}>{path.name}</h1>
-        <div style={{ color: "var(--muted)", margin: "4px 0 10px" }}>{path.description || path.goal}</div>
+        <div style={{ color: "var(--muted)", margin: "4px 0 10px" }}><MathText value={path.description || path.goal} /></div>
         <div className="meter"><i style={{ width: `${path.progress.percent}%` }} /></div>
         <small style={{ color: "var(--muted)" }}>{path.progress.mastered}/{path.progress.total} mục đã thành thạo · mức chung {path.progress.percent}%</small>
         <div className="bar" style={{ marginTop: 12, marginBottom: 0 }}>
           {!path.diagnosed && <button className="btn" disabled={!!busy} onClick={() => void diagnostic()}>{busy === "diag" ? "Đang soạn…" : "Làm bài chẩn đoán đầu vào"}</button>}
-          {path.next && <span>Nên học tiếp: <b>{path.next.name}</b></span>}
+          {path.next && <span>Nên học tiếp: <b><MathText value={path.next.name} /></b></span>}
           <span className="sp" />
           <button className="btn ghost" disabled={!!busy} onClick={() => void review()}>Ôn tập ({path.due.length} mục đến hạn)</button>
         </div>
@@ -130,12 +130,12 @@ export function Paths() {
         <div className="stack">
           {path.modules.map((m) => (
             <div className="card" key={m.name}>
-              <h2>{m.name}</h2>
-              <div style={{ color: "var(--muted)", marginTop: -8 }}>{m.objective}</div>
+              <h2><MathText value={m.name} /></h2>
+              <div style={{ color: "var(--muted)", marginTop: -8 }}><MathText value={m.objective} /></div>
               {m.points.map((p) => (
                 <div className="pt" key={p.id}>
                   <div className="grow">
-                    {p.name} <small style={{ color: "var(--muted)" }}>({TYPE_VI[p.type] ?? p.type})</small>
+                    <MathText value={p.name} /> <small style={{ color: "var(--muted)" }}>({TYPE_VI[p.type] ?? p.type})</small>
                     <div className="meter" style={{ marginTop: 6 }}><i style={{ width: `${Math.round(p.mastery * 100)}%` }} /></div>
                   </div>
                   <span className={`tag ${STATUS[p.status][1]}`}>{STATUS[p.status][0]}</span>
@@ -152,7 +152,7 @@ export function Paths() {
           {text && <div className="card"><Markdown text={text.md} cites={text.cites} /></div>}
           {fey && (
             <div className="card">
-              <h2>Tự giải thích: {path.modules.flatMap((m) => m.points).find((p) => p.id === fey.pointId)?.name}</h2>
+              <h2>Tự giải thích: <MathText value={path.modules.flatMap((m) => m.points).find((p) => p.id === fey.pointId)?.name ?? ""} /></h2>
               <textarea className="inp" placeholder="Em thử giải thích bằng lời của mình, như đang dạy một bạn nhỏ hơn…" value={fey.text} onChange={(e) => setFey({ ...fey, text: e.target.value })} />
               <div style={{ marginTop: 10 }}><button className="btn" disabled={fey.text.trim().length < 10 || !!busy} onClick={() => void feynman()}>Nhờ gia sư nhận xét</button></div>
               {feyRes && <div className={`result ${feyRes.passed ? "ok" : "mid"}`}><b>{feyRes.passed ? "Em giải thích tốt!" : "Cần bổ sung thêm"}</b><div>{feyRes.feedback}</div>{feyRes.gap && <div>Còn thiếu: {feyRes.gap}</div>}</div>}
