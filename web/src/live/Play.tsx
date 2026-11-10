@@ -48,6 +48,7 @@ export function Play() {
     try {
       const r = await call<{ token: string }>(`/api/live/pin/${pin}/join`, body);
       window.localStorage.setItem(KEY(pin), r.token);
+      window.history.replaceState(null, "", `/choi?pin=${pin}`); // tải lại trang vẫn vào đúng phòng
       setToken(r.token);
     } catch (e) {
       setError((e as Error).message);
