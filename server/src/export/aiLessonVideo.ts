@@ -10,13 +10,30 @@ import { chromium } from "playwright-core";
 import { readVendor } from "../services/aiLessons/vendor";
 import type { StoredScene } from "../services/aiLessons/types";
 import { type Timeline, compileTimeline, toSrt } from "./aiLessonTimeline";
-import { BASE_CSS, type Canvas, type QuizQ, quizHtml, slideHtml } from "./slideHtml";
+import { type Canvas, type QuizQ, quizHtml, quizQuestionHtml, slideHtml } from "./slideHtml";
 
 const run = promisify(execFile);
 const W = 1280;
 const H = 720;
 const ORIGIN = "http://eduvn.local";
 const KATEX_CSS = '<link rel="stylesheet" href="/vendor/interactive/katex@0.16.38/dist/katex.min.css">';
+
+// Khung video: 1280×720, phần hình (slide/câu hỏi/hoạt hình) thu vào 1100×619 ở trên, dải phụ đề 101 px nền đặc ở dưới (tối đa 2 dòng) — phụ đề không đè nội dung.
+const STAGE_W = 1100;
+const STAGE_H = 619;
+const BAND_BG = "#0d1024";
+const BAND_CSS = `html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden}#v{position:absolute;left:${(W - STAGE_W) / 2}px;top:0;width:${STAGE_W}px;height:${STAGE_H}px;border:0;background:#fff}#band{position:absolute;left:0;right:0;top:${STAGE_H}px;height:${H - STAGE_H}px;display:flex;align-items:center;justify-content:center;padding:0 48px;box-sizing:border-box;background:${BAND_BG};color:#fff;text-align:center;font:600 25px/1.3 'Be Vietnam Pro','Segoe UI',Roboto,'Noto Sans','DejaVu Sans',sans-serif}#s{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}`;
+/** Trang khung: slide/câu hỏi (tài liệu HTML do ta dựng, đã escape) nhúng thẳng vào ô 1100×619 + dải phụ đề; cảnh tương tác (mã AI) vào iframe sandbox "allow-scripts". */
+const framed = (inner: string, sub: string, sandbox: string) => {
+  const subHtml = sub.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const band = `<div id="band"><span id="s">${subHtml}</span></div>`;
+  if (sandbox) return `<!doctype html><html><head><meta charset="utf-8"><style>body{background:${BAND_BG}}${BAND_CSS}</style></head><body><iframe id="v" sandbox="${sandbox}" srcdoc="${inner.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}"></iframe>${band}</body></html>`;
+  const head = /<head>([\s\S]*?)<\/head>/.exec(inner)?.[1] ?? "";
+  const body = /<body>([\s\S]*)<\/body>/.exec(inner)?.[1] ?? inner;
+  return `<!doctype html><html><head>${head}<style>body{background:${BAND_BG}}${BAND_CSS}#v{overflow:hidden}</style></head><body><div id="v">${body}</div>${band}</body></html>`;
+};
+/** Chỉ dải phụ đề trên nền trong suốt (để phủ lên clip hoạt hình). */
+const bandOnly = () => `<!doctype html><html><head><meta charset="utf-8"><style>body{background:transparent}${BAND_CSS}</style></head><body><div id="band"><span id="s"></span></div></body></html>`;
 
 const latex = (tex: string) => {
   try {
@@ -57,8 +74,9 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
     const show = async (html: string) => {
       current = html;
       await page.goto(`${ORIGIN}/frame`, { waitUntil: "load" });
-      await page.evaluate(() => document.fonts.ready);
+      for (const f of page.frames()) await f.evaluate(() => document.fonts.ready).catch(() => undefined);
     };
+    const setSub = (t: string) => page.evaluate((x) => { const el = document.getElementById("s"); if (el) el.textContent = x; }, t);
 
     const clips: string[] = [];
     let frameN = 0;
@@ -70,22 +88,22 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
       let interactiveReady = false;
       const animFile = seg.anim && opts.animDir ? path.join(opts.animDir, `${seg.anim.hash}.mp4`) : null;
       if (animFile && (await stat(animFile).then((f) => f.size > 0, () => false))) {
-        // Cảnh có hoạt hình: clip thay hình slide; phụ đề là PNG trong suốt phủ lên đúng mốc.
-        await show(`<!doctype html><html><head><meta charset="utf-8"><style>${BASE_CSS}html,body{background:transparent}.stage{background:transparent}</style></head><body><div class="stage"><div class="sub" id="s"></div></div></body></html>`);
+        // Cảnh có hoạt hình: clip thu vào khung phía trên; phụ đề là PNG (chỉ dải dưới, nền đặc) phủ lên đúng mốc.
+        await show(bandOnly());
         const subs: { png: string; startMs: number; endMs: number }[] = [];
         for (const cue of cues) {
           if (!cue.text) continue;
-          await page.evaluate((t) => { const el = document.getElementById("s"); if (el) el.textContent = t; }, cue.text);
+          await setSub(cue.text);
           const png = path.join(work, `s${String(frameN++).padStart(5, "0")}.png`);
           await page.screenshot({ path: png, omitBackground: true });
           subs.push({ png, startMs: cue.startMs, endMs: cue.startMs + cue.durationMs });
         }
         const dur = (seg.durationMs / 1000).toFixed(3);
         const audio = seg.audioFile ? ["-i", path.join(audioDir, seg.audioFile)] : ["-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono"];
-        const inputs = ["-ss", (seg.anim?.offsetMs ?? 0) / 1000 + "", "-i", animFile, ...audio, ...subs.flatMap((s) => ["-i", s.png])];
-        let chain = `[0:v]tpad=stop_mode=clone:stop_duration=${dur},fps=25,scale=${W}:${H}[b0]`;
-        subs.forEach((s, k) => {
-          chain += `;[b${k}][${k + 2}:v]overlay=0:0:enable='between(t,${(s.startMs / 1000).toFixed(3)},${(s.endMs / 1000).toFixed(3)})'[b${k + 1}]`;
+        const inputs = ["-ss", `${(seg.anim?.offsetMs ?? 0) / 1000}`, "-i", animFile, ...audio, ...subs.flatMap((x) => ["-i", x.png])];
+        let chain = `[0:v]tpad=stop_mode=clone:stop_duration=${dur},fps=25,scale=${STAGE_W}:${STAGE_H},pad=${W}:${H}:${(W - STAGE_W) / 2}:0:color=0x${BAND_BG.slice(1)}[b0]`;
+        subs.forEach((x, k) => {
+          chain += `;[b${k}][${k + 2}:v]overlay=0:0:enable='between(t,${(x.startMs / 1000).toFixed(3)},${(x.endMs / 1000).toFixed(3)})'[b${k + 1}]`;
         });
         const clip = path.join(work, `c${si}.mp4`);
         await run("ffmpeg", ["-y", "-loglevel", "error", ...inputs, "-filter_complex", `${chain};[b${subs.length}]format=yuv420p[v]`, "-map", "[v]", "-map", "1:a", "-t", dur, "-af", "apad", "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-c:a", "aac", "-b:a", "96k", "-ar", "24000", "-ac", "1", clip], { timeout: 300_000 });
@@ -97,28 +115,24 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
         const png = path.join(work, `f${String(frameN++).padStart(5, "0")}.png`);
         const sub = cue.text;
         if (seg.kind === "slide") {
-          await show(slideHtml((sc.content as unknown as { canvas: Canvas }).canvas, { latex, focusId: seg.focusId, effect: seg.effect, subtitle: sub, extraHead: KATEX_CSS }));
+          await show(framed(slideHtml((sc.content as unknown as { canvas: Canvas }).canvas, { latex, focusId: seg.focusId, effect: seg.effect, extraHead: KATEX_CSS }), sub, ""));
         } else if (seg.kind === "quiz") {
-          await show(quizHtml(sc.title, (sc.content as unknown as { questions: QuizQ[] }).questions, { latex, reveal: seg.reveal, subtitle: sub, extraHead: KATEX_CSS }));
+          const qs = (sc.content as unknown as { questions: QuizQ[] }).questions;
+          const q = seg.quizIndex !== undefined ? qs[seg.quizIndex] : undefined;
+          await show(framed(q ? quizQuestionHtml(sc.title, q, seg.quizIndex as number, qs.length, { latex, reveal: seg.reveal, extraHead: KATEX_CSS }) : quizHtml(sc.title, qs, { latex, reveal: seg.reveal, extraHead: KATEX_CSS }), sub, ""));
         } else if (!interactiveReady) {
           const html = (sc.content as { html?: string }).html ?? "";
-          await show(`<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%;background:#fff}iframe{border:0;width:100%;height:100%}#sub{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;max-width:90%;background:rgba(0,0,0,.62);color:#fff;font:600 26px/1.35 sans-serif;padding:6px 16px;border-radius:8px;text-align:center}</style></head><body><iframe sandbox="allow-scripts" srcdoc="${html.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}"></iframe><div id="sub"></div></body></html>`);
+          await show(framed(html, sub, "allow-scripts"));
           await page.waitForTimeout(1800);
           interactiveReady = true;
         }
-        if (seg.kind === "interactive") await page.evaluate((t) => {
-          const el = document.getElementById("sub");
-          if (el) {
-            el.textContent = t;
-            el.style.display = t ? "block" : "none";
-          }
-        }, sub);
+        if (seg.kind === "interactive") await setSub(sub);
         await page.screenshot({ path: png });
         shots.push({ png, durationMs: cue.durationMs });
         opts.onProgress?.(frameN, total);
       }
       const list = path.join(work, `l${si}.txt`);
-      const lines = shots.flatMap((s) => [`file '${s.png}'`, `duration ${(s.durationMs / 1000).toFixed(3)}`]);
+      const lines = shots.flatMap((x) => [`file '${x.png}'`, `duration ${(x.durationMs / 1000).toFixed(3)}`]);
       lines.push(`file '${shots[shots.length - 1]?.png}'`);
       await writeFile(list, lines.join("\n"));
       const clip = path.join(work, `c${si}.mp4`);

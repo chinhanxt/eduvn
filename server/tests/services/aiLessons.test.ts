@@ -5,9 +5,9 @@ import path from "node:path";
 import JSZip from "jszip";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { renderAiLessonPptx } from "../../src/export/aiLessonPptx";
-import { compileTimeline, splitCues, toSrt } from "../../src/export/aiLessonTimeline";
+import { compileTimeline, shortExplain, splitCues, toSrt } from "../../src/export/aiLessonTimeline";
 import { renderLessonVideo } from "../../src/export/aiLessonVideo";
-import { slideHtml } from "../../src/export/slideHtml";
+import { mathInline, quizQuestionHtml, slideHtml } from "../../src/export/slideHtml";
 import type { Ai } from "../../src/services/ai";
 import { type AnimService, createAnimService } from "../../src/services/anim";
 import { extractMaterialText } from "../../src/services/aiLessons/material";
@@ -403,6 +403,46 @@ describe("dòng thời gian video (IR) và phụ đề", () => {
     expect(srt).toMatch(/^1\n00:00:00,000 --> 00:00:0\d,\d{3}\n/);
   });
 
+  it("quiz: mỗi câu hai đoạn (câu hỏi rồi đáp án), lời giải ngắn nằm ở phụ đề; lời giảng đầu hiện câu 1", () => {
+    const quiz = { id: "q", outlineId: "s2", type: "quiz", title: "Luyện tập", order: 1, stageId: "x", content: { type: "quiz", questions: QUIZ }, actions: [{ id: "1", type: "speech", text: "Làm thử nhé.", durationMs: 3000 }] } as unknown as StoredScene;
+    const tl = compileTimeline("Bài", [quiz]);
+    expect(tl.segments.map((x) => [x.quizIndex, x.reveal ?? false, x.durationMs])).toEqual([[0, false, 3000], [0, true, 4000], [1, false, 6200], [1, true, 4000]]);
+    const cue = tl.segments[1]?.cues[0]?.text ?? "";
+    expect(cue.startsWith("Đáp án B.")).toBe(true);
+    expect(cue.length).toBeLessThanOrEqual(150);
+    expect(tl.segments[1]?.cues[0]?.text).not.toContain("$");
+    const q2 = { ...QUIZ[0], analysis: "Ta có (x+1)^2 = x^2 + 2x + 1 nên chọn B." };
+    expect(shortExplain(q2 as never)).toBe("Đáp án B. Ta có (x+1)² = x² + 2x + 1 nên chọn B.");
+  });
+
+  it("phụ đề: câu dài chia nhỏ ≤ ~140 ký tự mà tổng thời lượng không đổi", () => {
+    const long = `${"Chúng ta khai triển từng số hạng, rồi gộp các số hạng đồng dạng lại với nhau, ".repeat(4)}và thu gọn.`;
+    const cues = splitCues(long, 20000);
+    expect(cues.length).toBeGreaterThan(2);
+    expect(Math.max(...cues.map((c) => c.text.length))).toBeLessThanOrEqual(150);
+    expect(cues.reduce((n, c) => n + c.durationMs, 0)).toBe(20000);
+  });
+
+  it("công thức viết thuần (^) trong quiz được dựng KaTeX; chữ thường giữ nguyên, $…$ vẫn dùng được", () => {
+    const L = (t: string) => `<i>${t}</i>`;
+    expect(mathInline("Khai triển biểu thức (2x - 3y)^2 ta được kết quả là:", L)).toBe("Khai triển biểu thức <i>(2x - 3y)^2</i> ta được kết quả là:");
+    expect(mathInline("4x^2 - 12xy + 9y^2", L)).toBe("<i>4x^2 - 12xy + 9y^2</i>");
+    expect(mathInline("102^2 - 4 = (102 - 2)(102 + 2) = 100 * 104", L)).toBe("<i>102^2 - 4 = (102 - 2)(102 + 2) = 100 \\cdot 104</i>");
+    expect(mathInline("Hôm nay học hằng đẳng thức", L)).toBe("Hôm nay học hằng đẳng thức");
+    expect(mathInline("Ta có $x^2$ và <b>", L)).toBe("Ta có <i>x^2</i> và &lt;b&gt;");
+  });
+
+  it("khung câu hỏi: phương án đúng tô xanh có dấu ✓, phương án sai mờ đi khi hiện đáp án", () => {
+    const L = (t: string) => `<i>${t}</i>`;
+    const q = QUIZ[0] as never;
+    const before = quizQuestionHtml("Luyện tập", q, 0, 2, { latex: L });
+    const after = quizQuestionHtml("Luyện tập", q, 0, 2, { latex: L, reveal: true });
+    expect(before).toContain("CÂU HỎI 1/2");
+    expect(before).not.toContain("✓");
+    expect(after).toContain("✓");
+    expect(after.match(/opacity:0\.4/g)).toHaveLength(3);
+  });
+
   it("speakable bỏ LaTeX để giọng đọc không đọc ký hiệu", () => {
     expect(speakable("Ta có $(a+b)^2$ và **đậm**")).not.toMatch(/[$*\\]/);
     expect(speakable("$\\frac{1}{2}$")).toContain("1 phần 2");
@@ -438,7 +478,7 @@ describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () =
     expect(probe).toContain("video,1280,720");
     expect(probe).toContain("audio");
     expect(readFileSync(r.srt, "utf8")).toContain("Công thức bình phương");
-    expect(r.totalMs).toBe(9500);
+    expect(r.totalMs).toBe(23100); // 1500 + (7400 + 4000) + (6200 + 4000): mỗi câu quiz một đoạn câu hỏi + một đoạn đáp án
   });
 });
 

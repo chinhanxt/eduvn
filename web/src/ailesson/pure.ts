@@ -2,6 +2,25 @@ import type { QuizQ } from "../../../server/src/export/slideHtml";
 
 export const estimateMs = (text: string) => Math.max(1500, Math.round((text.length / 14) * 1000));
 
+const MAX_CUE = 140;
+/** Câu quá dài chia tiếp ở dấu phẩy/hai chấm hoặc khoảng trắng gần giữa (khớp server/src/export/aiLessonTimeline.ts). */
+function halve(c: string): string[] {
+  if (c.length <= MAX_CUE) return [c];
+  const mid = c.length / 2;
+  let best = -1;
+  let bd = Number.POSITIVE_INFINITY;
+  for (const m of c.matchAll(/[,:;] |\s/g)) {
+    const pos = (m.index ?? 0) + (m[0].length > 1 ? 1 : 0);
+    const d = Math.abs(pos - mid) - (m[0].length > 1 ? 25 : 0);
+    if (pos > 20 && pos < c.length - 20 && d < bd) {
+      bd = d;
+      best = pos;
+    }
+  }
+  if (best < 0) return [c];
+  return [...halve(c.slice(0, best).trim()), ...halve(c.slice(best).trim())];
+}
+
 /** Chia lời giảng theo câu (khớp server/src/export/aiLessonTimeline.ts). */
 export function splitCues(text: string, durationMs: number): { text: string; startMs: number; durationMs: number }[] {
   const parts = (text.match(/[^.!?…;\n]+[.!?…;]*/g) ?? [text]).map((s) => s.trim()).filter(Boolean);
@@ -11,7 +30,7 @@ export function splitCues(text: string, durationMs: number): { text: string; sta
     if (last !== undefined && last.length < 40) merged[merged.length - 1] = `${last} ${p}`;
     else merged.push(p);
   }
-  const chunks = merged.length > 0 ? merged : [text];
+  const chunks = merged.length > 0 ? merged.flatMap(halve) : [text];
   const total = chunks.reduce((n, c) => n + c.length, 0) || 1;
   let t = 0;
   return chunks.map((c, i) => {

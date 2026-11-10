@@ -155,11 +155,29 @@ export function slideHtml(canvas: Canvas, o: HtmlOpts): string {
   return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><style>${BASE_CSS}</style>${o.extraHead ?? ""}</head><body>${slideBody(canvas, o)}</body></html>`;
 }
 
+// Chữ thuần có công thức viết kiểu máy ("(2x - 3y)^2", "4x^2 - 12xy + 9y^2") → bọc thành LaTeX để dựng bằng KaTeX như trên slide.
+const MT = String.raw`(?:\([^()]*\)|[A-Za-z0-9.]+)(?:\^(?:\{[^}]*\}|[A-Za-z0-9]+))?`;
+const MATH_RUN = new RegExp(`(?<![\\p{L}\\p{N}_])${MT}(?:\\s*[-+*/=×]\\s*${MT}|\\s*\\([^()]*\\)(?:\\^[A-Za-z0-9]+)?)*`, "gu");
+/** Chữ → HTML: $…$ dựng KaTeX; nếu không có $ thì tự nhận các đoạn biểu thức (có ^ = + * / hoặc " - ") và dựng KaTeX. */
+export function mathInline(s: string, latex: (t: string) => string): string {
+  if (s.includes("$")) return esc(s).replace(/\$([^$]+)\$/g, (_x, t: string) => latex(t));
+  let out = "";
+  let last = 0;
+  for (const m of s.matchAll(MATH_RUN)) {
+    const run = m[0];
+    if (!/[\^=+*/×]|\s-\s/.test(run)) continue;
+    const at = m.index ?? 0;
+    out += esc(s.slice(last, at)) + latex(run.replace(/\s*\*\s*/g, " \\cdot ").replace(/×/g, "\\times "));
+    last = at + run.length;
+  }
+  return out + esc(s.slice(last));
+}
+
 export type QuizQ = { id?: string; type: string; question: string; options?: { value: string; label: string }[]; answer?: string[]; analysis?: string };
 
 /** Khung cho cảnh quiz: danh sách câu hỏi (có thể kèm đáp án). */
 export function quizHtml(title: string, questions: QuizQ[], o: { latex: (t: string) => string; reveal?: boolean; subtitle?: string; extraHead?: string }): string {
-  const m = (s: string) => esc(s).replace(/\$([^$]+)\$/g, (_x, t: string) => o.latex(t));
+  const m = (s: string) => mathInline(s, o.latex);
   const qs = questions
     .map((q, i) => `<div style="margin:0 0 ${cq(14)}"><div style="font-weight:600">Câu ${i + 1}. ${m(q.question)}</div>${(q.options ?? []).map((op) => `<div style="margin-left:${cq(20)};${o.reveal && q.answer?.includes(op.value) ? "color:#0a8a4a;font-weight:700" : ""}">${esc(op.value)}. ${m(op.label)}</div>`).join("")}${o.reveal && q.analysis ? `<div style="margin-left:${cq(20)};color:#5b6290;font-size:${cq(15)}">${m(q.analysis)}</div>` : ""}</div>`)
     .join("");
@@ -176,4 +194,19 @@ function textOn(bg: string): string {
     [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as [number, number, number];
   } else if (rgb) [r, g, b] = [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
   return 0.299 * r + 0.587 * g + 0.114 * b < 150 ? "#ffffff" : "#232842";
+}
+
+/** Một câu hỏi trên một khung (video): câu + phương án lớn, dễ đọc ở 720p; `reveal` tô xanh đáp án đúng, làm mờ các phương án sai. */
+export function quizQuestionHtml(title: string, q: QuizQ, index: number, total: number, o: { latex: (t: string) => string; reveal?: boolean; extraHead?: string }): string {
+  const m = (t: string) => mathInline(t, o.latex);
+  const right = (v: string) => !!q.answer?.includes(v);
+  const opts = (q.options ?? [])
+    .map((op) => {
+      const good = o.reveal && right(op.value);
+      const dim = o.reveal && !right(op.value);
+      return `<div style="display:flex;align-items:center;gap:${cq(16)};margin:0 0 ${cq(12)};padding:${cq(9)} ${cq(18)};border-radius:${cq(14)};border:${cq(3)} solid ${good ? "#0a8a4a" : "#d9ddf0"};background:${good ? "#e3f6ec" : "#f6f7fd"};opacity:${dim ? 0.4 : 1};font-size:${cq(27)};line-height:1.25"><span style="flex:none;width:${cq(40)};height:${cq(40)};border-radius:50%;background:${good ? "#0a8a4a" : "#4f6bed"};color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:${cq(23)}">${esc(op.value)}</span><span style="${good ? "font-weight:700;color:#0a6a3a" : ""}">${m(op.label)}</span>${good ? `<span style="margin-left:auto;color:#0a8a4a;font-weight:700;font-size:${cq(26)}">✓</span>` : ""}</div>`;
+    })
+    .join("");
+  const open = !(q.options?.length) ? `<div style="margin-top:${cq(14)};padding:${cq(14)} ${cq(20)};border-radius:${cq(14)};background:${o.reveal ? "#e3f6ec" : "#f6f7fd"};border:${cq(3)} solid ${o.reveal ? "#0a8a4a" : "#d9ddf0"};font-size:${cq(27)}">${o.reveal ? `Đáp án: <b>${m((q.answer ?? []).join(", ") || "—")}</b>` : "Hãy tự làm rồi so với đáp án."}</div>` : "";
+  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><style>${BASE_CSS}</style>${o.extraHead ?? ""}</head><body><div class="stage" style="background:#fff;color:#232842;padding:${cq(36)} ${cq(44)}"><div style="display:flex;align-items:center;gap:${cq(16)};margin-bottom:${cq(18)}"><span style="background:#4f6bed;color:#fff;font-size:${cq(17)};font-weight:700;padding:${cq(5)} ${cq(16)};border-radius:${cq(20)}">CÂU HỎI ${index + 1}/${total}</span><span style="color:#7a82b5;font-size:${cq(18)}">${esc(title)}</span></div><div style="font-size:${cq(31)};font-weight:700;line-height:1.3;color:#1e2340;margin-bottom:${cq(20)}">${m(q.question)}</div>${opts}${open}</div></body></html>`;
 }

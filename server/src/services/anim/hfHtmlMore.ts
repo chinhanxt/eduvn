@@ -243,7 +243,7 @@ export function moreHtml(spec: HfSpec): string {
   };
   const total = 1 + branches.length + leaves.length;
   let k = 0;
-  node("root", X0, rootY, esc(p.goc ?? "Bắt đầu"), "nd root", at(k++, total, T));
+  node("nroot", X0, rootY, esc(p.goc ?? "Bắt đầu"), "nd root", at(k++, total, T));
   branches.forEach((b, bi) => {
     const t = at(k++, total, T);
     line(`e${bi}`, X0 + 80, rootY, X1 - 80, bY[bi] as number, t);

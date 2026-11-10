@@ -221,7 +221,7 @@ html,body{width:1280px;height:720px;overflow:hidden;background:#10142b}
 .nd{position:absolute;text-align:center;font-size:22px;padding:8px 6px;border-radius:12px;background:#1c2350;border:3px solid #56B4E9}.root{border-color:#ffd166;font-weight:700}.leaf{border-color:#009E73;background:#14392f;font-size:20px}.leaf small{font-size:22px;color:#F0E442;font-weight:700}.pl2{position:absolute;text-align:center;font-size:22px;color:#F0E442;font-weight:700}.ln2{position:absolute}</style></head><body>
 <div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1280" data-height="720">
 <h1 id="tt" class="clip" data-start="0" data-duration="10" data-track-index="0">Tiêu đề &lt;b&gt;x&lt;/b&gt;</h1>
-<div id="root" class="nd root clip" style="left:70px;top:378px;width:160px" data-start="0.4" data-duration="9.6" data-track-index="1">Bốc bi</div>
+<div id="nroot" class="nd root clip" style="left:70px;top:378px;width:160px" data-start="0.4" data-duration="9.6" data-track-index="1">Bốc bi</div>
 <div id="e0" class="ln2 clip" style="inset:0" data-start="1.66" data-duration="8.34" data-track-index="2"><svg width="1280" height="720" viewBox="0 0 1280 720"><line id="e0s" x1="230" y1="400" x2="440" y2="246.66666666666669" pathLength="1" stroke="#9aa3d0" stroke-width="3" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
 <div id="p0" class="pl2 clip" style="left:295px;top:293.33333333333337px;width:80px" data-start="1.66" data-duration="8.34" data-track-index="3">0,6</div>
 <div id="n0" class="nd clip" style="left:440px;top:224.66666666666669px;width:160px" data-start="1.66" data-duration="8.34" data-track-index="4">Đỏ</div>
@@ -243,7 +243,7 @@ html,body{width:1280px;height:720px;overflow:hidden;background:#10142b}
 </div>
 <script>
 const tl = gsap.timeline({ paused: true });
-tl.fromTo("#root", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 0.4);
+tl.fromTo("#nroot", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 0.4);
 tl.to("#e0s", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 1.66);
 tl.fromTo("#p0", { opacity: 0 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 1.66);
 tl.fromTo("#n0", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 1.66);

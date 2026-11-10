@@ -86,7 +86,7 @@ class DoThiLuongGiac(Base):
         self.play(Create(ax), run_time=dt)
         base = run(fn)
         name = {"sin": "\\sin", "cos": "\\cos", "tan": "\\tan"}[P["ham"]]
-        tag0 = MathTex(f"y = {name} x", font_size=36, color=C_ACC).to_corner(UR, buff=0.5).shift(DOWN * (0.9 if self.title_obj else 0))
+        tag0 = MathTex(f"y = {name} x", font_size=36, color=C_ACC).to_corner(UL, buff=0.5).shift(DOWN * (0.9 if self.title_obj else 0))
         if P.get("tuVongTron"):
             circ = Circle(radius=0.9, color=C_BLUE).move_to(LEFT * 5.6 + DOWN * 0.3)
             th = ValueTracker(0.0)
@@ -104,7 +104,9 @@ class DoThiLuongGiac(Base):
             B = 1.0 / T
             new = run(lambda x: A * fn(B * x + ph))
             new.set_color(C_GREEN)
-            tag1 = MathTex(f"y = {fmt(A)}\\,{name}({fmt(B)}x{'+' if ph >= 0 else '-'}{fmt(abs(ph), 2)})", font_size=36, color=C_GREEN).move_to(tag0)
+            coef = "" if A == 1 else fmt(A)
+            inner = (fmt(B) if B != 1 else "") + "x" + (f"{'+' if ph >= 0 else '-'}{fmt(abs(ph), 2)}" if ph != 0 else "")
+            tag1 = MathTex(f"y = {coef}{name}({inner})", font_size=36, color=C_GREEN).move_to(tag0, aligned_edge=LEFT)
             self.play(ReplacementTransform(base, new), ReplacementTransform(tag0, tag1), run_time=dt * 1.4)
         self.finish()
 

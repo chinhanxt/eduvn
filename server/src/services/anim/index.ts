@@ -36,7 +36,7 @@ const MANIM_CLASS: Record<string, [string, string]> = {
 };
 export const HF_VERSION = "0.9.28";
 /** Đổi khi sửa mẫu → cache cũ không dùng lại. */
-const TEMPLATE_VERSION = "2";
+const TEMPLATE_VERSION = "3";
 
 export type AnimCfg = {
   dataDir: string;

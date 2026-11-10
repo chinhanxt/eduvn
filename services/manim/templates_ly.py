@@ -137,7 +137,7 @@ class TongHopLuc(Base):
             chain.append(DashedLine(end + np.array([4.5, 0, 0]) * 0, nxt, color=cols[i % 4], stroke_width=3))
             end = nxt
         # cộng nối đuôi: vẽ sang bên phải
-        off = RIGHT * 5.6 + (ctr[1] - 0) * UP
+        off = RIGHT * 1.0 + ctr[1] * UP
         st = off.copy()
         arrows = []
         for i, v in enumerate(vecs):

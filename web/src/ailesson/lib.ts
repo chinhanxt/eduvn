@@ -14,7 +14,7 @@ export type Scene = {
   content: { type: string; canvas?: Canvas; questions?: QuizQ[]; html?: string; widgetType?: string };
   actions?: Action[];
   /** Hoạt hình toán gắn vào cảnh slide (do máy chủ quản). */
-  animation?: { status: "dang_dung" | "xong" | "loi"; hash?: string; durationMs?: number; error?: string; spec?: { template?: string; tieuDe?: string } };
+  animation?: { status: "dang_dung" | "xong" | "loi"; hash?: string; durationMs?: number; error?: string; reason?: string; confidence?: number; spec?: { template?: string; tieuDe?: string } };
 };
 export type Progress = { done: number; total: number; stage: string; error?: string; failed?: string[] };
 export type LessonSummary = { id: string; title: string; subject: string; grade: number | null; status: "queued" | "running" | "done" | "error"; progress: Progress; sceneCount: number; updatedAt: string };
