@@ -81,54 +81,112 @@ export function layoutMind(doc: DiagramDoc): DiagramDoc {
   return { ...doc, nodes: doc.nodes.map((n) => (pos.has(n.id) ? { ...n, ...pos.get(n.id)! } : n)) };
 }
 
-/** Lưu đồ xếp tầng từ trên xuống (BFS theo cạnh), mỗi tầng căn giữa quanh x = 0. */
+const YES = /^(có|co|yes|đúng|true)$/i;
+const NO = /^(không|khong|no|sai|false)$/i;
+const prio = (e: DEdge) => (YES.test(e.label?.trim() ?? "") ? 0 : NO.test(e.label?.trim() ?? "") ? 2 : 1);
+
+/** Lưu đồ xếp tầng: tầng theo đường dài nhất, thứ tự trong tầng theo trung bình vị trí cha/con (giảm cắt nhau),
+ *  nhánh "Có" ngay dưới nút điều kiện, "Không" lệch sang phải; nút kết thúc (nhiều đường vào) nằm riêng tầng cuối, căn giữa. */
 export function layoutFlow(doc: DiagramDoc): DiagramDoc {
   if (!doc.nodes.length) return doc;
-  const out = new Map<string, DEdge[]>();
+  const byId = new Map(doc.nodes.map((n) => [n.id, n]));
+  const outs = new Map<string, DEdge[]>();
   const hasIn = new Set<string>();
   for (const e of doc.edges) {
-    out.set(e.from, [...(out.get(e.from) ?? []), e]);
+    if (!byId.has(e.from) || !byId.has(e.to) || e.from === e.to) continue;
+    outs.set(e.from, [...(outs.get(e.from) ?? []), e]);
     hasIn.add(e.to);
   }
-  const level = new Map<string, number>();
+  for (const [k, v] of outs) outs.set(k, [...v].sort((x, y) => prio(x) - prio(y)));
+  // DFS: thứ tự thăm, cạnh quay ngược, thứ tự hậu tố
+  const state = new Map<string, number>();
+  const back = new Set<string>();
+  const disc: string[] = [];
+  const post: string[] = [];
+  const dfs = (id: string) => {
+    state.set(id, 1);
+    disc.push(id);
+    for (const e of outs.get(id) ?? []) {
+      const st = state.get(e.to) ?? 0;
+      if (st === 1) back.add(e.id);
+      else if (st === 0) dfs(e.to);
+    }
+    state.set(id, 2);
+    post.push(id);
+  };
   const starts = doc.nodes.filter((n) => !hasIn.has(n.id));
-  const queue = (starts.length ? starts : [doc.nodes[0]!]).map((n) => n.id);
-  for (const id of queue) level.set(id, 0);
-  for (let i = 0; i < queue.length; i++) {
-    const id = queue[i]!;
-    for (const e of out.get(id) ?? []) {
-      if (level.has(e.to)) continue;
-      level.set(e.to, level.get(id)! + 1);
-      queue.push(e.to);
-    }
+  for (const n of starts.length ? starts : [doc.nodes[0]!]) if (!state.get(n.id)) dfs(n.id);
+  for (const n of doc.nodes) if (!state.get(n.id)) dfs(n.id);
+  const fwd = (id: string) => (outs.get(id) ?? []).filter((e) => !back.has(e.id));
+  const level = new Map<string, number>(doc.nodes.map((n) => [n.id, 0]));
+  for (const id of [...post].reverse()) for (const e of fwd(id)) level.set(e.to, Math.max(level.get(e.to)!, level.get(id)! + 1));
+  const inN = new Map<string, string[]>();
+  for (const n of doc.nodes) for (const e of fwd(n.id)) inN.set(e.to, [...(inN.get(e.to) ?? []), n.id]);
+  // nút kết thúc có từ 2 đường vào: tầng riêng ở cuối
+  const finals = doc.nodes.filter((n) => !fwd(n.id).length && (inN.get(n.id)?.length ?? 0) >= 2).map((n) => n.id);
+  const rest = doc.nodes.filter((n) => !finals.includes(n.id));
+  const lastLevel = Math.max(0, ...rest.map((n) => level.get(n.id)!));
+  for (const id of finals) level.set(id, lastLevel + 1);
+  const layers: string[][] = [];
+  for (const id of disc) {
+    const l = level.get(id)!;
+    (layers[l] ??= []).push(id);
   }
-  // kéo tầng xuống theo đường dài nhất trên các cạnh xuôi (theo tầng BFS) để các nhánh gom về cuối
-  const fwd = doc.edges.filter((e) => (level.get(e.to) ?? -1) > (level.get(e.from) ?? Infinity));
-  for (let pass = 0; pass < doc.nodes.length; pass++) {
-    let moved = false;
-    for (const e of fwd) {
-      const want = level.get(e.from)! + 1;
-      if (level.get(e.to)! < want) (level.set(e.to, want), (moved = true));
+  for (let l = 0; l < layers.length; l++) layers[l] ??= [];
+  // quét trọng tâm
+  const idx = new Map<string, number>();
+  const reindex = () => layers.forEach((ly) => ly.forEach((id, i) => idx.set(id, i)));
+  reindex();
+  const outN = (id: string) => fwd(id).map((e) => e.to);
+  const sweep = (down: boolean) => {
+    const range = down ? layers.map((_, i) => i).slice(1) : layers.map((_, i) => i).reverse().slice(1);
+    for (const l of range) {
+      const key = (id: string) => {
+        const nb = (down ? inN.get(id) ?? [] : outN(id)).filter((x) => level.get(x) === l + (down ? -1 : 1));
+        return nb.length ? nb.reduce((a, x) => a + idx.get(x)!, 0) / nb.length : idx.get(id)!;
+      };
+      const cur = new Map(layers[l]!.map((id) => [id, idx.get(id)!]));
+      layers[l] = [...layers[l]!].sort((p, q) => key(p) - key(q) || cur.get(p)! - cur.get(q)!);
+      layers[l]!.forEach((id, i) => idx.set(id, i));
     }
-    if (!moved) break;
+  };
+  for (let pass = 0; pass < 3; pass++) {
+    sweep(true);
+    sweep(false);
   }
-  const maxL = Math.max(0, ...level.values());
-  for (const n of doc.nodes) if (!level.has(n.id)) level.set(n.id, maxL + 1);
-  const rows = new Map<number, DNode[]>();
-  for (const n of doc.nodes) rows.set(level.get(n.id)!, [...(rows.get(level.get(n.id)!) ?? []), n]);
-  const GX = 56;
-  const GY = 64;
+  // toạ độ: mỗi nút ưu tiên nằm dưới trung bình cha; chồng nhau thì đẩy sang phải
+  const GX = 64;
+  const GY = 72;
+  const cx = new Map<string, number>();
   const pos = new Map<string, { x: number; y: number }>();
   let y = 0;
-  for (const l of [...rows.keys()].sort((a, b) => a - b)) {
-    const row = rows.get(l)!;
-    const total = row.reduce((a, n) => a + n.w, 0) + GX * (row.length - 1);
-    let x = -total / 2;
-    for (const n of row) {
-      pos.set(n.id, { x: Math.round(x), y: Math.round(y) });
-      x += n.w + GX;
+  for (const ly of layers) {
+    let right = -Infinity;
+    for (const id of ly) {
+      const n = byId.get(id)!;
+      const ps = (inN.get(id) ?? []).filter((p) => cx.has(p));
+      const want = ps.length ? ps.reduce((a, p) => a + cx.get(p)!, 0) / ps.length : right === -Infinity ? 0 : right + GX + n.w / 2;
+      const c = Math.max(want, right + GX + n.w / 2);
+      cx.set(id, c);
+      right = c + n.w / 2;
     }
-    y += Math.max(...row.map((n) => n.h)) + GY;
+    const h = Math.max(0, ...ly.map((id) => byId.get(id)!.h));
+    for (const id of ly) pos.set(id, { x: cx.get(id)! - byId.get(id)!.w / 2, y: y + (h - byId.get(id)!.h) / 2 });
+    y += h + GY;
   }
-  return { ...doc, nodes: doc.nodes.map((n) => ({ ...n, ...pos.get(n.id)! })) };
+  // nút kết thúc căn giữa theo khung của phần còn lại
+  const others = rest.map((n) => pos.get(n.id)!).filter(Boolean);
+  const mid = others.length ? (Math.min(...rest.map((n) => pos.get(n.id)!.x)) + Math.max(...rest.map((n) => pos.get(n.id)!.x + n.w))) / 2 : 0;
+  if (finals.length) {
+    const tot = finals.reduce((a, id) => a + byId.get(id)!.w, 0) + GX * (finals.length - 1);
+    let x = mid - tot / 2;
+    for (const id of finals) {
+      pos.set(id, { x, y: pos.get(id)!.y });
+      x += byId.get(id)!.w + GX;
+    }
+  }
+  const x0 = Math.min(...[...pos.values()].map((p) => p.x));
+  const x1 = Math.max(...doc.nodes.map((n) => pos.get(n.id)!.x + n.w));
+  const shift = -(x0 + x1) / 2;
+  return { ...doc, nodes: doc.nodes.map((n) => ({ ...n, x: Math.round(pos.get(n.id)!.x + shift), y: Math.round(pos.get(n.id)!.y) })) };
 }

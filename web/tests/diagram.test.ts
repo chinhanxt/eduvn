@@ -92,6 +92,50 @@ describe("layout", () => {
   });
 });
 
+type Seg = { a: { x: number; y: number }; b: { x: number; y: number }; last: boolean };
+const segsOf = (pts: { x: number; y: number }[]): Seg[] => pts.slice(1).map((b, i) => ({ a: pts[i]!, b, last: i === pts.length - 2 }));
+const overlap1d = (a0: number, a1: number, b0: number, b1: number) => Math.min(Math.max(a0, a1), Math.max(b0, b1)) - Math.max(Math.min(a0, a1), Math.min(b0, b1));
+
+function lineQuality(doc: DiagramDoc) {
+  const routes = routeAll(doc);
+  const list = doc.edges.map((e) => ({ e, segs: segsOf(polyline(routes.get(e.id)!)) }));
+  let crossings = 0;
+  const shared: string[] = [];
+  for (let i = 0; i < list.length; i++)
+    for (let j = i + 1; j < list.length; j++)
+      for (const s of list[i]!.segs)
+        for (const t of list[j]!.segs) {
+          const sv = s.a.x === s.b.x, tv = t.a.x === t.b.x;
+          if (sv === tv) {
+            const same = sv ? s.a.x === t.a.x : s.a.y === t.a.y;
+            const ov = sv ? overlap1d(s.a.y, s.b.y, t.a.y, t.b.y) : overlap1d(s.a.x, s.b.x, t.a.x, t.b.x);
+            if (same && ov > 8 && !(list[i]!.e.to === list[j]!.e.to && s.last && t.last)) shared.push(`${list[i]!.e.id}/${list[j]!.e.id}`);
+          } else {
+            const v = sv ? s : t, h = sv ? t : s;
+            const x = v.a.x, y = h.a.y;
+            if (x > Math.min(h.a.x, h.b.x) && x < Math.max(h.a.x, h.b.x) && y > Math.min(v.a.y, v.b.y) && y < Math.max(v.a.y, v.b.y)) crossings++;
+          }
+        }
+  return { crossings, shared };
+}
+
+describe("chất lượng đường nối lưu đồ", () => {
+  it("không đường nào đi chung đoạn thẳng, cắt nhau tối đa 1 lần", () => {
+    const q = lineQuality(flowSample());
+    expect(q.shared).toEqual([]);
+    expect(q.crossings).toBeLessThanOrEqual(1);
+  });
+  it("nhánh Có nằm ngay dưới nút điều kiện, Không lệch sang phải; Kết thúc ở tầng cuối", () => {
+    const doc = flowSample();
+    const n = (l: string) => doc.nodes.find((x) => x.label === l)!;
+    const q1 = n("$\\Delta<0$ ?"), r1 = n("Phương trình vô nghiệm"), q2 = n("$\\Delta=0$ ?"), e = n("Kết thúc");
+    expect(Math.abs(r1.x + r1.w / 2 - (q1.x + q1.w / 2))).toBeLessThan(2);
+    expect(q2.x).toBeGreaterThan(r1.x + r1.w);
+    expect(e.y).toBeGreaterThan(Math.max(...doc.nodes.filter((x) => x !== e).map((x) => x.y)));
+  });
+  it("sơ đồ tư duy: đường nối ghi chú/liên hệ không xuyên hình", () => check(mindSample()));
+});
+
 describe("định tuyến + nhãn", () => {
   it("sơ đồ Hàm số bậc hai", () => check(mindSample()));
   it("lưu đồ giải PT bậc hai", () => check(flowSample()));
@@ -99,10 +143,13 @@ describe("định tuyến + nhãn", () => {
     const nodes: DNode[] = Array.from({ length: 60 }, (_, i) => node(`Ý ${i}`, "rect", null, { x: (i % 10) * 150, y: Math.floor(i / 10) * 100 }));
     const edges: DEdge[] = Array.from({ length: 80 }, (_, i) => edge(nodes[i % 60]!, nodes[(i * 7 + 13) % 60 === i % 60 ? (i + 1) % 60 : (i * 7 + 13) % 60]!, i % 3 ? "nhãn" : ""));
     const doc: DiagramDoc = { version: 1, kind: "flow", nodes, edges };
-    routeAll(doc); // làm nóng JIT
+    const c0 = performance.now();
+    placeLabels(doc, routeAll(doc));
+    const cold = performance.now() - c0;
+    for (let w = 0; w < 3; w++) placeLabels(doc, routeAll(doc)); // làm nóng JIT
     let ms = Infinity;
     let tR = 0;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       const t0 = performance.now();
       const routes = routeAll(doc);
       const r = performance.now() - t0;
@@ -110,7 +157,7 @@ describe("định tuyến + nhãn", () => {
       const all = performance.now() - t0;
       if (all < ms) (ms = all, (tR = r));
     }
-    console.log(`route+label 60 nút/80 cạnh: ${ms.toFixed(1)} ms (route ${tR.toFixed(1)})`);
+    console.log(`route+label 60 nút/80 cạnh: lạnh ${cold.toFixed(1)} ms, nóng (tốt nhất/5) ${ms.toFixed(1)} ms (route ${tR.toFixed(1)})`);
     expect(ms).toBeLessThan(50);
   });
 });

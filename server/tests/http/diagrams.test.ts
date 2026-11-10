@@ -90,6 +90,11 @@ describe("HTTP sơ đồ — chưa bật cổng AI", () => {
 
 describe("HTTP sơ đồ — AI lưu đồ", () => {
   beforeEach(() => boot(fakeAi));
+  it("cây nhiều nhánh → chuỗi bước theo thứ tự duyệt", async () => {
+    aiReply = JSON.stringify({ root: { text: "A", children: [{ text: "B", children: [{ text: "C", children: [] }] }, { text: "D", children: [] }] } });
+    const r = await call("POST", "/api/diagrams/ai", { topic: "x", kind: "flow" });
+    expect(r.json().links).toEqual([{ from: "a1", to: "a2" }, { from: "a2", to: "a3" }, { from: "a3", to: "a4" }]);
+  });
   it("cây mặc định → mũi tên nối; id số và label null vẫn nhận", async () => {
     aiReply = JSON.stringify({ root: { text: "Bắt đầu", children: [{ text: "Bước 1", children: [{ text: "Kết thúc", children: [] }] }] } });
     const r = await call("POST", "/api/diagrams/ai", { topic: "x", kind: "flow" });

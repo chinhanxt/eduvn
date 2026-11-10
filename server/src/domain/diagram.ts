@@ -92,8 +92,8 @@ export function parseAiDiagram(raw: unknown, kind: "mind" | "flow" = "mind"): { 
       if (Array.isArray(t.children)) for (const c of t.children) if (c && typeof c === "object") walk(c as Tree, id);
     };
     walk(root, null);
-    // lưu đồ: quan hệ cha → con thành mũi tên nối
-    v = kind === "flow" ? { nodes: nodes.map((n) => ({ ...n, parent: null })), links: nodes.filter((n) => n.parent).map((n) => ({ from: n.parent, to: n.id })) } : { nodes, links: [] };
+    // lưu đồ: các nút theo thứ tự duyệt cây nối thành chuỗi bước
+    v = kind === "flow" ? { nodes: nodes.map((n) => ({ ...n, parent: null })), links: nodes.slice(1).map((n, i) => ({ from: nodes[i]!.id, to: n.id })) } : { nodes, links: [] };
   }
   const o = v as { nodes?: unknown; links?: unknown; edges?: unknown } | null;
   if (o && Array.isArray(o.nodes)) {
