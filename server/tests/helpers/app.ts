@@ -5,6 +5,8 @@ import { AUDIENCE, ISSUER, makeIssuer } from "./tokens";
 
 export const PUBLIC_URL = "http://eduvn.test";
 
+export const STUDENT_SECRET = "student-secret-student-secret-0123";
+
 export async function testApp(extra: Partial<AppDeps> = {}) {
   const db = await testDb();
   const kc = await makeIssuer();
@@ -14,6 +16,7 @@ export async function testApp(extra: Partial<AppDeps> = {}) {
     issuer: ISSUER,
     publicUrl: PUBLIC_URL,
     downloadSecret: "test-secret-test-secret-test-secret!",
+    studentSecret: STUDENT_SECRET,
     ...extra,
   });
   return { app, db, sign: (claims: Record<string, unknown>) => kc.sign(claims) };

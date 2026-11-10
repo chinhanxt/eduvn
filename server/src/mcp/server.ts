@@ -4,7 +4,9 @@ import { MatrixCell } from "../domain/matrix";
 import { QuestionFilter, QuestionInput } from "../domain/question";
 import { ResponseValue } from "../domain/scoring";
 import type { Actor, ExamLinks, Service } from "../service";
+import type { AssignmentService } from "../services/assignments";
 import type { ClassService } from "../services/classes";
+import { registerAssignmentTools } from "./assignments";
 import type { LessonService } from "../services/lessons";
 import { registerClassTools } from "./classes";
 import { registerLessonTools } from "./lessons";
@@ -18,6 +20,7 @@ import { registerSkillTools } from "./skills";
 
 export type McpDeps = { service: Service; actor: Actor; makeLinks: (examId: string) => Promise<ExamLinks>;
   classes: ClassService;
+  assignments: AssignmentService;
   makeClassLink: (classRef: string, kind: "class_list" | "gradebook", term?: "HK1" | "HK2") => Promise<{ url: string; expiresInMinutes: number }>;
   lessons: LessonService;
   vanBan: VanBanService;
@@ -38,7 +41,7 @@ function fail(message: string) {
   return { content: [{ type: "text" as const, text: message }], isError: true };
 }
 
-export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLink, lessons, makeLessonLink, vanBan, makeVanBanLink, slides, games, makeSlideLink, makeGameLink, makeMatrixLink }: McpDeps): McpServer {
+export function buildMcpServer({ service, actor, makeLinks, classes, assignments, makeClassLink, lessons, makeLessonLink, vanBan, makeVanBanLink, slides, games, makeSlideLink, makeGameLink, makeMatrixLink }: McpDeps): McpServer {
   const server = new McpServer({ name: "eduvn", version: "0.1.0" });
 
   server.registerTool(
@@ -132,6 +135,7 @@ export function buildMcpServer({ service, actor, makeLinks, classes, makeClassLi
   registerSlideTools(server, { slides, actor, makeSlideLink });
   registerGameTools(server, { games, actor, makeGameLink });
   registerClassTools(server, { classes, actor, makeClassLink });
+  registerAssignmentTools(server, { assignments, classes, service, actor });
   registerSkillTools(server);
 
   return server;

@@ -27,3 +27,25 @@ export class AiUnavailableError extends Error {
     this.name = "AiUnavailableError";
   }
 }
+
+/** 429: kèm số giây chờ (header Retry-After). */
+export class TooManyRequestsError extends Error {
+  constructor(
+    message: string,
+    public retryAfterSec: number,
+  ) {
+    super(message);
+    this.name = "TooManyRequestsError";
+  }
+}
+
+/** 409: trạng thái không cho phép (bài đã nộp, hết lượt…); extra gửi kèm trong thân lỗi. */
+export class ConflictError extends Error {
+  constructor(
+    message: string,
+    public extra: Record<string, unknown> = {},
+  ) {
+    super(message);
+    this.name = "ConflictError";
+  }
+}

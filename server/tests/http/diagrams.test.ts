@@ -24,7 +24,7 @@ const fakeAi: Ai = { chat: async () => aiReply, stream: async function* () {} };
 
 async function boot(ai?: Ai) {
   const kc = await makeIssuer();
-  app = buildApp({ db: await testDb(), verify: createVerifier({ issuer: ISSUER, audience: AUDIENCE, keys: kc.keys }), issuer: ISSUER, publicUrl: "http://eduvn.test", downloadSecret: "test-secret-test-secret-test-secret!", ai });
+  app = buildApp({ db: await testDb(), verify: createVerifier({ issuer: ISSUER, audience: AUDIENCE, keys: kc.keys }), issuer: ISSUER, publicUrl: "http://eduvn.test", downloadSecret: "test-secret-test-secret-test-secret!", studentSecret: "student-secret-student-secret-0123", ai });
   auth = { authorization: `Bearer ${await kc.sign({ sub: "gv-1", name: "Cô Lan" })}` };
 }
 afterEach(async () => {

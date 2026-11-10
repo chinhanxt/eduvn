@@ -13,6 +13,9 @@ const app = buildApp({
   issuer: cfg.OIDC_ISSUER,
   publicUrl: cfg.PUBLIC_URL,
   downloadSecret: cfg.DOWNLOAD_SECRET,
+  studentSecret: cfg.STUDENT_SECRET,
+  pressure: { maxEventLoopDelay: 1000 },
+  sweepMs: 60_000,
   ai: createAi({ url: cfg.GATEWAY_URL, token: cfg.GATEWAY_TOKEN }),
   aiLessons: {
     dataDir: cfg.DATA_DIR,
