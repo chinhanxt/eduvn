@@ -99,7 +99,7 @@ export function createDiagramService(db: Db, ai: Ai) {
     } catch {
       throw new AiUnavailableError("AI trả về không phải JSON, thử lại");
     }
-    const out = parseAiDiagram(parsed);
+    const out = parseAiDiagram(parsed, q.kind);
     if (!out.ok) throw new AiUnavailableError(`${out.error}, thử lại`);
     return out.diagram;
   }

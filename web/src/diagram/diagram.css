@@ -1,0 +1,52 @@
+/* web/src/diagram/diagram.css — trình soạn sơ đồ (dg-) */
+.dg { position: fixed; inset: 0; display: grid; grid-template-columns: 72px 1fr 272px; background: var(--bg); z-index: 10; }
+.dg-rail { background: var(--side); color: var(--side-ink); position: static; height: auto; overflow: visible; display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px; }
+.dg-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--brand); color: #fff; display: grid; place-items: center; margin-bottom: 14px; }
+.dg-rb { width: 58px; padding: 8px 0 6px; border-radius: 12px; border: 0; background: transparent; color: var(--side-ink); display: grid; justify-items: center; gap: 2px; font-size: 10.5px; }
+.dg-rb:hover:not(:disabled) { background: rgba(255,255,255,.06); }
+.dg-rb.on { background: var(--side-active); color: #fff; }
+.dg-rb:disabled { opacity: .35; }
+.dg-main { display: grid; grid-template-rows: 62px 1fr; min-width: 0; min-height: 0; }
+.dg-top { display: flex; align-items: center; gap: 8px; padding: 0 18px; }
+.dg-title { font-weight: 700; font-size: 16px; }
+.dg-chip { background: var(--card); box-shadow: var(--shadow); padding: 5px 12px; border-radius: 999px; font-size: 12.5px; color: var(--muted); font-weight: 500; }
+.dg-grow { flex: 1; }
+.dg-state { font-size: 12.5px; color: var(--amber); font-weight: 500; }
+.dg-state.ok { color: var(--green); }
+.dg-err { font-size: 12.5px; color: #b42318; background: #fdecec; padding: 4px 10px; border-radius: 8px; cursor: pointer; max-width: 380px; }
+.dg-zoom { font-size: 12.5px; color: var(--muted); min-width: 40px; text-align: center; }
+.dg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 0; font-weight: 500; font-size: 15px; min-width: 36px; padding: 7px 10px; border-radius: 12px; background: var(--card); box-shadow: var(--shadow); color: var(--ink); }
+.dg-btn:disabled { opacity: .4; }
+.dg-btn.pri { background: var(--brand); color: #fff; font-size: 13px; }
+.dg-btn.flip svg { transform: scaleX(-1); }
+.dg-btn svg.i { width: 17px; height: 17px; }
+.dg-canvas { position: relative; margin: 0 18px 18px; border-radius: 18px; overflow: hidden; background: #fff; box-shadow: var(--shadow); min-height: 0; background-image: radial-gradient(#d9deea 1px, transparent 1px); background-size: 24px 24px; }
+.dg-svg { position: absolute; inset: 0; width: 100%; height: 100%; user-select: none; touch-action: none; cursor: grab; font-family: "Be Vietnam Pro", system-ui, sans-serif; }
+.dg-svg.linking { cursor: crosshair; }
+.dg-node { cursor: move; }
+.dg-svg.linking .dg-node { cursor: crosshair; }
+.dg-selbox { fill: none; stroke: #4f6bed; stroke-width: 1.6; stroke-dasharray: 5 3; pointer-events: none; }
+.dg-node.src .dg-selbox { stroke: #e08a00; }
+.dg-lbl { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 14px; line-height: 1.3; padding: 2px 10px; box-sizing: border-box; pointer-events: none; }
+.dg-lbl .me-text { font-size: 14px; }
+.dg-edit { pointer-events: auto; width: 100%; height: 100%; resize: none; border: 1.5px solid #4f6bed; border-radius: 6px; font: inherit; text-align: center; background: #fff; color: #1b2033; padding: 4px; box-sizing: border-box; }
+.dg-hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer; }
+.dg-elbl-bg { fill: rgba(255,255,255,.88); }
+.dg-elbl { width: 100%; height: 100%; display: grid; place-items: center; font-size: 12px; color: #4a5068; pointer-events: none; white-space: nowrap; }
+.dg-elbl .me-text { font-size: 12px; }
+.dg-hint { position: absolute; left: 14px; bottom: 10px; font-size: 12px; color: var(--muted); background: rgba(255,255,255,.85); padding: 4px 10px; border-radius: 999px; pointer-events: none; }
+.dg-panel { background: var(--card); padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; position: static; height: auto; border-left: 1px solid var(--line); }
+.dg-panel h3 { margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.dg-shapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.dg-shapes button { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 4px; display: grid; place-items: center; }
+.dg-shapes button.on { border-color: var(--brand); background: var(--blue-bg); }
+.dg-colors { display: flex; flex-wrap: wrap; gap: 8px; }
+.dg-colors button { width: 24px; height: 24px; border-radius: 50%; border: 0; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--line); }
+.dg-colors button.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--brand); }
+.dg-wide { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 10px; font-weight: 500; font-size: 13px; margin-top: 6px; }
+.dg-wide.pri { background: var(--brand); color: #fff; border-color: var(--brand); }
+.dg-wide:disabled { opacity: .5; }
+.dg-wide svg.i { width: 17px; height: 17px; }
+.dg-row { display: flex; gap: 6px; }
+.dg-f { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); }
+.dg-chk { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; }

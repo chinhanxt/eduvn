@@ -13,6 +13,8 @@ import { VanBan } from "./pages/VanBan";
 import { Slides } from "./pages/Slides";
 import { Boards } from "./pages/Boards";
 import { BoardPage } from "./board/BoardPage";
+import { Diagrams } from "./pages/Diagrams";
+import { DiagramPage } from "./diagram/DiagramPage";
 import { Games } from "./pages/Games";
 import { Connect } from "./pages/Connect";
 import { Placeholder } from "./pages/Placeholder";
@@ -32,8 +34,10 @@ export function App() {
       ) : (
         <>
         <Route path="bang-giang/:id" element={<BoardPage />} />
+        <Route path="so-do/:id" element={<DiagramPage />} />
         <Route element={<Shell />}>
           <Route path="bang-giang" element={<Boards />} />
+          <Route path="so-do" element={<Diagrams />} />
           <Route index element={<Home />} />
           <Route path="ngan-hang" element={<Bank />} />
           <Route path="de-thi" element={<Exams />} />

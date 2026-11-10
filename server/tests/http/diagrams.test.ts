@@ -87,3 +87,16 @@ describe("HTTP sơ đồ — chưa bật cổng AI", () => {
     expect(r.json().error).toContain("Chưa bật cổng AI");
   });
 });
+
+describe("HTTP sơ đồ — AI lưu đồ", () => {
+  beforeEach(() => boot(fakeAi));
+  it("cây mặc định → mũi tên nối; id số và label null vẫn nhận", async () => {
+    aiReply = JSON.stringify({ root: { text: "Bắt đầu", children: [{ text: "Bước 1", children: [{ text: "Kết thúc", children: [] }] }] } });
+    const r = await call("POST", "/api/diagrams/ai", { topic: "x", kind: "flow" });
+    expect(r.json().links).toEqual([{ from: "a1", to: "a2" }, { from: "a2", to: "a3" }]);
+    aiReply = JSON.stringify({ nodes: [{ id: 1, label: "A", parent: null }, { id: 2, label: "B" }], links: [{ from: 1, to: 2, label: null }] });
+    const r2 = await call("POST", "/api/diagrams/ai", { topic: "x", kind: "flow" });
+    expect(r2.statusCode).toBe(200);
+    expect(r2.json().links).toHaveLength(1);
+  });
+});

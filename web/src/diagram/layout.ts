@@ -102,6 +102,16 @@ export function layoutFlow(doc: DiagramDoc): DiagramDoc {
       queue.push(e.to);
     }
   }
+  // kéo tầng xuống theo đường dài nhất trên các cạnh xuôi (theo tầng BFS) để các nhánh gom về cuối
+  const fwd = doc.edges.filter((e) => (level.get(e.to) ?? -1) > (level.get(e.from) ?? Infinity));
+  for (let pass = 0; pass < doc.nodes.length; pass++) {
+    let moved = false;
+    for (const e of fwd) {
+      const want = level.get(e.from)! + 1;
+      if (level.get(e.to)! < want) (level.set(e.to, want), (moved = true));
+    }
+    if (!moved) break;
+  }
   const maxL = Math.max(0, ...level.values());
   for (const n of doc.nodes) if (!level.has(n.id)) level.set(n.id, maxL + 1);
   const rows = new Map<number, DNode[]>();

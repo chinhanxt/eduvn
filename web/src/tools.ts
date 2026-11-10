@@ -1,6 +1,6 @@
 export type Tool = { to: string; name: string; icon: string; color: "blue" | "green" | "violet" | "amber"; pill?: string };
 
-/** 13 công cụ ở trang chủ. */
+/** 14 công cụ ở trang chủ. */
 export const TOOLS: Tool[] = [
   { to: "/de-thi", name: "Tạo đề", icon: "exam", color: "blue" },
   { to: "/ngan-hang", name: "Thêm câu hỏi", icon: "bank", color: "blue" },
@@ -12,6 +12,7 @@ export const TOOLS: Tool[] = [
   { to: "/lop-hoc", name: "Lớp học", icon: "users", color: "amber" },
   { to: "/giao-an", name: "Soạn giáo án", icon: "pen", color: "violet" },
   { to: "/bang-giang", name: "Bảng giảng", icon: "board", color: "violet" },
+  { to: "/so-do", name: "Sơ đồ", icon: "graph", color: "violet" },
   { to: "/tro-choi", name: "Trò chơi ôn tập", icon: "spark", color: "violet" },
   { to: "/van-ban", name: "Văn bản", icon: "exam", color: "green" },
   { to: "/so-diem", name: "Sổ điểm", icon: "clip", color: "amber" },

@@ -70,16 +70,17 @@ export function validateDiagram(raw: unknown, mode: "create" | "save"): { ok: tr
 
 /** Kết quả AI vẽ sơ đồ: web tự layout. */
 export const AI_MAX_NODES = 40;
-const AiNode = z.object({ id: Id, label: z.string().trim().min(1).max(500), parent: Id.nullish() });
+const AiId = z.union([z.string(), z.number()]).transform((v) => String(v).slice(0, 40)).pipe(z.string().min(1));
+const AiNode = z.object({ id: AiId, label: z.string().trim().min(1).transform((v) => v.slice(0, 500)), parent: AiId.nullish() });
 const AiResultSchema = z.object({
   nodes: z.array(AiNode).min(1).max(AI_MAX_NODES),
-  links: z.array(z.object({ from: Id, to: Id, label: z.string().max(200).optional() })).max(AI_MAX_NODES * 2).default([]),
+  links: z.array(z.object({ from: AiId, to: AiId, label: z.string().nullish().transform((v) => v?.slice(0, 200) || undefined) })).max(AI_MAX_NODES * 2).default([]),
 });
 export type AiDiagram = z.infer<typeof AiResultSchema>;
 
 type Tree = { text?: unknown; children?: unknown };
 /** Nhận cả dạng {nodes,links} lẫn dạng cây mặc định của tác vụ so_do_tu_duy ({root:{text,children}}). */
-export function parseAiDiagram(raw: unknown): { ok: true; diagram: AiDiagram } | { ok: false; error: string } {
+export function parseAiDiagram(raw: unknown, kind: "mind" | "flow" = "mind"): { ok: true; diagram: AiDiagram } | { ok: false; error: string } {
   let v = raw;
   const root = (raw as { root?: Tree } | null)?.root;
   if (root && typeof root === "object" && !Array.isArray((raw as { nodes?: unknown }).nodes)) {
@@ -91,7 +92,18 @@ export function parseAiDiagram(raw: unknown): { ok: true; diagram: AiDiagram } |
       if (Array.isArray(t.children)) for (const c of t.children) if (c && typeof c === "object") walk(c as Tree, id);
     };
     walk(root, null);
-    v = { nodes, links: [] };
+    // lưu đồ: quan hệ cha → con thành mũi tên nối
+    v = kind === "flow" ? { nodes: nodes.map((n) => ({ ...n, parent: null })), links: nodes.filter((n) => n.parent).map((n) => ({ from: n.parent, to: n.id })) } : { nodes, links: [] };
+  }
+  const o = v as { nodes?: unknown; links?: unknown; edges?: unknown } | null;
+  if (o && Array.isArray(o.nodes)) {
+    // chịu vài cách đặt tên khác của model
+    const pick = (x: Record<string, unknown>, ...ks: string[]) => ks.map((k) => x[k]).find((y) => y !== undefined);
+    const arr = (x: unknown) => (Array.isArray(x) ? x.filter((i): i is Record<string, unknown> => !!i && typeof i === "object") : []);
+    v = {
+      nodes: arr(o.nodes).map((n) => ({ id: n.id, label: pick(n, "label", "text", "name", "title"), parent: pick(n, "parent", "parentId") })),
+      links: arr(o.links ?? o.edges).map((l) => ({ from: pick(l, "from", "source"), to: pick(l, "to", "target"), label: pick(l, "label", "text") })),
+    };
   }
   const r = AiResultSchema.safeParse(v);
   if (!r.success) return { ok: false, error: "AI trả sơ đồ sai định dạng" };
@@ -100,7 +112,7 @@ export function parseAiDiagram(raw: unknown): { ok: true; diagram: AiDiagram } |
   return {
     ok: true,
     diagram: {
-      nodes: r.data.nodes.map((n) => ({ ...n, parent: n.parent && ids.has(n.parent) && n.parent !== n.id ? n.parent : null })),
+      nodes: r.data.nodes.map((n) => ({ ...n, parent: kind === "mind" && n.parent && ids.has(n.parent) && n.parent !== n.id ? n.parent : null })),
       links: r.data.links.filter((l) => ids.has(l.from) && ids.has(l.to) && l.from !== l.to),
     },
   };
