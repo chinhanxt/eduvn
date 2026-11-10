@@ -25,5 +25,6 @@ export type Config = z.infer<typeof Env>;
 
 export function loadConfig(env: Record<string, string | undefined> = process.env): Config {
   const cfg = Env.parse(env);
+  if (env.NODE_ENV === "production" && /change-me|dev-only/i.test(cfg.STUDENT_SECRET)) throw new Error("STUDENT_SECRET đang là giá trị mẫu — đặt chuỗi ngẫu nhiên ≥ 32 ký tự");
   return { ...cfg, OIDC_ISSUER: cfg.OIDC_ISSUER.replace(/\/+$/, ""), PUBLIC_URL: cfg.PUBLIC_URL.replace(/\/+$/, "") };
 }

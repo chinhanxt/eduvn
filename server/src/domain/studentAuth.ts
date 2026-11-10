@@ -38,7 +38,7 @@ export type GuardOptions = {
 /** Theo (lớp, số thứ tự): 5 lần sai / 10 phút. Theo IP: 30 lần (cả lớp thường chung một IP qua NAT của trường). Cả lớp: 200 lần / 60 phút. */
 export const DEFAULT_GUARD: GuardOptions = { maxFails: 5, maxIpFails: 30, windowMs: 600_000, lockMs: 600_000, maxClassFails: 200, classWindowMs: 3_600_000, maxKeys: 100_000 };
 
-export type AttemptToken = { readonly keys: readonly string[]; readonly at: number };
+export type AttemptToken = { readonly keys: readonly string[]; readonly at: number; /** Khoá do chính lượt này đặt (rút lại nếu lượt này đúng PIN). */ readonly locked: readonly string[] };
 export type AttemptResult = { ok: true; token: AttemptToken } | { ok: false; retryAfterMs: number };
 
 type Entry = { hits: number[]; until: number; windowMs: number };
@@ -61,19 +61,21 @@ export class PinGuard {
       if (e && e.until > now) ms = Math.max(ms, e.until - now);
     }
     if (ms > 0) return { ok: false, retryAfterMs: ms };
-    this.bump(keys[0]!, this.o.maxFails, this.o.windowMs, now);
-    this.bump(keys[1]!, this.o.maxIpFails, this.o.windowMs, now);
-    this.bump(keys[2]!, this.o.maxClassFails, this.o.classWindowMs, now);
+    const locked: string[] = [];
+    if (this.bump(keys[0]!, this.o.maxFails, this.o.windowMs, now)) locked.push(keys[0]!);
+    if (this.bump(keys[1]!, this.o.maxIpFails, this.o.windowMs, now)) locked.push(keys[1]!);
+    if (this.bump(keys[2]!, this.o.maxClassFails, this.o.classWindowMs, now)) locked.push(keys[2]!);
     this.evict(now);
-    return { ok: true, token: { keys, at: now } };
+    return { ok: true, token: { keys, at: now, locked } };
   }
 
-  /** Đúng PIN: rút lần ghi của lượt này khỏi cả ba bộ đếm (không tiêu hạn mức IP chung của trường). Khoá đã đặt thì giữ. */
+  /** Đúng PIN: rút lần ghi của lượt này khỏi cả ba bộ đếm (không tiêu hạn mức IP chung của trường). Khoá do chính lượt này đặt thì gỡ. */
   success(token: AttemptToken): void {
     for (const k of token.keys) {
       const e = this.entries.get(k);
       const i = e ? e.hits.indexOf(token.at) : -1;
       if (e && i >= 0) e.hits.splice(i, 1);
+      if (e && token.locked.includes(k)) e.until = 0;
     }
   }
 
@@ -105,16 +107,19 @@ export class PinGuard {
     while (this.entries.size > this.o.maxKeys) this.entries.delete(this.entries.keys().next().value as string);
   }
 
-  private bump(key: string, max: number, windowMs: number, now: number): void {
+  private bump(key: string, max: number, windowMs: number, now: number): boolean {
     const old = this.entries.get(key);
     this.entries.delete(key);
     const hits = (old?.hits ?? []).filter((t) => t > now - windowMs);
     hits.push(now);
     const e: Entry = { hits, until: old && old.until > now ? old.until : 0, windowMs };
+    let locked = false;
     if (hits.length >= max) {
       e.until = now + this.o.lockMs;
       e.hits = [];
+      locked = true;
     }
     this.entries.set(key, e);
+    return locked;
   }
 }
