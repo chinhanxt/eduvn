@@ -16,7 +16,7 @@ const thumbs = new Map<string, string>();
 function thumb(id: string, spec: ConstructionSpec): string {
   let t = thumbs.get(id);
   if (!t) {
-    t = printSvg(spec, SGK_VIEW[defaultMode(spec)], 46).svg;
+    t = printSvg(spec, SGK_VIEW[defaultMode(spec)], 90, 15).svg;
     thumbs.set(id, t);
   }
   return t;
@@ -75,8 +75,8 @@ export function FigureBuilder({ initialProblem = "", startWithAi = false, doneLa
     <div className="fg" data-testid="fig-builder">
       <div className="fg-left">
         <div className="fg-tabs">
-          <button className={tab === "lib" ? "on" : ""} onClick={() => setTab("lib")} data-testid="fig-tab-lib"><Icon name="box" />Thư viện hình</button>
-          <button className={tab === "ai" ? "on" : ""} onClick={() => setTab("ai")} data-testid="fig-tab-ai"><Icon name="spark" />AI dựng từ đề bài</button>
+          <button type="button" className={tab === "lib" ? "on" : ""} onClick={() => setTab("lib")} data-testid="fig-tab-lib"><Icon name="box" />Thư viện hình</button>
+          <button type="button" className={tab === "ai" ? "on" : ""} onClick={() => setTab("ai")} data-testid="fig-tab-ai"><Icon name="spark" />AI dựng từ đề bài</button>
         </div>
         {tab === "lib" ? (
           <div className="fg-lib">
@@ -85,7 +85,7 @@ export function FigureBuilder({ initialProblem = "", startWithAi = false, doneLa
                 <h4>{g === "Chóp" ? "Tứ diện, hình chóp" : g === "Lăng trụ" ? "Lăng trụ, hình hộp" : "Nón, trụ, cầu"}</h4>
                 <div className="fg-grid">
                   {PRESETS.filter((p) => p.group === g).map((p) => (
-                    <button key={p.id} className={cur?.kind === p.id ? "on" : ""} onClick={() => pick(p.id)} title={p.title} data-testid={`fig-lib-${p.id}`}>
+                    <button type="button" key={p.id} className={cur?.kind === p.id ? "on" : ""} onClick={() => pick(p.id)} title={p.title} data-testid={`fig-lib-${p.id}`}>
                       <span className="fg-th" dangerouslySetInnerHTML={{ __html: thumb(p.id, p.spec()) }} />
                       <small>{p.title}</small>
                     </button>
@@ -98,7 +98,7 @@ export function FigureBuilder({ initialProblem = "", startWithAi = false, doneLa
           <div className="fg-ai">
             <label className="fg-lbl">Dán đề bài hình học không gian</label>
             <textarea className="inp" rows={8} value={problem} onChange={(e) => setProblem(e.target.value)} placeholder="Ví dụ: Cho hình chóp S.ABCD có đáy ABCD là hình vuông cạnh a, SA ⊥ (ABCD), SA = a√2. Gọi M là trung điểm SC. Tính góc giữa SC và (ABCD)." data-testid="fig-problem" />
-            <button className="btn" disabled={busy || !problem.trim()} onClick={() => void askAi()} data-testid="fig-ai"><Icon name="spark" size={18} />{busy ? "AI đang dựng hình…" : "Dựng hình"}</button>
+            <button type="button" className="btn" disabled={busy || !problem.trim()} onClick={() => void askAi()} data-testid="fig-ai"><Icon name="spark" size={18} />{busy ? "AI đang dựng hình…" : "Dựng hình"}</button>
             <p className="fg-note">AI đọc đề → lập các ràng buộc (đáy, đỉnh, trung điểm, hình chiếu…) → bộ giải tính toạ độ và vẽ theo quy ước SGK. Số đo (góc, khoảng cách) tính đúng từ hình.</p>
             {err && <div className="fg-err" data-testid="fig-err">{err}</div>}
           </div>
@@ -115,10 +115,10 @@ export function FigureBuilder({ initialProblem = "", startWithAi = false, doneLa
           </ul>
         )}
         <div className="fg-ft">
-          <button className="fg-link" disabled={!cur} onClick={() => cur && setCur({ ...cur, view: SGK_VIEW[defaultMode(cur.spec)] })} title="Kéo trên hình để xoay; bấm để về góc nhìn như SGK"><Icon name="rotate" />Về góc SGK</button>
+          <button type="button" className="fg-link" disabled={!cur} onClick={() => cur && setCur({ ...cur, view: SGK_VIEW[defaultMode(cur.spec)] })} title="Kéo trên hình để xoay; bấm để về góc nhìn như SGK"><Icon name="rotate" />Về góc SGK</button>
           <span className="fg-grow" />
-          <button className="btn ghost" onClick={onCancel}>Huỷ</button>
-          <button className="btn" disabled={!cur || busy} onClick={() => cur && void onDone(cur)} data-testid="fig-done"><Icon name="check" size={18} />{doneLabel}</button>
+          <button type="button" className="btn ghost" onClick={onCancel}>Huỷ</button>
+          <button type="button" className="btn" disabled={!cur || busy} onClick={() => cur && void onDone(cur)} data-testid="fig-done"><Icon name="check" size={18} />{doneLabel}</button>
         </div>
       </div>
     </div>

@@ -46,9 +46,9 @@ export function figureScene(o: FigureLike, font = 18): { spec: ConstructionSpec;
 }
 
 /** Hình đen trắng để in đề / chèn câu hỏi (cỡ chữ 17, nét SGK). */
-export function printSvg(spec: ConstructionSpec, view: View = SGK_VIEW[defaultMode(spec)], size = 150): { svg: string; w: number; h: number } {
-  const sc = buildScene(solvedOf(spec), view, { cx: 0, cy: 0, size, font: 17 });
-  return sceneSvg(sc, "print", { font: 17 });
+export function printSvg(spec: ConstructionSpec, view: View = SGK_VIEW[defaultMode(spec)], size = 150, font = 17): { svg: string; w: number; h: number } {
+  const sc = buildScene(solvedOf(spec), view, { cx: 0, cy: 0, size, font });
+  return sceneSvg(sc, "print", { font, pad: Math.round(font * 0.8) });
 }
 
 export async function svgToPngBlob(svg: string, w: number, h: number, scale = 2): Promise<Blob> {

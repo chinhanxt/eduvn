@@ -9,6 +9,7 @@ export async function boardPng(svg: SVGSVGElement, w: number, h: number, scale =
   c.setAttribute("width", String(w));
   c.setAttribute("height", String(h));
   for (const fo of Array.from(c.querySelectorAll("foreignObject"))) if (!fo.hasAttribute("data-plain")) fo.remove();
+  for (const el of Array.from(c.querySelectorAll("[data-noexport]"))) el.remove();
   const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
   style.textContent = `${css}\n.bd-text{line-height:1.5;padding:2px 12px;white-space:nowrap;font-family:'Be Vietnam Pro',Arial,sans-serif}.me-tex{display:inline-block;vertical-align:middle}`;
   c.insertBefore(style, c.firstChild);

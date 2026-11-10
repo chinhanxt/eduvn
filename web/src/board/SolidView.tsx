@@ -119,9 +119,9 @@ export function SolidView({ obj, tool, selected, onSelect, b, toBoard }: Props) 
       <g dangerouslySetInnerHTML={{ __html: body }} />
       {picks.map((n) => {
         const p = sc.points.get(n);
-        return p ? <circle key={n} cx={p[0]} cy={p[1]} r={11} fill="rgba(143,162,255,.35)" stroke="#8fa2ff" strokeWidth={1.5} pointerEvents="none" /> : null;
+        return p ? <circle data-noexport="" key={n} cx={p[0]} cy={p[1]} r={11} fill="rgba(143,162,255,.35)" stroke="#8fa2ff" strokeWidth={1.5} pointerEvents="none" /> : null;
       })}
-      {selected && <rect x={x0 - 12} y={y0 - 12} width={x1 - x0 + 24} height={y1 - y0 + 24} rx={12} fill="none" stroke="#8fa2ff" strokeDasharray="6 5" strokeWidth={1.5} pointerEvents="none" />}
+      {selected && <rect data-noexport="" x={x0 - 12} y={y0 - 12} width={x1 - x0 + 24} height={y1 - y0 + 24} rx={12} fill="none" stroke="#8fa2ff" strokeDasharray="6 5" strokeWidth={1.5} pointerEvents="none" />}
       {(selected || lines.length > 0) && (
         <foreignObject x={tbX} y={tbY} width={600} height={150}>
           <div className="bd-tbw">
