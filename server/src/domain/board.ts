@@ -1,8 +1,10 @@
 // server/src/domain/board.ts
 import { z } from "zod";
+import { ConstructionSpecSchema } from "./geometry3d";
 
 /** Bảng giảng: tài liệu JSON nhiều trang (nét bút / đồ thị / hình khối, toạ độ bảng 1280×720).
  *  Server chỉ kiểm cấu trúc + giới hạn; hình học và đồ thị tính ở trình duyệt (web/src/board). */
+/** Loại hình cũ (P4); từ P10b kind là mã hình mẫu bất kỳ ("chop_vuong_sa", "ai"…) và hình vẽ theo `spec`. */
 export const SOLID_KINDS = ["cube", "cuboid", "pyramid4", "pyramid3", "prism3"] as const;
 export const MAX_PAGES = 30;
 
@@ -33,7 +35,7 @@ const Graph = z.object({
 const Solid = z.object({
   type: z.literal("solid"),
   id: Id,
-  kind: z.enum(SOLID_KINDS),
+  kind: z.string().regex(/^[a-z][a-z0-9_]{0,39}$/, "Mã loại hình không hợp lệ"),
   cx: Num,
   cy: Num,
   size: z.number().min(60).max(600),
@@ -42,6 +44,9 @@ const Solid = z.object({
   points: z.array(z.object({ name: PtName, a: z.number().int().min(0).max(11), b: z.number().int().min(0).max(11), t: z.number().min(0).max(1) })).max(12, "Tối đa 12 điểm dựng thêm"),
   section: Tri.nullable(),
   angle: Tri.nullable(),
+  spec: ConstructionSpecSchema.optional(),
+  mode: z.enum(["sgk", "ortho"]).optional(),
+  print: z.boolean().optional(),
 });
 export const SHAPE_KINDS = ["line", "arrow", "rect", "triangle", "circle", "polygon"] as const;
 const Shape = z.object({

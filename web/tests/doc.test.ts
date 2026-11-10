@@ -1,6 +1,8 @@
 // web/tests/doc.test.ts
 import { describe, expect, it } from "vitest";
 import { boardKeywords, graphFromExprs, newSolid } from "../src/board/doc";
+import { PRESET_MAP } from "../src/geometry3d/presets";
+import { SGK_VIEW } from "../src/geometry3d/render";
 
 describe("graphFromExprs", () => {
   it("tham số mặc định 1, giữ giá trị cũ; khung tự căn", () => {
@@ -16,9 +18,11 @@ describe("graphFromExprs", () => {
 
 describe("boardKeywords", () => {
   it("rút từ khoá từ khối, thiết diện, loại hàm", () => {
-    const solid = { ...newSolid("cube"), section: ["A", "C", "C'"] as [string, string, string] };
-    const kw = boardKeywords({ id: "p", objects: [solid, graphFromExprs(["y=x^2-3", "A\\sin x+B"], [-5, 5])] });
-    for (const w of ["hình lập phương", "thiết diện", "đồ thị hàm số", "bậc hai", "lượng giác"]) expect(kw).toContain(w);
+    const spec = PRESET_MAP.get("chop_vuong_sa")!.spec();
+    const solid = newSolid("chop_vuong_sa", { ...spec, sections: [{ through: ["A", "C", "S"] }], measures: [{ type: "distance", from: "A", plane: ["S", "B", "C"] }] }, SGK_VIEW.sgk);
+    const legacy = { type: "solid" as const, id: "c", kind: "cube", cx: 0, cy: 0, size: 100, th: 0, ph: 0, points: [], section: ["A", "C", "C'"] as [string, string, string], angle: null };
+    const kw = boardKeywords({ id: "p", objects: [solid, legacy, graphFromExprs(["y=x^2-3", "A\\sin x+B"], [-5, 5])] });
+    for (const w of ["chóp đáy vuông", "hình lập phương", "thiết diện", "khoảng cách", "đồ thị hàm số", "bậc hai", "lượng giác"]) expect(kw).toContain(w);
   });
 });
 
