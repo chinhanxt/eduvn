@@ -1,4 +1,4 @@
-import { AlignmentType, Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from "docx";
+import { AlignmentType, Document, ImageRun, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from "docx";
 import { mathRuns } from "./mathDocx";
 import type { QuestionType } from "../domain/question";
 import type { KeyEntry, Variant, VariantItem } from "../domain/variants";
@@ -40,21 +40,40 @@ function header(meta: ExamMeta): Paragraph[] {
   ];
 }
 
+/** Kích thước PNG từ khối IHDR (byte 16–23). */
+export function pngSize(buf: Buffer): { w: number; h: number } | null {
+  if (buf.length < 24 || buf.toString("ascii", 1, 4) !== "PNG") return null;
+  return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+}
+
+/** Hình vẽ kèm câu hỏi: căn giữa, rộng tối đa 260 px, cao tối đa 240 px (96 dpi). */
+function figureParagraph(dataUrl: string): Paragraph | null {
+  const data = Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
+  const size = pngSize(data);
+  if (!size) return null;
+  const k = Math.min(260 / size.w, 240 / size.h, 1);
+  return new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 60, after: 60 }, children: [new ImageRun({ type: "png", data, transformation: { width: Math.round(size.w * k), height: Math.round(size.h * k) }, altText: { name: "Hình vẽ", description: "Hình vẽ kèm câu hỏi", title: "Hình vẽ" } })] });
+}
+
 function itemParagraphs(it: VariantItem): Paragraph[] {
   const q = it.question;
-  const head = new Paragraph({
-    spacing: { before: 120 },
-    children: [new TextRun({ text: `Câu ${it.sectionNo}. `, bold: true }), ...mathRuns(q.stem)],
-  });
+  const fig = q.figure ? figureParagraph(q.figure) : null;
+  const head = [
+    new Paragraph({
+      spacing: { before: 120 },
+      children: [new TextRun({ text: `Câu ${it.sectionNo}. `, bold: true }), ...mathRuns(q.stem)],
+    }),
+    ...(fig ? [fig] : []),
+  ];
   switch (q.type) {
     case "mcq":
-      return [head, ...q.options.map((o, i) => indented(`${OPTION_LABELS[i]}. ${o}`))];
+      return [...head, ...q.options.map((o, i) => indented(`${OPTION_LABELS[i]}. ${o}`))];
     case "true_false":
-      return [head, ...q.statements.map((s, i) => indented(`${STATEMENT_LABELS[i]}) ${s}`))];
+      return [...head, ...q.statements.map((s, i) => indented(`${STATEMENT_LABELS[i]}) ${s}`))];
     case "short_answer":
-      return [head];
+      return head;
     case "essay":
-      return [head, indented(`(${q.points} điểm)`)];
+      return [...head, indented(`(${q.points} điểm)`)];
   }
 }
 

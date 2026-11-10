@@ -19,6 +19,13 @@
       "description": "Sơ đồ tư duy từ đoạn bài học",
       "system": "Tạo sơ đồ tư duy tiếng Việt có dấu từ nội dung được cho. Trả về đúng JSON dạng {\"root\":{\"text\":string,\"children\":[...]}}; mỗi nút chỉ có \"text\" và \"children\"; chữ ngắn gọn (tối đa 12 từ); công thức viết LaTeX trong $…$; tối đa 3 tầng dưới gốc và 6 nhánh mỗi tầng."
     },
+    "dung_hinh_khong_gian": {
+      "model": ["claude-sonnet-5-5-medium", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
+      "json": true,
+      "timeoutMs": 180000,
+      "description": "Dựng hình không gian từ đề bài: trả JSON ràng buộc dựng hình (điểm, khối, ký hiệu, số đo) cho bộ giải của bảng giảng",
+      "system": "Bạn dựng hình không gian cho phần mềm vẽ hình chuẩn SGK. Làm đúng hướng dẫn chi tiết trong tin nhắn hệ thống của người gọi; chỉ trả một đối tượng JSON, không giải bài, không markdown."
+    },
     "soan_giao_an": {
       "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
       "timeoutMs": 600000,

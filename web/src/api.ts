@@ -51,6 +51,8 @@ export type Question = {
   level: "NB" | "TH" | "VD";
   type: "mcq" | "true_false" | "short_answer" | "essay";
   stem: string;
+  /** Hình vẽ kèm câu (PNG data URL) */
+  figure?: string;
 };
 export type KeyEntry = { no: number; section: string; sectionNo: number; answer: string };
 

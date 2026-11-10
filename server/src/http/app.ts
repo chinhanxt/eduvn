@@ -11,6 +11,8 @@ import { answerKey } from "../domain/variants";
 import { AiUnavailableError, NotFoundError, UnauthorizedError, ValidationError } from "../errors";
 import { type Ai, disabledAi } from "../services/ai";
 import { createDiagramService } from "../services/diagrams";
+import { buildFigure } from "../services/geometry";
+import { parseOverrides, withTaskOverrides } from "../tutor/tasks";
 import { renderAnswerKeyDocx, renderExamDocx } from "../export/docx";
 import { renderLessonDocx } from "../export/lesson";
 import { renderMatrixDocx } from "../export/matrix";
@@ -228,6 +230,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     await boardsSvc.remove(await authenticate(req), Cid(req));
     return reply.code(204).send();
   });
+
+  const geoAi = withTaskOverrides(deps.ai ?? disabledAi, parseOverrides(process.env.AI_TASK_OVERRIDES));
+  app.post("/api/geometry/ai", async (req) => buildFigure(geoAi, await authenticate(req), req.body));
 
   app.get("/api/diagrams", async (req) => diagramsSvc.list(await authenticate(req)));
   app.post("/api/diagrams/ai", async (req) => diagramsSvc.draw(await authenticate(req), req.body));

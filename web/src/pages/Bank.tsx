@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { ApiError, aiSkill, api, errText, type BankQuestion, type Question } from "../api";
+import { blobToDataUrl, printSvg, svgToPngBlob } from "../geometry3d/figure";
+import { FigureBuilder } from "../geometry3d/FigureBuilder";
 import { Icon } from "../Icon";
 import { MathEditor } from "../math/MathEditor";
 import { MathText } from "../math/MathText";
@@ -53,7 +55,7 @@ export function Bank() {
             <tbody>
               {rows?.map((q) => (
                 <tr key={q.id}>
-                  <td><MathText value={q.stem} /></td>
+                  <td><MathText value={q.stem} />{q.figure && <img className="q-fig sm" src={q.figure} alt="Hình vẽ" />}</td>
                   <td>{q.topic}</td>
                   <td><span className="tag green">{q.level}</span></td>
                   <td><span className="tag violet">{TYPE_LABEL[q.type]}</span></td>
@@ -76,14 +78,17 @@ function AddForm({ subject, grade, onDone }: { subject: string; grade: number; o
   const [answer, setAnswer] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [figure, setFigure] = useState<string | null>(null);
+  const [figOpen, setFigOpen] = useState(false);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      await api("/api/questions", { method: "POST", body: { type: "mcq", subject, grade, topic, level, stem, options, answer } });
+      await api("/api/questions", { method: "POST", body: { type: "mcq", subject, grade, topic, level, stem, options, answer, ...(figure ? { figure } : {}) } });
       setStem("");
+      setFigure(null);
       setFormKey((k) => k + 1);
       setOptions(["", "", "", ""]);
       setAnswer(0);
@@ -107,6 +112,32 @@ function AddForm({ subject, grade, onDone }: { subject: string; grade: number; o
         </label>
       </div>
       <MathEditor key={`stem-${formKey}`} value={stem} onChange={setStem} placeholder="Câu hỏi — gõ $ để chèn công thức" testId="q-stem" />
+      <div className="q-figrow">
+        <button type="button" className="btn ghost sm" onClick={() => setFigOpen(true)} data-testid="q-figure"><Icon name="box" size={16} />{figure ? "Dựng lại hình vẽ" : "Chèn hình không gian"}</button>
+        {figure && (
+          <>
+            <img className="q-fig" src={figure} alt="Hình vẽ kèm câu hỏi" data-testid="q-figure-img" />
+            <button type="button" className="btn ghost sm" onClick={() => setFigure(null)}>Bỏ hình</button>
+          </>
+        )}
+      </div>
+      {figOpen && (
+        <div className="fg-modal" onClick={() => setFigOpen(false)}>
+          <div className="fg-dlg" onClick={(e) => e.stopPropagation()}>
+            <FigureBuilder
+              initialProblem={stem.replace(/\$/g, "")}
+              startWithAi={stem.trim().length > 20}
+              doneLabel="Chèn vào câu hỏi"
+              onCancel={() => setFigOpen(false)}
+              onDone={async (r) => {
+                const { svg, w, h } = printSvg(r.spec, r.view);
+                setFigure(await blobToDataUrl(await svgToPngBlob(svg, w, h, 2)));
+                setFigOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
       {options.map((o, i) => (
         <div className="opt" key={i}>
           <input type="radio" name="ans" checked={answer === i} onChange={() => setAnswer(i)} aria-label={`Đáp án ${"ABCD"[i]}`} />
