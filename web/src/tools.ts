@@ -16,6 +16,7 @@ export const TOOLS: Tool[] = [
   { to: "/bang-giang", name: "Bảng giảng", icon: "board", color: "violet" },
   { to: "/so-do", name: "Sơ đồ", icon: "graph", color: "violet" },
   { to: "/tro-choi", name: "Trò chơi ôn tập", icon: "spark", color: "violet" },
+  { to: "/dau-truong", name: "Đấu trường", icon: "game", color: "amber" },
   { to: "/van-ban", name: "Văn bản", icon: "exam", color: "green" },
   { to: "/so-diem", name: "Sổ điểm", icon: "clip", color: "amber" },
 ];

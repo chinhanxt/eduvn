@@ -521,3 +521,44 @@ export const tutorBookPages = pgTable(
   },
   (t) => [index("tutor_book_pages_idx").on(t.bookId, t.idx)],
 );
+
+/** Phiên chơi trực tiếp (P11): lưu một lần lúc kết thúc. `qstats` = thống kê từng câu. */
+export type LiveQStat = { i: number; q: string; kind: "choice" | "text"; answered: number; correct: number; counts: number[] };
+export type LiveAnswer = { i: number; ok: boolean; pts: number; ms: number };
+
+export const liveSessions = pgTable(
+  "live_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    classId: uuid("class_id").references(() => classes.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    questionCount: integer("question_count").notNull(),
+    qstats: jsonb("qstats").$type<LiveQStat[]>().notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    endedAt: timestamp("ended_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("live_sessions_org_idx").on(t.orgId)],
+);
+
+export const liveResults = pgTable(
+  "live_results",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => liveSessions.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id").references(() => students.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    rank: integer("rank").notNull(),
+    score: integer("score").notNull(),
+    correctCount: integer("correct_count").notNull(),
+    answers: jsonb("answers").$type<LiveAnswer[]>().notNull(),
+  },
+  (t) => [index("live_results_session_idx").on(t.sessionId)],
+);
