@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import JSZip from "jszip";
@@ -9,8 +9,9 @@ import { compileTimeline, splitCues, toSrt } from "../../src/export/aiLessonTime
 import { renderLessonVideo } from "../../src/export/aiLessonVideo";
 import { slideHtml } from "../../src/export/slideHtml";
 import type { Ai } from "../../src/services/ai";
+import { type AnimService, createAnimService } from "../../src/services/anim";
 import { extractMaterialText } from "../../src/services/aiLessons/material";
-import { speakable } from "../../src/services/aiLessons/tts";
+import { createVieneuTts, speakable } from "../../src/services/aiLessons/tts";
 import type { Tts } from "../../src/services/aiLessons/tts";
 import type { StoredScene } from "../../src/services/aiLessons/types";
 import { testApp } from "../helpers/app";
@@ -40,7 +41,7 @@ const QUIZ = [
 const HTML = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Mô phỏng</title></head><body><h1>Kéo a và b</h1><input id="a" type="range" min="1" max="10" value="3"><div id="out">9</div><script>document.getElementById('a').addEventListener('input',function(e){document.getElementById('out').textContent=String(e.target.value*e.target.value)});</script></body></html>`;
 const ACTIONS = (id: string) => [{ type: "action", name: "spotlight", params: { elementId: id } }, { type: "text", content: "Chúng ta cùng xem công thức bình phương của một tổng." }, { type: "text", content: "Hãy ghi nhớ: a cộng b, tất cả bình phương." }];
 
-function fakeAi(opts: { failInteractive?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
+function fakeAi(opts: { failInteractive?: boolean; noAnim?: boolean; badAnim?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
   const calls: string[] = [];
   const ai = {
     calls,
@@ -55,6 +56,11 @@ function fakeAi(opts: { failInteractive?: boolean } = {}): Ai & { calls: string[
       }
       if (task === "slide_noi_dung") return user.includes("Luyện tập nhanh") ? JSON.stringify(QUIZ) : JSON.stringify(SLIDE);
       if (task === "loi_giang") return JSON.stringify(ACTIONS("t1"));
+      if (task === "hoat_hinh_toan") {
+        if (ai.opts.noAnim) return JSON.stringify({ hoatHinh: null });
+        if (ai.opts.badAnim) return JSON.stringify({ hoatHinh: { template: "do_thi_ham_so", thoiLuong: 5, params: { bieuThuc: "__import__('os').system('x')" } } });
+        return JSON.stringify({ hoatHinh: { template: "bien_doi_cong_thuc", thoiLuong: 99, params: { cacBuoc: [{ latex: "(a+b)^2" }, { latex: "a^2+2ab+b^2", ghiChu: "Khai triển" }], toMau: ["2ab"] } } });
+      }
       throw new Error(`task lạ ${task}`);
     },
     // biome-ignore lint: không dùng
@@ -64,13 +70,34 @@ function fakeAi(opts: { failInteractive?: boolean } = {}): Ai & { calls: string[
 }
 
 const fakeTts: Tts = {
-  async synth(_t, dir, name) {
-    const f = path.join(dir, `${name}.mp3`);
+  async synthMany(items, dir) {
     execFileSync("mkdir", ["-p", dir]);
-    writeFileSync(f, Buffer.from("ID3-fake-audio"));
-    return { file: `${name}.mp3`, durationMs: 2000 };
+    return items.map((it) => {
+      writeFileSync(path.join(dir, `${it.name}.mp3`), Buffer.from("ID3-fake-audio"));
+      return { file: `${it.name}.mp3`, durationMs: 2000 };
+    });
   },
 };
+const tmpDirs: string[] = [];
+const mkTmp = (p: string) => {
+  const d = mkdtempSync(path.join(tmpdir(), p));
+  tmpDirs.push(d);
+  return d;
+};
+
+/** Dựng giả: ffmpeg tạo clip 1 giây thay cho Manim/HyperFrames (việc dựng thật có test riêng ở anim.test.ts). */
+function fakeAnim(): AnimService {
+  const real = createAnimService({ dataDir, manimHome: "/khong/co", tinytexBin: "/khong/co" });
+  return {
+    ...real,
+    render: async (input: unknown) => {
+      const { hash } = real.prepare(input);
+      execFileSync("mkdir", ["-p", real.dir]);
+      execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc=size=320x180:rate=10:duration=1", "-pix_fmt", "yuv420p", real.fileOf(hash)]);
+      return { hash, file: real.fileOf(hash), durationMs: 1000 };
+    },
+  };
+}
 
 let ttsImpl: Tts = fakeTts;
 let dataDir: string;
@@ -79,9 +106,9 @@ let ai: ReturnType<typeof fakeAi>;
 let auth: Record<string, string>;
 
 async function boot() {
-  dataDir = mkdtempSync(path.join(tmpdir(), "eduvn-ail-"));
+  dataDir = mkTmp("eduvn-ail-");
   ai = fakeAi();
-  const app = await testApp({ ai, aiLessons: { dataDir, tts: { synth: (a, b, c) => ttsImpl.synth(a, b, c) }, sceneConcurrency: 3, chromePath: CHROME } });
+  const app = await testApp({ ai, aiLessons: { dataDir, tts: { synthMany: (a, b) => ttsImpl.synthMany(a, b) }, anim: fakeAnim(), sceneConcurrency: 3, chromePath: CHROME } });
   return { app };
 }
 
@@ -93,6 +120,7 @@ beforeEach(async () => {
 });
 afterEach(async () => {
   await t.app.close();
+  for (const d of tmpDirs.splice(0)) rmSync(d, { recursive: true, force: true });
 });
 
 const call = (method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload?: unknown) => t.app.inject({ method, url, headers: auth, payload: payload as object });
@@ -146,7 +174,7 @@ describe("sinh bài giảng AI", () => {
   });
 
   it("giọng đọc lỗi tạm thời: bài vẫn xong, 'sinh tiếp' bù lại các câu còn thiếu tiếng", async () => {
-    ttsImpl = { synth: async () => null };
+    ttsImpl = { synthMany: async (items) => items.map(() => null) };
     const { id } = await makeLesson();
     const speechOf = async () => ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[]).flatMap((s) => (s.actions ?? []).filter((a) => a.type === "speech"));
     expect((await speechOf()).every((a) => !(a as { audioFile?: string }).audioFile)).toBe(true);
@@ -190,6 +218,44 @@ describe("sinh bài giảng AI", () => {
     expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/luu-ngan-hang`, {})).statusCode).toBe(404);
   });
 
+  it("hoạt hình toán: AI chọn mẫu → kiểm zod → dựng nền → gắn vào cảnh; spec xấu bị chặn; bỏ hoạt hình", async () => {
+    const { id } = await makeLesson();
+    const scenes = (await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[];
+    const slide = scenes[0] as StoredScene;
+    const quiz = scenes[1] as StoredScene;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${quiz.id}/hoat-hinh`, {})).statusCode).toBe(400);
+    ai.opts.noAnim = true;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).json().error).toContain("không cần hoạt hình");
+    ai.opts.noAnim = false;
+    ai.opts.badAnim = true;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).statusCode).toBe(400);
+    ai.opts.badAnim = false;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, { spec: { template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "\\input{/etc/passwd}" }, { latex: "x" }] } } })).statusCode).toBe(400);
+    const r = await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {});
+    expect(r.statusCode).toBe(202);
+    for (let i = 0; i < 200; i++) {
+      const sc0 = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0];
+      if (sc0?.animation?.status !== "dang_dung") break;
+      await new Promise((r) => setTimeout(r, 25));
+    }
+    const got = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0] as StoredScene;
+    expect(got.animation).toMatchObject({ status: "xong", durationMs: 1000 });
+    expect((got.animation?.spec as { thoiLuong: number }).thoiLuong).toBe(4); // = tổng lời giảng 2 × 2 s, không theo số AI đưa ra (99)
+    const hash = got.animation?.hash as string;
+    const clip = await call("GET", `/api/ai-lessons/${id}/hoat-hinh/${hash}`);
+    expect(clip.statusCode).toBe(200);
+    expect(clip.headers["content-type"]).toBe("video/mp4");
+    expect((await call("GET", `/api/ai-lessons/${id}/hoat-hinh/${"0".repeat(24)}`)).statusCode).toBe(404);
+    // sửa nhanh không làm mất / đè hoạt hình do máy chủ quản
+    const body = { scenes: scenes.map((s) => ({ ...s, animation: { status: "dang_dung", spec: {} } })) };
+    await call("PUT", `/api/ai-lessons/${id}`, body);
+    expect(((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0]?.animation?.status).toBe("xong");
+    const tl = compileTimeline("Bài", [got]);
+    expect(tl.segments.map((s) => s.anim)).toEqual([{ hash, offsetMs: 0 }, { hash, offsetMs: 2000 }]);
+    expect((await call("DELETE", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`)).statusCode).toBe(200);
+    expect(((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0]?.animation).toBeUndefined();
+  });
+
   it("xuất PPTX: 3 trang, lời giảng trong ghi chú, đáp án quiz trong ghi chú", async () => {
     const { id } = await makeLesson();
     const res = await call("GET", `/api/ai-lessons/${id}/pptx`);
@@ -226,6 +292,45 @@ describe("sinh bài giảng AI", () => {
     expect(r.statusCode).toBe(503);
     expect((await call("POST", "/api/ai-lessons", { requirement: "" })).statusCode).toBe(400);
     await t2.app.close();
+  });
+});
+
+describe("giọng VieNeu (lệnh giả)", () => {
+  // lệnh giả: mỗi dòng trong -f thành 1 giây âm 330 Hz + 0,25 s lặng, ghi seg.json như vieneu-say thật
+  function fakeCmd(): string {
+    const dir = mkTmp("eduvn-fakesay-");
+    const f = path.join(dir, "vieneu-say");
+    writeFileSync(f, `#!/usr/bin/env bash
+while [ $# -gt 0 ]; do case "$1" in -f) F="$2"; shift 2;; -o) O="$2"; shift 2;; --segments) S="$2"; shift 2;; --ref) echo "$2" > "$(dirname "$O")/ref.txt"; shift 2;; *) shift;; esac; done
+N=$(grep -c . "$F")
+ffmpeg -y -loglevel error -f lavfi -i "sine=frequency=330:duration=$((N * 125 / 100 + 1))" "$O"
+python3 - "$F" "$S" <<'PY'
+import json,sys
+lines=[l.strip() for l in open(sys.argv[1],encoding="utf-8") if l.strip()]
+pos=0.0;segs=[]
+for l in lines:
+    segs.append({"text":l,"start":pos,"end":pos+1.0});pos+=1.25
+json.dump(segs,open(sys.argv[2],"w"))
+PY
+`);
+    chmodSync(f, 0o755);
+    return f;
+  }
+
+  it("đọc cả loạt một lần, cắt từng câu đúng mốc (+0,2 s đệm cuối), bỏ câu rỗng", async () => {
+    const out = mkTmp("eduvn-ttsout-");
+    const tts = createVieneuTts({ cmd: fakeCmd(), ref: "/x/mau.wav" });
+    const r = await tts.synthMany([{ text: "Câu một", name: "a" }, { text: "**", name: "rong" }, { text: "Câu **hai**", name: "b" }], out);
+    expect(r[1]).toBeNull();
+    expect(r[0]?.file).toBe("a.mp3");
+    expect(Math.abs((r[0]?.durationMs ?? 0) - 1200)).toBeLessThan(120);
+    expect(Math.abs((r[1 + 1]?.durationMs ?? 0) - 1200)).toBeLessThan(120);
+    expect(existsSync(path.join(out, "b.mp3"))).toBe(true);
+  });
+
+  it("lệnh lỗi → null, không ném", async () => {
+    const tts = createVieneuTts({ cmd: "/khong/co/lenh" });
+    expect(await tts.synthMany([{ text: "Xin chào", name: "a" }], mkTmp("eduvn-ttsout-"))).toEqual([null]);
   });
 });
 
@@ -306,7 +411,7 @@ describe("HTML slide dùng chung", () => {
 
 describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () => {
   it("dựng video ngắn có tiếng, tệp mp4 + srt hợp lệ", { timeout: 120_000 }, async () => {
-    const dir = mkdtempSync(path.join(tmpdir(), "eduvn-vid-"));
+    const dir = mkTmp("eduvn-vid-");
     const audio = path.join(dir, "audio");
     execFileSync("mkdir", ["-p", audio]);
     execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=330:duration=1.5", path.join(audio, "s1.mp3")]);

@@ -85,6 +85,41 @@ export function AiLessonPage() {
       setBusy(false);
     }
   };
+  const animate = async (sceneId: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await api(`${BASE}/${id}`, { method: "PUT", body: { title, scenes } });
+      setDirty(false);
+      const s = await api<Scene>(`${BASE}/${id}/canh/${sceneId}/hoat-hinh`, { method: "POST", body: {} });
+      setScenes((cur) => cur.map((x) => (x.id === sceneId ? { ...x, animation: s.animation } : x)));
+      setMsg("AI đã chọn mẫu hoạt hình, đang dựng…");
+    } catch (e) {
+      setError(errText(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const unanimate = async (sceneId: string) => {
+    setError(null);
+    try {
+      await api(`${BASE}/${id}/canh/${sceneId}/hoat-hinh`, { method: "DELETE" });
+      setScenes((cur) => cur.map((x) => (x.id === sceneId ? { ...x, animation: undefined } : x)));
+    } catch (e) {
+      setError(errText(e));
+    }
+  };
+  // đang dựng hoạt hình → hỏi lại máy chủ, chỉ cập nhật phần hoạt hình (không đè chỗ GV đang sửa)
+  const rendering = scenes.some((s) => s.animation?.status === "dang_dung");
+  useEffect(() => {
+    if (!rendering) return;
+    const t = setInterval(() => {
+      api<LessonDetail>(`${BASE}/${id}`)
+        .then((r) => setScenes((cur) => cur.map((x) => ({ ...x, animation: r.scenes.find((y) => y.id === x.id)?.animation ?? x.animation }))))
+        .catch(() => undefined);
+    }, 3000);
+    return () => clearInterval(t);
+  }, [rendering, id]);
   const resume = async () => {
     await api(`${BASE}/${id}/sinh-tiep`, { method: "POST", body: {} }).catch((e: unknown) => setError(errText(e)));
     await load();
@@ -152,7 +187,7 @@ export function AiLessonPage() {
       )}
 
       {scenes.length > 0 && tab === "play" && <Player lessonId={id} scenes={scenes} />}
-      {scenes.length > 0 && tab === "edit" && <Editor scenes={scenes} busy={busy} onChange={(s) => { setScenes(s); setDirty(true); }} onRegenerate={(sid, dir) => void regen(sid, dir)} />}
+      {scenes.length > 0 && tab === "edit" && <Editor scenes={scenes} busy={busy} onChange={(s) => { setScenes(s); setDirty(true); }} onRegenerate={(sid, dir) => void regen(sid, dir)} onAnimate={(sid) => void animate(sid)} onRemoveAnim={(sid) => void unanimate(sid)} />}
 
       {!active && scenes.length > 0 && (
         <div className="card" style={{ marginTop: 16 }} data-testid="ail-export">

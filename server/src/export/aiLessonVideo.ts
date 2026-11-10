@@ -1,7 +1,7 @@
 // Port ý tưởng từ OpenMAIC lib/video-export (compile → IR → emit) (MIT), đã sửa: không dùng render-service/HyperFrames;
 // IR chụp khung bằng Chrome headless (playwright-core + trình duyệt có sẵn) rồi FFmpeg ghép giọng đọc.
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -10,7 +10,7 @@ import { chromium } from "playwright-core";
 import { readVendor } from "../services/aiLessons/vendor";
 import type { StoredScene } from "../services/aiLessons/types";
 import { type Timeline, compileTimeline, toSrt } from "./aiLessonTimeline";
-import { type Canvas, type QuizQ, quizHtml, slideHtml } from "./slideHtml";
+import { BASE_CSS, type Canvas, type QuizQ, quizHtml, slideHtml } from "./slideHtml";
 
 const run = promisify(execFile);
 const W = 1280;
@@ -26,7 +26,7 @@ const latex = (tex: string) => {
   }
 };
 
-export type VideoOpts = { chromePath: string; outDir: string; onProgress?: (done: number, total: number) => void };
+export type VideoOpts = { chromePath: string; outDir: string; /** Thư mục clip hoạt hình toán (<hash>.mp4). */ animDir?: string; onProgress?: (done: number, total: number) => void };
 export type VideoResult = { video: string; srt: string; totalMs: number; frames: number; diagnostics: string[] };
 
 let busy: Promise<unknown> = Promise.resolve();
@@ -68,6 +68,31 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
       const cues = seg.cues.length > 0 ? seg.cues : [{ text: "", startMs: 0, durationMs: seg.durationMs }];
       const shots: { png: string; durationMs: number }[] = [];
       let interactiveReady = false;
+      const animFile = seg.anim && opts.animDir ? path.join(opts.animDir, `${seg.anim.hash}.mp4`) : null;
+      if (animFile && (await stat(animFile).then((f) => f.size > 0, () => false))) {
+        // Cảnh có hoạt hình: clip thay hình slide; phụ đề là PNG trong suốt phủ lên đúng mốc.
+        await show(`<!doctype html><html><head><meta charset="utf-8"><style>${BASE_CSS}html,body{background:transparent}.stage{background:transparent}</style></head><body><div class="stage"><div class="sub" id="s"></div></div></body></html>`);
+        const subs: { png: string; startMs: number; endMs: number }[] = [];
+        for (const cue of cues) {
+          if (!cue.text) continue;
+          await page.evaluate((t) => { const el = document.getElementById("s"); if (el) el.textContent = t; }, cue.text);
+          const png = path.join(work, `s${String(frameN++).padStart(5, "0")}.png`);
+          await page.screenshot({ path: png, omitBackground: true });
+          subs.push({ png, startMs: cue.startMs, endMs: cue.startMs + cue.durationMs });
+        }
+        const dur = (seg.durationMs / 1000).toFixed(3);
+        const audio = seg.audioFile ? ["-i", path.join(audioDir, seg.audioFile)] : ["-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono"];
+        const inputs = ["-ss", (seg.anim?.offsetMs ?? 0) / 1000 + "", "-i", animFile, ...audio, ...subs.flatMap((s) => ["-i", s.png])];
+        let chain = `[0:v]tpad=stop_mode=clone:stop_duration=${dur},fps=25,scale=${W}:${H}[b0]`;
+        subs.forEach((s, k) => {
+          chain += `;[b${k}][${k + 2}:v]overlay=0:0:enable='between(t,${(s.startMs / 1000).toFixed(3)},${(s.endMs / 1000).toFixed(3)})'[b${k + 1}]`;
+        });
+        const clip = path.join(work, `c${si}.mp4`);
+        await run("ffmpeg", ["-y", "-loglevel", "error", ...inputs, "-filter_complex", `${chain};[b${subs.length}]format=yuv420p[v]`, "-map", "[v]", "-map", "1:a", "-t", dur, "-af", "apad", "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-c:a", "aac", "-b:a", "96k", "-ar", "24000", "-ac", "1", clip], { timeout: 300_000 });
+        clips.push(clip);
+        opts.onProgress?.(frameN, total);
+        continue;
+      }
       for (const cue of cues) {
         const png = path.join(work, `f${String(frameN++).padStart(5, "0")}.png`);
         const sub = cue.text;

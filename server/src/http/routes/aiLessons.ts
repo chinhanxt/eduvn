@@ -73,6 +73,16 @@ export function registerAiLessonRoutes(app: FastifyInstance, ctx: Ctx): AiLesson
     return reply.header("content-type", "audio/mpeg").header("cache-control", "private, max-age=3600").header("content-length", st.size).send(createReadStream(p));
   });
 
+  // Hoạt hình toán gắn vào cảnh: tạo (AI chọn mẫu hoặc gửi spec) / bỏ / tải clip
+  app.post(`${P}/:id/canh/:sceneId/hoat-hinh`, async (req, reply) => reply.code(202).send(await svc.animate(await ctx.authenticate(req), id(req), (req.params as { sceneId: string }).sceneId, req.body)));
+  app.delete(`${P}/:id/canh/:sceneId/hoat-hinh`, async (req) => svc.removeAnimation(await ctx.authenticate(req), id(req), (req.params as { sceneId: string }).sceneId));
+  app.get(`${P}/:id/hoat-hinh/:hash`, async (req, reply) => {
+    const p = await svc.animPath(await ctx.authenticate(req), id(req), (req.params as { hash: string }).hash.replace(/\.mp4$/, ""));
+    const st = await stat(p).catch(() => null);
+    if (!st) throw new NotFoundError("Chưa có clip");
+    return reply.header("content-type", "video/mp4").header("cache-control", "private, max-age=3600").header("content-length", st.size).send(createReadStream(p));
+  });
+
   app.get(`${P}/:id/pptx`, async (req, reply) => {
     const l = await svc.loadForExport(await ctx.authenticate(req), id(req));
     return reply.header("content-type", PPTX).header("cache-control", "no-store").header("content-disposition", `attachment; filename="bai-giang-${slug(l.title)}.pptx"`).send(await renderAiLessonPptx(l.title, l.scenes));
@@ -89,6 +99,7 @@ export function registerAiLessonRoutes(app: FastifyInstance, ctx: Ctx): AiLesson
     void renderLessonVideo(l.title, l.scenes, audioDirOf(ctx.cfg.dataDir, key), {
       chromePath: ctx.cfg.chromePath ?? "/usr/bin/google-chrome",
       outDir: path.join(l.dir, "video"),
+      animDir: ctx.cfg.anim?.dir,
       onProgress: (d, t) => Object.assign(st, { done: d, total: t }),
     })
       .then((r) => Object.assign(st, { status: "done", durationMs: r.totalMs }))

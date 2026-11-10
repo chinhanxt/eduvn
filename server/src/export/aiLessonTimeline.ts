@@ -13,6 +13,8 @@ export type Segment = {
   /** Quiz: hiện đáp án. */
   reveal?: boolean;
   audioFile?: string;
+  /** Cảnh có hoạt hình toán: clip thay hình slide, đoạn này bắt đầu từ offsetMs trong clip. */
+  anim?: { hash: string; offsetMs: number };
   startMs: number;
   durationMs: number;
   cues: Cue[];
@@ -60,6 +62,8 @@ export function compileTimeline(title: string, scenes: StoredScene[]): Timeline 
     let focusId: string | undefined;
     let effect: Segment["effect"];
     let spoke = false;
+    const animHash = sc.type === "slide" && sc.animation?.status === "xong" ? sc.animation.hash : undefined;
+    let animOff = 0;
     for (const a of sc.actions ?? []) {
       if (a.type === "spotlight" || a.type === "laser") {
         focusId = a.elementId;
@@ -68,12 +72,13 @@ export function compileTimeline(title: string, scenes: StoredScene[]): Timeline 
         spoke = true;
         const durationMs = a.durationMs ?? estimateMs(a.text);
         if (a.durationMs === undefined) diagnostics.push(`Cảnh ${sceneIndex + 1}: chưa có giọng đọc, ước lượng thời lượng`);
-        push({ sceneIndex, sceneId: sc.id, kind, focusId, effect, audioFile: a.audioFile, durationMs, cues: splitCues(a.text, durationMs) });
+        push({ sceneIndex, sceneId: sc.id, kind, focusId, effect, audioFile: a.audioFile, durationMs, cues: splitCues(a.text, durationMs), ...(animHash && { anim: { hash: animHash, offsetMs: animOff } }) });
+        animOff += durationMs;
         focusId = undefined;
         effect = undefined;
       }
     }
-    if (!spoke) push({ sceneIndex, sceneId: sc.id, kind, durationMs: SILENT_MS, cues: [] });
+    if (!spoke) push({ sceneIndex, sceneId: sc.id, kind, durationMs: SILENT_MS, cues: [], ...(animHash && { anim: { hash: animHash, offsetMs: 0 } }) });
     if (kind === "quiz") push({ sceneIndex, sceneId: sc.id, kind, reveal: true, durationMs: REVEAL_MS, cues: [] });
   });
   return { title, segments, totalMs: t, diagnostics };

@@ -11,7 +11,7 @@ Nguyên tắc: dùng `@openmaic/generation@0.3.31` làm thư viện sinh bài (p
 | 5 | Hành động + lời giảng (`generateSceneActions`: speech, spotlight, laser, widget_*) | GIỮ | task `loi_giang` |
 | 6 | `withGenerationRetry`, `buildCompleteScene`, `parseJsonResponse` | GIỮ | thư viện |
 | 7 | Tài liệu đầu vào PDF/DOCX → `pdfText` (lib/server/material-extraction) | GIỮ (rút gọn) | PDF: `pdftotext`; DOCX: bóc `word/document.xml` bằng jszip; giáo án EDUVN (`lessonPlanId`) → văn bản từ domain/lesson. Ảnh trong PDF: BỎ (cần vision/ảnh, ít lợi) |
-| 8 | TTS lời giảng (lib/audio, 15+ provider) | THAY | Edge TTS vi-VN (`msedge-tts`, HoaiMy/NamMinh), lưu mp3 + thời lượng; `TTS_PROVIDER=edge\|off`. Bỏ azure/openai/qwen/voxcpm/clone/ASR |
+| 8 | TTS lời giảng (lib/audio, 15+ provider) | THAY | ~~Edge TTS~~ → (P5b) VieNeu `vieneu-say` giọng "Giọng dạy", đọc cả loạt một lần, cắt mp3 từng câu; `TTS_PROVIDER=vieneu\|off`. Bỏ azure/openai/qwen/voxcpm/clone/ASR |
 | 9 | Trình phát lớp học (lib/playback engine, components/stage) | GIỮ (viết lại gọn) | hàng đợi hành động theo cảnh: phát audio speech → hiệu ứng spotlight/laser trên phần tử → cảnh kế; dừng/tiếp/tua, phụ đề |
 | 10 | Renderer slide (packages/@openmaic/renderer, React) | GIỮ ý, viết gọn | `SlideView.tsx`: text (HTML), shape (SVG path), image, line, table, chart (SVG đơn giản), latex (KaTeX), code |
 | 11 | Quiz làm thử trong lớp (quiz-grade) | GIỮ (chấm cục bộ) | chấm single/multiple tại trình duyệt; short_answer hiện đáp án gợi ý |

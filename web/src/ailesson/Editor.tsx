@@ -25,7 +25,7 @@ const blankScene = (n: number): Scene => ({
 });
 
 /** Sửa nhanh sau khi sinh: sửa chữ phần tử, kéo vị trí, xoá/thêm cảnh, đổi thứ tự, sinh lại 1 cảnh. */
-export function Editor({ scenes, onChange, onRegenerate, busy }: { scenes: Scene[]; onChange: (s: Scene[]) => void; onRegenerate: (id: string, directive: string) => void; busy: boolean }) {
+export function Editor({ scenes, onChange, onRegenerate, onAnimate, onRemoveAnim, busy }: { scenes: Scene[]; onChange: (s: Scene[]) => void; onRegenerate: (id: string, directive: string) => void; onAnimate: (id: string) => void; onRemoveAnim: (id: string) => void; busy: boolean }) {
   const [idx, setIdx] = useState(0);
   const [sel, setSel] = useState<string | null>(null);
   const [directive, setDirective] = useState("");
@@ -137,13 +137,28 @@ export function Editor({ scenes, onChange, onRegenerate, busy }: { scenes: Scene
           ) : (
             <div className="card"><div className="empty">Cảnh {scene.type === "quiz" ? "quiz" : "tương tác"} — dùng "Sinh lại cảnh" để đổi nội dung, hoặc xoá/đổi chỗ ở danh sách bên trái.</div></div>
           )}
+          {scene.type === "slide" && (
+            <div className="card" style={{ marginTop: 12 }} data-testid="ail-anim-card">
+              <b>Hoạt hình toán</b>
+              <div style={{ margin: "6px 0", color: "var(--muted)", fontSize: 14 }}>
+                {!scene.animation && "AI chọn một mẫu hoạt hình có sẵn (đồ thị, biến đổi công thức, hình học diện tích, trục số, diễn giải từng bước, sơ đồ, bảng so sánh) khớp với lời giảng; clip thay hình slide của cảnh này khi trình chiếu và xuất video."}
+                {scene.animation?.status === "dang_dung" && "Đang dựng hoạt hình… (vài phút, tuỳ máy đang bận)"}
+                {scene.animation?.status === "xong" && `Đã có hoạt hình “${scene.animation.spec?.tieuDe ?? scene.animation.spec?.template ?? ""}” (${Math.round((scene.animation.durationMs ?? 0) / 1000)} giây).`}
+                {scene.animation?.status === "loi" && <span className="err">Dựng lỗi: {scene.animation.error}</span>}
+              </div>
+              <div className="bar" style={{ marginBottom: 0 }}>
+                <button className="btn" disabled={busy || scene.animation?.status === "dang_dung"} onClick={() => onAnimate(scene.id)} data-testid="ail-anim-make"><Icon name="video" size={18} />{scene.animation ? "Tạo lại hoạt hình" : "Tạo hoạt hình"}</button>
+                {scene.animation && <button className="btn ghost" disabled={busy} onClick={() => onRemoveAnim(scene.id)} data-testid="ail-anim-del"><Icon name="trash" size={18} />Bỏ hoạt hình</button>}
+              </div>
+            </div>
+          )}
           {speeches.length > 0 && (
             <div className="card" style={{ marginTop: 12 }}>
               <b>Lời giảng</b>
               {speeches.map((a) => (
                 <textarea key={a.id} className="inp" rows={2} style={{ marginTop: 8 }} value={a.text ?? ""} onChange={(e) => setScene({ ...scene, actions: (scene.actions ?? []).map((x) => (x.id === a.id ? { ...x, text: e.target.value, audioFile: undefined, durationMs: undefined } : x)) })} data-testid="ail-speech" />
               ))}
-              <small style={{ color: "var(--muted)" }}>Sửa lời giảng thì giọng đọc cũ bị bỏ; trình phát tự đọc ước lượng thời gian.</small>
+              <small style={{ color: "var(--muted)" }}>Sửa lời giảng thì giọng đọc cũ bị bỏ; lưu rồi bấm "Sinh tiếp" để đọc lại bằng giọng VieNeu (trước đó trình phát ước lượng thời gian).</small>
             </div>
           )}
         </div>
