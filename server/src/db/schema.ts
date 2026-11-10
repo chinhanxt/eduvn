@@ -250,3 +250,31 @@ export const games = pgTable(
   },
   (t) => [index("games_org_idx").on(t.orgId)],
 );
+
+export type AiLessonProgress = { done: number; total: number; stage: string; error?: string; failed?: string[] };
+export type AiLessonRequest = { requirement: string; sceneCount?: number; lessonPlanId?: string; materialText?: string; materialName?: string };
+
+export const aiLessons = pgTable(
+  "ai_lessons",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    title: text("title").notNull(),
+    subject: text("subject").notNull().default(""),
+    grade: integer("grade"),
+    /** queued | running | done | error */
+    status: text("status").notNull().default("queued"),
+    progress: jsonb("progress").$type<AiLessonProgress>().notNull(),
+    request: jsonb("request").$type<AiLessonRequest>().notNull(),
+    outline: jsonb("outline").$type<unknown[]>(),
+    scenes: jsonb("scenes").$type<unknown[]>().notNull().default([]),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("ai_lessons_org_idx").on(t.orgId)],
+);

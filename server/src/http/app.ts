@@ -23,13 +23,15 @@ import { renderSlidesPptx } from "../export/slides";
 import { createBoardService } from "../services/boards";
 import { createGameService } from "../services/games";
 import { createSlideService } from "../services/slides";
+import type { AiLessonsCfg } from "../services/aiLessons/service";
+import { registerAiLessonRoutes } from "./routes/aiLessons";
 import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
 import { StudentItem } from "../domain/roster";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
-export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string; ai?: Ai };
+export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string; ai?: Ai; aiLessons?: AiLessonsCfg };
 
 const GradeBody = z.object({ code: z.string().min(1), responses: z.record(z.string(), ResponseValue) });
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -328,6 +330,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     const { kind, term } = z.object({ kind: z.enum(["class_list", "gradebook"]), term: z.enum(["HK1", "HK2"]).optional() }).parse(req.body);
     return makeClassLink(actor, Cid(req), kind, term);
   });
+
+  registerAiLessonRoutes(app, { db: deps.db, ai: deps.ai, cfg: deps.aiLessons ?? { dataDir: "./data" }, service, authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

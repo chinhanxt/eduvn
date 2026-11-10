@@ -44,6 +44,12 @@
       "json": true,
       "description": "Nội dung một cảnh slide (OpenMAIC)"
     },
+    "slide_tuong_tac": {
+      "model": ["claude-sonnet-5-5-medium", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "json": true,
+      "timeoutMs": 300000,
+      "description": "Cảnh tương tác HTML (mô phỏng, sơ đồ, trò chơi, 3D) của bài giảng OpenMAIC"
+    },
     "loi_giang": {
       "model": ["gemini-3.8-flash-low", "gemini-4-argon-low", "claude-sonnet-4-6"],
       "description": "Lời giảng đọc kèm slide"

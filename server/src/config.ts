@@ -12,6 +12,13 @@ const Env = z.object({
   // Cổng AI (gateway/). Thiếu token = tắt tính năng AI phía lõi (trả 503).
   GATEWAY_URL: z.url().default("http://127.0.0.1:4340"),
   GATEWAY_TOKEN: z.string().min(24).optional(),
+  // Bài giảng AI (P5): thư mục media (âm thanh lời giảng, video xuất), giọng đọc, Chrome để dựng MP4.
+  DATA_DIR: z.string().min(1).default("./data"),
+  TTS_PROVIDER: z.enum(["edge", "off"]).default("edge"),
+  TTS_VOICE: z.string().min(1).default("vi-VN-HoaiMyNeural"),
+  CHROME_PATH: z.string().min(1).default("/usr/bin/google-chrome"),
+  /** JSON {"tên_task":"tên_task_khác"} — ánh xạ tạm khi cổng AI chưa có task mới. */
+  AI_TASK_OVERRIDES: z.string().optional(),
 });
 export type Config = z.infer<typeof Env>;
 

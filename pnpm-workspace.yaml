@@ -4,5 +4,6 @@ packages:
   - gateway
 allowBuilds:
   esbuild: true
+  msedge-tts: false
 minimumReleaseAgeExclude:
   - '@cortex-js/compute-engine@0.181.1'
