@@ -62,6 +62,9 @@ const Text = z.object({
   size: z.number().min(14).max(120),
   color: Color,
   text: z.string().min(1).max(500, "Chữ trên bảng tối đa 500 ký tự"),
+  // kích thước đo thật của ô chữ/công thức sau khi hiển thị (đơn vị bảng)
+  w: z.number().min(1).max(4000).optional(),
+  h: z.number().min(1).max(4000).optional(),
 });
 const BoardObj = z.discriminatedUnion("type", [Stroke, Graph, Solid, Shape, Text]);
 export const BoardDocSchema = z.object({
