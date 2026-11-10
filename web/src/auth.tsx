@@ -1,6 +1,8 @@
 import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
+/** Trang quay về sau khi đăng nhập Keycloak (khu HS: /hs?ma=…). */
+export const AFTER_LOGIN_KEY = "eduvn.after";
 const KEYCLOAK = (import.meta.env.VITE_OIDC_AUTHORITY as string | undefined) ?? "http://localhost:8180/realms/eduvn";
 
 export const userManager = new UserManager({
