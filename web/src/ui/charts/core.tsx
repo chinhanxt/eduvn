@@ -45,7 +45,7 @@ export function ChartFrame({ height, children, table, className }: { height: num
 }
 
 /** <details> "Xem dạng bảng": cùng số liệu với biểu đồ cho trình đọc màn hình và người cần số chính xác. */
-export function ChartTable({ caption, head, rows }: { caption: string; head: readonly string[]; rows: readonly (readonly (string | number))[] }) {
+export function ChartTable({ caption, head, rows }: { caption: string; head: readonly string[]; rows: readonly (readonly (string | number)[])[] }) {
   return (
     <details className="chart-table">
       <summary>Xem dạng bảng</summary>
