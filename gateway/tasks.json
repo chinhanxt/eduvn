@@ -20,17 +20,17 @@
       "system": "Tạo sơ đồ tư duy tiếng Việt có dấu từ nội dung được cho. Trả về đúng JSON dạng {\"root\":{\"text\":string,\"children\":[...]}}; mỗi nút chỉ có \"text\" và \"children\"; chữ ngắn gọn (tối đa 12 từ); công thức viết LaTeX trong $…$; tối đa 3 tầng dưới gốc và 6 nhánh mỗi tầng."
     },
     "soan_giao_an": {
-      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
       "timeoutMs": 600000,
       "description": "Soạn giáo án theo CV 5512"
     },
     "giao_trinh_chuong": {
-      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
       "timeoutMs": 600000,
       "description": "Viết một chương giáo trình"
     },
     "de_cuong_hoc_phan": {
-      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
       "timeoutMs": 600000,
       "description": "Soạn đề cương học phần đại học"
     },
@@ -59,7 +59,7 @@
       "description": "Sinh câu hỏi theo yêu cầu cần đạt"
     },
     "cham_tu_luan": {
-      "model": ["claude-sonnet-5-5-high", "claude-opus-4-6-thinking", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
       "timeoutMs": 300000,
       "json": true,
       "description": "Chấm bài tự luận theo rubric"
