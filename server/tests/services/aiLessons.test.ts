@@ -1,0 +1,325 @@
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import JSZip from "jszip";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { renderAiLessonPptx } from "../../src/export/aiLessonPptx";
+import { compileTimeline, splitCues, toSrt } from "../../src/export/aiLessonTimeline";
+import { renderLessonVideo } from "../../src/export/aiLessonVideo";
+import { slideHtml } from "../../src/export/slideHtml";
+import type { Ai } from "../../src/services/ai";
+import { extractMaterialText } from "../../src/services/aiLessons/material";
+import { speakable } from "../../src/services/aiLessons/tts";
+import type { Tts } from "../../src/services/aiLessons/tts";
+import type { StoredScene } from "../../src/services/aiLessons/types";
+import { testApp } from "../helpers/app";
+
+const CHROME = "/usr/bin/google-chrome";
+const OUTLINE = {
+  languageDirective: "Dạy bằng tiếng Việt",
+  courseTitle: "Hằng đẳng thức đáng nhớ",
+  outlines: [
+    { id: "s1", type: "slide", title: "Bình phương một tổng", description: "Công thức bình phương của một tổng", keyPoints: ["(a+b)^2", "Ví dụ"], order: 1 },
+    { id: "s2", type: "quiz", title: "Luyện tập nhanh", description: "Hai câu trắc nghiệm", keyPoints: ["áp dụng"], order: 2, quizConfig: { questionCount: 2, difficulty: "easy", questionTypes: ["single"] } },
+    { id: "s3", type: "interactive", title: "Mô phỏng hình vuông", description: "Kéo a, b xem diện tích", keyPoints: ["diện tích"], order: 3, widgetType: "simulation", widgetOutline: { concept: "Bình phương một tổng", keyVariables: ["a", "b"] } },
+  ],
+};
+const SLIDE = {
+  elements: [
+    { id: "t1", type: "text", left: 60, top: 40, width: 880, height: 80, content: "<p><strong>Bình phương một tổng</strong></p>", defaultFontName: "", defaultColor: "#1e2340" },
+    { id: "t2", type: "text", left: 60, top: 160, width: 880, height: 120, content: "<p>Công thức: $(a+b)^2 = a^2 + 2ab + b^2$</p>", defaultFontName: "", defaultColor: "#333333" },
+    { id: "l1", type: "latex", left: 200, top: 320, width: 600, height: 100, latex: "(a+b)^2=a^2+2ab+b^2" },
+  ],
+  background: { type: "solid", color: "#ffffff" },
+};
+const QUIZ = [
+  { id: "q1", type: "single", question: "Khai triển $(x+1)^2$ bằng", options: [{ label: "$x^2+1$", value: "A" }, { label: "$x^2+2x+1$", value: "B" }, { label: "$x^2-2x+1$", value: "C" }, { label: "$2x+1$", value: "D" }], answer: ["B"], analysis: "Áp dụng hằng đẳng thức.", points: 5 },
+  { id: "q2", type: "multiple", question: "Chọn các khẳng định đúng", options: [{ label: "A đúng", value: "A" }, { label: "B sai", value: "B" }], answer: ["A"], analysis: "—", points: 5 },
+];
+const HTML = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Mô phỏng</title></head><body><h1>Kéo a và b</h1><input id="a" type="range" min="1" max="10" value="3"><div id="out">9</div><script>document.getElementById('a').addEventListener('input',function(e){document.getElementById('out').textContent=String(e.target.value*e.target.value)});</script></body></html>`;
+const ACTIONS = (id: string) => [{ type: "action", name: "spotlight", params: { elementId: id } }, { type: "text", content: "Chúng ta cùng xem công thức bình phương của một tổng." }, { type: "text", content: "Hãy ghi nhớ: a cộng b, tất cả bình phương." }];
+
+function fakeAi(opts: { failInteractive?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
+  const calls: string[] = [];
+  const ai = {
+    calls,
+    opts,
+    async chat(task: string, messages: { content: unknown }[]) {
+      calls.push(task);
+      const user = String(messages[messages.length - 1]?.content);
+      if (task === "slide_dan_y") return JSON.stringify(OUTLINE);
+      if (task === "slide_tuong_tac") {
+        if (ai.opts.failInteractive) return "Xin lỗi, tôi không làm được.";
+        return HTML;
+      }
+      if (task === "slide_noi_dung") return user.includes("Luyện tập nhanh") ? JSON.stringify(QUIZ) : JSON.stringify(SLIDE);
+      if (task === "loi_giang") return JSON.stringify(ACTIONS("t1"));
+      throw new Error(`task lạ ${task}`);
+    },
+    // biome-ignore lint: không dùng
+    async *stream() {},
+  };
+  return ai as unknown as Ai & { calls: string[]; opts: typeof opts };
+}
+
+const fakeTts: Tts = {
+  async synth(_t, dir, name) {
+    const f = path.join(dir, `${name}.mp3`);
+    execFileSync("mkdir", ["-p", dir]);
+    writeFileSync(f, Buffer.from("ID3-fake-audio"));
+    return { file: `${name}.mp3`, durationMs: 2000 };
+  },
+};
+
+let dataDir: string;
+let t: Awaited<ReturnType<typeof testApp>>;
+let ai: ReturnType<typeof fakeAi>;
+let auth: Record<string, string>;
+let svc: Awaited<ReturnType<typeof boot>>["svc"];
+
+async function boot() {
+  dataDir = mkdtempSync(path.join(tmpdir(), "eduvn-ail-"));
+  ai = fakeAi();
+  const { buildApp } = await import("../../src/http/app");
+  void buildApp;
+  const app = await testApp({ ai, aiLessons: { dataDir, tts: fakeTts, sceneConcurrency: 3, chromePath: CHROME } });
+  return { app, svc: undefined as never };
+}
+
+beforeEach(async () => {
+  const b = await boot();
+  t = b.app;
+  auth = { authorization: `Bearer ${await t.sign({ sub: "gv-1", email: "gv1@example.test", name: "Cô Lan" })}` };
+});
+afterEach(async () => {
+  await t.app.close();
+});
+void svc;
+
+const call = (method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload?: unknown) => t.app.inject({ method, url, headers: auth, payload: payload as object });
+async function waitDone(id: string) {
+  for (let i = 0; i < 400; i++) {
+    const s = (await call("GET", `/api/ai-lessons/${id}/trang-thai`)).json();
+    if (s.status === "done" || s.status === "error") return s;
+    await new Promise((r) => setTimeout(r, 25));
+  }
+  throw new Error("quá thời gian");
+}
+async function makeLesson() {
+  const r = await call("POST", "/api/ai-lessons", { requirement: "Toán 8 — Hằng đẳng thức đáng nhớ", subject: "Toán", grade: 8, sceneCount: 3 });
+  expect(r.statusCode).toBe(202);
+  const id = r.json().id as string;
+  return { id, status: await waitDone(id) };
+}
+
+describe("sinh bài giảng AI", () => {
+  it("dàn ý → slide + quiz + interactive + lời giảng + giọng đọc; định tuyến đúng task", async () => {
+    const { id, status } = await makeLesson();
+    expect(status).toMatchObject({ status: "done", done: 3, total: 3, failed: [] });
+    expect(new Set(ai.calls)).toEqual(new Set(["slide_dan_y", "slide_noi_dung", "slide_tuong_tac", "loi_giang"]));
+    const d = (await call("GET", `/api/ai-lessons/${id}`)).json();
+    expect(d.title).toBe("Hằng đẳng thức đáng nhớ");
+    const scenes = d.scenes as StoredScene[];
+    expect(scenes.map((s) => s.type)).toEqual(["slide", "quiz", "interactive"]);
+    const speech = scenes[0]?.actions?.filter((a) => a.type === "speech") ?? [];
+    expect(speech.length).toBe(2);
+    expect(speech[0]).toMatchObject({ durationMs: 2000 });
+    expect((scenes[2]?.content as { html?: string }).html).toContain("<script>");
+    const audio = await call("GET", `/api/ai-lessons/${id}/audio/${(speech[0] as { audioFile: string }).audioFile}`);
+    expect(audio.statusCode).toBe(200);
+    expect(audio.headers["content-type"]).toBe("audio/mpeg");
+    expect((await call("GET", `/api/ai-lessons/${id}/audio/..%2Fx.mp3`)).statusCode).toBe(404);
+  });
+
+  it("cảnh lỗi thử lại 1 lần rồi bỏ qua; 'sinh tiếp' làm nốt cảnh còn thiếu", async () => {
+    ai.opts.failInteractive = true;
+    const { id, status } = await makeLesson();
+    expect(status.status).toBe("done");
+    expect(status.failed).toHaveLength(1);
+    expect(status.failed[0]).toContain("Mô phỏng hình vuông");
+    expect(ai.calls.filter((c) => c === "slide_tuong_tac")).toHaveLength(2);
+    expect(((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as unknown[]).length).toBe(2);
+    ai.opts.failInteractive = false;
+    expect((await call("POST", `/api/ai-lessons/${id}/sinh-tiep`)).statusCode).toBe(202);
+    const s2 = await waitDone(id);
+    expect(s2).toMatchObject({ status: "done", done: 3, failed: [] });
+    expect(ai.calls.filter((c) => c === "slide_dan_y")).toHaveLength(1);
+  });
+
+  it("sửa nhanh: đổi chữ, xoá cảnh, sinh lại 1 cảnh", async () => {
+    const { id } = await makeLesson();
+    const d = (await call("GET", `/api/ai-lessons/${id}`)).json();
+    const scenes = d.scenes as StoredScene[];
+    const first = scenes[0] as StoredScene & { content: { canvas: { elements: { content: string }[] } } };
+    first.content.canvas.elements[0]!.content = "<p>Tiêu đề mới</p>";
+    const saved = await call("PUT", `/api/ai-lessons/${id}`, { title: "Bài đã sửa", scenes: [first, scenes[1]] });
+    expect(saved.json()).toMatchObject({ ok: true, sceneCount: 2 });
+    const d2 = (await call("GET", `/api/ai-lessons/${id}`)).json();
+    expect(d2.title).toBe("Bài đã sửa");
+    expect(JSON.stringify(d2.scenes[0])).toContain("Tiêu đề mới");
+    const before = ai.calls.length;
+    const re = await call("POST", `/api/ai-lessons/${id}/canh/${first.id}/sinh-lai`, { directive: "Thêm ví dụ" });
+    expect(re.statusCode).toBe(200);
+    expect(JSON.stringify(re.json())).not.toContain("Tiêu đề mới");
+    expect(ai.calls.length).toBeGreaterThan(before);
+  });
+
+  it("lưu quiz vào ngân hàng: trắc nghiệm 4 phương án lưu, nhiều đáp án bị bỏ qua có lý do", async () => {
+    const { id } = await makeLesson();
+    const scenes = (await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[];
+    const quiz = scenes.find((s) => s.type === "quiz") as StoredScene;
+    const r = await call("POST", `/api/ai-lessons/${id}/canh/${quiz.id}/luu-ngan-hang`, { level: "NB" });
+    expect(r.json()).toMatchObject({ saved: 1 });
+    expect(r.json().skipped[0]).toContain("Câu 2");
+    const bank = (await call("GET", "/api/questions?subject=To%C3%A1n&grade=8")).json() as { stem: string; answer: number }[];
+    expect(bank.map((q) => q.stem)).toContain("Khai triển $(x+1)^2$ bằng");
+    expect(bank.find((q) => q.stem.startsWith("Khai triển"))?.answer).toBe(1);
+    const slide = scenes[0] as StoredScene;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/luu-ngan-hang`, {})).statusCode).toBe(404);
+  });
+
+  it("xuất PPTX: 3 trang, lời giảng trong ghi chú, đáp án quiz trong ghi chú", async () => {
+    const { id } = await makeLesson();
+    const res = await call("GET", `/api/ai-lessons/${id}/pptx`);
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["content-type"]).toContain("presentationml");
+    const zip = await JSZip.loadAsync(res.rawPayload);
+    const slides = Object.keys(zip.files).filter((f) => /^ppt\/slides\/slide\d+\.xml$/.test(f));
+    expect(slides).toHaveLength(3);
+    const s1 = await zip.file("ppt/slides/slide1.xml")!.async("string");
+    expect(s1).toContain("Bình phương một tổng");
+    const notes = await Promise.all(Object.keys(zip.files).filter((f) => /notesSlide\d+\.xml$/.test(f)).map((f) => zip.file(f)!.async("string")));
+    expect(notes.join("")).toContain("Chúng ta cùng xem công thức");
+    expect(notes.join("")).toContain("Đáp án");
+  });
+
+  it("khởi động lại: việc đang chạy dở đánh dấu lỗi", async () => {
+    const r = await call("POST", "/api/ai-lessons", { requirement: "Toán 8 — Hằng đẳng thức", sceneCount: 3 });
+    await waitDone(r.json().id);
+    const { db } = t;
+    const { aiLessons } = await import("../../src/db/schema");
+    const { eq } = await import("drizzle-orm");
+    await db.update(aiLessons).set({ status: "running" }).where(eq(aiLessons.id, r.json().id));
+    const { createAiLessonService } = await import("../../src/services/aiLessons/service");
+    expect(await createAiLessonService(db, ai, { dataDir }).markStale()).toBe(1);
+    const s = (await call("GET", `/api/ai-lessons/${r.json().id}/trang-thai`)).json();
+    expect(s.status).toBe("error");
+    expect(s.error).toContain("Sinh tiếp");
+  });
+
+  it("không có cổng AI → 503; thiếu mô tả → 400", async () => {
+    const t2 = await testApp();
+    const a2 = { authorization: `Bearer ${await t2.sign({ sub: "gv-2", name: "Thầy Nam" })}` };
+    const r = await t2.app.inject({ method: "POST", url: "/api/ai-lessons", headers: a2, payload: { requirement: "Toán 8 hằng đẳng thức" } });
+    expect(r.statusCode).toBe(503);
+    expect((await call("POST", "/api/ai-lessons", { requirement: "" })).statusCode).toBe(400);
+    await t2.app.close();
+  });
+});
+
+describe("thư viện interactive /vendor/interactive", () => {
+  it("phục vụ tệp trong danh sách cho phép với CORS *, chặn ngoài danh sách và ../", async () => {
+    const ok = await t.app.inject({ method: "GET", url: "/vendor/interactive/katex@0.16.38/dist/katex.min.js" });
+    expect(ok.statusCode).toBe(200);
+    expect(ok.headers["access-control-allow-origin"]).toBe("*");
+    expect((await t.app.inject({ method: "GET", url: "/vendor/interactive/three@0.160.0/build/three.module.js" })).statusCode).toBe(200);
+    expect((await t.app.inject({ method: "GET", url: "/vendor/interactive/katex@0.16.38/package.json" })).statusCode).toBe(404);
+    expect((await t.app.inject({ method: "GET", url: "/vendor/interactive/katex@0.16.38/dist/../package.json" })).statusCode).toBe(404);
+    expect((await t.app.inject({ method: "GET", url: "/vendor/interactive/khong-co@1.0.0/x.js" })).statusCode).toBe(404);
+  });
+});
+
+describe("tài liệu đầu vào", () => {
+  it("DOCX và TXT → chữ; định dạng lạ bị từ chối", async () => {
+    const zip = new JSZip();
+    zip.file("word/document.xml", '<w:document><w:body><w:p><w:r><w:t>Hằng đẳng thức &amp; ví dụ</w:t></w:r></w:p><w:p><w:r><w:t>Dòng hai</w:t></w:r></w:p></w:body></w:document>');
+    const buf = await zip.generateAsync({ type: "nodebuffer" });
+    expect(await extractMaterialText("bai.docx", buf)).toBe("Hằng đẳng thức & ví dụ\nDòng hai");
+    expect(await extractMaterialText("a.txt", Buffer.from("  nội dung  "))).toBe("nội dung");
+    await expect(extractMaterialText("a.exe", Buffer.from("x"))).rejects.toThrow("Chỉ hỗ trợ");
+  });
+
+  it("API tải tài liệu trả chữ để đưa vào dàn ý", async () => {
+    const r = await call("POST", "/api/ai-lessons/tai-lieu", { name: "ghi-chu.txt", contentBase64: Buffer.from("Chương 2: Hằng đẳng thức").toString("base64") });
+    expect(r.json()).toMatchObject({ text: "Chương 2: Hằng đẳng thức", chars: 24 });
+  });
+});
+
+describe("dòng thời gian video (IR) và phụ đề", () => {
+  const scenes = (): StoredScene[] =>
+    [
+      { id: "a", outlineId: "s1", type: "slide", title: "A", order: 1, stageId: "x", content: { type: "slide", canvas: { elements: [] } }, actions: [{ id: "1", type: "spotlight", elementId: "t1" }, { id: "2", type: "speech", text: "Xin chào các em. Hôm nay học hằng đẳng thức đáng nhớ.", durationMs: 6000 }, { id: "3", type: "speech", text: "Hết.", durationMs: 1000 }] },
+      { id: "b", outlineId: "s2", type: "quiz", title: "B", order: 2, stageId: "x", content: { type: "quiz", questions: [] }, actions: [] },
+    ] as unknown as StoredScene[];
+
+  it("speech → đoạn có hiệu ứng spotlight, quiz thêm đoạn hiện đáp án, tổng thời lượng đúng", () => {
+    const tl = compileTimeline("Bài", scenes());
+    expect(tl.segments.map((s) => [s.kind, s.effect ?? null, s.reveal ?? false, s.durationMs])).toEqual([
+      ["slide", "spotlight", false, 6000],
+      ["slide", null, false, 1000],
+      ["quiz", null, false, 4000],
+      ["quiz", null, true, 4000],
+    ]);
+    expect(tl.segments[0]?.focusId).toBe("t1");
+    expect(tl.totalMs).toBe(15000);
+  });
+
+  it("tách phụ đề theo câu, cộng đúng thời lượng; SRT hợp lệ", () => {
+    const cues = splitCues("Xin chào các em, hôm nay chúng ta học bài mới. Hãy chú ý lắng nghe nhé!", 8000);
+    expect(cues.length).toBeGreaterThanOrEqual(1);
+    expect(cues.reduce((n, c) => n + c.durationMs, 0)).toBe(8000);
+    const srt = toSrt(compileTimeline("Bài", scenes()));
+    expect(srt).toMatch(/^1\n00:00:00,000 --> 00:00:0\d,\d{3}\n/);
+  });
+
+  it("speakable bỏ LaTeX để giọng đọc không đọc ký hiệu", () => {
+    expect(speakable("Ta có $(a+b)^2$ và **đậm**")).not.toMatch(/[$*\\]/);
+    expect(speakable("$\\frac{1}{2}$")).toContain("1 phần 2");
+  });
+});
+
+describe("HTML slide dùng chung", () => {
+  it("chữ, công thức, spotlight; loại script/onclick trong nội dung AI", () => {
+    const html = slideHtml(
+      { elements: [{ id: "t1", type: "text", left: 10, top: 10, width: 300, height: 50, content: '<p onclick="x()">Chào<script>alert(1)</script></p>', defaultColor: "#222" }, { id: "m", type: "latex", left: 10, top: 100, width: 200, height: 50, latex: "x^2" }] },
+      { latex: (t) => `<i>${t}</i>`, focusId: "t1", effect: "spotlight", subtitle: "Phụ đề" },
+    );
+    expect(html).not.toContain("<script>");
+    expect(html).not.toContain("onclick");
+    expect(html).toContain("<i>x^2</i>");
+    expect(html).toContain('class="spot"');
+    expect(html).toContain("Phụ đề");
+  });
+});
+
+describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () => {
+  it("dựng video ngắn có tiếng, tệp mp4 + srt hợp lệ", { timeout: 120_000 }, async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "eduvn-vid-"));
+    const audio = path.join(dir, "audio");
+    execFileSync("mkdir", ["-p", audio]);
+    execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=330:duration=1.5", path.join(audio, "s1.mp3")]);
+    const sc = [
+      { id: "a", outlineId: "s1", type: "slide", title: "A", order: 1, stageId: "x", content: { type: "slide", canvas: SLIDE }, actions: [{ id: "1", type: "spotlight", elementId: "t1" }, { id: "s1", type: "speech", text: "Công thức bình phương của một tổng.", audioFile: "s1.mp3", durationMs: 1500 }] },
+      { id: "b", outlineId: "s2", type: "quiz", title: "Luyện tập nhanh", order: 2, stageId: "x", content: { type: "quiz", questions: QUIZ }, actions: [] },
+    ] as unknown as StoredScene[];
+    const r = await renderLessonVideo("Thử", sc, audio, { chromePath: CHROME, outDir: path.join(dir, "out") });
+    const probe = execFileSync("ffprobe", ["-v", "error", "-show_entries", "stream=codec_type,width,height", "-of", "csv=p=0", r.video]).toString();
+    expect(probe).toContain("video,1280,720");
+    expect(probe).toContain("audio");
+    expect(readFileSync(r.srt, "utf8")).toContain("Công thức bình phương");
+    expect(r.totalMs).toBe(9500);
+  });
+});
+
+describe("xuất PPTX hàm thuần", () => {
+  it("không lỗi với đủ loại phần tử", async () => {
+    const sc = [
+      { id: "a", outlineId: "s1", type: "slide", title: "A", order: 1, stageId: "x", content: { type: "slide", canvas: { ...SLIDE, theme: { fontColor: "#333" }, elements: [...SLIDE.elements, { id: "sh", type: "shape", left: 10, top: 10, width: 100, height: 50, rotate: 0, viewBox: [200, 200], path: "M0 0L200 0L200 200L0 200Z", fill: "#4f6bed", text: { content: "<p>Hộp</p>", defaultColor: "#fff", align: "middle" } }, { id: "ln", type: "line", left: 100, top: 100, width: 100, start: [0, 0], end: [100, 40], style: "dashed", color: "#f00", points: ["", "arrow"] }, { id: "tb", type: "table", left: 10, top: 300, width: 400, height: 100, rotate: 0, colWidths: [0.5, 0.5], data: [[{ text: "a", colspan: 1, rowspan: 1 }, { text: "b", colspan: 1, rowspan: 1 }]], theme: { color: "#4472c4", rowHeader: true } }, { id: "ch", type: "chart", left: 500, top: 300, width: 300, height: 200, rotate: 0, chartType: "column", data: { labels: ["x", "y"], legends: ["s"], series: [[1, 2]] }, themeColors: ["#5b9bd5"] }, { id: "cd", type: "code", left: 10, top: 400, width: 300, height: 100, rotate: 0, language: "js", lines: [{ id: "1", content: "let a = 1;" }] }] } }, actions: [] },
+    ] as unknown as StoredScene[];
+    const buf = await renderAiLessonPptx("Thử", sc);
+    const zip = await JSZip.loadAsync(buf);
+    expect(Object.keys(zip.files).some((f) => f.startsWith("ppt/charts/"))).toBe(true);
+    expect(await zip.file("ppt/slides/slide1.xml")!.async("string")).toContain("Hộp");
+  });
+});

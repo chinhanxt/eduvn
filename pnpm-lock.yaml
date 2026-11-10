@@ -114,6 +114,9 @@ importers:
       '@cortex-js/compute-engine':
         specifier: ^0.181.1
         version: 0.181.1
+      katex:
+        specifier: 0.16.38
+        version: 0.16.38
       mathlive:
         specifier: ^0.111.4
         version: 0.111.4

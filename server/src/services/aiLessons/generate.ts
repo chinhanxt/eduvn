@@ -98,7 +98,7 @@ export async function buildScene(deps: GenDeps, o: SceneOutline, all: SceneOutli
   const kind = o.type === "interactive" ? TASKS.interactive : o.type === "quiz" ? TASKS.quiz : TASKS.slide;
   const content = await retry(
     `noi-dung:${o.id}`,
-    () => generateSceneContent(o, caller(deps, kind, true), { languageDirective: VI_DIRECTIVE, logger: noLog, ...(edit.directive && o.type === "slide" ? { editDirective: edit.directive } : {}) }),
+    () => generateSceneContent(o, caller(deps, kind, o.type !== "interactive"), { languageDirective: VI_DIRECTIVE, logger: noLog, ...(edit.directive && o.type === "slide" ? { editDirective: edit.directive } : {}) }),
     (r) => r === null,
   );
   if (!content) throw new Error("AI trả nội dung cảnh không hợp lệ");
