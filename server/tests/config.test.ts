@@ -18,6 +18,7 @@ describe("loadConfig", () => {
       OIDC_AUDIENCE: "eduvn-api",
       HOST: "127.0.0.1",
       PORT: 4310,
+      GATEWAY_URL: "http://127.0.0.1:4340",
     });
   });
 

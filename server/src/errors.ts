@@ -19,3 +19,11 @@ export class ValidationError extends Error {
     this.name = "ValidationError";
   }
 }
+
+/** Cổng AI chưa bật / quá tải / mất kết nối → 503, web báo "AI đang bận, thử lại". */
+export class AiUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AiUnavailableError";
+  }
+}
