@@ -1,4 +1,5 @@
 // web/src/math/MathText.tsx
+import "./setup";
 import { convertLatexToMarkup } from "mathlive";
 import { isSafeLatex, splitMath } from "./segments";
 

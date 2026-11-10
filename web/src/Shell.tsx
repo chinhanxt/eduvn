@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, Suspense } from "react";
 import { NavLink, Outlet } from "react-router";
 import { ApiError, api, getOrgId, setOrgId, type Me } from "./api";
 import { useAuth } from "./auth";
@@ -98,7 +98,9 @@ export function Shell() {
         </div>
         <main>
           <MeCtx value={me}>
-            <Outlet />
+            <Suspense fallback={<div className="center">…</div>}>
+              <Outlet />
+            </Suspense>
           </MeCtx>
         </main>
       </div>

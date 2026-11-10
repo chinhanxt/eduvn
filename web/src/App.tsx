@@ -1,36 +1,42 @@
+import { lazy, Suspense, useSyncExternalStore } from "react";
+import { mathStore } from "./math/mathStore";
 import { Navigate, Route, Routes } from "react-router";
 import { useAuth } from "./auth";
 import { Shell } from "./Shell";
 import { Login, Callback } from "./pages/Login";
 import { Home } from "./pages/Home";
-import { Bank } from "./pages/Bank";
-import { Exams } from "./pages/Exams";
-import { Grade } from "./pages/Grade";
-import { Classes, ClassDetailPage } from "./pages/Classes";
-import { Gradebook } from "./pages/Gradebook";
-import { LessonDetailPage, Lessons } from "./pages/Lessons";
-import { VanBan } from "./pages/VanBan";
-import { Slides } from "./pages/Slides";
-import { AiLessons } from "./pages/AiLessons";
-import { AiLessonPage } from "./pages/AiLessonPage";
-import { Boards } from "./pages/Boards";
-import { BoardPage } from "./board/BoardPage";
-import { Games } from "./pages/Games";
-import { Connect } from "./pages/Connect";
 import { Placeholder } from "./pages/Placeholder";
-import { MathKeyboard } from "./math/MathKeyboard";
 import { TOOLS } from "./tools";
-import { Books } from "./hoc/Books";
-import { HocLayout } from "./hoc/HocLayout";
-import { KhoTriThuc } from "./hoc/KhoTriThuc";
-import { Paths } from "./hoc/Paths";
-import { Practice } from "./hoc/Practice";
-import { Tutor } from "./hoc/Tutor";
+
+const Bank = lazy(() => import("./pages/Bank").then((m) => ({ default: m.Bank })));
+const Exams = lazy(() => import("./pages/Exams").then((m) => ({ default: m.Exams })));
+const Grade = lazy(() => import("./pages/Grade").then((m) => ({ default: m.Grade })));
+const Classes = lazy(() => import("./pages/Classes").then((m) => ({ default: m.Classes })));
+const ClassDetailPage = lazy(() => import("./pages/Classes").then((m) => ({ default: m.ClassDetailPage })));
+const Gradebook = lazy(() => import("./pages/Gradebook").then((m) => ({ default: m.Gradebook })));
+const LessonDetailPage = lazy(() => import("./pages/Lessons").then((m) => ({ default: m.LessonDetailPage })));
+const Lessons = lazy(() => import("./pages/Lessons").then((m) => ({ default: m.Lessons })));
+const VanBan = lazy(() => import("./pages/VanBan").then((m) => ({ default: m.VanBan })));
+const Slides = lazy(() => import("./pages/Slides").then((m) => ({ default: m.Slides })));
+const AiLessons = lazy(() => import("./pages/AiLessons").then((m) => ({ default: m.AiLessons })));
+const AiLessonPage = lazy(() => import("./pages/AiLessonPage").then((m) => ({ default: m.AiLessonPage })));
+const Boards = lazy(() => import("./pages/Boards").then((m) => ({ default: m.Boards })));
+const BoardPage = lazy(() => import("./board/BoardPage").then((m) => ({ default: m.BoardPage })));
+const Games = lazy(() => import("./pages/Games").then((m) => ({ default: m.Games })));
+const Connect = lazy(() => import("./pages/Connect").then((m) => ({ default: m.Connect })));
+const MathKeyboard = lazy(() => import("./math/MathKeyboard").then((m) => ({ default: m.MathKeyboard })));
+const Books = lazy(() => import("./hoc/Books").then((m) => ({ default: m.Books })));
+const HocLayout = lazy(() => import("./hoc/HocLayout").then((m) => ({ default: m.HocLayout })));
+const KhoTriThuc = lazy(() => import("./hoc/KhoTriThuc").then((m) => ({ default: m.KhoTriThuc })));
+const Paths = lazy(() => import("./hoc/Paths").then((m) => ({ default: m.Paths })));
+const Practice = lazy(() => import("./hoc/Practice").then((m) => ({ default: m.Practice })));
+const Tutor = lazy(() => import("./hoc/Tutor").then((m) => ({ default: m.Tutor })));
 
 export function App() {
   const { user, ready } = useAuth();
   return (
     <>
+    <Suspense fallback={<div className="center">…</div>}>
     <Routes>
       <Route path="/callback" element={<Callback />} />
       {!ready ? (
@@ -76,7 +82,21 @@ export function App() {
         </>
       )}
     </Routes>
-    {user && <MathKeyboard />}
+    </Suspense>
+    {user && <LazyMathKeyboard />}
     </>
+  );
+}
+
+/** Bàn phím toán chỉ tải (kèm MathLive) khi có ô toán đầu tiên được mở. */
+let mathUsed = false;
+function LazyMathKeyboard() {
+  const active = useSyncExternalStore(mathStore.subscribe, mathStore.get);
+  if (active) mathUsed = true;
+  if (!mathUsed) return null;
+  return (
+    <Suspense fallback={null}>
+      <MathKeyboard />
+    </Suspense>
   );
 }

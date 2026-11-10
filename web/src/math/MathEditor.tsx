@@ -1,4 +1,5 @@
 // web/src/math/MathEditor.tsx
+import "./setup";
 import { type ClipboardEvent, type KeyboardEvent, useEffect, useRef } from "react";
 import { MathfieldElement } from "mathlive";
 import { VN_SHORTCUTS } from "./keyboard";
