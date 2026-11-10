@@ -46,6 +46,9 @@ import { StudentItem } from "../domain/roster";
 import { createTutor } from "../tutor";
 import { registerInkRoutes } from "./routes/ink";
 import { registerTutorRoutes } from "./routes/tutor";
+import { registerTodayRoutes } from "./routes/today";
+import { registerIdempotency } from "./idempotency";
+import { createTodayService } from "../services/today";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -177,6 +180,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const slug = (s: string, fallback: string) => s.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/gi, "d").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase().slice(0, 50) || fallback;
 
   app.get("/health", async () => ({ ok: true }));
+  registerIdempotency(app);
 
   registerStudentRoutes(app, { auth: studentAuth, verify: deps.verify, credentials, submissions: submissionsSvc, rateLimit: deps.studentRateLimit ?? { max: 60, timeWindow: 60_000 } });
   registerClassroomRoutes(app, { authenticate, credentials, assignments: assignmentsSvc });
@@ -414,6 +418,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   app.addHook("onClose", async () => live.dispose());
   registerLiveRoutes(app, { live, authenticate });
   registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
+  registerTodayRoutes(app, { db: deps.db, today: createTodayService(deps.db, { now }), authenticate, studentAuth });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
