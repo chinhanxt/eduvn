@@ -49,6 +49,16 @@
       "timeoutMs": 300000,
       "description": "Cảnh tương tác HTML (mô phỏng, sơ đồ, trò chơi, 3D) của bài giảng OpenMAIC — trả HTML, không ép JSON"
     },
+    "hoat_hinh_toan": {
+      "model": [
+        "claude-sonnet-5-5-medium",
+        "gemini-3.8-flash-medium",
+        "claude-sonnet-4-6"
+      ],
+      "json": true,
+      "description": "Đề xuất hoạt hình toán (mẫu cố định + tham số JSON) cho một cảnh bài giảng",
+      "system": "Bạn đề xuất tối đa MỘT hoạt hình toán cho một cảnh bài giảng, bằng cách CHỌN MỘT MẪU CỐ ĐỊNH và điền tham số JSON. Không viết mã. Nếu cảnh không cần hoạt hình (chỉ là định nghĩa, câu hỏi, giới thiệu) thì trả {\"hoatHinh\":null}.\nTrả về đúng JSON {\"hoatHinh\":{\"template\":string,\"thoiLuong\":number,\"tieuDe\":string?,\"params\":{...}}} hoặc {\"hoatHinh\":null}. thoiLuong (giây, 3–60) lấy đúng bằng thời lượng lời giảng được cho. Mọi chữ tiếng Việt có dấu; công thức LaTeX viết ASCII thuần.\nCác mẫu:\n1. do_thi_ham_so: params {bieuThuc:\"biểu thức theo x (và tham số a nếu cần), vd \\\"a*x^2\\\", \\\"x^2-4x+3\\\", \\\"sin(x)\\\"; chỉ dùng + - * / ^ ( ), x, a, pi, e, sin cos tan sqrt abs ln log exp\", thamSo?:{tu,den} (a chạy từ tu đến den), xMin,xMax,yMin,yMax (số), diemDacBiet?:[{x:số, nhan?:\"chữ ngắn\"}] tối đa 5}.\n2. bien_doi_cong_thuc: params {cacBuoc:[{latex:\"LaTeX ASCII\", ghiChu?:\"giải thích ngắn tiếng Việt\"}] 2–6 bước nối tiếp, toMau?:[\"số hạng LaTeX cần tô màu\"] tối đa 4}. Chữ tiếng Việt chỉ đặt trong ghiChu, KHÔNG đặt trong latex. Lệnh LaTeX cho phép: \\frac \\sqrt \\cdot \\times \\pm \\le \\ge \\ne \\approx \\sin \\cos \\tan \\log \\ln \\pi \\alpha \\beta \\theta \\Delta \\sum \\infty \\to \\Rightarrow \\left \\right \\quad.\n3. hinh_hoc_dien_tich: params {a:số 0.5–5, b:số 0.5–5} — hình vuông cạnh (a+b) chia ô minh hoạ (a+b)^2 = a^2 + 2ab + b^2. Chỉ dùng khi cảnh nói về hằng đẳng thức bình phương một tổng.\n4. truc_so: params {khoang:{min,max} số nguyên, dài tối đa 24, cacDiem?:[{giaTri,nhan?}] tối đa 6, cacBuocNhay?:[{tu,den,nhan?}] tối đa 4} — cộng/trừ số, so sánh số, khoảng.\n5. dien_giai_tung_buoc: params {cacDong:[\"lời giải / biểu thức, có thể chứa $công thức$\", ...] 1–8 dòng, mỗi dòng ≤ 200 ký tự}.\n6. so_do_quy_trinh: params {cacBuoc:[{nhan:\"≤40 ký tự\", moTa?:\"≤80 ký tự\"}] 2–6 bước}.\n7. so_sanh_bang: params {cotTieuDe:[\"cột 1\",\"cột 2\",...] 2–4 cột, cacHang:[[\"ô\",\"ô\",...],...] 1–6 hàng, mỗi hàng đúng bằng số cột; ô có thể chứa $công thức$}.\nChọn mẫu hợp nhất với nội dung; ưu tiên 1–4 (Manim) cho đồ thị/biến đổi/hình học/trục số và 5–7 (HyperFrames) cho diễn giải, quy trình, so sánh. Các bước hiện lần lượt nên khớp thứ tự lời giảng."
+    },
     "loi_giang": {
       "model": ["gemini-3.8-flash-low", "gemini-4-argon-low", "claude-sonnet-4-6"],
       "description": "Lời giảng đọc kèm slide"

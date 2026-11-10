@@ -1,0 +1,88 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`HTML HyperFrames từ mẫu (snapshot) > dien_giai_tung_buoc: dòng hiện lần lượt, công thức KaTeX, chữ AI bị escape 1`] = `
+"<!doctype html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1280, height=720">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<style>
+@font-face{font-family:"Noto Sans";src:local("Noto Sans"),local("NotoSans-Regular")}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1280px;height:720px;overflow:hidden;background:#10142b}
+#root{position:absolute;inset:0;background:#10142b;font-family:"Noto Sans","DejaVu Sans",sans-serif;color:#f3f5ff}
+#tt{position:absolute;left:64px;right:64px;top:30px;font-size:38px;font-weight:700;color:#ffd166}
+.body{position:absolute;left:64px;right:64px;top:100px;bottom:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.line{font-size:36px;line-height:1.35;padding:12px 22px;border-left:6px solid #4f6bed;border-radius:6px;background:rgba(79,107,237,.12)}
+.flow{flex-direction:row;align-items:center;justify-content:center;gap:0}
+.box{width:180px;min-height:170px;padding:18px 14px;border-radius:14px;background:#1c2350;border:3px solid #4f6bed;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.box b{font-size:30px;color:#ffd166}.box span{font-size:22px;color:#c9d0ff}
+.arr{width:50px;height:40px;display:flex;align-items:center;justify-content:center}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:0;font-size:30px;border-radius:8px;overflow:hidden}
+.row div{padding:14px 18px;border-bottom:1px solid #2c3470}
+.hd div{background:#4f6bed;font-weight:700;color:#fff}
+.rw div{background:rgba(79,107,237,.10)}
+.katex{font-size:1.05em}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1280" data-height="720">
+<h1 id="tt" class="clip" data-start="0" data-duration="10" data-track-index="0">Giải phương trình</h1>
+<div class="body">
+<div id="l0" class="line clip" data-start="0.4" data-duration="9.6" data-track-index="1">Ta có <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></div>
+<div id="l1" class="line clip" data-start="4.8" data-duration="5.2" data-track-index="2">&lt;script&gt;alert(1)&lt;/script&gt; Vậy x = ±2</div>
+</div>
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+tl.fromTo("#l0", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 0.4);
+tl.fromTo("#l0", { backgroundColor: "rgba(255,209,102,0.28)", borderLeftColor: "#ffd166" }, { backgroundColor: "rgba(79,107,237,0.12)", borderLeftColor: "#4f6bed", duration: 0.4 }, 4.8);
+tl.to("#l0", { opacity: 0.55, duration: 0.3 }, 4.8);
+tl.fromTo("#l1", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 4.8);
+tl.fromTo("#l1", { backgroundColor: "rgba(255,209,102,0.28)", borderLeftColor: "#ffd166" }, { backgroundColor: "rgba(79,107,237,0.12)", borderLeftColor: "#4f6bed", duration: 0.4 }, 9.7);
+tl.to("#l1", { opacity: 0.55, duration: 0.3 }, 9.7);
+window.__timelines["main"] = tl;
+tl.seek(0);
+</script></body></html>
+"
+`;
+
+exports[`HTML HyperFrames từ mẫu (snapshot) > so_do_quy_trinh và so_sanh_bang dựng đủ khối 1`] = `
+"<!doctype html>
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1280, height=720">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<style>
+@font-face{font-family:"Noto Sans";src:local("Noto Sans"),local("NotoSans-Regular")}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1280px;height:720px;overflow:hidden;background:#10142b}
+#root{position:absolute;inset:0;background:#10142b;font-family:"Noto Sans","DejaVu Sans",sans-serif;color:#f3f5ff}
+#tt{position:absolute;left:64px;right:64px;top:30px;font-size:38px;font-weight:700;color:#ffd166}
+.body{position:absolute;left:64px;right:64px;top:40px;bottom:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.line{font-size:36px;line-height:1.35;padding:12px 22px;border-left:6px solid #4f6bed;border-radius:6px;background:rgba(79,107,237,.12)}
+.flow{flex-direction:row;align-items:center;justify-content:center;gap:0}
+.box{width:180px;min-height:170px;padding:18px 14px;border-radius:14px;background:#1c2350;border:3px solid #4f6bed;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.box b{font-size:30px;color:#ffd166}.box span{font-size:22px;color:#c9d0ff}
+.arr{width:50px;height:40px;display:flex;align-items:center;justify-content:center}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:0;font-size:30px;border-radius:8px;overflow:hidden}
+.row div{padding:14px 18px;border-bottom:1px solid #2c3470}
+.hd div{background:#4f6bed;font-weight:700;color:#fff}
+.rw div{background:rgba(79,107,237,.10)}
+.katex{font-size:1.05em}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="9" data-width="1280" data-height="720">
+
+<div class="body" style="justify-content:flex-start;gap:0">
+<div id="r0" class="row hd clip" data-start="0.4" data-duration="8.6" data-track-index="1"><div>Hàm số</div><div>Đồ thị</div></div>
+<div id="r1" class="row rw clip" data-start="3" data-duration="6" data-track-index="2"><div><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span></div><div>Đường thẳng</div></div>
+<div id="r2" class="row rw clip" data-start="5.6" data-duration="3.4" data-track-index="3"><div><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></div><div>Parabol</div></div>
+</div>
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+tl.fromTo("#r0", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.4);
+tl.fromTo("#r1", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 3);
+tl.fromTo("#r2", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 5.6);
+
+window.__timelines["main"] = tl;
+tl.seek(0);
+</script></body></html>
+"
+`;
