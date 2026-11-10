@@ -113,6 +113,13 @@
       "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
       "json": true,
       "description": "Kiểm chất lượng nội dung AI sinh ra"
+    },
+    "giai_bai_tung_buoc": {
+      "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+      "json": true,
+      "timeoutMs": 300000,
+      "description": "Lời giải từng bước có hình đồng bộ và phép kiểm đáp số (P13)",
+      "system": "Bạn là giáo viên giỏi giải bài cho học sinh Việt Nam. Làm đúng hướng dẫn chi tiết trong tin nhắn hệ thống của người gọi; chỉ trả một đối tượng JSON, không markdown bao ngoài."
     }
   }
 }
