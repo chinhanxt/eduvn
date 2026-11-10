@@ -109,7 +109,7 @@ export function createLiveService(deps: LiveDeps) {
     return { room, p };
   }
 
-  function wrongPin(ip: string) {
+  function wrongPin(ip: string): never {
     const t = now();
     const w = wrong.get(ip);
     const cur = !w || w.reset < t ? { n: 0, reset: t + 60_000 } : w;
