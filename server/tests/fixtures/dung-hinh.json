@@ -1,0 +1,52 @@
+[
+  {
+    "problem": "Cho hình chóp S.ABCD có đáy ABCD là hình vuông cạnh a, SA ⊥ (ABCD), SA = a√2. Gọi M là trung điểm SC. Tính góc giữa đường thẳng SC và mặt phẳng (ABCD).",
+    "expect": { "info": ["45°"] },
+    "spec": { "title": "Hình chóp S.ABCD", "points": [{ "type": "polygon", "ids": ["A", "B", "C", "D"], "shape": "square", "a": 1 }, { "type": "above", "id": "S", "of": "A", "height": "a√2" }, { "type": "midpoint", "id": "M", "of": ["S", "C"] }], "bodies": [{ "type": "pyramid", "base": ["A", "B", "C", "D"], "apex": "S" }], "segments": [["A", "C"]], "marks": [{ "type": "right", "at": "A", "a": "S", "b": "B" }, { "type": "right", "at": "A", "a": "S", "b": "D" }], "measures": [{ "type": "angle_line_plane", "line": ["S", "C"], "plane": ["A", "B", "C"] }] }
+  },
+  {
+    "problem": "Cho hình chóp S.ABC có đáy ABC là tam giác vuông tại B, AB = a, BC = a√3, SA vuông góc với mặt phẳng đáy và SA = 2a. Tính khoảng cách từ A đến mặt phẳng (SBC).",
+    "expect": { "info": ["2a√5/5"] },
+    "spec": { "title": "Hình chóp S.ABC", "points": [{ "type": "polygon", "ids": ["A", "B", "C"], "shape": "right", "at": "B", "a": 1, "b": "a√3" }, { "type": "above", "id": "S", "of": "A", "height": "2a" }], "bodies": [{ "type": "pyramid", "base": ["A", "B", "C"], "apex": "S" }], "marks": [{ "type": "right", "at": "B", "a": "A", "b": "C" }, { "type": "right", "at": "A", "a": "S", "b": "B" }], "measures": [{ "type": "distance", "from": "A", "plane": ["S", "B", "C"], "foot": "H" }] }
+  },
+  {
+    "problem": "Cho hình chóp tứ giác đều S.ABCD có cạnh đáy bằng a, cạnh bên bằng a√2. Gọi O là tâm của đáy. Tính góc giữa mặt bên (SCD) và mặt đáy.",
+    "expect": { "info": ["tan = √6"] },
+    "spec": { "title": "Hình chóp tứ giác đều S.ABCD", "points": [{ "type": "polygon", "ids": ["A", "B", "C", "D"], "shape": "square", "a": 1 }, { "type": "center", "id": "O", "of": ["A", "B", "C", "D"] }, { "type": "above", "id": "S", "of": "O", "height": "a√6/2" }], "bodies": [{ "type": "pyramid", "base": ["A", "B", "C", "D"], "apex": "S" }], "segments": [["A", "C"], ["B", "D"]], "measures": [{ "type": "angle_planes", "planes": [["S", "C", "D"], ["A", "B", "C"]], "feet": ["O", "M"] }] }
+  },
+  {
+    "problem": "Cho lăng trụ đứng ABC.A'B'C' có đáy ABC là tam giác đều cạnh a, AA' = a√3. Tính góc giữa đường thẳng A'B và mặt phẳng (ABC).",
+    "expect": { "info": ["60°"] },
+    "spec": { "title": "Lăng trụ đứng ABC.A'B'C'", "points": [{ "type": "polygon", "ids": ["A", "B", "C"], "shape": "equilateral", "a": 1 }, { "type": "translate", "ids": ["A'", "B'", "C'"], "of": ["A", "B", "C"], "vector": [0, 0, "a√3"] }], "bodies": [{ "type": "prism", "base": ["A", "B", "C"], "top": ["A'", "B'", "C'"] }], "measures": [{ "type": "angle_line_plane", "line": ["A'", "B"], "plane": ["A", "B", "C"] }] }
+  },
+  {
+    "problem": "Cho hình lập phương ABCD.A'B'C'D' cạnh a. Tính khoảng cách giữa hai đường thẳng AB' và BC'.",
+    "expect": { "info": ["a√3/3"] },
+    "spec": { "title": "Hình lập phương ABCD.A'B'C'D'", "points": [{ "type": "polygon", "ids": ["A", "B", "C", "D"], "shape": "square", "a": 1 }, { "type": "translate", "ids": ["A'", "B'", "C'", "D'"], "of": ["A", "B", "C", "D"], "vector": [0, 0, 1] }], "bodies": [{ "type": "prism", "base": ["A", "B", "C", "D"], "top": ["A'", "B'", "C'", "D'"] }], "segments": [["A", "B'"], ["B", "C'"]], "measures": [{ "type": "distance_lines", "lines": [["A", "B'"], ["B", "C'"]] }] }
+  },
+  {
+    "problem": "Cho tứ diện đều ABCD cạnh a. Gọi G là trọng tâm tam giác BCD. Tính khoảng cách từ A đến mặt phẳng (BCD).",
+    "expect": { "info": ["a√6/3"] },
+    "spec": { "title": "Tứ diện đều ABCD", "points": [{ "type": "polygon", "ids": ["B", "C", "D"], "shape": "equilateral", "a": 1 }, { "type": "center", "id": "G", "of": ["B", "C", "D"] }, { "type": "above", "id": "A", "of": "G", "height": "a√6/3" }], "bodies": [{ "type": "pyramid", "base": ["B", "C", "D"], "apex": "A" }], "measures": [{ "type": "distance", "from": "A", "plane": ["B", "C", "D"], "foot": "G" }] }
+  },
+  {
+    "problem": "Cho hình chóp S.ABCD có đáy ABCD là hình chữ nhật, AB = a, AD = 2a, SA ⊥ (ABCD), SA = a. Gọi M, N lần lượt là trung điểm của SB, SD. Xác định thiết diện của hình chóp cắt bởi mặt phẳng (AMN).",
+    "expect": { "section": 4 },
+    "spec": { "title": "Hình chóp S.ABCD", "points": [{ "type": "polygon", "ids": ["A", "B", "C", "D"], "shape": "rectangle", "a": 1, "b": 2 }, { "type": "above", "id": "S", "of": "A", "height": 1 }, { "type": "midpoint", "id": "M", "of": ["S", "B"] }, { "type": "midpoint", "id": "N", "of": ["S", "D"] }], "bodies": [{ "type": "pyramid", "base": ["A", "B", "C", "D"], "apex": "S" }], "sections": [{ "through": ["A", "M", "N"] }], "marks": [{ "type": "equal", "segments": [["S", "M"], ["M", "B"]], "group": 1 }, { "type": "equal", "segments": [["S", "N"], ["N", "D"]], "group": 2 }] }
+  },
+  {
+    "problem": "Cho hình chóp S.ABC có SA, SB, SC đôi một vuông góc và SA = SB = SC = a. Tính khoảng cách từ S đến mặt phẳng (ABC).",
+    "expect": { "info": ["a√3/3"] },
+    "spec": { "title": "Hình chóp S.ABC", "points": [{ "type": "coord", "id": "S", "at": [0, 0, 0] }, { "type": "coord", "id": "A", "at": [0, 0, 1] }, { "type": "coord", "id": "B", "at": [0, -1, 0] }, { "type": "coord", "id": "C", "at": [1, 0, 0] }], "bodies": [{ "type": "pyramid", "base": ["A", "B", "C"], "apex": "S" }], "marks": [{ "type": "right", "at": "S", "a": "A", "b": "B" }, { "type": "right", "at": "S", "a": "B", "b": "C" }, { "type": "right", "at": "S", "a": "A", "b": "C" }], "measures": [{ "type": "distance", "from": "S", "plane": ["A", "B", "C"], "foot": "H" }] }
+  },
+  {
+    "problem": "Cho hình nón đỉnh S có bán kính đáy r = a và độ dài đường sinh l = 2a. Tính góc giữa đường sinh và mặt phẳng đáy.",
+    "expect": { "info": ["60°"] },
+    "spec": { "title": "Hình nón", "view": "ortho", "points": [{ "type": "coord", "id": "O", "at": [0, 0, 0] }, { "type": "above", "id": "S", "of": "O", "height": "a√3" }, { "type": "coord", "id": "A", "at": [0.5, -0.866, 0] }, { "type": "coord", "id": "B", "at": [-1, 0, 0] }], "bodies": [{ "type": "cone", "center": "O", "apex": "S", "radius": 1 }], "segments": [["S", "O"], ["O", "A"]], "hide": ["B"], "measures": [{ "type": "angle_line_plane", "line": ["S", "A"], "plane": ["O", "A", "B"] }] }
+  },
+  {
+    "problem": "Cho hình trụ có bán kính đáy bằng a và chiều cao bằng 2a. Thiết diện qua trục của hình trụ là hình gì? Tính diện tích thiết diện.",
+    "expect": { "polygon": "hình vuông" },
+    "spec": { "title": "Hình trụ", "points": [{ "type": "coord", "id": "O", "at": [0, 0, 0] }, { "type": "above", "id": "O'", "of": "O", "height": "2a" }, { "type": "coord", "id": "A", "at": [-0.9396926, -0.3420201, 0] }, { "type": "coord", "id": "B", "at": [0.9396926, 0.3420201, 0] }, { "type": "above", "id": "A'", "of": "A", "height": 2 }, { "type": "above", "id": "B'", "of": "B", "height": 2 }], "bodies": [{ "type": "cylinder", "center": "O", "top": "O'", "radius": 1 }], "segments": [["O", "O'"]], "polygons": [["A", "B", "B'", "A'"]] }
+  }
+]
