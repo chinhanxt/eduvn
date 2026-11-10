@@ -169,3 +169,47 @@ export function figureElementIds(f: Figure | undefined): Set<string> {
   }
   return out;
 }
+
+/** Đọc dần JSON lời giải đang stream: các bước đã đóng ngoặc + tiêu đề/nội dung (dở) của bước đang viết. */
+export function partialSteps(text: string): { done: unknown[]; current?: { title: string; body: string } } {
+  const k = text.search(/"(steps|buoc|cac_buoc)"\s*:\s*\[/);
+  if (k < 0) return { done: [] };
+  let i = text.indexOf("[", k) + 1;
+  const done: unknown[] = [];
+  for (;;) {
+    while (i < text.length && /[\s,]/.test(text[i]!)) i++;
+    if (i >= text.length || text[i] !== "{") return { done };
+    // tìm dấu } khớp (bỏ qua ngoặc trong chuỗi)
+    let depth = 0, inStr = false, j = i;
+    for (; j < text.length; j++) {
+      const c = text[j]!;
+      if (inStr) {
+        if (c === "\\") j++;
+        else if (c === '"') inStr = false;
+      } else if (c === '"') inStr = true;
+      else if (c === "{" || c === "[") depth++;
+      else if (c === "}" || c === "]") {
+        depth--;
+        if (depth === 0) break;
+      }
+    }
+    if (j >= text.length) return { done, current: { title: partialField(text.slice(i), "title"), body: partialField(text.slice(i), "body") } };
+    try {
+      done.push(JSON.parse(text.slice(i, j + 1)));
+    } catch {
+      return { done };
+    }
+    i = j + 1;
+  }
+}
+
+function partialField(obj: string, key: string): string {
+  const m = new RegExp(`"${key}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)(")?`).exec(obj);
+  if (!m) return "";
+  const raw = m[1]!.replace(/\\u[0-9a-fA-F]{0,3}$|\\$/, "");
+  try {
+    return JSON.parse(`"${raw}"`) as string;
+  } catch {
+    return raw;
+  }
+}

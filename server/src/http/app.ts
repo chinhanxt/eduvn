@@ -46,6 +46,7 @@ import { StudentItem } from "../domain/roster";
 import { createTutor } from "../tutor";
 import { registerInkRoutes } from "./routes/ink";
 import { registerTutorRoutes } from "./routes/tutor";
+import { registerSolutionRoutes } from "./routes/solutions";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -414,6 +415,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   app.addHook("onClose", async () => live.dispose());
   registerLiveRoutes(app, { live, authenticate });
   registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
+  registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

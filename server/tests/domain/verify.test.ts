@@ -170,3 +170,16 @@ describe("mô hình lời giải", () => {
     expect(verifySolution(sol({ answer: "Văn nghị luận" })).status).toBe("unchecked");
   });
 });
+
+describe("đọc dần JSON đang stream", () => {
+  it("trả bước đã xong và phần dở của bước đang viết", async () => {
+    const { partialSteps } = await import("../../src/domain/solution");
+    const full = JSON.stringify({ problem: "Đề", steps: [{ title: "Đặt ẩn", body: "Gọi x {là} \"số\"", refs: ["A"] }, { title: "Giải", body: "Ta có $x^2 = 4$" }] });
+    const cut = full.slice(0, full.indexOf("$x^2") + 3);
+    const r = partialSteps(cut);
+    expect(r.done).toEqual([{ title: "Đặt ẩn", body: 'Gọi x {là} "số"', refs: ["A"] }]);
+    expect(r.current).toEqual({ title: "Giải", body: "Ta có $x" });
+    expect(partialSteps(full).done).toHaveLength(2);
+    expect(partialSteps('{"problem": "x"').done).toEqual([]);
+  });
+});
