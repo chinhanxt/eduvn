@@ -190,3 +190,35 @@ describe("định tuyến + nhãn", () => {
     expect(ms).toBeLessThan(100); // mục tiêu 50 ms trên máy rảnh (đo ~19 ms nóng); nới cho máy đang tải nặng
   });
 });
+
+import { diagramSvg, plain } from "../src/diagram/export";
+import { setLabelMeasurer } from "../src/diagram/layout";
+import { resizeAll } from "../src/diagram/ops";
+
+describe("sơ đồ công thức: kích thước đo bằng render, xuất giữ công thức", () => {
+  it("có bộ đo → kích thước nút theo số đo thật (cộng lề), không theo số ký tự", () => {
+    setLabelMeasurer((l) => (l.includes("frac") ? { w: 210, h: 44 } : null));
+    try {
+      expect(estimateSize("$\\dfrac{a}{b}$", "round")).toEqual({ w: 238, h: 60 });
+      const doc = resizeAll({ version: 1, kind: "mind", nodes: [node("$\\frac{1}{2}$"), node("chữ")], edges: [] });
+      expect(doc.nodes[0]).toMatchObject({ w: 238, h: 60 });
+      expect(doc.nodes[1]!.w).toBe(estimateSize("chữ", "round").w);
+    } finally {
+      setLabelMeasurer(null);
+    }
+  });
+  it("xuất có `rich`: nhãn công thức vào foreignObject (XHTML) kèm CSS nhúng; chữ thường giữ <text>", () => {
+    const root = node("Lượng giác");
+    const f = node("$\\sin 2a=2\\sin a\\cos a$", "round", root.id, { x: 200 });
+    const doc = { version: 1 as const, kind: "mind" as const, nodes: [root, f], edges: [] };
+    const { svg } = diagramSvg(doc, new Map(), new Map(), (n) => n.id === root.id, { css: "@font-face{font-family:KaTeX_Main;src:url(data:font/woff2;base64,AAAA)}", html: (v) => (v.includes("$") ? '<span xmlns="http://www.w3.org/1999/xhtml" class="me-text">MATH</span>' : null) });
+    expect(svg).toContain("<foreignObject");
+    expect(svg).toContain("MATH");
+    expect(svg).toContain("@font-face{font-family:KaTeX_Main");
+    expect(svg).toContain(">Lượng giác</tspan>");
+  });
+  it("không nhúng được: chữ thường gần đúng vẫn giữ tên hàm (không còn lỗi mất sin/cos)", () => {
+    expect(plain("$\\sin(a+b)=\\sin a\\cos b+\\cos a\\sin b$")).toBe("sin (a+b)=sin acos b+cos asin b");
+    expect(plain("$\\tan 2a=\\dfrac{2\\tan a}{1-\\tan^2 a}$")).toContain("tan 2a=(2tan a)/(1-tan");
+  });
+});

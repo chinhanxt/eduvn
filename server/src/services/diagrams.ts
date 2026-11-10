@@ -27,6 +27,8 @@ const AiReq = z.object({
   kind: z.enum(["mind", "flow"]).default("mind"),
   subject: z.string().trim().max(60).default(""),
   grade: z.number().int().min(1).max(16).optional(),
+  /** Sơ đồ công thức: mỗi nút lá là một công thức LaTeX, nhóm theo nhánh. */
+  formulas: z.boolean().default(false),
 });
 
 export function createDiagramService(db: Db, ai: Ai) {
@@ -91,7 +93,10 @@ export function createDiagramService(db: Db, ai: Ai) {
       q.kind === "mind"
         ? "Sơ đồ tư duy: nút gốc (parent=null) là chủ đề, các nhánh có parent là id nút cha, tối đa 3 tầng; links để rỗng hoặc chỉ vài liên hệ chéo."
         : "Lưu đồ: các bước nối bằng links theo thứ tự thực hiện, rẽ nhánh dùng nhãn \"Có\"/\"Không\"; parent luôn null.";
-    const prompt = `Vẽ ${q.kind === "mind" ? "sơ đồ tư duy" : "lưu đồ"} tiếng Việt có dấu về: ${q.topic}${ctx ? ` (${ctx})` : ""}.\n${shape}\nBỏ qua định dạng mặc định; CHỈ trả JSON đúng dạng {"nodes":[{"id":"n1","label":"...","parent":null}],"links":[{"from":"n1","to":"n2","label":""}]}. Tối đa ${AI_MAX_NODES} nút, chữ ngắn gọn, công thức viết LaTeX trong $…$.`;
+    const formula = q.formulas
+      ? `Đây là SƠ ĐỒ CÔNG THỨC: nút gốc là chủ đề; 3–6 nhánh cấp 1 là các nhóm công thức (tên nhóm ngắn, không công thức); mỗi nút lá là ĐÚNG MỘT công thức chuẩn SGK viết LaTeX trong $…$, có thể kèm tên rất ngắn phía trước (vd "Nhân đôi: $\\sin 2a=2\\sin a\\cos a$"). Phân số dùng \\dfrac, căn dùng \\sqrt, không dùng \\begin hay \\text. Công thức phải đúng toán học, đủ các công thức trọng tâm của chủ đề.\n`
+      : "";
+    const prompt = `Vẽ ${q.kind === "mind" ? "sơ đồ tư duy" : "lưu đồ"} tiếng Việt có dấu về: ${q.topic}${ctx ? ` (${ctx})` : ""}.\n${formula}${shape}\nBỏ qua định dạng mặc định; CHỈ trả JSON đúng dạng {"nodes":[{"id":"n1","label":"...","parent":null}],"links":[{"from":"n1","to":"n2","label":""}]}. Tối đa ${AI_MAX_NODES} nút, chữ ngắn gọn, công thức viết LaTeX trong $…$.`;
     const text = await ai.chat("so_do_tu_duy", [{ role: "user", content: prompt }], { json: true });
     let parsed: unknown;
     try {
