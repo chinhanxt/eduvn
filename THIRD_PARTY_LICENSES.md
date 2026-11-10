@@ -190,3 +190,22 @@ Các skill được EDUVN tự viết bằng tiếng Việt; chỉ mượn **khu
 - **GarethManning/education-agent-skills** — CC BY-SA 4.0. Chỉ tham khảo ý tưởng cấp cao (thiết kế ngược, nhận xét theo thang, rubric theo tiêu chí); **không sao chép văn bản** nên không phát sinh nghĩa vụ ShareAlike.
 
 Văn bản pháp quy (CV 5512, CV 7991, TT22/2021, TT27/2020, CT GDPT 2018) được tóm lược lại bằng lời của EDUVN trong `references/`.
+
+## $P Point-Cloud Recognizer (và họ $-family, $Q) — BSD-3-Clause
+
+Nhận dạng nét tay → hình trên bảng giảng (P12) port phần lõi của bộ nhận dạng **$P** (resample 32 điểm, chuẩn hoá, khớp đám điểm tham lam) sang TypeScript tại `web/src/board/dollarP.ts`. $Q là bản tối ưu tốc độ cùng họ (không port; chỉ dùng phần $P). Dùng làm phương án dự phòng sau bước nhận dạng hình học trực tiếp (`web/src/board/recognize.ts`, viết mới).
+
+Nguồn: Vatavu, R.-D., Anthony, L., Wobbrock, J. O. "Gestures as Point Clouds: A $P Recognizer for User Interface Prototypes", ICMI 2012; Vatavu, Anthony, Wobbrock, "$Q: A Super-Quick, Articulation-Invariant Stroke-Gesture Recognizer…", MobileHCI 2018. https://depts.washington.edu/acelab/proj/dollar/
+
+```
+BSD 3-Clause License
+Copyright (c) 2012, Radu-Daniel Vatavu, Lisa Anthony, and Jacob O. Wobbrock. All rights reserved.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
+that the following conditions are met: (1) redistributions of source code retain the above copyright
+notice, this list of conditions and the following disclaimer; (2) redistributions in binary form
+reproduce the above copyright notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution; (3) neither the names of the
+authors nor the names of their institutions may be used to endorse or promote products derived from
+this software without specific prior written permission. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT
+WARRANTY OF ANY KIND; see the full license text at the URL above.
+```
