@@ -42,17 +42,17 @@ export function ExamRoom() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      const sentAt = Date.now();
+      const sentAt = performance.now();
       const r = await hsJson<RoomPayload>(`/api/student/assignments/${id}/start`, { method: "POST", body: {} });
-      clock.current.sample(r.serverNow, sentAt, Date.now());
+      clock.current.sample(r.serverNow, sentAt, performance.now());
       const sid = r.submission.id;
       const send: Sender = async (seq, ans, o) => {
-        const t0 = Date.now();
+        const t0 = performance.now();
         try {
           const res = await hsFetch(`/api/student/submissions/${sid}/answers`, { method: "PUT", body: { seq, answers: ans }, keepalive: o.keepalive, retries: 0 });
           if (res.ok) {
             const b = (await res.json()) as SaveResult;
-            clock.current.sample(b.serverNow, t0, Date.now());
+            clock.current.sample(b.serverNow, t0, performance.now());
             setDeadline(b.deadlineAt);
             return { kind: "ok", seq: b.seq };
           }
