@@ -167,3 +167,9 @@ web/
 - 11 màn × 1440/1024/390: không tràn ngang (`scrollWidth − innerWidth = 0`), không lỗi console.
 - Chế độ tối: Kết quả lớp, Hôm nay (Học) — đã sửa cột "giảm nhấn" bị sáng hơn cột chính ở nền tối (`--seq-dim`).
 - Bảng màu dữ liệu: `validate_palette.js` đạt mọi cổng cứng ở cả hai chế độ; ordinal đạt.
+
+## Đã duyệt (chinhan, 2026-11-10)
+- Font: Inter (giao diện) + Source Serif 4 (tiêu đề, nội dung đọc).
+- Thanh bên cổng GV: nền sáng.
+- Màu nhấn theo cổng: GV `#3346D1`, Học `#0B7466`.
+- Phòng làm bài: chế độ tập trung (ẩn menu chính, giữ nút thoát rõ ràng).
