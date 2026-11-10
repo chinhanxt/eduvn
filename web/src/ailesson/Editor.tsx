@@ -4,7 +4,7 @@ import { elementHtml, esc } from "../../../server/src/export/slideHtml";
 import { type El, type Scene, latex } from "./lib";
 
 const plainOf = (html: string) => html.replace(/<\/p>|<br\s*\/?>|<\/li>/gi, "\n").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/\n+$/, "");
-const styleOfFirst = (html: string) => /<span[^>]*style="([^"]*)"/i.exec(html)?.[1];
+const styleOfFirst = (html: string) => /<(?:span|strong|em|b|i|u)\b[^>]*style=["']([^"']*)["']/i.exec(html)?.[1];
 const linesToHtml = (text: string, style?: string) => text.split("\n").map((l) => `<p>${style ? `<span style="${style}">` : ""}${esc(l)}${style ? "</span>" : ""}</p>`).join("");
 
 const blankScene = (n: number): Scene => ({

@@ -178,7 +178,7 @@ td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middl
 .ail-rowbtn { flex: 1; text-align: left; border: 0; background: none; padding: 4px 6px; font-size: 13px; }
 .ail-rowbtn small { display: block; color: var(--muted); }
 .ail-canvas-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 14px; align-items: start; }
-.ail-canvas { border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif; }
+.ail-canvas { container-type: inline-size; position: relative; width: 100%; aspect-ratio: 1000 / 562.5; overflow: hidden; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); font-family: 'Be Vietnam Pro', 'Segoe UI', sans-serif; }
 .ail-canvas p { margin: 0; }
 .ail-handle { position: absolute; cursor: move; border: 1px dashed transparent; z-index: 5; touch-action: none; }
 .ail-handle:hover { border-color: #9aa6e8; }

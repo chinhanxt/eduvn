@@ -108,7 +108,7 @@ export function elementHtml(e: El, o: Pick<HtmlOpts, "latex">): string {
         : `<div ${id} class="el" style="${base}background:#eef0f7;border:1px dashed #b9bfd8"></div>`;
     }
     case "latex":
-      return `<div ${id} class="el" style="${base}display:flex;align-items:center;justify-content:${e.align === "left" ? "flex-start" : e.align === "right" ? "flex-end" : "center"};color:${css(e.color)};font-size:${cq(Math.min(e.height * 0.55, 60))};overflow:hidden">${o.latex(String(e.latex ?? ""))}</div>`;
+      return `<div ${id} class="el" style="${base}display:flex;align-items:center;justify-content:${e.align === "left" ? "flex-start" : e.align === "right" ? "flex-end" : "center"};color:${css(e.color)};font-size:${cq(Math.min(e.height * 0.55, 60, e.width / (Math.max(String(e.latex ?? "").length, 4) * 0.62)))};white-space:nowrap;overflow:hidden">${o.latex(String(e.latex ?? ""))}</div>`;
     case "table": {
       const data = (e.data as { text: string; colspan?: number; rowspan?: number; style?: { bold?: boolean; color?: string; backcolor?: string } }[][]) ?? [];
       const th = (e.theme as { color?: string; rowHeader?: boolean } | undefined) ?? {};

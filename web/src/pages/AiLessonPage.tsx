@@ -118,7 +118,7 @@ export function AiLessonPage() {
         <Link to="/bai-giang-ai" className="btn ghost sm"><Icon name="left" size={16} />Danh sách</Link>
         {tab === "edit" ? <input className="inp" style={{ minWidth: 320 }} value={title} onChange={(e) => { setTitle(e.target.value); setDirty(true); }} aria-label="Tên bài giảng" /> : <h1 style={{ margin: 0 }}>{title}</h1>}
         <span className="sp" />
-        {d.status === "done" && scenes.length > 0 && (
+        {!active && scenes.length > 0 && (
           <>
             <div className="seg">
               <button className={`btn sm ${tab === "play" ? "" : "ghost"}`} onClick={() => setTab("play")} data-testid="ail-tab-play"><Icon name="play" size={16} />Trình chiếu</button>
@@ -154,7 +154,7 @@ export function AiLessonPage() {
       {scenes.length > 0 && tab === "play" && <Player lessonId={id} scenes={scenes} />}
       {scenes.length > 0 && tab === "edit" && <Editor scenes={scenes} busy={busy} onChange={(s) => { setScenes(s); setDirty(true); }} onRegenerate={(sid, dir) => void regen(sid, dir)} />}
 
-      {d.status === "done" && scenes.length > 0 && (
+      {!active && scenes.length > 0 && (
         <div className="card" style={{ marginTop: 16 }} data-testid="ail-export">
           <b>Xuất bài giảng</b>
           <div className="bar" style={{ marginTop: 10, marginBottom: 0 }}>
