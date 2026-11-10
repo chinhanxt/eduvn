@@ -32,6 +32,8 @@ import { createClassService } from "../services/classes";
 import { StudentItem } from "../domain/roster";
 import { createTutor } from "../tutor";
 import { registerTutorRoutes } from "./routes/tutor";
+import { registerPhotoGradingRoutes } from "./routes/photoGrading";
+import { createPhotoGradingService } from "../services/photoGrading";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string; ai?: Ai; aiLessons?: AiLessonsCfg };
@@ -347,6 +349,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
 
   registerAiLessonRoutes(app, { db: deps.db, ai: deps.ai, cfg: deps.aiLessons ?? { dataDir: "./data" }, service, authenticate });
   registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
+  registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, deps.ai ?? disabledAi, classes), authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

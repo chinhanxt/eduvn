@@ -11,6 +11,7 @@ import { TOOLS } from "./tools";
 const Bank = lazy(() => import("./pages/Bank").then((m) => ({ default: m.Bank })));
 const Exams = lazy(() => import("./pages/Exams").then((m) => ({ default: m.Exams })));
 const Grade = lazy(() => import("./pages/Grade").then((m) => ({ default: m.Grade })));
+const PhotoGrade = lazy(() => import("./pages/PhotoGrade").then((m) => ({ default: m.PhotoGrade })));
 const Classes = lazy(() => import("./pages/Classes").then((m) => ({ default: m.Classes })));
 const ClassDetailPage = lazy(() => import("./pages/Classes").then((m) => ({ default: m.ClassDetailPage })));
 const Gradebook = lazy(() => import("./pages/Gradebook").then((m) => ({ default: m.Gradebook })));
@@ -56,6 +57,7 @@ export function App() {
           <Route path="ngan-hang" element={<Bank />} />
           <Route path="de-thi" element={<Exams />} />
           <Route path="cham-bai" element={<Grade />} />
+          <Route path="cham-anh" element={<PhotoGrade />} />
           <Route path="lop-hoc" element={<Classes />} />
           <Route path="lop-hoc/:id" element={<ClassDetailPage />} />
           <Route path="so-diem" element={<Gradebook />} />

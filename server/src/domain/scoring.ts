@@ -12,7 +12,7 @@ export type PointRules = {
 export const DEFAULT_RULES: PointRules = { mcq: 0.25, trueFalseByCorrect: [0, 0.1, 0.25, 0.5, 1], shortAnswer: 0.25 };
 export const MATH_RULES: PointRules = { ...DEFAULT_RULES, shortAnswer: 0.5 };
 
-export const ResponseValue = z.union([z.number().int(), z.array(z.boolean()), z.string(), z.null()]);
+export const ResponseValue = z.union([z.number().int(), z.array(z.boolean().nullable()), z.string(), z.null()]);
 export type ResponseValue = z.infer<typeof ResponseValue>;
 
 function foldVietnamese(s: string): string {

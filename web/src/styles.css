@@ -185,3 +185,15 @@ td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middl
 .ail-handle.on { border: 1.5px solid var(--brand); }
 .ail-props { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
 @media (max-width: 900px) { .ail-edit, .ail-canvas-wrap { grid-template-columns: 1fr; } }
+
+/* Chấm từ ảnh: phiếu in A4 */
+.omr-page { margin: 0 auto 16px; max-width: 560px; background: #fff; box-shadow: var(--shadow); }
+.omr-page svg { width: 100%; height: auto; display: block; }
+@media print {
+  body * { visibility: hidden; }
+  .omr-print, .omr-print * { visibility: visible; }
+  .omr-print { position: absolute; left: 0; top: 0; width: 210mm; }
+  .omr-page { max-width: none; width: 210mm; margin: 0; box-shadow: none; break-after: page; }
+  .omr-page svg { width: 210mm; height: 297mm; }
+  @page { size: A4; margin: 0; }
+}

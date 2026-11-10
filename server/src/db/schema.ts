@@ -521,3 +521,27 @@ export const tutorBookPages = pgTable(
   },
   (t) => [index("tutor_book_pages_idx").on(t.bookId, t.idx)],
 );
+
+/** Kết quả chấm từ ảnh (P7): kind "omr" = phiếu trắc nghiệm quét; "essay" = bài viết tay đã duyệt. */
+export const photoResults = pgTable(
+  "photo_results",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    kind: text("kind").$type<"omr" | "essay">().notNull(),
+    examId: uuid("exam_id").references(() => exams.id, { onDelete: "set null" }),
+    /** SBD / tên học sinh GV nhập. */
+    student: text("student").notNull().default(""),
+    title: text("title").notNull().default(""),
+    total: real("total").notNull(),
+    max: real("max").notNull(),
+    body: jsonb("body").$type<Record<string, unknown>>().notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("photo_results_org_idx").on(t.orgId, t.kind)],
+);
