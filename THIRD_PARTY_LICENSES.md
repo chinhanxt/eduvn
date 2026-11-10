@@ -16,7 +16,7 @@ Bài giảng AI (P5) dùng và port một phần từ [OpenMAIC](https://github.
 ```
 MIT License
 
-Copyright (c) OpenMAIC contributors (Tsinghua University MAIC)
+Copyright (c) 2026 THU-MAIC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
