@@ -1,0 +1,16 @@
+{
+  "skill": "de-cuong-hoc-phan",
+  "task": "de_cuong_hoc_phan",
+  "common": [
+    "Đầu ra là JSON hợp lệ đúng cấu trúc trong SKILL.md cho pha được yêu cầu.",
+    "CLO dùng động từ Bloom đo được, đánh số CLO1…; mỗi CLO nối ít nhất một PLO trong cloPlo.",
+    "Trọng số assessment cộng đúng 100 và mỗi CLO được đo bởi ít nhất một thành phần."
+  ],
+  "cases": [
+    {"id": "ctdl-khung", "input": "PHA: khung\nHọc phần: Cấu trúc dữ liệu và giải thuật, 3 tín chỉ (2 lí thuyết + 1 thực hành), ngành Công nghệ thông tin, năm 2, 15 tuần. Tiên quyết: Nhập môn lập trình. GV chưa cung cấp danh sách PLO.", "criteria": ["Có 4–7 CLO mức từ hiểu đến vận dụng/phân tích, nội dung đúng chuyên môn.", "Ghi chú nói rõ PLO là giả định cần đối chiếu.", "Giờ lí thuyết/thực hành khớp 3 tín chỉ (30 lí thuyết + 30 thực hành)."]},
+    {"id": "kinhte-vimo-toanbo", "input": "PHA: toan_bo\nHọc phần: Kinh tế vi mô, 3 tín chỉ lí thuyết, ngành Quản trị kinh doanh năm 1, 15 tuần. PLO của chương trình: PLO1 Áp dụng kiến thức kinh tế nền tảng; PLO2 Phân tích dữ liệu và thị trường; PLO3 Làm việc nhóm và giao tiếp.", "criteria": ["Ma trận CLO–PLO chỉ dùng PLO1–PLO3 mà GV đã cho, mỗi PLO được ít nhất một CLO nối.", "Có đủ 15 tuần với chủ đề tăng dần từ cơ bản đến nâng cao, có tuần ôn tập/kiểm tra.", "Tổng số tiết lí thuyết khoảng 45."]},
+    {"id": "giaiduc-kehoach", "input": "PHA: ke_hoach\nHọc phần: Tâm lí học giáo dục, 2 tín chỉ, ngành Sư phạm, 15 tuần.\nKhung đã duyệt: CLO1 Giải thích được các lí thuyết học tập cơ bản; CLO2 Phân tích được đặc điểm tâm lí lứa tuổi học sinh; CLO3 Thiết kế được một hoạt động dạy học phù hợp đặc điểm tâm lí học sinh. Đánh giá: Chuyên cần 10%, Bài tập nhóm 30%, Cuối kì 60%.", "criteria": ["Chỉ trả schedule và materials (không lặp khung).", "Mỗi tuần có chủ đề, CLO, hoạt động và nhiệm vụ tự học; mọi CLO xuất hiện trong kế hoạch.", "Không bịa tài liệu: tài liệu không chắc thì ghi 'GV bổ sung'."]},
+    {"id": "thuchanh-hoa", "input": "PHA: khung\nHọc phần: Thực hành hoá học đại cương, 1 tín chỉ thực hành, ngành Hoá học năm 1, 15 tuần.", "criteria": ["Đánh giá phù hợp học phần thực hành (báo cáo thí nghiệm, kĩ năng thao tác, kiểm tra thực hành).", "Số giờ thực hành 30, lí thuyết 0 hoặc rất ít.", "CLO có yếu tố an toàn phòng thí nghiệm hoặc kĩ năng thao tác."]},
+    {"id": "ngoaingu-toanbo", "input": "Soạn đề cương học phần Tiếng Anh chuyên ngành Du lịch, 2 tín chỉ, sinh viên năm 3 ngành Quản trị du lịch, 15 tuần.", "criteria": ["Không ghi pha vẫn trả đủ khung và kế hoạch.", "CLO gắn năng lực ngôn ngữ cụ thể (nghe, nói, đọc, viết trong bối cảnh du lịch).", "Đánh giá gồm cả thành phần quá trình và cuối kì, trọng số cộng 100."]}
+  ]
+}

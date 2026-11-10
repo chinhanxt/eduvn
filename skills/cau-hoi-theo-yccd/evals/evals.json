@@ -1,0 +1,16 @@
+{
+  "skill": "cau-hoi-theo-yccd",
+  "task": "sinh_cau_hoi",
+  "common": [
+    "Đầu ra là JSON hợp lệ có khoá questions, mỗi câu đủ subject, grade, topic, level, stem, đúng cấu trúc theo type.",
+    "Đáp án ghi trong answer là đúng (người chấm tự giải lại).",
+    "Mức level khớp động từ của yêu cầu cần đạt."
+  ],
+  "cases": [
+    {"id": "toan10-mcq-th", "input": "Môn Toán lớp 10, chủ đề Mệnh đề. YCCĐ: Xác định được mệnh đề phủ định của một mệnh đề có lượng từ. Mức TH. Tạo 3 câu nhiều lựa chọn.", "criteria": ["Có đúng 3 câu type mcq, mỗi câu 4 phương án.", "Mỗi phương án nhiễu mô phỏng một lỗi sai có thật (ví dụ quên đổi lượng từ, đổi dấu bất đẳng thức sai), không vô lí.", "Vị trí đáp án đúng không trùng nhau ở cả 3 câu."]},
+    {"id": "hoa11-tf", "input": "Môn Hoá học lớp 11, chủ đề Cân bằng hoá học. YCCĐ: Vận dụng được nguyên lí Le Chatelier để dự đoán chiều chuyển dịch cân bằng. Mức VD. Tạo 2 câu đúng/sai.", "criteria": ["Mỗi câu có đúng 4 statements và answer gồm 4 boolean.", "Bốn ý của một câu kiểm các khía cạnh khác nhau (nhiệt độ, áp suất, nồng độ, chất xúc tác…).", "Nội dung hoá học đúng."]},
+    {"id": "toan12-short", "input": "Môn Toán lớp 12, chủ đề Ứng dụng đạo hàm. YCCĐ: Tìm được giá trị lớn nhất, nhỏ nhất của hàm số trên một đoạn. Mức VD. Tạo 2 câu trả lời ngắn.", "criteria": ["Đáp án là số hoặc biểu thức ngắn, duy nhất.", "Đề nêu rõ quy tắc làm tròn nếu đáp án không nguyên.", "Có lời giải explanation đúng."]},
+    {"id": "van10-essay", "input": "Môn Ngữ văn lớp 10, chủ đề Thơ Đường luật. YCCĐ: Phân tích được hình ảnh thiên nhiên và tâm trạng nhà thơ trong một bài thơ. Mức VD cao. Tạo 1 câu tự luận 3 điểm.", "criteria": ["type là essay, points bằng 3.", "rubric chia ý rõ và cộng đúng 3 điểm.", "Có tag VDC và level là VD."]},
+    {"id": "sinh12-mix", "input": "Môn Sinh học lớp 12, chủ đề Di truyền học quần thể. YCCĐ: Nêu được khái niệm vốn gen và tần số allele. Mức NB. Tạo 1 câu mcq, 1 câu true_false, 1 câu short_answer.", "criteria": ["Đúng một câu mỗi dạng.", "Đều là mức NB và dùng động từ nhận biết/nêu.", "Không phương án nào là 'tất cả đều đúng/sai'."]}
+  ]
+}

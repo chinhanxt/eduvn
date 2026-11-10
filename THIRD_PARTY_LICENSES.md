@@ -167,3 +167,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Bộ skill sư phạm `skills/` (P8) — nguồn tái chế
+
+Các skill được EDUVN tự viết bằng tiếng Việt; chỉ mượn **khung cấu trúc và ý tưởng quy trình** từ các dự án sau (không chép nguyên văn):
+
+- **anthropics/k12-teacher-skills** — Apache License 2.0. Khung `SKILL.md` (frontmatter, quy trình từng bước), cách dùng tiêu chí chấm dạng LLM-judge cho `evals/`. Theo điều 4 của Apache-2.0 giữ nguyên NOTICE dưới đây (cũng có ở `skills/NOTICE`):
+
+  ```
+  Agent Skills for K-12 Teachers
+  Copyright 2026 Anthropic, PBC
+  Copyright 2026 Learning Commons
+  Portions of this product were co-developed by Anthropic, PBC
+  and Learning Commons under a collaboration agreement.
+  ```
+
+  Toàn văn: https://www.apache.org/licenses/LICENSE-2.0. Thay đổi: dịch và viết lại theo CV 5512, 7991, TT22, TT27; không dùng nội dung tiêu chuẩn Mỹ.
+- **DaRL-GenAI/instructional_agents** — MIT. Luồng ADDIE và phân vai (giảng viên, nhà thiết kế, trợ giảng, điều phối) cho `de-cuong-hoc-phan`.
+- **oaknational/oak-ai-lesson-assistant** và **oak-ai-autoeval-tools** — MIT. Ý tưởng sinh giáo án theo từng mục có schema và chấm tự động bằng LLM-judge (`scripts/eval-skills.mjs`).
+- **duongtrung/BloomLLM**, **nicyscaria/AEQG_Blooms_Evaluation_LLMs** — MIT. Ý tưởng bảng động từ Bloom và tiêu chí đánh giá câu hỏi.
+- **Khalidsyfullah/Vision-Language-Models-for-Outcome-Based-Assessment** — Apache-2.0. Ý tưởng chấm theo từng tiêu chí (`rubric-tu-luan`).
+- **GarethManning/education-agent-skills** — CC BY-SA 4.0. Chỉ tham khảo ý tưởng cấp cao (thiết kế ngược, nhận xét theo thang, rubric theo tiêu chí); **không sao chép văn bản** nên không phát sinh nghĩa vụ ShareAlike.
+
+Văn bản pháp quy (CV 5512, CV 7991, TT22/2021, TT27/2020, CT GDPT 2018) được tóm lược lại bằng lời của EDUVN trong `references/`.
