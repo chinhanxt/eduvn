@@ -1,6 +1,6 @@
 import { lazy, Suspense, useSyncExternalStore } from "react";
 import { mathStore } from "./math/mathStore";
-import { Navigate, Route, Routes } from "react-router";
+import { Navigate, Route, Routes, useLocation } from "react-router";
 import { useAuth } from "./auth";
 import { Shell } from "./Shell";
 import { Login, Callback } from "./pages/Login";
@@ -8,6 +8,7 @@ import { Home } from "./pages/Home";
 import { Placeholder } from "./pages/Placeholder";
 import { TOOLS } from "./tools";
 
+const StudentApp = lazy(() => import("./student/StudentApp").then((m) => ({ default: m.StudentApp })));
 const Bank = lazy(() => import("./pages/Bank").then((m) => ({ default: m.Bank })));
 const Exams = lazy(() => import("./pages/Exams").then((m) => ({ default: m.Exams })));
 const Grade = lazy(() => import("./pages/Grade").then((m) => ({ default: m.Grade })));
@@ -41,12 +42,14 @@ const Tutor = lazy(() => import("./hoc/Tutor").then((m) => ({ default: m.Tutor }
 
 export function App() {
   const { user, ready } = useAuth();
+  const inHs = /^\/hs(\/|$)/.test(useLocation().pathname);
   return (
     <>
     <Suspense fallback={<div className="center">…</div>}>
     <Routes>
       <Route path="/callback" element={<Callback />} />
       <Route path="/choi" element={<Play />} />
+      <Route path="/hs/*" element={<StudentApp />} />
       {!ready ? (
         <Route path="*" element={<div className="center">…</div>} />
       ) : !user ? (
@@ -97,7 +100,7 @@ export function App() {
       )}
     </Routes>
     </Suspense>
-    {user && <LazyMathKeyboard />}
+    {(user || inHs) && <LazyMathKeyboard />}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { hasBalancedMath } from "./mathText";
+import { ambiguousKey } from "./shortAnswer";
 
 export const LEVELS = ["NB", "TH", "VD"] as const; // Nhận biết, Thông hiểu, Vận dụng
 export const QUESTION_TYPES = ["mcq", "true_false", "short_answer", "essay"] as const;
@@ -50,7 +51,10 @@ export const TrueFalseQuestion = z.object({
 export const ShortAnswerQuestion = z.object({
   ...base,
   type: z.literal("short_answer"),
-  answer: mathText(),
+  answer: mathText().superRefine((v, ctx) => {
+    const k = ambiguousKey(v);
+    if (k) ctx.addIssue({ code: "custom", message: `Đáp án "${k}" dễ hiểu nhầm: viết "${k.replace(".", ",")}" nếu là số thập phân, hoặc "${k.replace(".", "")}" nếu là số nguyên.` });
+  }),
 });
 
 export const EssayQuestion = z.object({

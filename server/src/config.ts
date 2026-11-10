@@ -7,6 +7,7 @@ const Env = z.object({
   OIDC_AUDIENCE: z.string().min(1).default("eduvn-api"),
   PUBLIC_URL: z.url(),
   DOWNLOAD_SECRET: z.string().min(32),
+  STUDENT_SECRET: z.string().min(32),
   HOST: z.string().min(1).default("127.0.0.1"),
   PORT: z.coerce.number().int().min(1).max(65535).default(4310),
   // Cổng AI (gateway/). Thiếu token = tắt tính năng AI phía lõi (trả 503).
@@ -24,5 +25,6 @@ export type Config = z.infer<typeof Env>;
 
 export function loadConfig(env: Record<string, string | undefined> = process.env): Config {
   const cfg = Env.parse(env);
+  if (env.NODE_ENV === "production" && /change-me|dev-only/i.test(cfg.STUDENT_SECRET)) throw new Error("STUDENT_SECRET đang là giá trị mẫu — đặt chuỗi ngẫu nhiên ≥ 32 ký tự");
   return { ...cfg, OIDC_ISSUER: cfg.OIDC_ISSUER.replace(/\/+$/, ""), PUBLIC_URL: cfg.PUBLIC_URL.replace(/\/+$/, "") };
 }

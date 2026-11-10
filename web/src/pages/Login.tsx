@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { finishLogin, useAuth } from "../auth";
+import { AFTER_LOGIN_KEY, finishLogin, useAuth } from "../auth";
 import { Icon } from "../Icon";
 
 export function Login() {
@@ -23,7 +23,11 @@ export function Callback() {
   const [err, setErr] = useState<string | null>(null);
   useEffect(() => {
     finishLogin()
-      .then(() => window.location.replace("/"))
+      .then(() => {
+        const after = window.sessionStorage.getItem(AFTER_LOGIN_KEY);
+        window.sessionStorage.removeItem(AFTER_LOGIN_KEY);
+        window.location.replace(after?.startsWith("/hs") ? after : "/");
+      })
       .catch((e: unknown) => setErr(e instanceof Error ? e.message : "Lỗi đăng nhập"));
   }, [nav]);
   return <div className="center">{err ?? "…"}</div>;

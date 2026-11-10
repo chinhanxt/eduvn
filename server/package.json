@@ -14,6 +14,8 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@fastify/rate-limit": "^11.2.2",
+    "@fastify/under-pressure": "^9.2.1",
     "@modelcontextprotocol/sdk": "^1.32.2",
     "@openmaic/dsl": "0.13.0",
     "@openmaic/generation": "0.3.31",
@@ -37,6 +39,7 @@
     "@electric-sql/pglite": "^0.5.15",
     "@types/node": "^24.19.2",
     "@types/pg": "^8.23.1",
+    "autocannon": "^9.0.0",
     "drizzle-kit": "^0.31.11",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
