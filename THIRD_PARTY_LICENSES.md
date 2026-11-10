@@ -37,9 +37,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Edge TTS (`msedge-tts`, MIT)
+## VieNeu-TTS (Apache License 2.0)
 
-Giọng đọc lời giảng (vi-VN-HoaiMyNeural / vi-VN-NamMinhNeural) qua dịch vụ đọc của Microsoft Edge.
+Giọng đọc lời giảng: CLI `vieneu-say` dùng chung của máy (gói `vieneu` 3.8.3, `~/Apps/vieneu-tts`), nhân giọng từ mẫu "Giọng dạy". EDUVN chỉ gọi qua dòng lệnh, không chép mã.
+
+## Manim Community (MIT)
+
+Hoạt hình toán (`do_thi_ham_so`, `bien_doi_cong_thuc`, `hinh_hoc_dien_tich`, `truc_so`): các mẫu cố định viết sẵn trong `server/src/services/manim/`, chạy bằng Manim Community (venv ngoài repo `~/Apps/manim`) và TinyTeX (LaTeX Project Public License / các gói TeX Live). Không chạy mã do AI viết.
+
+## HyperFrames (Apache License 2.0)
+
+Hoạt hình HTML (`dien_giai_tung_buoc`, `so_do_quy_trinh`, `so_sanh_bang`): mẫu cố định dựng HTML + GSAP, render bằng `npx hyperframes render`. GSAP chạy theo giấy phép của chính nó (gói kèm HyperFrames); KaTeX (MIT) cho công thức.
 
 ## DeepTutor v1.7.2 (HKUDS/DeepTutor, commit 60fb3bd) — Apache License 2.0
 

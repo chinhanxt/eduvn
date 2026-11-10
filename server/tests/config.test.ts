@@ -1,3 +1,5 @@
+import { homedir } from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config";
 
@@ -20,8 +22,11 @@ describe("loadConfig", () => {
       PORT: 4310,
       GATEWAY_URL: "http://127.0.0.1:4340",
       DATA_DIR: "./data",
-      TTS_PROVIDER: "edge",
-      TTS_VOICE: "vi-VN-HoaiMyNeural",
+      TTS_PROVIDER: "vieneu",
+      VIENEU_CMD: "vieneu-say",
+      VIENEU_REF: path.join(homedir(), "video-studio/voices/Giọng dạy.wav"),
+      MANIM_HOME: path.join(homedir(), "Apps/manim"),
+      TINYTEX_BIN: path.join(homedir(), "Apps/tinytex/bin/x86_64-linux"),
       CHROME_PATH: "/usr/bin/google-chrome",
     });
   });
