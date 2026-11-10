@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { estimateSize, layoutFlow, layoutMind } from "../src/diagram/layout";
 import { placeLabels } from "../src/diagram/labels";
-import { bezierAt, polyline, routeAll, segHitsRect } from "../src/diagram/route";
+import { polyline, routeAll, segHitsRect } from "../src/diagram/route";
 import type { DEdge, DiagramDoc, DNode, Rect, Shape } from "../src/diagram/types";
 import { rectOf } from "../src/diagram/types";
 
@@ -109,7 +109,7 @@ function lineQuality(doc: DiagramDoc) {
           if (sv === tv) {
             const same = sv ? s.a.x === t.a.x : s.a.y === t.a.y;
             const ov = sv ? overlap1d(s.a.y, s.b.y, t.a.y, t.b.y) : overlap1d(s.a.x, s.b.x, t.a.x, t.b.x);
-            if (same && ov > 8 && !(list[i]!.e.to === list[j]!.e.to && s.last && t.last)) shared.push(`${list[i]!.e.id}/${list[j]!.e.id}`);
+            if (same && ov > 8 && list[i]!.e.to !== list[j]!.e.to) shared.push(`${list[i]!.e.id}/${list[j]!.e.id}`);
           } else {
             const v = sv ? s : t, h = sv ? t : s;
             const x = v.a.x, y = h.a.y;
@@ -120,7 +120,7 @@ function lineQuality(doc: DiagramDoc) {
 }
 
 describe("chất lượng đường nối lưu đồ", () => {
-  it("không đường nào đi chung đoạn thẳng, cắt nhau tối đa 1 lần", () => {
+  it("đường khác đích không đi chung đoạn thẳng, cắt nhau tối đa 1 lần", () => {
     const q = lineQuality(flowSample());
     expect(q.shared).toEqual([]);
     expect(q.crossings).toBeLessThanOrEqual(1);
@@ -138,7 +138,7 @@ describe("chất lượng đường nối lưu đồ", () => {
     const bad: string[] = [];
     for (const A of doc.edges)
       for (const B of doc.edges) {
-        if (A.id === B.id) continue;
+        if (A.id === B.id || A.to === B.to) continue; // cùng đích: được nhập chung một trục
         const pa = polyline(routes.get(A.id)!), pb = polyline(routes.get(B.id)!);
         for (const v of pa) for (let i = 0; i + 1 < pb.length; i++) if (on(v, pb[i]!, pb[i + 1]!)) bad.push(`${A.id}@${v.x},${v.y} trên ${B.id}`);
       }
@@ -152,24 +152,15 @@ describe("chất lượng đường nối lưu đồ", () => {
     expect(q2.x).toBeGreaterThan(r1.x + r1.w);
     expect(e.y).toBeGreaterThan(Math.max(...doc.nodes.filter((x) => x !== e).map((x) => x.y)));
   });
-  it("sơ đồ tư duy: đường nối liên hệ (nét đứt) không cắt đường cong của cây", () => {
+  it("sơ đồ tư duy: nét đứt không đi vòng quá xa (<= 1.8x đường ngắn nhất hoặc +300px)", () => {
     const doc = mindSample();
     const routes = routeAll(doc);
-    const X = (a: { x: number; y: number }, b: { x: number; y: number }, p: { x: number; y: number }, q: { x: number; y: number }) => {
-      const d = (u: number, v: number, w: number, z: number) => u * z - v * w;
-      return d(b.x - a.x, b.y - a.y, p.x - a.x, p.y - a.y) * d(b.x - a.x, b.y - a.y, q.x - a.x, q.y - a.y) < 0 && d(q.x - p.x, q.y - p.y, a.x - p.x, a.y - p.y) * d(q.x - p.x, q.y - p.y, b.x - p.x, b.y - p.y) < 0;
-    };
-    let hits = 0;
-    for (const link of doc.edges.filter((e) => e.kind === "link")) {
-      const lp = polyline(routes.get(link.id)!);
-      for (const tree of doc.edges.filter((e) => e.kind === "tree")) {
-        const r = routes.get(tree.id)!;
-        if (r.kind !== "bezier") continue;
-        const tp = Array.from({ length: 49 }, (_, i) => bezierAt(r.pts, i / 48));
-        for (let i = 0; i + 1 < lp.length; i++) for (let k = 0; k + 1 < tp.length; k++) if (X(lp[i]!, lp[i + 1]!, tp[k]!, tp[k + 1]!)) hits++;
-      }
-    }
-    expect(hits).toBe(0);
+    const link = doc.edges.find((e) => e.label === "là tung độ đỉnh")!;
+    const pts = polyline(routes.get(link.id)!);
+    const len = pts.slice(1).reduce((a, p, i) => a + Math.abs(p.x - pts[i]!.x) + Math.abs(p.y - pts[i]!.y), 0);
+    const f = doc.nodes.find((n) => n.id === link.from)!, t = doc.nodes.find((n) => n.id === link.to)!;
+    const shortest = Math.abs(f.x + f.w / 2 - (t.x + t.w / 2)) + Math.abs(f.y + f.h / 2 - (t.y + t.h / 2));
+    expect(len).toBeLessThanOrEqual(Math.max(shortest * 1.8, shortest + 300));
   });
   it("sơ đồ tư duy: đường nối ghi chú/liên hệ không xuyên hình", () => check(mindSample()));
 });

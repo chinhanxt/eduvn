@@ -9,7 +9,7 @@ const INFLATE = 4;
 const TURN = 24;
 const CROSS = 120;
 const OVERLAP = 700;
-const CURVE_CROSS = 2500;
+const CURVE_CROSS = 250; // một lần cắt đường cong cây rẻ hơn đi vòng quá ~250px
 
 type Side = 0 | 1 | 2 | 3; // 0 trên, 1 phải, 2 dưới, 3 trái
 const DIRS: [number, number][] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
@@ -86,6 +86,7 @@ class Grid {
   inflated: Rect[];
   blocked!: Uint8Array; // 0 chưa tính, 1 trống, 2 bị chặn
   steps!: Uint8Array;
+  usedKey!: Int32Array; // đường đã đi qua điểm này thuộc cổng đích nào (cùng cổng đích thì được nhập chung thành một trục)
   usedPt!: Uint8Array; // điểm lưới đã có đường khác đi qua → bit 1 ngang, bit 2 dọc
   gArr!: Float64Array;
   prevArr!: Int32Array;
@@ -103,6 +104,7 @@ class Grid {
     this.blocked = new Uint8Array(cells);
     this.steps = new Uint8Array(cells * 2);
     this.usedPt = new Uint8Array(cells);
+    this.usedKey = new Int32Array(cells);
     this.gArr = new Float64Array(cells * 4).fill(Infinity);
     this.prevArr = new Int32Array(cells * 4);
     this.inflated = rects.map((r) => ({ x: r.x - INFLATE, y: r.y - INFLATE, w: r.w + 2 * INFLATE, h: r.h + 2 * INFLATE }));
@@ -163,18 +165,18 @@ class Grid {
     }
     return c;
   }
-  mark(pts: Pt[]) {
+  mark(pts: Pt[], key = 0) {
     for (let s = 0; s + 1 < pts.length; s++) {
       const a = pts[s]!, b = pts[s + 1]!;
       const horiz = a.y === b.y;
       const bit = horiz ? 1 : 2;
       const i0 = this.nearest(Math.min(a.x, b.x), this.xs), i1 = this.nearest(Math.max(a.x, b.x), this.xs);
       const j0 = this.nearest(Math.min(a.y, b.y), this.ys), j1 = this.nearest(Math.max(a.y, b.y), this.ys);
-      for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) this.usedPt[this.idx(i, j)]! |= bit;
+      for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) (this.usedPt[this.idx(i, j)]! |= bit, (this.usedKey[this.idx(i, j)] = key));
     }
   }
   /** A* từ điểm lưới (si,sj) tới (ti,tj), có phạt rẽ và phạt cắt/đè đường khác. */
-  astar(si: number, sj: number, ti: number, tj: number, startDir: number, cap = 40000, penalise = true): Pt[] | null {
+  astar(si: number, sj: number, ti: number, tj: number, startDir: number, cap = 40000, penalise = true, busKey = 0): Pt[] | null {
     const NY = this.ys.length;
     const key = (i: number, j: number, d: number) => (i * NY + j) * 4 + d;
     const g = this.gArr;
@@ -212,9 +214,11 @@ class Grid {
         if (ni < 0 || nj < 0 || ni >= this.xs.length || nj >= NY) continue;
         if (this.isBlocked(ni, nj) || this.stepBlocked(i, j, ni, nj)) continue;
         let cost = Math.abs(this.xs[ni]! - this.xs[i]!) + Math.abs(this.ys[nj]! - this.ys[j]!);
+        const bus = busKey !== 0 && this.usedKey[this.idx(ni, nj)] === busKey && this.usedPt[this.idx(ni, nj)] !== 0;
+        if (bus) cost *= 0.4; // đi chung trục với đường cùng cổng đích: rẻ hơn, khuyến khích nhập một
         if (nd !== d) cost += TURN;
         if (penalise && this.curves.length) cost += CURVE_CROSS * this.curveCross(i, j, ni, nj);
-        const used = penalise ? this.usedPt[this.idx(ni, nj)]! : 0;
+        const used = penalise && !bus ? this.usedPt[this.idx(ni, nj)]! : 0;
         if (used) cost += used & (nd % 2 === 0 ? 2 : 1) ? OVERLAP : CROSS;
         if (used && nd !== d) cost += OVERLAP; // rẽ ngay trên đường khác = ngã ba, đọc như nối vào nhau
         const nk = key(ni, nj, nd);
@@ -308,20 +312,61 @@ function portPt(n: DNode, s: Side, off: number): PortPt {
   return { p, o, s };
 }
 
-/** Chia cổng: nhiều đường vào/ra cùng một cạnh hình thì mỗi đường một vị trí riêng (xếp theo toạ độ đầu kia). */
+/** Chia cổng. Đường RA: mỗi đường một vị trí riêng nếu cùng cạnh (có cạnh khác trống thì chuyển sang cạnh đó cho đỡ gấp khúc);
+ *  đường VÀO cùng một cạnh hình thì dùng chung một cổng (nhập thành một trục). Cạnh chỉ có một đường thì cổng ở giữa. */
 function spreadPorts(byId: Map<string, DNode>, edges: DEdge[]): Map<string, { a: PortPt; b: PortPt }> {
-  const sides = new Map<string, [Side, Side]>();
-  const groups = new Map<string, { key: string; end: number; at: number }[]>();
+  const pairs = new Map<string, [Side, Side]>();
   for (const e of edges) {
     const a = byId.get(e.from), b = byId.get(e.to);
     if (!a || !b || a === b) continue;
-    const pr = sidePairs(rectOf(a), rectOf(b))[0]!;
-    sides.set(e.id, pr);
+    pairs.set(e.id, sidePairs(rectOf(a), rectOf(b))[0]!);
+  }
+  // hai đường ra cùng một cạnh: giữ đường thẳng hàng nhất, đường còn lại chuyển sang cạnh trống hướng về đích
+  const usage = () => {
+    const u = new Map<string, number>();
+    for (const e of edges) {
+      const pr = pairs.get(e.id);
+      if (!pr) continue;
+      u.set(`${e.from}|${pr[0]}`, (u.get(`${e.from}|${pr[0]}`) ?? 0) + 1);
+      u.set(`${e.to}|${pr[1]}`, (u.get(`${e.to}|${pr[1]}`) ?? 0) + 1);
+    }
+    return u;
+  };
+  const outBy = new Map<string, DEdge[]>();
+  for (const e of edges) {
+    const pr = pairs.get(e.id);
+    if (pr) outBy.set(`${e.from}|${pr[0]}`, [...(outBy.get(`${e.from}|${pr[0]}`) ?? []), e]);
+  }
+  for (const [k, list] of outBy) {
+    if (list.length < 2) continue;
+    const [nid, sd] = k.split("|") as [string, string];
+    const n = byId.get(nid)!, s0 = Number(sd);
+    const dev = (e: DEdge) => {
+      const o = byId.get(e.to)!;
+      return s0 % 2 === 0 ? Math.abs(o.x + o.w / 2 - (n.x + n.w / 2)) : Math.abs(o.y + o.h / 2 - (n.y + n.h / 2));
+    };
+    const sorted = [...list].sort((x, y) => dev(x) - dev(y));
+    for (const e of sorted.slice(1)) {
+      const u = usage();
+      const o = byId.get(e.to)!;
+      const cands = sidePairs(rectOf(n), rectOf(o)).filter(([s, t]) => s !== s0 && !u.get(`${nid}|${s}`) && Math.abs(port(rectOf(n), s).x - port(rectOf(o), t).x) + Math.abs(port(rectOf(n), s).y - port(rectOf(o), t).y) < 4000);
+      const facing = cands.find(([s]) => {
+        const v = { x: o.x + o.w / 2 - (n.x + n.w / 2), y: o.y + o.h / 2 - (n.y + n.h / 2) };
+        return DIRS[s]![0] * v.x + DIRS[s]![1] * v.y > 0;
+      });
+      if (facing) pairs.set(e.id, facing);
+    }
+  }
+  // gom theo (nút, cạnh): ô RA mỗi đường một ô; mọi đường VÀO chung một ô
+  type Slot = { id: string; end: number; at: number };
+  const groups = new Map<string, Slot[]>();
+  for (const e of edges) {
+    const pr = pairs.get(e.id);
+    if (!pr) continue;
+    const a = byId.get(e.from)!, b = byId.get(e.to)!;
     const add = (n: DNode, s: Side, end: number, other: DNode) => {
       const k = `${n.id}|${s}`;
-      const g = groups.get(k) ?? [];
-      g.push({ key: e.id, end, at: s % 2 === 0 ? other.x + other.w / 2 : other.y + other.h / 2 });
-      groups.set(k, g);
+      groups.set(k, [...(groups.get(k) ?? []), { id: e.id, end, at: s % 2 === 0 ? other.x + other.w / 2 : other.y + other.h / 2 }]);
     };
     add(a, pr[0], 0, b);
     add(b, pr[1], 1, a);
@@ -330,15 +375,22 @@ function spreadPorts(byId: Map<string, DNode>, edges: DEdge[]): Map<string, { a:
   for (const [k, g] of groups) {
     const [nid, sd] = k.split("|") as [string, string];
     const n = byId.get(nid)!, s = Number(sd);
-    g.sort((x, y) => x.at - y.at || x.key.localeCompare(y.key));
+    const slots: { ids: string[]; at: number }[] = [];
+    const ins = g.filter((x) => x.end === 1);
+    for (const x of g.filter((y) => y.end === 0)) slots.push({ ids: [`${x.id}:0`], at: x.at });
+    if (ins.length) slots.push({ ids: ins.map((x) => `${x.id}:1`), at: ins.reduce((a, x) => a + x.at, 0) / ins.length });
+    slots.sort((x, y) => x.at - y.at || x.ids[0]!.localeCompare(y.ids[0]!));
     const len = s % 2 === 0 ? n.w : n.h;
     const usable = n.shape === "diamond" || n.shape === "ellipse" || n.shape === "cloud" ? 0.55 : 0.85;
-    const gap = Math.min(26, (len * usable) / Math.max(1, g.length));
-    g.forEach((it, i) => off.set(`${it.key}:${it.end}`, g.length === 1 ? 0 : Math.round((i - (g.length - 1) / 2) * gap)));
+    const gap = Math.min(26, (len * usable) / Math.max(1, slots.length));
+    slots.forEach((sl, i) => {
+      const o = slots.length === 1 ? 0 : Math.round((i - (slots.length - 1) / 2) * gap);
+      for (const id of sl.ids) off.set(id, o);
+    });
   }
   const out = new Map<string, { a: PortPt; b: PortPt }>();
   for (const e of edges) {
-    const pr = sides.get(e.id);
+    const pr = pairs.get(e.id);
     if (!pr) continue;
     out.set(e.id, { a: portPt(byId.get(e.from)!, pr[0], off.get(`${e.id}:0`) ?? 0), b: portPt(byId.get(e.to)!, pr[1], off.get(`${e.id}:1`) ?? 0) });
   }
@@ -353,13 +405,18 @@ export function routeAll(doc: DiagramDoc, opts: RouteOpts = {}): Map<string, Rou
   const exX: number[] = [], exY: number[] = [];
   for (const pp of ports.values()) for (const q of [pp.a, pp.b]) (exX.push(q.o.x), exY.push(q.o.y));
   const grid = new Grid(doc.nodes.map(rectOf), exX, exY);
+  const nodeIdx = new Map(doc.nodes.map((n, i) => [n.id, i]));
+  const keyOf = (e: DEdge) => {
+    const pp = ports.get(e.id);
+    return pp ? nodeIdx.get(e.to)! * 4 + pp.b.s + 1 : 0;
+  };
   const result = new Map<string, Route>();
   const todo: DEdge[] = [];
   for (const e of doc.edges) {
     const keep = opts.only && !opts.only.has(e.id) ? opts.existing?.get(e.id) : undefined;
     if (keep) {
       result.set(e.id, keep);
-      if (keep.kind === "poly") grid.mark(keep.pts);
+      if (keep.kind === "poly") grid.mark(keep.pts, keyOf(e));
       else grid.addCurve(dense(keep));
     } else todo.push(e);
   }
@@ -372,15 +429,15 @@ export function routeAll(doc: DiagramDoc, opts: RouteOpts = {}): Map<string, Rou
   for (const e of todo) {
     const a = byId.get(e.from), b = byId.get(e.to);
     if (!a || !b || a === b) continue;
-    const r = routeOne(grid, doc.nodes, a, b, isTree(e), ports.get(e.id));
+    const r = routeOne(grid, doc.nodes, a, b, isTree(e), ports.get(e.id), keyOf(e));
     result.set(e.id, r);
-    if (r.kind === "poly") grid.mark(r.pts);
+    if (r.kind === "poly") grid.mark(r.pts, keyOf(e));
     else grid.addCurve(dense(r));
   }
   return result;
 }
 
-function routeOne(grid: Grid, nodes: DNode[], a: DNode, b: DNode, tree: boolean, pp?: { a: PortPt; b: PortPt }): Route {
+function routeOne(grid: Grid, nodes: DNode[], a: DNode, b: DNode, tree: boolean, pp?: { a: PortPt; b: PortPt }, key = 0): Route {
   const ra = rectOf(a), rb = rectOf(b);
   if (tree) {
     const right = rb.x >= ra.x + ra.w, left = rb.x + rb.w <= ra.x;
@@ -397,12 +454,12 @@ function routeOne(grid: Grid, nodes: DNode[], a: DNode, b: DNode, tree: boolean,
   const tries: [PortPt, PortPt][] = [];
   if (pp) tries.push([pp.a, pp.b]);
   for (const [s, t] of sidePairs(ra, rb).slice(0, 5)) tries.push([{ p: port(ra, s), o: out(port(ra, s), s), s }, { p: port(rb, t), o: out(port(rb, t), t), s: t }]);
-  for (const [A, B] of tries) {
+  for (const [ti, [A, B]] of tries.entries()) {
     const i0 = grid.nearest(A.o.x, grid.xs), j0 = grid.nearest(A.o.y, grid.ys);
     const i3 = grid.nearest(B.o.x, grid.xs), j3 = grid.nearest(B.o.y, grid.ys);
     if (Math.abs(grid.xs[i0]! - A.o.x) > 1 || Math.abs(grid.ys[j0]! - A.o.y) > 1 || Math.abs(grid.xs[i3]! - B.o.x) > 1 || Math.abs(grid.ys[j3]! - B.o.y) > 1) continue;
     if (grid.isBlocked(i0, j0) || grid.isBlocked(i3, j3)) continue;
-    const mid = grid.astar(i0, j0, i3, j3, A.s, grid.curves.length ? 6000 : 2000) ?? grid.astar(i0, j0, i3, j3, A.s, 40000, false);
+    const mid = grid.astar(i0, j0, i3, j3, A.s, grid.curves.length ? 6000 : 2000, true, ti === 0 && pp ? key : 0) ?? grid.astar(i0, j0, i3, j3, A.s, 40000, false);
     if (mid) return { kind: "poly", pts: simplify([A.p, ...mid, B.p]) };
   }
   return { kind: "poly", pts: simplify([tries[0]![0].p, tries[0]![1].p]) };
