@@ -9,6 +9,7 @@ const INFLATE = 4;
 const TURN = 24;
 const CROSS = 120;
 const OVERLAP = 700;
+const CURVE_CROSS = 2500;
 
 type Side = 0 | 1 | 2 | 3; // 0 trên, 1 phải, 2 dưới, 3 trái
 const DIRS: [number, number][] = [[0, -1], [1, 0], [0, 1], [-1, 0]];
@@ -212,9 +213,10 @@ class Grid {
         if (this.isBlocked(ni, nj) || this.stepBlocked(i, j, ni, nj)) continue;
         let cost = Math.abs(this.xs[ni]! - this.xs[i]!) + Math.abs(this.ys[nj]! - this.ys[j]!);
         if (nd !== d) cost += TURN;
-        if (penalise && this.curves.length) cost += CROSS * this.curveCross(i, j, ni, nj);
+        if (penalise && this.curves.length) cost += CURVE_CROSS * this.curveCross(i, j, ni, nj);
         const used = penalise ? this.usedPt[this.idx(ni, nj)]! : 0;
         if (used) cost += used & (nd % 2 === 0 ? 2 : 1) ? OVERLAP : CROSS;
+        if (used && nd !== d) cost += OVERLAP; // rẽ ngay trên đường khác = ngã ba, đọc như nối vào nhau
         const nk = key(ni, nj, nd);
         const ng = gc + cost;
         if (ng < g[nk]!) {
@@ -251,6 +253,10 @@ function sidePairs(a: Rect, b: Rect): [Side, Side][] {
       const p = port(a, s), q = port(b, t);
       let c = Math.abs(p.x - q.x) + Math.abs(p.y - q.y);
       if (DIRS[s]![0] * v.x + DIRS[s]![1] * v.y < 0) c += 400; // cổng quay lưng về đích
+      // đích chủ yếu nằm dưới/trên thì ưu tiên cổng dọc, chủ yếu bên cạnh thì ưu tiên cổng ngang
+      const vertical = Math.abs(v.y) / (a.h / 2 + b.h / 2) >= Math.abs(v.x) / (a.w / 2 + b.w / 2);
+      if (vertical !== (s % 2 === 0)) c += 160;
+      if (vertical !== (t % 2 === 0)) c += 160;
       if (DIRS[t]![0] * -v.x + DIRS[t]![1] * -v.y < 0) c += 400;
       all.push({ s: [s, t], c });
     }
@@ -277,6 +283,9 @@ export function pathD(r: Route): string {
   const [a, b, c, d] = r.pts as [Pt, Pt, Pt, Pt];
   return `M${a.x} ${a.y} C${b.x} ${b.y} ${c.x} ${c.y} ${d.x} ${d.y}`;
 }
+
+/** Mẫu dày (~4px) của đường cong để kiểm giao. */
+const dense = (r: Route): Pt[] => Array.from({ length: 49 }, (_, i) => bezierAt(r.pts, i / 48));
 
 export type RouteOpts = { only?: Set<string>; existing?: Map<string, Route> };
 
@@ -351,7 +360,7 @@ export function routeAll(doc: DiagramDoc, opts: RouteOpts = {}): Map<string, Rou
     if (keep) {
       result.set(e.id, keep);
       if (keep.kind === "poly") grid.mark(keep.pts);
-      else grid.addCurve(polyline(keep));
+      else grid.addCurve(dense(keep));
     } else todo.push(e);
   }
   // cạnh cây (Bézier) trước, rồi cạnh ngắn, đường vòng dài sau
@@ -366,7 +375,7 @@ export function routeAll(doc: DiagramDoc, opts: RouteOpts = {}): Map<string, Rou
     const r = routeOne(grid, doc.nodes, a, b, isTree(e), ports.get(e.id));
     result.set(e.id, r);
     if (r.kind === "poly") grid.mark(r.pts);
-    else grid.addCurve(polyline(r));
+    else grid.addCurve(dense(r));
   }
   return result;
 }
@@ -393,7 +402,7 @@ function routeOne(grid: Grid, nodes: DNode[], a: DNode, b: DNode, tree: boolean,
     const i3 = grid.nearest(B.o.x, grid.xs), j3 = grid.nearest(B.o.y, grid.ys);
     if (Math.abs(grid.xs[i0]! - A.o.x) > 1 || Math.abs(grid.ys[j0]! - A.o.y) > 1 || Math.abs(grid.xs[i3]! - B.o.x) > 1 || Math.abs(grid.ys[j3]! - B.o.y) > 1) continue;
     if (grid.isBlocked(i0, j0) || grid.isBlocked(i3, j3)) continue;
-    const mid = grid.astar(i0, j0, i3, j3, A.s, 1500) ?? grid.astar(i0, j0, i3, j3, A.s, 40000, false);
+    const mid = grid.astar(i0, j0, i3, j3, A.s, grid.curves.length ? 6000 : 2000) ?? grid.astar(i0, j0, i3, j3, A.s, 40000, false);
     if (mid) return { kind: "poly", pts: simplify([A.p, ...mid, B.p]) };
   }
   return { kind: "poly", pts: simplify([tries[0]![0].p, tries[0]![1].p]) };

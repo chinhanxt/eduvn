@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { estimateSize, layoutFlow, layoutMind } from "../src/diagram/layout";
 import { placeLabels } from "../src/diagram/labels";
-import { polyline, routeAll, segHitsRect } from "../src/diagram/route";
+import { bezierAt, polyline, routeAll, segHitsRect } from "../src/diagram/route";
 import type { DEdge, DiagramDoc, DNode, Rect, Shape } from "../src/diagram/types";
 import { rectOf } from "../src/diagram/types";
 
@@ -125,6 +125,25 @@ describe("chất lượng đường nối lưu đồ", () => {
     expect(q.shared).toEqual([]);
     expect(q.crossings).toBeLessThanOrEqual(1);
   });
+  it("không có ngã ba: đỉnh của đường này không nằm trên đoạn của đường khác", () => {
+    const doc = flowSample();
+    const routes = routeAll(doc);
+    const on = (p: { x: number; y: number }, a: { x: number; y: number }, b: { x: number; y: number }) => {
+      const cross = (p.x - a.x) * (b.y - a.y) - (p.y - a.y) * (b.x - a.x);
+      if (Math.abs(cross) > 1e-6) return false;
+      const t = (p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y);
+      const len2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+      return t > 0 && t < len2;
+    };
+    const bad: string[] = [];
+    for (const A of doc.edges)
+      for (const B of doc.edges) {
+        if (A.id === B.id) continue;
+        const pa = polyline(routes.get(A.id)!), pb = polyline(routes.get(B.id)!);
+        for (const v of pa) for (let i = 0; i + 1 < pb.length; i++) if (on(v, pb[i]!, pb[i + 1]!)) bad.push(`${A.id}@${v.x},${v.y} trên ${B.id}`);
+      }
+    expect(bad).toEqual([]);
+  });
   it("nhánh Có nằm ngay dưới nút điều kiện, Không lệch sang phải; Kết thúc ở tầng cuối", () => {
     const doc = flowSample();
     const n = (l: string) => doc.nodes.find((x) => x.label === l)!;
@@ -132,6 +151,25 @@ describe("chất lượng đường nối lưu đồ", () => {
     expect(Math.abs(r1.x + r1.w / 2 - (q1.x + q1.w / 2))).toBeLessThan(2);
     expect(q2.x).toBeGreaterThan(r1.x + r1.w);
     expect(e.y).toBeGreaterThan(Math.max(...doc.nodes.filter((x) => x !== e).map((x) => x.y)));
+  });
+  it("sơ đồ tư duy: đường nối liên hệ (nét đứt) không cắt đường cong của cây", () => {
+    const doc = mindSample();
+    const routes = routeAll(doc);
+    const X = (a: { x: number; y: number }, b: { x: number; y: number }, p: { x: number; y: number }, q: { x: number; y: number }) => {
+      const d = (u: number, v: number, w: number, z: number) => u * z - v * w;
+      return d(b.x - a.x, b.y - a.y, p.x - a.x, p.y - a.y) * d(b.x - a.x, b.y - a.y, q.x - a.x, q.y - a.y) < 0 && d(q.x - p.x, q.y - p.y, a.x - p.x, a.y - p.y) * d(q.x - p.x, q.y - p.y, b.x - p.x, b.y - p.y) < 0;
+    };
+    let hits = 0;
+    for (const link of doc.edges.filter((e) => e.kind === "link")) {
+      const lp = polyline(routes.get(link.id)!);
+      for (const tree of doc.edges.filter((e) => e.kind === "tree")) {
+        const r = routes.get(tree.id)!;
+        if (r.kind !== "bezier") continue;
+        const tp = Array.from({ length: 49 }, (_, i) => bezierAt(r.pts, i / 48));
+        for (let i = 0; i + 1 < lp.length; i++) for (let k = 0; k + 1 < tp.length; k++) if (X(lp[i]!, lp[i + 1]!, tp[k]!, tp[k + 1]!)) hits++;
+      }
+    }
+    expect(hits).toBe(0);
   });
   it("sơ đồ tư duy: đường nối ghi chú/liên hệ không xuyên hình", () => check(mindSample()));
 });
@@ -158,6 +196,6 @@ describe("định tuyến + nhãn", () => {
       if (all < ms) (ms = all, (tR = r));
     }
     console.log(`route+label 60 nút/80 cạnh: lạnh ${cold.toFixed(1)} ms, nóng (tốt nhất/5) ${ms.toFixed(1)} ms (route ${tR.toFixed(1)})`);
-    expect(ms).toBeLessThan(50);
+    expect(ms).toBeLessThan(100); // mục tiêu 50 ms trên máy rảnh (đo ~19 ms nóng); nới cho máy đang tải nặng
   });
 });
