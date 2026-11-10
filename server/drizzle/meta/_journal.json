@@ -57,6 +57,13 @@
       "when": 1793953831089,
       "tag": "0007_calm_scrambler",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794273385973,
+      "tag": "0008_whole_butterfly",
+      "breakpoints": true
     }
   ]
 }
