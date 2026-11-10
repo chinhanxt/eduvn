@@ -27,6 +27,8 @@ import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
 import { StudentItem } from "../domain/roster";
+import { createTutor } from "../tutor";
+import { registerTutorRoutes } from "./routes/tutor";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string; ai?: Ai };
@@ -328,6 +330,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     const { kind, term } = z.object({ kind: z.enum(["class_list", "gradebook"]), term: z.enum(["HK1", "HK2"]).optional() }).parse(req.body);
     return makeClassLink(actor, Cid(req), kind, term);
   });
+
+  registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

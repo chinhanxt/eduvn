@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, primaryKey, real, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, primaryKey, real, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { ROLES } from "../domain/authz";
 import type { Scale } from "../domain/comments";
 import type { GradeColumn } from "../domain/gradebook";
@@ -249,4 +249,225 @@ export const games = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("games_org_idx").on(t.orgId)],
+);
+
+// ---- Gia sư AI (P6, port từ DeepTutor) ------------------------------------
+
+const orgRef = () =>
+  uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" });
+const updatedAt = () => timestamp("updated_at", { withTimezone: true }).notNull().defaultNow();
+
+export const tutorKbs = pgTable(
+  "tutor_kbs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: orgRef(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    name: text("name").notNull(),
+    subject: text("subject").notNull(),
+    grade: integer("grade").notNull(),
+    classId: uuid("class_id").references(() => classes.id, { onDelete: "set null" }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("tutor_kbs_org_idx").on(t.orgId)],
+);
+
+export const tutorDocs = pgTable(
+  "tutor_docs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kbId: uuid("kb_id")
+      .notNull()
+      .references(() => tutorKbs.id, { onDelete: "cascade" }),
+    orgId: orgRef(),
+    name: text("name").notNull(),
+    source: text("source").notNull(),
+    pages: integer("pages").notNull(),
+    chars: integer("chars").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("tutor_docs_kb_idx").on(t.kbId)],
+);
+
+export const tutorChunks = pgTable(
+  "tutor_chunks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    docId: uuid("doc_id")
+      .notNull()
+      .references(() => tutorDocs.id, { onDelete: "cascade" }),
+    kbId: uuid("kb_id")
+      .notNull()
+      .references(() => tutorKbs.id, { onDelete: "cascade" }),
+    page: integer("page").notNull(),
+    idx: integer("idx").notNull(),
+    text: text("text").notNull(),
+  },
+  (t) => [index("tutor_chunks_kb_idx").on(t.kbId)],
+);
+
+export type TutorCitation = { n: number; docId: string; doc: string; page: number; snippet: string };
+
+export const tutorSessions = pgTable(
+  "tutor_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: orgRef(),
+    learnerKey: text("learner_key").notNull(),
+    kbId: uuid("kb_id").references(() => tutorKbs.id, { onDelete: "set null" }),
+    mode: text("mode").notNull().default("chat"),
+    title: text("title").notNull().default("Cuộc trò chuyện mới"),
+    summary: text("summary").notNull().default(""),
+    summarizedCount: integer("summarized_count").notNull().default(0),
+    context: jsonb("context").$type<{ bookPageId?: string }>().notNull().default({}),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("tutor_sessions_learner_idx").on(t.orgId, t.learnerKey)],
+);
+
+export const tutorMessages = pgTable(
+  "tutor_messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => tutorSessions.id, { onDelete: "cascade" }),
+    seq: integer("seq").notNull(),
+    role: text("role").notNull(),
+    content: text("content").notNull(),
+    citations: jsonb("citations").$type<TutorCitation[]>().notNull().default([]),
+    createdAt: createdAt(),
+  },
+  (t) => [index("tutor_messages_session_idx").on(t.sessionId, t.seq)],
+);
+
+export const tutorReviewState = pgTable(
+  "tutor_review_state",
+  {
+    orgId: orgRef(),
+    learnerKey: text("learner_key").notNull(),
+    questionId: uuid("question_id").notNull(),
+    subject: text("subject").notNull(),
+    grade: integer("grade").notNull(),
+    topic: text("topic").notNull(),
+    intervalDays: real("interval_days").notNull(),
+    ease: real("ease").notNull(),
+    streak: integer("streak").notNull(),
+    lapses: integer("lapses").notNull(),
+    reviewCount: integer("review_count").notNull(),
+    version: integer("version").notNull(),
+    dueAt: timestamp("due_at", { withTimezone: true }).notNull(),
+    lastReviewAt: timestamp("last_review_at", { withTimezone: true }).notNull(),
+    prev: jsonb("prev").$type<Record<string, number> | null>(),
+    lastCorrect: boolean("last_correct").notNull().default(true),
+    isMistake: boolean("is_mistake").notNull().default(false),
+    firstWrongAt: timestamp("first_wrong_at", { withTimezone: true }),
+  },
+  (t) => [primaryKey({ columns: [t.orgId, t.learnerKey, t.questionId] }), index("tutor_review_due_idx").on(t.orgId, t.learnerKey, t.dueAt)],
+);
+
+export const tutorReviewEvents = pgTable(
+  "tutor_review_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: orgRef(),
+    learnerKey: text("learner_key").notNull(),
+    questionId: uuid("question_id").notNull(),
+    rating: text("rating").notNull(),
+    correct: boolean("correct").notNull(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("tutor_review_events_idx").on(t.orgId, t.learnerKey, t.reviewedAt)],
+);
+
+export type TutorPathBody = {
+  description: string;
+  modules: { name: string; objective: string; pointIds: string[] }[];
+  points: import("../domain/tutorLearning").Point[];
+  /** Bài đang chờ chấm (đáp án giữ ở máy chủ). */
+  pending: { kind: "diagnostic" | "quiz"; pointId: string | null; items: { question: string; answer: string; explanation: string; pointId: string }[] } | null;
+  diagnosed: boolean;
+  errors: { pointId: string; question: string; errorType: string; remediation: string; at: number }[];
+};
+
+export const tutorPaths = pgTable(
+  "tutor_paths",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: orgRef(),
+    learnerKey: text("learner_key").notNull(),
+    kbId: uuid("kb_id").references(() => tutorKbs.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    goal: text("goal").notNull(),
+    subject: text("subject").notNull(),
+    grade: integer("grade").notNull(),
+    body: jsonb("body").$type<TutorPathBody>().notNull(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("tutor_paths_learner_idx").on(t.orgId, t.learnerKey)],
+);
+
+export const tutorDrafts = pgTable(
+  "tutor_question_drafts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: orgRef(),
+    ownerId: text("owner_id").notNull(),
+    /** pending = chờ GV duyệt; practice = HS luyện ngay (riêng của ownerId); approved/rejected. */
+    status: text("status").notNull(),
+    kbId: uuid("kb_id").references(() => tutorKbs.id, { onDelete: "set null" }),
+    subject: text("subject").notNull(),
+    grade: integer("grade").notNull(),
+    topic: text("topic").notNull(),
+    body: jsonb("body").$type<QuestionInput>().notNull(),
+    bankQuestionId: uuid("bank_question_id"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("tutor_drafts_org_idx").on(t.orgId, t.status)],
+);
+
+export type BookBlock = { type: string; title?: string; markdown?: string; data?: unknown; citations?: TutorCitation[] };
+
+export const tutorBooks = pgTable(
+  "tutor_books",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: orgRef(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    kbId: uuid("kb_id").references(() => tutorKbs.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    description: text("description").notNull().default(""),
+    scope: text("scope").notNull().default(""),
+    level: text("level").notNull().default("mixed"),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("tutor_books_org_idx").on(t.orgId)],
+);
+
+export const tutorBookPages = pgTable(
+  "tutor_book_pages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    bookId: uuid("book_id")
+      .notNull()
+      .references(() => tutorBooks.id, { onDelete: "cascade" }),
+    idx: integer("idx").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary").notNull().default(""),
+    objectives: jsonb("objectives").$type<string[]>().notNull().default([]),
+    contentType: text("content_type").notNull().default("theory"),
+    status: text("status").notNull().default("planned"),
+    blocks: jsonb("blocks").$type<BookBlock[]>().notNull().default([]),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index("tutor_book_pages_idx").on(t.bookId, t.idx)],
 );
