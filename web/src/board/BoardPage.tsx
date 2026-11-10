@@ -4,7 +4,10 @@ import { Link, useParams } from "react-router";
 import { type BankQuestion, gradeLabel } from "../api";
 import { Icon } from "../Icon";
 import "./board.css";
-import { type BoardObj, type GraphObj, graphFromExprs, newId, newSolid, PALETTE, type Stroke } from "./doc";
+import { download } from "../diagram/export";
+import { type BoardObj, type GraphObj, graphFromExprs, newId, newSolid, PALETTE, SHAPE_KINDS, type ShapeKind, type ShapeObj, type Stroke, type TextObj } from "./doc";
+import { boardPng } from "./exportPng";
+import { ShapeView, TextDialog, TextView } from "./ShapeView";
 import { GraphDialog, GraphView } from "./GraphView";
 import { hitStroke, strokePath } from "./ink";
 import { Projector } from "./Projector";
@@ -12,7 +15,10 @@ import { SolidPicker, SolidView } from "./SolidView";
 import { SuggestPanel } from "./SuggestPanel";
 import { useBoard } from "./useBoard";
 
-export type Tool = "pointer" | "pen" | "eraser";
+export type Tool = "pointer" | "pen" | "eraser" | ShapeKind | "text";
+const isShapeTool = (t: Tool): t is ShapeKind => (SHAPE_KINDS as readonly string[]).includes(t);
+const SHAPE_TITLE: Record<ShapeKind, string> = { line: "Đoạn thẳng (L)", arrow: "Mũi tên (A)", rect: "Hình chữ nhật (R)", triangle: "Tam giác", circle: "Đường tròn (O)", polygon: "Đa giác (bấm từng đỉnh, Enter để đóng)" };
+const SHAPE_ICON: Record<ShapeKind, string> = { line: "M5 19L19 5", arrow: "M5 19L19 5M10 5H19V14", rect: "M4 6H20V18H4Z", triangle: "M12 5L20 19H4Z", circle: "M12 4A8 8 0 1 0 12.01 4Z", polygon: "M6 7L17 5L20 14L11 19L4 13Z" };
 export const W = 1280;
 export const H = 720;
 export type ToBoard = (e: { clientX: number; clientY: number }) => [number, number];
@@ -31,6 +37,11 @@ export function BoardPage() {
   const [draft, setDraft] = useState<number[] | null>(null);
   const [graphDlg, setGraphDlg] = useState<{ edit?: GraphObj } | null>(null);
   const [picker, setPicker] = useState(false);
+  const [shapeDraft, setShapeDraft] = useState<ShapeObj | null>(null);
+  const [poly, setPoly] = useState<number[] | null>(null);
+  const [hover, setHover] = useState<[number, number] | null>(null);
+  const [fill, setFill] = useState(false);
+  const [textDlg, setTextDlg] = useState<{ edit?: TextObj; x: number; y: number } | null>(null);
   const [suggest, setSuggest] = useState(false);
   const [projected, setProjected] = useState<BankQuestion | null>(null);
   const erasing = useRef<{ snapped: boolean } | null>(null);
@@ -56,6 +67,13 @@ export function BoardPage() {
         b.removeObjs([selected]);
         setSelected(null);
       } else if (mod || e.altKey) return;
+      else if (e.key === "Enter" && poly) finishPoly();
+      else if (e.key === "Escape" && (poly || shapeDraft)) (setPoly(null), setShapeDraft(null));
+      else if (e.key === "l") setTool("line");
+      else if (e.key === "a") setTool("arrow");
+      else if (e.key === "r") setTool("rect");
+      else if (e.key === "o") setTool("circle");
+      else if (e.key === "t") setTool("text");
       else if (e.key === "v") setTool("pointer");
       else if (e.key === "p") setTool("pen");
       else if (e.key === "e") setTool("eraser");
@@ -65,6 +83,9 @@ export function BoardPage() {
   });
 
   useEffect(() => setSelected(null), [b.page]);
+  useEffect(() => {
+    if (tool !== "polygon") setPoly(null);
+  }, [tool]);
 
   if (!b.board || !b.doc || !b.current) return <div className="center">{b.error ?? "…"}</div>;
   const objs = b.current.objects;
@@ -78,6 +99,16 @@ export function BoardPage() {
     }
     b.removeObjs(hits, true);
   };
+  const mkShape = (kind: ShapeKind, pts: number[]): ShapeObj => ({ type: "shape", id: newId(), kind, color, width: 3.5, fill, pts: pts.map((v) => Math.round(v * 10) / 10) });
+  function finishPoly() {
+    if (poly && poly.length >= 6) {
+      const o = mkShape("polygon", poly);
+      b.addObj(o);
+      setSelected(o.id);
+    }
+    setPoly(null);
+    setHover(null);
+  }
   const onDown = (e: PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 || !e.isPrimary) return;
     const [x, y] = toBoard(e);
@@ -88,7 +119,17 @@ export function BoardPage() {
       svgRef.current?.setPointerCapture(e.pointerId);
       erasing.current = { snapped: false };
       erase(x, y);
-    } else setSelected(null);
+    } else if (tool === "polygon") {
+      const p: [number, number] = [Math.round(x), Math.round(y)];
+      if (poly && poly.length >= 6 && Math.hypot(p[0] - poly[0]!, p[1] - poly[1]!) < 14) return finishPoly();
+      const lx = poly?.[poly.length - 2], ly = poly?.[poly.length - 1];
+      if (lx !== undefined && Math.hypot(p[0] - lx, p[1] - ly!) < 4) return;
+      if ((poly?.length ?? 0) < 48) setPoly([...(poly ?? []), ...p]);
+    } else if (isShapeTool(tool)) {
+      svgRef.current?.setPointerCapture(e.pointerId);
+      setShapeDraft(mkShape(tool, [x, y, x, y]));
+    } else if (tool === "text") setTextDlg({ x: Math.round(x), y: Math.round(y) });
+    else setSelected(null);
   };
   const onMove = (e: PointerEvent<SVGSVGElement>) => {
     const [x, y] = toBoard(e);
@@ -96,6 +137,8 @@ export function BoardPage() {
       const lx = draft[draft.length - 2]!, ly = draft[draft.length - 1]!;
       if (draft.length < 4000 && Math.hypot(x - lx, y - ly) > 1.5) setDraft([...draft, Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
     } else if (erasing.current) erase(x, y);
+    else if (shapeDraft) setShapeDraft({ ...shapeDraft, pts: [shapeDraft.pts[0]!, shapeDraft.pts[1]!, x, y] });
+    else if (poly) setHover([x, y]);
   };
   const onUp = (e: PointerEvent<SVGSVGElement>) => {
     if (!e.isPrimary) return;
@@ -104,6 +147,15 @@ export function BoardPage() {
       b.addObj({ type: "stroke", id: newId(), color, width: 4.5, pts });
       setDraft(null);
     }
+    if (shapeDraft) {
+      const [x1, y1, x2, y2] = shapeDraft.pts as [number, number, number, number];
+      if (Math.hypot(x2 - x1, y2 - y1) >= 8) {
+        const o = mkShape(shapeDraft.kind, shapeDraft.pts);
+        b.addObj(o);
+        setSelected(o.id);
+      }
+      setShapeDraft(null);
+    }
     erasing.current = null;
   };
 
@@ -111,6 +163,15 @@ export function BoardPage() {
     <button className={on ? "bd-rb on" : "bd-rb"} title={title} onClick={onClick} data-testid={testId}><Icon name={icon} /></button>
   );
   const n = b.doc.pages.length;
+  const exportPng = async () => {
+    if (!svgRef.current) return;
+    try {
+      const name = b.board!.title.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "bang-giang";
+      download(`${name}-trang-${b.page + 1}.png`, await boardPng(svgRef.current, W, H));
+    } catch (e) {
+      b.setError(e instanceof Error ? e.message : "Không xuất được PNG");
+    }
+  };
 
   return (
     <div className="bd" ref={rootRef}>
@@ -122,6 +183,15 @@ export function BoardPage() {
         <div className="bd-sep" />
         {rail("graph", "Đồ thị hàm số", false, () => setGraphDlg({}), "t-graph")}
         {rail("box", "Hình không gian", picker, () => setPicker((p) => !p), "t-solid")}
+        <div className="bd-sep" />
+        {SHAPE_KINDS.map((k) => (
+          <button key={k} className={tool === k ? "bd-rb sh on" : "bd-rb sh"} title={SHAPE_TITLE[k]} onClick={() => setTool(k)} data-testid={`t-${k}`}>
+            <svg viewBox="0 0 24 24"><path d={SHAPE_ICON[k]} /></svg>
+          </button>
+        ))}
+        <button className={fill ? "bd-rb sh on" : "bd-rb sh"} title="Tô nền hình" onClick={() => setFill((f) => !f)} data-testid="t-fill"><svg viewBox="0 0 24 24"><path d="M4 6H20V18H4Z" fill="currentColor" fillOpacity=".35" /></svg></button>
+        <button className={tool === "text" ? "bd-rb tx on" : "bd-rb tx"} title="Ô chữ / công thức (T)" onClick={() => setTool("text")} data-testid="t-text">Aa</button>
+        <div className="bd-sep" />
         {rail("spark", "Gợi ý bài liên quan", suggest, () => setSuggest((s) => !s), "t-suggest")}
         <div className="bd-swatches">
           {PALETTE.map((c) => (
@@ -136,13 +206,14 @@ export function BoardPage() {
           <span className="bd-grow" />
           {b.error && <span className="bd-err" onClick={() => b.setError(null)}>{b.error}</span>}
           <span className={b.dirty ? "bd-state" : "bd-state ok"} data-testid="bd-state">{b.saving ? "Đang lưu…" : b.dirty ? "Chưa lưu" : "Đã lưu"}</span>
+          <button className="bd-btn" onClick={() => void exportPng()} title="Xuất trang này ra PNG" data-testid="bd-png"><Icon name="down" />PNG</button>
           <button className="bd-btn" onClick={b.undo} title="Hoàn tác (Ctrl+Z)"><Icon name="undo" /></button>
           <button className="bd-btn pri" onClick={() => void b.save()} data-testid="bd-save"><Icon name="save" />Lưu</button>
           <button className="bd-btn" onClick={() => void (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {})} title="Toàn màn hình"><Icon name="max" /></button>
         </header>
         <div className="bd-wrap">
           <div className="bd-stage" data-testid="bd-stage">
-            <svg ref={svgRef} className={`bd-svg bd-tool-${tool}`} viewBox={`0 0 ${W} ${H}`} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
+            <svg ref={svgRef} className={`bd-svg bd-tool-${tool}`} viewBox={`0 0 ${W} ${H}`} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} onDoubleClick={() => poly && finishPoly()}>
               <defs>
                 <pattern id="bd-dots" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(255,255,255,.07)" /></pattern>
               </defs>
@@ -150,6 +221,13 @@ export function BoardPage() {
               {objs.map((o) => renderObject(o))}
               {objs.map((o) => (o.type === "stroke" ? <path key={o.id} className="bd-ink" d={strokePath(o.pts, o.width)} fill={o.color} /> : null))}
               {draft && <path d={strokePath(draft, 4.5)} fill={color} />}
+              {shapeDraft && <ShapeView obj={shapeDraft} tool="pen" selected={false} onSelect={() => {}} b={b} toBoard={toBoard} />}
+              {poly && (
+                <g pointerEvents="none">
+                  <path d={`${poly.reduce((d, v, i) => (i % 2 ? `${d}${v} ` : `${d}${i ? "L" : "M"}${v} `), "")}${hover ? `L${hover[0]} ${hover[1]}` : ""}`} fill="none" stroke={color} strokeWidth={3.5} strokeDasharray="8 5" />
+                  {poly.length >= 6 && <circle cx={poly[0]} cy={poly[1]} r={9} fill="none" stroke="#8fa2ff" strokeWidth={2} />}
+                </g>
+              )}
             </svg>
             {projected && <Projector key={projected.id} q={projected} onClose={() => setProjected(null)} />}
           </div>
@@ -179,6 +257,22 @@ export function BoardPage() {
           }}
         />
       )}
+      {textDlg && (
+        <TextDialog
+          initial={textDlg.edit?.text}
+          onCancel={() => setTextDlg(null)}
+          onDone={(text) => {
+            if (textDlg.edit) b.updateObj(textDlg.edit.id, { text });
+            else {
+              const o: TextObj = { type: "text", id: newId(), x: textDlg.x, y: textDlg.y, size: 32, color, text };
+              b.addObj(o);
+              setSelected(o.id);
+              setTool("pointer");
+            }
+            setTextDlg(null);
+          }}
+        />
+      )}
       {picker && (
         <SolidPicker
           onClose={() => setPicker(false)}
@@ -198,6 +292,8 @@ export function BoardPage() {
     if (o.type === "graph")
       return <GraphView key={o.id} obj={o} tool={tool} selected={selected === o.id} onSelect={() => setSelected(o.id)} onEdit={() => setGraphDlg({ edit: o })} b={b} toBoard={toBoard} />;
     if (o.type === "solid") return <SolidView key={o.id} obj={o} tool={tool} selected={selected === o.id} onSelect={() => setSelected(o.id)} b={b} toBoard={toBoard} />;
+    if (o.type === "shape") return <ShapeView key={o.id} obj={o} tool={tool} selected={selected === o.id} onSelect={() => setSelected(o.id)} b={b} toBoard={toBoard} />;
+    if (o.type === "text") return <TextView key={o.id} obj={o} tool={tool} selected={selected === o.id} onSelect={() => setSelected(o.id)} onEdit={() => setTextDlg({ edit: o, x: o.x, y: o.y })} b={b} toBoard={toBoard} />;
     return null;
   }
 }

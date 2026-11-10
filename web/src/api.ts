@@ -138,3 +138,8 @@ export type BoardDetail = BoardSummary & { doc: BoardDoc };
 /** Câu hỏi đầy đủ (gợi ý bài, chiếu lên bảng). */
 export type BankQuestion = Question & { options?: string[]; statements?: string[]; answer: number | boolean[] | string; explanation?: string; rubric?: string; points?: number };
 export const gradeLabel = (g: number): string => (g <= 12 ? `Lớp ${g}` : `Năm ${g - 12}`);
+
+import type { DiagramDoc } from "./diagram/types";
+export type DiagramSummary = { id: string; title: string; subject: string; grade: number; topic: string; kind: "mind" | "flow"; nodeCount: number; updatedAt: string };
+export type DiagramDetail = DiagramSummary & { doc: DiagramDoc };
+export type AiDiagramResult = { nodes: { id: string; label: string; parent: string | null }[]; links: { from: string; to: string; label?: string }[] };

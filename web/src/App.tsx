@@ -22,6 +22,8 @@ const AiLessons = lazy(() => import("./pages/AiLessons").then((m) => ({ default:
 const AiLessonPage = lazy(() => import("./pages/AiLessonPage").then((m) => ({ default: m.AiLessonPage })));
 const Boards = lazy(() => import("./pages/Boards").then((m) => ({ default: m.Boards })));
 const BoardPage = lazy(() => import("./board/BoardPage").then((m) => ({ default: m.BoardPage })));
+const Diagrams = lazy(() => import("./pages/Diagrams").then((m) => ({ default: m.Diagrams })));
+const DiagramPage = lazy(() => import("./diagram/DiagramPage").then((m) => ({ default: m.DiagramPage })));
 const Games = lazy(() => import("./pages/Games").then((m) => ({ default: m.Games })));
 const Connect = lazy(() => import("./pages/Connect").then((m) => ({ default: m.Connect })));
 const MathKeyboard = lazy(() => import("./math/MathKeyboard").then((m) => ({ default: m.MathKeyboard })));
@@ -46,8 +48,10 @@ export function App() {
       ) : (
         <>
         <Route path="bang-giang/:id" element={<BoardPage />} />
+        <Route path="so-do/:id" element={<DiagramPage />} />
         <Route element={<Shell />}>
           <Route path="bang-giang" element={<Boards />} />
+          <Route path="so-do" element={<Diagrams />} />
           <Route index element={<Home />} />
           <Route path="ngan-hang" element={<Bank />} />
           <Route path="de-thi" element={<Exams />} />

@@ -71,6 +71,13 @@
       "when": 1794282256721,
       "tag": "0009_tutor",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794284992661,
+      "tag": "0010_diagrams",
+      "breakpoints": true
     }
   ]
 }

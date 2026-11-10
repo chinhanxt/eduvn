@@ -43,7 +43,27 @@ const Solid = z.object({
   section: Tri.nullable(),
   angle: Tri.nullable(),
 });
-const BoardObj = z.discriminatedUnion("type", [Stroke, Graph, Solid]);
+export const SHAPE_KINDS = ["line", "arrow", "rect", "triangle", "circle", "polygon"] as const;
+const Shape = z.object({
+  type: z.literal("shape"),
+  id: Id,
+  kind: z.enum(SHAPE_KINDS),
+  color: Color,
+  width: z.number().min(1).max(20),
+  fill: z.boolean(),
+  // line/arrow/rect/triangle/circle: [x1,y1,x2,y2] (khung bao); polygon: danh sách đỉnh [x,y,…]
+  pts: z.array(Num).min(4).max(48, "Đa giác tối đa 24 đỉnh"),
+});
+const Text = z.object({
+  type: z.literal("text"),
+  id: Id,
+  x: Num,
+  y: Num,
+  size: z.number().min(14).max(120),
+  color: Color,
+  text: z.string().min(1).max(500, "Chữ trên bảng tối đa 500 ký tự"),
+});
+const BoardObj = z.discriminatedUnion("type", [Stroke, Graph, Solid, Shape, Text]);
 export const BoardDocSchema = z.object({
   version: z.literal(1),
   pages: z

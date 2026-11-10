@@ -6,7 +6,12 @@ import { type PointRef, SOLIDS, type SolidKind } from "./solids";
 export type Stroke = { type: "stroke"; id: string; color: string; width: number; pts: number[] };
 export type GraphObj = { type: "graph"; id: string; x: number; y: number; w: number; h: number; exprs: { latex: string; color: string }[]; params: Record<string, number>; view: View2 };
 export type SolidObj = { type: "solid"; id: string; kind: SolidKind; cx: number; cy: number; size: number; th: number; ph: number; points: PointRef[]; section: [string, string, string] | null; angle: [string, string, string] | null };
-export type BoardObj = Stroke | GraphObj | SolidObj;
+export const SHAPE_KINDS = ["line", "arrow", "rect", "triangle", "circle", "polygon"] as const;
+export type ShapeKind = (typeof SHAPE_KINDS)[number];
+/** line/arrow/rect/triangle/circle: pts = [x1,y1,x2,y2] (khung bao / hai đầu); polygon: danh sách đỉnh. */
+export type ShapeObj = { type: "shape"; id: string; kind: ShapeKind; color: string; width: number; fill: boolean; pts: number[] };
+export type TextObj = { type: "text"; id: string; x: number; y: number; size: number; color: string; text: string };
+export type BoardObj = Stroke | GraphObj | SolidObj | ShapeObj | TextObj;
 export type BoardPageDoc = { id: string; objects: BoardObj[] };
 export type BoardDoc = { version: 1; pages: BoardPageDoc[] };
 
@@ -61,3 +66,42 @@ export function boardKeywords(page: BoardPageDoc): string {
   }
   return [...out].join(" ");
 }
+
+/** Đường viền SVG của hình phẳng (đoạn thẳng/mũi tên vẽ riêng). */
+export function shapeD(o: ShapeObj): string {
+  const [x1, y1, x2, y2] = o.pts as [number, number, number, number];
+  switch (o.kind) {
+    case "line":
+    case "arrow":
+      return `M${x1} ${y1}L${x2} ${y2}`;
+    case "rect":
+      return `M${x1} ${y1}H${x2}V${y2}H${x1}Z`;
+    case "triangle":
+      return `M${(x1 + x2) / 2} ${y1}L${x2} ${y2}L${x1} ${y2}Z`;
+    case "circle": {
+      const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2, rx = Math.abs(x2 - x1) / 2, ry = Math.abs(y2 - y1) / 2;
+      return `M${cx - rx} ${cy}A${rx} ${ry} 0 1 0 ${cx + rx} ${cy}A${rx} ${ry} 0 1 0 ${cx - rx} ${cy}Z`;
+    }
+    case "polygon": {
+      let d = "";
+      for (let i = 0; i + 1 < o.pts.length; i += 2) d += `${i ? "L" : "M"}${o.pts[i]} ${o.pts[i + 1]}`;
+      return `${d}Z`;
+    }
+  }
+}
+/** Đầu mũi tên (hai đoạn ngắn) tại điểm cuối. */
+export function arrowHead(o: ShapeObj): string {
+  const [x1, y1, x2, y2] = o.pts as [number, number, number, number];
+  const a = Math.atan2(y2 - y1, x2 - x1), L = 10 + o.width * 2;
+  const p = (da: number) => `${x2 - L * Math.cos(a + da)} ${y2 - L * Math.sin(a + da)}`;
+  return `M${p(0.45)}L${x2} ${y2}L${p(-0.45)}`;
+}
+export const textBox = (o: TextObj): { w: number; h: number } => {
+  const lines = o.text.split("\n");
+  const w = Math.max(...lines.map((l) => l.replace(/\\[a-zA-Z]+/g, "x").replace(/[${}\\^_]/g, "").length)) * o.size * 0.6 + 24;
+  const h = lines.reduce((a, l) => a + (/\\d?frac|\\sqrt/.test(l) ? o.size * 2.2 : o.size * 1.5), 0) + 8;
+  return { w: Math.max(60, Math.round(w)), h: Math.round(h) };
+};
+/** Chuyển dịch cả hình phẳng/ô chữ. */
+export const moveObj = (o: ShapeObj | TextObj, dx: number, dy: number): Partial<ShapeObj> | Partial<TextObj> =>
+  o.type === "text" ? { x: o.x + dx, y: o.y + dy } : { pts: o.pts.map((v, i) => v + (i % 2 ? dy : dx)) };

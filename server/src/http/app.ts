@@ -9,7 +9,8 @@ import { ForbiddenError } from "../domain/authz";
 import { ResponseValue } from "../domain/scoring";
 import { answerKey } from "../domain/variants";
 import { AiUnavailableError, NotFoundError, UnauthorizedError, ValidationError } from "../errors";
-import type { Ai } from "../services/ai";
+import { type Ai, disabledAi } from "../services/ai";
+import { createDiagramService } from "../services/diagrams";
 import { renderAnswerKeyDocx, renderExamDocx } from "../export/docx";
 import { renderLessonDocx } from "../export/lesson";
 import { renderMatrixDocx } from "../export/matrix";
@@ -50,6 +51,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const slides = createSlideService(deps.db);
   const games = createGameService(deps.db);
   const boardsSvc = createBoardService(deps.db);
+  const diagramsSvc = createDiagramService(deps.db, deps.ai ?? disabledAi);
   const signer = createDownloadSigner(deps.downloadSecret, `${LINK_TTL_MINUTES}m`);
   const metadataUrl = `${deps.publicUrl}/.well-known/oauth-protected-resource`;
 
@@ -223,6 +225,16 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   app.put("/api/boards/:id", BIG, async (req) => boardsSvc.save(await authenticate(req), Cid(req), req.body));
   app.delete("/api/boards/:id", async (req, reply) => {
     await boardsSvc.remove(await authenticate(req), Cid(req));
+    return reply.code(204).send();
+  });
+
+  app.get("/api/diagrams", async (req) => diagramsSvc.list(await authenticate(req)));
+  app.post("/api/diagrams/ai", async (req) => diagramsSvc.draw(await authenticate(req), req.body));
+  app.get("/api/diagrams/:id", async (req) => diagramsSvc.get(await authenticate(req), Cid(req)));
+  app.post("/api/diagrams", BIG, async (req, reply) => reply.code(201).send(await diagramsSvc.create(await authenticate(req), req.body)));
+  app.put("/api/diagrams/:id", BIG, async (req) => diagramsSvc.save(await authenticate(req), Cid(req), req.body));
+  app.delete("/api/diagrams/:id", async (req, reply) => {
+    await diagramsSvc.remove(await authenticate(req), Cid(req));
     return reply.code(204).send();
   });
 
