@@ -195,3 +195,37 @@ web/
 - **A · Tạp chí nghiên cứu** (`huong-a/`): giấy ấm, serif dẫn dắt, phần đánh số La Mã, Hình/Bảng có chú thích kết luận, ghi chú lề.
 - **B · Công cụ chính xác** (`huong-b/`): chữ 13 px, hộp việc nhóm + khung chi tiết, mã việc, phím tắt, dải chỉ số.
 - **C · Học đường hiện đại** (`huong-c/`): mảng màu lớn, chữ 800, thẻ bo 16 có bóng mềm, màu nhận diện lớp/môn, vòng tiến độ, chuỗi ngày.
+
+## 7. Đã chọn (chinhan, 2026-11-10, vòng 3)
+
+| Cổng | Hướng | Vì sao |
+|---|---|---|
+| Giáo viên `/gv` | **B · Công cụ chính xác** | GV dạy 3–5 lớp, mỗi ngày xử lý hàng chục việc nhỏ (chấm, nhắc, duyệt). Cần mật độ cao, ít cuộn, phím tắt, danh sách + khung chi tiết. Đây là mẫu đã chứng minh hiệu quả ở Linear và Observable (khảo sát nguyên tắc 2, 3, 6, 11). |
+| Học sinh/SV `/hoc` | **C · Học đường hiện đại** | Người học cần thấy ngay một việc tiếp theo và có động lực (vòng tiến độ, chuỗi ngày, màu môn học). Chữ to, vùng chạm lớn hợp điện thoại; thẻ bo tròn có chiều sâu cho cảm giác “chạm được”. |
+
+**Học trên laptop là bố cục riêng, không phải bản di động phóng to.**
+
+| Bề rộng | Bố cục cổng Học |
+|---|---|
+| ≥ 1181 px | Thanh bên 248 px (mục chính · nhóm Môn học có chấm màu · ô chuỗi ngày) + nội dung + cột phải 300–340 px (Sắp tới, Ôn hôm nay, nguồn trích dẫn, mục lục trong bài) |
+| 721–1180 px | Thanh bên thu về 64 px; cột phải còn ở Hôm nay/Luyện tập/Kết quả, ẩn ở Gia sư/Giáo trình |
+| ≤ 720 px | Ngăn kéo + tab dưới 5 mục |
+
+Cùng một component Shell cho hai cổng (`shell2.js` → `ui/Shell.tsx` với props `portal`).
+
+**Kiến trúc skin:** `tokens.css` (chung) → `ui.css` (thành phần chung) → `skin-gv.css` | `skin-hoc.css`.
+- Mọi luật của skin gói trong `[data-portal="…"]`, nên hai skin đặt được cạnh nhau (`thanh-phan.html`).
+- Skin chỉ đổi token (cỡ chữ, bo góc, nền, khoảng cách) và vài biến thể thành phần; HTML giống nhau.
+
+**Hợp đồng trạng thái vùng dữ liệu:** mỗi vùng lấy dữ liệu (`data-region`) có 4 nhánh: `ok | dang-tai | trong | loi`; mất mạng là băng dưới thanh trên.
+- Mockup xem bằng `?trang-thai=dang-tai|trong|loi|mat-mang` hoặc thanh “Mockup” góc trái dưới.
+- Code thật: `<Region status empty={…}>`.
+
+**Màn đã vẽ lại:**
+- GV: `gv/hom-nay`, `gv/lop`, `gv/cham-bai`, `gv/ket-qua`, `gv/ngan-hang`, `gv/soan-de`.
+- Học: `hoc/hom-nay`, `hoc/gia-su`, `hoc/luyen-tap`, `hoc/lam-bai` (tập trung), `hoc/ket-qua`, `hoc/giao-trinh`.
+- Các bản vòng 1–2 giữ làm lưu trữ.
+
+**Ghi chú dựng app:**
+- Chấm theo câu gộp đáp án giống nhau (chuẩn hoá khoảng/tập nghiệm) và AI gợi ý điểm kèm độ tin cậy. Độ tin cậy < 80% → “Cần cô xem”, không tự duyệt.
+- Ký hiệu toán trong đoạn serif dùng `.m` (Source Serif 4 thiếu “≠”); công thức thật dùng MathLive/KaTeX.

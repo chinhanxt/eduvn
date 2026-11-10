@@ -155,6 +155,7 @@ svg.i.lg { width: var(--icon-lg); height: var(--icon-lg); stroke-width: 1.5; }
 .btn.primary:active { background: var(--accent-press); }
 .btn.ghost { border-color: transparent; background: transparent; color: var(--ink-2); }
 .btn.ghost:hover { background: var(--bg-hover); color: var(--ink); }
+.btn[aria-pressed="true"]:not(.primary) { background: var(--accent-bg); border-color: var(--accent-line); color: var(--accent); }
 .btn.danger { color: var(--danger); }
 .btn.danger:hover { background: var(--danger-bg); border-color: var(--danger); }
 .btn.sm { --h: 30px; padding: 0 var(--s-3); font-size: var(--fs-sm); }
@@ -420,3 +421,16 @@ table.data.dense td { height: var(--row-h-dense); padding-top: var(--s-1); paddi
   .tabbar a[aria-current="page"] { color: var(--accent); }
 }
 @media (min-width: 721px) { .show-sm { display: none !important; } }
+
+/* ---------- Vùng dữ liệu: skeleton hàng + thanh chọn trạng thái (chỉ mockup) ---------- */
+.skel-list { padding: var(--s-2) var(--s-4); }
+.skel-row { display: flex; align-items: center; gap: var(--s-3); height: 52px; border-bottom: var(--bw) solid var(--line); }
+.skel-row:last-child { border-bottom: 0; }
+.mock-states { position: fixed; left: 12px; bottom: 12px; z-index: var(--z-toast); display: flex; align-items: center; gap: 2px; padding: 3px; background: var(--ink); border-radius: 999px; font-size: 11px; box-shadow: var(--shadow-2); }
+.mock-states span { color: #9aa1b1; padding: 0 8px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.mock-states a { color: #e9ecf3; padding: 4px 10px; border-radius: 999px; }
+.mock-states a[aria-current] { background: #fff; color: var(--ink); font-weight: 600; }
+@media (max-width: 720px) { .mock-states { bottom: calc(var(--tab-h) + 8px); } .mock-states span { display: none; } }
+
+/* Ký hiệu toán trong đoạn serif: Source Serif 4 và subset Inter của Google thiếu ≠ → dùng font toán hệ thống */
+.m { font-family: "Cambria Math", "STIX Two Math", "DejaVu Sans", "Segoe UI Symbol", sans-serif; font-style: normal; font-size: .95em; }

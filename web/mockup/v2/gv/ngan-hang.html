@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ngân hàng câu hỏi · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="../skin-gv.css">
+<style>
+  .fbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .fbar .input-ic { flex: 1 1 220px; max-width: 320px; }
+  .fbar .input { height: 30px; font-size: 13px; }
+  .fchip { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border: 1px dashed var(--line-input); border-radius: 6px; background: var(--bg); color: var(--ink-2); font-size: 12px; white-space: nowrap; }
+  .fchip.on { border-style: solid; border-color: var(--accent-line); background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+  .fchip .x { margin-right: -4px; }
+  .split { grid-template-columns: minmax(0, 1fr) 400px; }
+  .qt { width: 100%; border-collapse: collapse; }
+  .qt th { position: sticky; top: var(--top-h); z-index: 1; text-align: left; font-size: 11px; font-weight: 600; color: var(--ink-3); height: 30px; padding: 0 10px; background: var(--bg-sunken); border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .qt td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .qt tr { cursor: pointer; }
+  .qt tbody tr:hover { background: var(--bg-hover); }
+  .qt tr[aria-selected="true"] { background: var(--accent-bg); box-shadow: inset 2px 0 0 var(--accent); }
+  .qt .stem { line-height: 19px; }
+  .qt .sub { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+  .qt .r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .qt .w-check { width: 34px; padding-right: 0; }
+  .rate { display: inline-flex; align-items: center; gap: 6px; }
+  .rate i { width: 40px; height: 4px; border-radius: 2px; background: var(--line); position: relative; overflow: hidden; }
+  .rate i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--c1); }
+  .rate.low i::after { background: var(--c2); }
+  .prev .stem { font-family: var(--font-read); font-size: 17px; line-height: 27px; padding: 14px 16px 6px; }
+  .opts { list-style: none; margin: 0; padding: 0 16px 12px; display: grid; gap: 6px; }
+  .opts li { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-family: var(--font-read); font-size: 15px; }
+  .opts li b { font-family: var(--font-ui); font-size: 12px; color: var(--ink-3); }
+  .opts li.ok { border-color: var(--ok); background: var(--ok-bg); }
+  .opts li .pick { font: 600 11px/1 var(--font-ui); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .opts li.ok .pick { color: var(--ok); }
+  .bulkbar { height: 40px; padding: 0 12px; font-size: 13px; }
+  .bulkbar[hidden] { display: none; }
+  .pager { padding: 8px 12px; font-size: 12px; }
+  @media (max-width: 1180px) { .split { grid-template-columns: minmax(0, 1fr); } .prev { position: static !important; } }
+  @media (max-width: 720px) { .page-head .tabs .count { display: none; } .qt .hide-sm { display: none; } .fbar .input-ic { max-width: none; flex-basis: 100%; } }
+</style>
+</head>
+<body data-nav="ngan-hang" data-crumb="Soạn|Ngân hàng câu hỏi">
+<script src="../icons.js"></script>
+<main id="main">
+  <div class="page-head bar">
+    <h1>Ngân hàng câu hỏi</h1>
+    <nav class="tabs" aria-label="Phạm vi">
+      <a href="?pham-vi=tat-ca" aria-current="page">Tất cả <span class="count">1.284</span></a>
+      <a href="?pham-vi=cua-toi">Của tôi <span class="count">812</span></a>
+      <a href="?pham-vi=to">Tổ Toán <span class="count">472</span></a>
+      <a href="?pham-vi=can-duyet">Cần duyệt <span class="count">6</span></a>
+    </nav>
+    <div class="acts">
+      <button class="btn sm"><svg class="i sm"><use href="#i-upload"/></svg><span>Nhập Word</span></button>
+      <button class="btn sm"><svg class="i sm"><use href="#i-spark"/></svg><span>AI soạn</span></button>
+      <button class="btn primary sm"><svg class="i sm"><use href="#i-plus"/></svg><span>Thêm câu</span><kbd class="k">N</kbd></button>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:0">
+    <section class="pane" aria-label="Danh sách câu hỏi">
+      <div class="fbar" role="search">
+        <label class="input-ic"><svg class="i sm"><use href="#i-search"/></svg><input class="input" type="search" placeholder="Tìm nội dung, mã câu…  /" aria-label="Tìm câu hỏi"></label>
+        <button class="fchip on">Lớp 10 <svg class="i sm x"><use href="#i-x"/></svg></button>
+        <button class="fchip on">Hàm số bậc hai <svg class="i sm x"><use href="#i-x"/></svg></button>
+        <button class="fchip on">Mức: TH, VD <svg class="i sm x"><use href="#i-x"/></svg></button>
+        <button class="fchip"><svg class="i sm"><use href="#i-plus"/></svg>Dạng câu</button>
+        <button class="fchip"><svg class="i sm"><use href="#i-plus"/></svg>Tỉ lệ đúng</button>
+        <span class="grow"></span>
+        <button class="btn ghost sm" style="font-size:12px">Xoá lọc</button>
+      </div>
+      <div class="bulkbar" id="bulk"><span><b id="nsel">2</b> câu đã chọn</span><span class="grow"></span><button class="btn sm"><svg class="i sm"><use href="#i-exam"/></svg><span>Thêm vào đề</span></button><button class="btn sm danger" id="del"><svg class="i sm"><use href="#i-trash"/></svg><span>Xoá</span></button></div>
+      <div data-region data-skel-rows="8" data-empty-icon="search" data-empty-title="Không có câu nào khớp bộ lọc" data-empty-text="Thử bỏ “Mức: TH, VD” hoặc tìm ở “Tổ Toán”." data-empty-act="Xoá lọc">
+        <table class="qt">
+          <thead><tr><th class="w-check"><input class="check" type="checkbox" aria-label="Chọn tất cả"></th><th class="hide-sm">Mã</th><th>Câu hỏi</th><th class="hide-sm">Mức</th><th class="r"><button class="sort" aria-sort="ascending">% đúng<svg class="i"><use href="#i-up"/></svg></button></th><th class="r hide-sm"><button class="sort">Dùng<svg class="i"><use href="#i-sort"/></svg></button></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="pager"><span class="num">21–30 trong 96</span><nav class="pages" aria-label="Phân trang"><a href="?trang=1" aria-label="Trang trước"><svg class="i sm"><use href="#i-left"/></svg></a><a href="?trang=1">1</a><a href="?trang=2" aria-current="page">2</a><a href="?trang=3">3</a><span>…</span><a href="?trang=10">10</a><a href="?trang=3" aria-label="Trang sau"><svg class="i sm"><use href="#i-right"/></svg></a></nav></div>
+    </section>
+
+    <aside class="pane prev" aria-label="Xem trước" style="position:sticky;top:calc(var(--top-h) + 16px)">
+      <div class="dhd"><span class="mono">Q-1041</span> <span class="badge" style="margin-left:6px">Trả lời ngắn</span><h2 style="margin-top:6px">Dấu tam thức bậc hai</h2></div>
+      <p class="stem">Tìm tất cả giá trị của tham số m để x² − 2mx + m + 2 &gt; 0 với mọi x ∈ ℝ. Đáp án dạng khoảng.</p>
+      <ul class="opts"><li class="ok"><b>ĐA</b><span>−1 &lt; m &lt; 2</span><span class="pick">31% đúng</span></li><li><b>Sai</b><span>−1 ≤ m ≤ 2</span><span class="pick">42%</span></li><li><b>Sai</b><span>m &lt; −1 hoặc m &gt; 2</span><span class="pick">14%</span></li></ul>
+      <dl class="props" style="margin:0;border-top:1px solid var(--line)">
+        <dt>Mức độ</dt><dd><span class="lvl l3">Vận dụng</span></dd>
+        <dt>Đã dùng</dt><dd>12 lần · gần nhất KT 15′ 10A3 (07/11)</dd>
+        <dt>Học sinh làm</dt><dd>387 lượt · <b>31%</b> đúng · lỗi hay gặp: lấy dấu “≤”</dd>
+        <dt>Nguồn</dt><dd>SGK Toán 10 KNTT · tr. 24 · bài 6.12</dd>
+        <dt>Sửa lần cuối</dt><dd>Cô Lan Anh · 09/11</dd>
+      </dl>
+      <div class="dact" style="flex-direction:row;flex-wrap:wrap">
+        <button class="btn primary sm" data-busy="500" data-toast="Đã thêm Q-1041 vào “KT giữa kỳ I · Toán 10”"><svg class="i sm"><use href="#i-exam"/></svg><span>Thêm vào đề</span></button>
+        <button class="btn sm"><svg class="i sm"><use href="#i-pen"/></svg><span>Sửa</span><kbd>E</kbd></button>
+        <button class="btn sm"><svg class="i sm"><use href="#i-copy"/></svg><span>Nhân bản</span></button>
+      </div>
+    </aside>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell2.js"></script>
+<script src="../charts.js"></script>
+<script>
+  const Q = [
+    ["Q-1040", "Parabol (P): y = x² − 4x + 3 có đỉnh là điểm nào?", "Đồ thị parabol", 1, "Nhiều lựa chọn", 41, 23],
+    ["Q-1041", "Tìm m để x² − 2mx + m + 2 > 0 với mọi x ∈ ℝ.", "Dấu tam thức", 3, "Trả lời ngắn", 12, 31],
+    ["Q-1042", "Cho f(x) = −x² + 6x − 5. Xét tính đúng/sai của 4 mệnh đề a)–d).", "Dấu tam thức", 2, "Đúng/Sai", 18, 38],
+    ["Q-1043", "Cổng parabol rộng 8 m, cao 6 m. Tính chiều cao tại điểm cách chân cổng 1 m.", "Đồ thị parabol", 3, "Trả lời ngắn", 9, 42],
+    ["Q-1044", "Tập nghiệm của bất phương trình x² − 5x + 6 ≤ 0 là", "BPT bậc hai", 2, "Nhiều lựa chọn", 37, 47],
+    ["Q-1045", "Hàm số y = 2x² + 4x − 1 đồng biến trên khoảng nào?", "Đồ thị parabol", 2, "Nhiều lựa chọn", 29, 52],
+    ["Q-1046", "Xác định a, b, c biết parabol y = ax² + bx + c đi qua A(0; 1), B(1; 2), C(2; 5).", "Đồ thị parabol", 3, "Tự luận", 6, 55],
+    ["Q-1047", "Bất phương trình (x − 1)(3 − x) > 0 có bao nhiêu nghiệm nguyên?", "BPT bậc hai", 2, "Trả lời ngắn", 22, 58],
+    ["Q-1048", "Giá trị nhỏ nhất của y = x² − 2x + 5 trên ℝ bằng", "Đồ thị parabol", 2, "Nhiều lựa chọn", 33, 61],
+    ["Q-1049", "Lợi nhuận L(x) = −x² + 40x − 300 (triệu đồng). Tìm x để lợi nhuận lớn nhất.", "Đồ thị parabol", 3, "Tự luận", 4, 63],
+  ];
+  const lvl = ["", "NB", "TH", "VD", "VDC"], esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  document.getElementById("rows").innerHTML = Q.map((q, i) => `<tr ${i === 1 ? 'aria-selected="true"' : ""}><td class="w-check"><input class="check" type="checkbox" ${i === 1 || i === 3 ? "checked" : ""} aria-label="Chọn ${q[0]}"></td><td class="hide-sm mono" style="color:var(--ink-3);white-space:nowrap">${q[0]}</td><td><div class="stem">${esc(q[1])}</div><div class="sub">${q[2]} · ${q[4]}</div></td><td class="hide-sm"><span class="lvl l${q[3]}">${lvl[q[3]]}</span></td><td class="r"><span class="rate ${q[6] < 40 ? "low" : ""}"><i style="--v:${q[6]}%"></i>${q[6]}%</span></td><td class="r hide-sm">${q[5]}</td></tr>`).join("");
+  document.getElementById("rows").addEventListener("click", (e) => { const tr = e.target.closest("tr"); if (!tr || e.target.matches("input")) return; document.querySelectorAll("#rows tr").forEach((x) => x.removeAttribute("aria-selected")); tr.setAttribute("aria-selected", "true"); });
+  document.getElementById("del").onclick = () => UI.toast({ title: "Đã xoá 2 câu", undo: () => {} });
+  UI.states();
+</script>
+</body>
+</html>
