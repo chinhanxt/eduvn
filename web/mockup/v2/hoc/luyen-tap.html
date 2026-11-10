@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="vi" data-portal="hoc">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230b7466%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luyện tập · EDUVN Học sinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="../skin-hoc.css">
+<style>
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: var(--s-6); align-items: start; max-width: 1240px; }
+  .prog { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-4); }
+  .dots { flex: 1; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+  .dots i { height: 8px; border-radius: 4px; background: var(--line-2); }
+  .dots i.ok { background: var(--ok); } .dots i.bad { background: var(--danger); } .dots i.cur { background: var(--accent); }
+  .qcard { padding: var(--s-8); }
+  .qhead { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .stem { font-family: var(--font-read); font-size: 24px; line-height: 36px; margin-top: var(--s-5); }
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-6); }
+  .opt { display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: var(--s-3); min-height: 72px; padding: var(--s-3) var(--s-4); border-radius: 16px; border: 2px solid var(--line-2); background: var(--bg-raised); text-align: left; font-size: 18px; transition: border-color var(--dur-1), transform var(--dur-1); position: relative; }
+  .opt:hover { border-color: var(--accent-line); }
+  .opt .k { width: 40px; height: 40px; border-radius: 12px; background: var(--bg-sunken); display: grid; place-items: center; font-weight: 800; color: var(--ink-2); }
+  .opt .st { position: absolute; top: 8px; right: 10px; display: inline-flex; gap: 4px; align-items: center; font-size: 12px; font-weight: 700; }
+  .opt.right { border-color: var(--ok); background: var(--ok-bg); } .opt.right .k { background: var(--ok); color: #fff; } .opt.right .st { color: var(--ok); }
+  .opt.wrong { border-color: var(--danger); background: var(--danger-bg); } .opt.wrong .k { background: var(--danger); color: #fff; } .opt.wrong .st { color: var(--danger); }
+  .opt.dim { opacity: .55; }
+  .why { margin-top: var(--s-5); padding: var(--s-5); border-radius: 16px; background: var(--accent-bg); }
+  .why h3 { font-size: 15px; font-weight: 800; color: var(--accent); display: flex; gap: 6px; align-items: center; }
+  .why p { font-family: var(--font-read); font-size: 17px; line-height: 28px; margin-top: 6px; }
+  .after { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; margin-top: var(--s-6); }
+  .rail { display: flex; flex-direction: column; gap: var(--s-4); position: sticky; top: calc(var(--top-h) + var(--s-6)); }
+  .score { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 4px; }
+  .score b { display: block; font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -.02em; }
+  .score span { font-size: 12px; color: var(--ink-3); }
+  .delta { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; font-size: 13px; }
+  .delta .m { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--line); position: relative; overflow: hidden; }
+  .delta .m i { position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--c2); }
+  .delta .m i.gain { left: var(--from); width: var(--g); background: var(--ok); }
+  @media (max-width: 1180px) { .layout { grid-template-columns: minmax(0, 1fr) 280px; gap: var(--s-4); } .qcard { padding: var(--s-6); } .opts { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 720px) { .layout { grid-template-columns: minmax(0, 1fr); } .rail { position: static; } .qcard { padding: var(--s-5); } .stem { font-size: 20px; line-height: 31px; } .opt { min-height: 60px; font-size: 16px; } .after .btn { flex: 1; } .after .caption { flex-basis: 100%; } .kb { display: none; } }
+</style>
+</head>
+<body data-nav="luyen-tap" data-crumb="Luyện tập|Ôn hôm nay">
+<script src="../icons.js"></script>
+<main id="main">
+<div class="layout">
+  <div style="min-width:0">
+    <div class="prog"><a class="btn ghost sm" href="hom-nay.html"><svg class="i sm"><use href="#i-left"/></svg><span>Thoát</span></a><div class="dots" aria-label="Thẻ 5 trên 12"><i class="ok"></i><i class="ok"></i><i class="bad"></i><i class="ok"></i><i class="cur"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b class="num">5/12</b></div>
+    <section class="card qcard" aria-label="Thẻ 5" data-region data-skel-rows="5" data-empty-icon="check" data-empty-title="Hôm nay ôn xong rồi!" data-empty-text="12/12 thẻ · thẻ tiếp theo đến hạn ngày mai 07:00." data-empty-act="Luyện thêm 5 câu">
+      <div class="qhead"><span class="chipc" style="background:var(--accent-bg);color:var(--accent)">Dấu tam thức bậc hai</span><span class="lvl l2">Thông hiểu</span><span class="caption">· lần ôn thứ 3</span></div>
+      <p class="stem">Tam thức f(x) = −x² + 4x − 3 nhận giá trị dương khi và chỉ khi</p>
+      <div class="opts" role="radiogroup" aria-label="Phương án">
+        <button class="opt dim" role="radio" aria-checked="false"><span class="k">A</span><span>x &lt; 1 hoặc x &gt; 3</span></button>
+        <button class="opt right" role="radio" aria-checked="false"><span class="k">B</span><span>1 &lt; x &lt; 3</span><span class="st"><svg class="i sm"><use href="#i-ok"/></svg>Đáp án</span></button>
+        <button class="opt wrong" role="radio" aria-checked="true"><span class="k">C</span><span>1 ≤ x ≤ 3</span><span class="st"><svg class="i sm"><use href="#i-err"/></svg>Em chọn</span></button>
+        <button class="opt dim" role="radio" aria-checked="false"><span class="k">D</span><span>x &gt; 3</span></button>
+      </div>
+      <div class="why"><h3><svg class="i sm"><use href="#i-bulb"/></svg>Vì sao là B</h3><p>a = −1 &lt; 0, hai nghiệm 1 và 3. Giữa hai nghiệm f(x) trái dấu a nên <b>dương</b>. Tại x = 1, x = 3 thì f(x) = 0 — không dương — nên là khoảng mở.</p></div>
+      <div class="after"><span class="caption grow"><svg class="i sm"><use href="#i-refresh"/></svg> Thẻ này quay lại sau <b>10 phút</b></span><a class="btn lg" href="gia-su.html"><svg class="i sm"><use href="#i-chat"/></svg><span>Hỏi gia sư</span></a><button class="btn lg primary" data-busy="400"><span>Thẻ tiếp</span><kbd class="kb" style="background:transparent;color:inherit;border-color:currentColor;opacity:.75">Enter</kbd></button></div>
+    </section>
+  </div>
+  <aside class="rail">
+    <section class="card"><div class="hd"><h2>Phiên này</h2></div><div class="score"><div><b style="color:var(--ok)">3</b><span>đúng</span></div><div><b style="color:var(--danger)">2</b><span>sai</span></div><div><b>2′40″</b><span>thời gian</span></div></div><p class="caption" style="margin-top:12px;text-align:center">Còn 7 thẻ · khoảng 3 phút</p></section>
+    <section class="card"><div class="hd"><h2>Dấu tam thức</h2><span class="grow"></span><b class="up">+4%</b></div>
+      <div class="delta"><span>Thành thạo: 38% → <b>42%</b></span><span class="caption">0–100%</span><div class="m" role="img" aria-label="Từ 38% lên 42%"><i style="--v:38%"></i><i class="gain" style="--from:38%;--g:4%"></i></div></div>
+      <p class="caption" style="margin-top:10px">Lên <b>50%</b> là qua vùng cam. Còn khoảng 4 thẻ đúng liên tiếp.</p></section>
+    <p class="caption kb">Phím tắt: <kbd>1</kbd>–<kbd>4</kbd> chọn · <kbd>Enter</kbd> tiếp · <kbd>H</kbd> hỏi gia sư</p>
+  </aside>
+</div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell2.js"></script>
+<script>UI.states();</script>
+</body>
+</html>

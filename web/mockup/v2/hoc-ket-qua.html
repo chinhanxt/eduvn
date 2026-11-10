@@ -2,6 +2,7 @@
 <html lang="vi" data-portal="hoc">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kết quả · EDUVN Học sinh</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +97,7 @@
         <div class="hd"><h2>So với lần trước</h2></div>
         <div class="bd">
           <div id="trend"></div>
-          <p class="caption" style="margin-top:var(--s-2)">5 bài kiểm tra Toán gần nhất · thang 0–10. Bài này <b>7,25</b>.</p>
+          <p class="caption" style="margin-top:var(--s-2)">5 bài kiểm tra Toán gần nhất trên thang 0–10; vạch: ngưỡng 5,0. Bài này <b>7,25</b>, cao nhất 5 bài, <b>+0,5</b> so với bài trước.</p>
         </div>
       </section>
       <p class="caption">Lời nhận xét của cô sẽ hiện ở đây khi cô chấm xong.</p>
@@ -106,6 +107,6 @@
 <script src="ui.js"></script>
 <script src="shell.js"></script>
 <script src="charts.js"></script>
-<script>Charts.spark(document.getElementById("trend"), [5.5, 6.25, 6, 6.75, 7.25], { height: 56, min: 0, max: 10 });</script>
+<script>Charts.track(document.getElementById("trend"), { vals: [5.5, 6.25, 6, 6.75, 7.25], labels: ["KT 15′ · 03/10", "KT 15′ · 17/10", "Giữa kỳ · 24/10", "KT 15′ · 31/10", "Bài này · 07/11"], threshold: 5, height: 34, showAxis: true });</script>
 </body>
 </html>

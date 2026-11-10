@@ -31,30 +31,30 @@
     if (act === "cmdk") UI.openCmdk();
   });
 
-  /* ---------- Toast: hàng đợi, tối đa 3 hiển thị, tự tắt, dừng khi rê chuột, hoàn tác ---------- */
-  let region = null; const queue = []; const MAX = 3;
+  /* ---------- Toast: nhẹ, một dòng, tối đa 2 hiển thị, còn lại xếp hàng; tự tắt, dừng khi rê chuột; Hoàn tác ---------- */
+  let region = null; const queue = []; const MAX = 2;
   function ensureRegion() {
     if (!region) { region = document.createElement("div"); region.className = "toasts"; region.setAttribute("role", "status"); region.setAttribute("aria-live", "polite"); document.body.append(region); }
     return region;
   }
   UI.toast = (opt) => { queue.push(opt); pump(); };
-  function pump() {
-    const r = ensureRegion();
-    while (queue.length && r.children.length < MAX) show(queue.shift());
-  }
-  function show({ title, msg = "", kind = "ok", undo, life = 5000 }) {
+  function pump() { const r = ensureRegion(); while (queue.length && r.children.length < MAX) show(queue.shift()); }
+  function show({ title, msg = "", kind = "ok", undo, action, life }) {
+    life = life || (undo ? 8000 : 4000);
     const el = document.createElement("div");
-    el.className = "toast"; el.style.setProperty("--life", life + "ms");
-    const icon = { ok: ["ok", "ic-ok"], err: ["err", "ic-err"], info: ["info", "ic-info"] }[kind];
-    el.innerHTML = `${ic(icon[0], icon[1])}<div class="msg"><b></b><span></span></div>${undo ? '<button class="act">Hoàn tác</button>' : ""}<button class="close" aria-label="Đóng">${ic("x", "sm")}</button><i class="life"></i>`;
+    el.className = "toast " + kind;
+    const icon = { ok: "ok", err: "err", info: "info" }[kind];
+    const act = undo ? "Hoàn tác" : action ? action.label : "";
+    el.innerHTML = `${ic(icon)}<div class="msg"><b></b><span></span></div>${act ? `<button class="act">${act}</button>` : ""}<button class="close" aria-label="Đóng">${ic("x", "sm")}</button>`;
     el.querySelector("b").textContent = title; el.querySelector(".msg span").textContent = msg;
+    el.title = msg ? title + " — " + msg : title;
     let left = life, start = Date.now(), timer;
     const close = () => { clearTimeout(timer); el.classList.add("out"); el.addEventListener("animationend", () => { el.remove(); pump(); }, { once: true }); };
     const arm = () => { start = Date.now(); timer = setTimeout(close, left); };
     el.addEventListener("mouseenter", () => { clearTimeout(timer); left -= Date.now() - start; });
     el.addEventListener("mouseleave", arm);
     el.querySelector(".close").onclick = close;
-    if (undo) el.querySelector(".act").onclick = () => { undo(); close(); };
+    if (act) el.querySelector(".act").onclick = () => { (undo || action.run)(); close(); };
     ensureRegion().append(el); arm();
   }
 
@@ -147,6 +147,33 @@
     if (k !== "trang") u.searchParams.delete("trang");
     history[push ? "pushState" : "replaceState"](null, "", u);
     const shown = $("[data-url]"); if (shown) shown.textContent = u.pathname.replace(/.*\/v2\//, "/") + u.search;
+  };
+
+
+  /* ---------- Trạng thái vùng dữ liệu (mockup + hợp đồng cho code thật) ----------
+     Mỗi vùng lấy dữ liệu đánh dấu data-region; khi code thật, <Region status> render đúng 4 nhánh:
+     ok | dang-tai (skeleton cùng hình) | trong (data-empty-*) | loi (thông báo + Thử lại). Mất mạng = băng dưới thanh trên.
+     Mockup: ?trang-thai=dang-tai|trong|loi|mat-mang */
+  UI.states = () => {
+    const qs = new URLSearchParams(location.search), st = qs.get("trang-thai");
+    if (!qs.has("shot") && document.querySelector("[data-region]")) {
+      const bar = document.createElement("nav"); bar.className = "mock-states"; bar.setAttribute("aria-label", "Mockup: xem trạng thái");
+      bar.innerHTML = '<span>Mockup</span>' + [["", "Bình thường"], ["dang-tai", "Đang tải"], ["trong", "Trống"], ["loi", "Lỗi"], ["mat-mang", "Mất mạng"]].map(([k, l]) => `<a href="?${k ? "trang-thai=" + k : ""}" ${(st || "") === k ? 'aria-current="true"' : ""}>${l}</a>`).join("");
+      document.body.append(bar);
+    }
+    if (!st) return;
+    if (st === "mat-mang") {
+      const top = document.querySelector(".top, .exam-top");
+      top && top.insertAdjacentHTML("afterend", `<div class="banner" role="status">${ic("offline", "sm")}<span><b>Mất kết nối.</b> Đang hiện dữ liệu đã lưu lúc 14:02; thay đổi sẽ tự gửi khi có mạng.</span><button class="btn sm">Thử lại</button></div>`);
+      return;
+    }
+    document.querySelectorAll("[data-region]").forEach((r) => {
+      const h = r.offsetHeight; r.style.minHeight = Math.min(h, 420) + "px";
+      const rows = +r.dataset.skelRows || 4;
+      if (st === "dang-tai") r.innerHTML = `<div class="skel-list" aria-busy="true" aria-label="Đang tải">${Array.from({ length: rows }, (_, i) => `<div class="skel-row"><span class="skel circle" style="width:28px;height:28px"></span><div style="flex:1"><div class="skel line" style="width:${[72, 54, 64, 46][i % 4]}%"></div><div class="skel line" style="width:${[38, 30, 44, 26][i % 4]}%;height:8px"></div></div><span class="skel line" style="width:56px"></span></div>`).join("")}</div>`;
+      if (st === "trong") r.innerHTML = `<div class="empty"><div class="art">${ic(r.dataset.emptyIcon || "inbox", "lg")}</div><h3>${r.dataset.emptyTitle || "Chưa có dữ liệu"}</h3><p>${r.dataset.emptyText || ""}</p>${r.dataset.emptyAct ? `<div class="acts"><button class="btn sm">${r.dataset.emptyAct}</button></div>` : ""}</div>`;
+      if (st === "loi") r.innerHTML = `<div class="empty err"><div class="art">${ic("alert", "lg")}</div><h3>Không tải được</h3><p>Máy chủ không phản hồi (mã 503). Dữ liệu khác trên trang vẫn dùng được.</p><div class="acts"><button class="btn sm" data-busy="900">${ic("refresh", "sm")}<span>Thử lại</span></button></div></div>`;
+    });
   };
 
   /* ---------- Skeleton → nội dung (giả lập tải lần đầu) ---------- */

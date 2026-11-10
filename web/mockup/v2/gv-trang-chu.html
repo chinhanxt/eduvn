@@ -2,6 +2,7 @@
 <html lang="vi" data-portal="gv">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hôm nay · EDUVN Giáo viên</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,15 +18,16 @@
   .agenda .body .s { white-space: normal; }
   .agenda .act { flex: none; align-self: center; }
   .agenda li.now { box-shadow: inset 2px 0 0 var(--accent); }
-  .cls > li { gap: var(--s-4); }
-  .cls .sp { width: 88px; flex: none; }
-  .cls .avg { width: 48px; text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--fw-semibold); flex: none; }
-  .cls .avg small { display: block; font-weight: 400; color: var(--ink-3); font-size: var(--fs-xs); line-height: 14px; }
+  .cls > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px var(--s-4); align-items: baseline; padding-top: var(--s-3); padding-bottom: var(--s-3); }
+  .cls .gb { grid-column: 1 / -1; }
+  .cls .avg { text-align: right; font-variant-numeric: tabular-nums; font-size: var(--fs-sm); color: var(--ink-3); white-space: nowrap; }
+  .cls .avg b { color: var(--ink); font-size: var(--fs-md); font-weight: var(--fw-semibold); }
+  .cls .avg .up { color: var(--ok); } .cls .avg .dn { color: var(--danger); }
   .prog { display: flex; align-items: center; gap: var(--s-2); min-width: 140px; }
   .prog .meter { flex: 1; }
   .prog span { font-size: var(--fs-sm); color: var(--ink-3); font-variant-numeric: tabular-nums; width: 44px; text-align: right; }
   @media (max-width: 720px) {
-    .cls .sp { display: none; } .agenda .act .txt { display: none; }
+    .agenda .act .txt { display: none; }
     .agenda > li { flex-wrap: wrap; row-gap: 2px; }
     .agenda .when { width: 100%; display: flex; gap: 6px; align-items: baseline; padding: 0; }
     .agenda .when b { display: inline; font-size: var(--fs-sm); }
@@ -50,7 +52,7 @@
 
   <section class="stats" aria-label="Tóm tắt">
     <div class="stat"><div class="lbl">Chờ chấm</div><div class="val">23<small>bài</small></div><div class="delta"><svg class="i sm"><use href="#i-up"/></svg>8 từ sáng nay</div></div>
-    <div class="stat"><div class="lbl">Nộp đúng hạn · 4 tuần</div><div class="val">91<small>%</small></div><div class="spark stat-spark" data-v="84,86,85,88,87,90,89,91"></div></div>
+    <div class="stat"><div class="lbl">Nộp đúng hạn · 4 tuần</div><div class="val">91<small>%</small></div><div class="delta up"><svg class="i sm"><use href="#i-trend"/></svg>+3 điểm % so với 4 tuần trước</div></div>
     <div class="stat"><div class="lbl">Điểm TB tuần này</div><div class="val">6,9</div><div class="delta up"><svg class="i sm"><use href="#i-trend"/></svg>+0,3 so với tuần trước</div></div>
     <div class="stat"><div class="lbl">HS cần quan tâm</div><div class="val">7</div><div class="delta">ở 3 lớp · <a class="link" href="gv-ket-qua.html">xem</a></div></div>
   </section>
@@ -85,11 +87,12 @@
     <section class="panel span-5 md-12">
       <div class="hd"><h2>Lớp của tôi</h2><span class="grow"></span><a class="btn ghost sm" href="#">Tất cả</a></div>
       <ul class="list cls">
-        <li class="link-row" onclick="location.href='gv-ket-qua.html'"><span class="lead-ic accent"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">10A1 · Toán 10</div><div class="s">32 HS · 2 cần quan tâm</div></div><div class="sp" data-v="6.1,6.4,6.2,6.8,6.6,7.0"></div><div class="avg">7,0<small>TB</small></div></li>
-        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">10A3 · Toán 10</div><div class="s">41 HS · 3 cần quan tâm</div></div><div class="sp" data-v="6.5,6.3,6.0,6.2,5.9,6.1"></div><div class="avg">6,1<small>TB</small></div></li>
-        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">11B2 · Toán 11</div><div class="s">40 HS · 2 cần quan tâm</div></div><div class="sp" data-v="7.2,7.0,7.3,7.1,7.4,7.5"></div><div class="avg">7,5<small>TB</small></div></li>
-        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">Giải tích 1 · K68 CNTT</div><div class="s">86 SV · Đại học</div></div><div class="sp" data-v="6.8,6.9,7.1,6.7,7.0,7.2"></div><div class="avg">7,2<small>TB</small></div></li>
+        <li class="link-row" onclick="location.href='gv-ket-qua.html'"><div class="grow"><div class="t">10A1 · Toán 10</div><div class="s">32 HS · 2 cần quan tâm</div></div><div class="avg">TB <b>7,0</b> <span class="up">+0,4</span></div><div class="gb" data-c="9,14,7,2"></div></li>
+        <li class="link-row"><div class="grow"><div class="t">10A3 · Toán 10</div><div class="s">41 HS · 3 cần quan tâm</div></div><div class="avg">TB <b>6,1</b> <span class="dn">−0,4</span></div><div class="gb" data-c="5,16,17,3"></div></li>
+        <li class="link-row"><div class="grow"><div class="t">11B2 · Toán 11</div><div class="s">40 HS · 2 cần quan tâm</div></div><div class="avg">TB <b>7,5</b> <span class="up">+0,1</span></div><div class="gb" data-c="12,18,8,2"></div></li>
+        <li class="link-row"><div class="grow"><div class="t">Giải tích 1 · K68 CNTT</div><div class="s">86 SV · Đại học</div></div><div class="avg">TB <b>7,2</b> <span class="up">+0,2</span></div><div class="gb" data-c="21,38,22,5"></div></li>
       </ul>
+      <div class="ft stack" style="gap:6px"><span id="glegend"></span><span class="caption">Số HS theo học lực HK I. TB: điểm trung bình, so với tháng trước.</span></div>
     </section>
 
     <section class="panel span-12">
@@ -111,7 +114,8 @@
 <script src="shell.js"></script>
 <script src="charts.js"></script>
 <script>
-  document.querySelectorAll(".sp, .stat-spark").forEach((el) => Charts.spark(el, el.dataset.v.split(",").map(Number), { height: el.classList.contains("stat-spark") ? 24 : 28 }));
+  document.querySelectorAll(".gb").forEach((el) => Charts.gradeBar(el, el.dataset.c.split(",").map(Number)));
+  document.getElementById("glegend").innerHTML = Charts.gradeLegend();
 </script>
 </body>
 </html>

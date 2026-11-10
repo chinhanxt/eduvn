@@ -2,6 +2,7 @@
 <html lang="vi" data-portal="gv">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EDUVN v2 · Mockup 2 cổng</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,49 +26,54 @@
   .portal li small { display: block; color: var(--ink-3); font-size: var(--fs-sm); }
   .portal li code { font: 12px/18px var(--font-mono); color: var(--ink-3); white-space: nowrap; }
   .foot { margin-top: var(--s-10); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
+  .foot.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .foot a { display: block; padding: var(--s-4); border: var(--bw) solid var(--line-2); border-radius: var(--r-md); }
   .foot a:hover { border-color: var(--line-input); }
   .foot a b { display: flex; align-items: center; gap: var(--s-2); }
-  @media (max-width: 720px) { .cols, .foot { grid-template-columns: 1fr; } body { padding-top: var(--s-6); } header h1 { font-size: 28px; line-height: 36px; } .portal li code { display: none; } }
+  @media (max-width: 1024px) { .foot.four { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 720px) { .cols, .foot, .foot.four { grid-template-columns: 1fr; } body { padding-top: var(--s-6); } header h1 { font-size: 28px; line-height: 36px; } .portal li code { display: none; } }
 </style>
 </head>
 <body>
 <script src="icons.js"></script>
 <header>
-  <div class="eyebrow">EDUVN · Mockup v2 · 10/11/2026 · chờ duyệt</div>
-  <h1>Hai cổng, một hệ thiết kế</h1>
-  <p>Giáo viên làm việc trên máy tính: cổng dày thông tin, thanh bên. Học sinh học trên điện thoại: cổng thoáng, thanh tab dưới. Dùng chung chữ, màu, thành phần.</p>
-  <div class="row" style="margin-top:var(--s-5)"><button class="btn sm" data-act="theme"><svg class="i sm"><use href="#i-moon"/></svg><span>Sáng / tối</span></button><span class="caption"><kbd>Ctrl</kbd> <kbd>K</kbd> trong mọi màn</span></div>
+  <div class="eyebrow">EDUVN · Mockup vòng 3 · 10/11/2026 · đã chọn hướng</div>
+  <h1>GV = Công cụ chính xác · Học = Học đường hiện đại</h1>
+  <p>Cổng GV dùng skin B: dày, phím tắt, danh sách + khung chi tiết. Cổng Học dùng skin C trên cả điện thoại lẫn laptop: thanh bên, mảng màu, thẻ bo tròn. Chung token, chung thành phần, chung khung cố định.</p>
+  <div class="row" style="margin-top:var(--s-5)"><button class="btn sm" data-act="theme"><svg class="i sm"><use href="#i-moon"/></svg><span>Sáng / tối</span></button><span class="caption">Mỗi màn có thanh “Mockup” góc trái dưới: Bình thường · Đang tải · Trống · Lỗi · Mất mạng</span></div>
 </header>
 
 <div class="cols">
   <section class="portal" style="--pc:#3346d1">
-    <h2><span class="dot"></span>Cổng Giáo viên <code style="margin-left:auto;font:12px var(--font-mono);color:var(--ink-3)">/gv</code></h2>
-    <p class="caption why">Máy tính trước · thanh bên 240 → 64 px · bảng dày</p>
+    <h2><span class="dot"></span>Cổng Giáo viên · skin B <code style="margin-left:auto;font:12px var(--font-mono);color:var(--ink-3)">/gv</code></h2>
+    <p class="caption why">Máy tính trước · chữ 13 px · phím tắt · danh sách + chi tiết</p>
     <ol>
-      <li><a href="gv-trang-chu.html"><span><b>Hôm nay</b><small>Việc trong ngày, lớp, bài chờ chấm, số liệu nhỏ</small></span><code>/gv</code></a></li>
-      <li><a href="gv-ngan-hang.html"><span><b>Ngân hàng câu hỏi</b><small>Lọc theo chủ đề + mức độ, bảng, chọn hàng loạt, phân trang</small></span><code>/gv/ngan-hang?…</code></a></li>
-      <li><a href="gv-soan-de.html"><span><b>Soạn đề với AI</b><small>Ma trận → đề viết dần (streaming), kiểm tra tự động</small></span><code>/gv/de-thi/:id</code></a></li>
-      <li><a href="gv-ket-qua.html"><span><b>Kết quả lớp</b><small>Phổ điểm, độ khó từng câu, học sinh cần quan tâm</small></span><code>/gv/lop/:lop/bai/:bai</code></a></li>
+      <li><a href="gv/hom-nay.html"><span><b>Hôm nay</b><small>Hộp việc nhóm theo hạn, chi tiết + phổ điểm, lớp</small></span><code>/gv</code></a></li>
+      <li><a href="gv/lop.html"><span><b>Lớp học · 10A1</b><small>Danh sách HS, 5 bài gần nhất, hồ sơ + nhận xét nháp</small></span><code>/gv/lop/10a1</code></a></li>
+      <li><a href="gv/cham-bai.html"><span><b>Chấm bài</b><small>Chấm theo câu: gộp đáp án giống nhau, AI gợi ý điểm</small></span><code>/gv/cham/:bai/cau/9</code></a></li>
+      <li><a href="gv/ket-qua.html"><span><b>Kết quả lớp</b><small>Phổ điểm, độ khó, phân tích từng câu, HS cần quan tâm</small></span><code>/gv/lop/:lop/bai/:bai</code></a></li>
+      <li><a href="gv/ngan-hang.html"><span><b>Ngân hàng câu hỏi</b><small>Lọc chip, bảng + xem trước, chọn hàng loạt</small></span><code>/gv/ngan-hang?…</code></a></li>
+      <li><a href="gv/soan-de.html"><span><b>Soạn đề với AI</b><small>Ma trận → đề viết dần (streaming) + kiểm tra</small></span><code>/gv/de-thi/:id</code></a></li>
     </ol>
   </section>
   <section class="portal" style="--pc:#0b7466">
-    <h2><span class="dot"></span>Cổng Học sinh · Sinh viên <code style="margin-left:auto;font:12px var(--font-mono);color:var(--ink-3)">/hoc</code></h2>
-    <p class="caption why">Điện thoại trước · 5 tab dưới · một nút chính mỗi màn</p>
+    <h2><span class="dot"></span>Cổng Học sinh · Sinh viên · skin C <code style="margin-left:auto;font:12px var(--font-mono);color:var(--ink-3)">/hoc</code></h2>
+    <p class="caption why">Laptop: thanh bên + cột phải · điện thoại: tab dưới · một nút chính mỗi màn</p>
     <ol>
-      <li><a href="hoc-trang-chu.html"><span><b>Hôm nay</b><small>Việc tiếp theo, bài cần làm, ôn hôm nay, thành thạo</small></span><code>/hoc</code></a></li>
-      <li><a href="hoc-gia-su.html"><span><b>Gia sư AI</b><small>Hỏi đáp streaming, gợi ý từng bước, trích nguồn</small></span><code>/hoc/gia-su/:id</code></a></li>
-      <li><a href="hoc-luyen-tap.html"><span><b>Luyện tập</b><small>Thẻ ôn ngắt quãng, phản hồi ngay, giải thích</small></span><code>/hoc/luyen</code></a></li>
-      <li><a href="hoc-lam-bai.html"><span><b>Phòng làm bài</b><small>Tập trung, đồng hồ, lưu trên máy khi mất mạng</small></span><code>/hoc/bai/:id/cau/4</code></a></li>
-      <li><a href="hoc-ket-qua.html"><span><b>Kết quả</b><small>Điểm, từng câu, nên ôn gì tiếp</small></span><code>/hoc/ket-qua/:id</code></a></li>
+      <li><a href="hoc/hom-nay.html"><span><b>Hôm nay</b><small>Việc tiếp theo, môn học, thành thạo, sắp tới, chuỗi ngày</small></span><code>/hoc</code></a></li>
+      <li><a href="hoc/gia-su.html"><span><b>Gia sư AI</b><small>Hỏi đáp streaming, gợi ý từng bước, trích nguồn</small></span><code>/hoc/gia-su/:id</code></a></li>
+      <li><a href="hoc/luyen-tap.html"><span><b>Luyện tập</b><small>Thẻ ôn, phản hồi đúng/sai, thành thạo tăng bao nhiêu</small></span><code>/hoc/luyen</code></a></li>
+      <li><a href="hoc/lam-bai.html"><span><b>Phòng làm bài</b><small>Chế độ tập trung, đồng hồ, lưu khi mất mạng</small></span><code>/hoc/bai/:id/cau/4</code></a></li>
+      <li><a href="hoc/ket-qua.html"><span><b>Kết quả</b><small>Điểm theo phần, từng câu, nên ôn gì, lời cô</small></span><code>/hoc/ket-qua/:id</code></a></li>
+      <li><a href="hoc/giao-trinh.html"><span><b>Giáo trình</b><small>Đọc bài, định lí, hình, chọn đoạn → hỏi gia sư / thẻ ôn</small></span><code>/hoc/giao-trinh/toan-10/3</code></a></li>
     </ol>
   </section>
 </div>
 
 <div class="foot">
-  <a href="thanh-phan.html"><b><svg class="i sm"><use href="#i-box"/></svg>Thành phần</b><span class="caption">Nút, bảng, toast, skeleton, trống/lỗi, streaming, icon</span></a>
-  <a href="../../../docs/design/eduvn-design-system.md"><b><svg class="i sm"><use href="#i-book"/></svg>Hệ thiết kế</b><span class="caption">Token, lý do, kiến trúc frontend</span></a>
-  <a href="../../../docs/research/2026-11-10-ui-survey.md"><b><svg class="i sm"><use href="#i-chart"/></svg>Khảo sát 26 trang</b><span class="caption">Số đo + nguyên tắc rút ra</span></a>
+  <a href="thanh-phan.html" style="border-color:var(--accent)"><b><svg class="i sm"><use href="#i-box"/></svg>Thành phần · 2 skin</b><span class="caption">Cạnh nhau: nút, ô nhập, trạng thái, toast, streaming, biểu đồ</span></a>
+  <a href="../../../docs/design/eduvn-design-system.md"><b><svg class="i sm"><use href="#i-book"/></svg>Hệ thiết kế</b><span class="caption">Token, quyết định “Đã chọn”, kiến trúc</span></a>
+  <a href="huong.html"><b><svg class="i sm"><use href="#i-layers"/></svg>Lưu trữ</b><span class="caption">Vòng 2: 3 hướng · vòng 1: gv-*.html, hoc-*.html, thanh-phan-v1</span></a>
 </div>
 <script src="ui.js"></script>
 </body>

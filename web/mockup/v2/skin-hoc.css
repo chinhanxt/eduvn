@@ -1,0 +1,60 @@
+/* Skin Học = Hướng C "Học đường hiện đại" (chinhan chọn 2026-11-10). Gói trong [data-portal="hoc"]. Sinh từ huong-c/c.css. */
+[data-portal="hoc"] {
+  --bg: #f7f4ee; --bg-sunken: #efebe3; --bg-raised: #ffffff; --bg-hover: #f1ede5;
+  --ink: #17181c; --ink-2: #3f4350; --ink-3: #5a5f6b;   /* 5,8:1 trên nền kem */
+  --line: #ebe6dc; --line-2: #ddd7cb;
+  --r-md: 16px; --r-lg: 20px; --r-sm: 10px;
+  --shadow-card: 0 1px 2px rgb(40 30 10 / .05), 0 6px 20px rgb(40 30 10 / .06);
+  --display: 800;
+}
+[data-portal="hoc"] { background: var(--bg); color: var(--ink); font-size: var(--fs-md); line-height: var(--lh-md); }
+[data-portal="hoc"] .side { background: var(--bg); border-right-color: var(--line); }
+[data-portal="hoc"] .nav a { border-radius: 10px; }
+[data-portal="hoc"] .nav a[aria-current="page"] { background: var(--accent); color: #fff; box-shadow: none; }
+[data-portal="hoc"] .nav a[aria-current="page"] svg.i, [data-portal="hoc"] .nav a[aria-current="page"] .count { color: #fff; }
+[data-portal="hoc"] .top, [data-portal="hoc"] .hoc-top { background: var(--bg); }
+[data-portal="hoc"] .btn { border-radius: 10px; }
+[data-portal="hoc"] .btn.lg { --h: 48px; font-weight: 600; }
+[data-portal="hoc"] .card { background: var(--bg-raised); border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: var(--s-6); min-width: 0; }
+[data-portal="hoc"] .card h2 { font-size: 18px; line-height: 26px; font-weight: 700; }
+[data-portal="hoc"] .card .hd { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-4); }
+[data-portal="hoc"] .card .hd .grow + * { margin-left: auto; }
+
+/* Mảng màu chính */
+[data-portal="hoc"] .hero-field { position: relative; overflow: hidden; border-radius: var(--r-lg); color: #fff; padding: var(--s-8); background: var(--accent); }
+[data-portal="hoc"] .hero-field::after { content: ""; position: absolute; right: -60px; top: -80px; width: 320px; height: 320px; border-radius: 50%; background: rgb(255 255 255 / .07); pointer-events: none; }
+[data-portal="hoc"] .hero-field::before { content: ""; position: absolute; right: 120px; bottom: -140px; width: 260px; height: 260px; border-radius: 50%; background: rgb(255 255 255 / .05); pointer-events: none; }
+[data-portal="hoc"] .hero-field .eyebrow { color: rgb(255 255 255 / .82); }
+[data-portal="hoc"] .hero-field h1 { font-size: 44px; line-height: 50px; font-weight: var(--display); letter-spacing: -.025em; margin-top: var(--s-2); }
+[data-portal="hoc"] .hero-field .sub { font-size: 17px; line-height: 26px; color: #e6e9ff; margin-top: var(--s-2); max-width: 52ch; }
+[data-portal="hoc"] .hero-field .btn.on-field { background: #fff; color: var(--accent); border-color: #fff; font-weight: 700; }
+[data-portal="hoc"] .hero-field .btn.on-field:hover { background: #f1f3ff; }
+[data-portal="hoc"] .hero-field .btn.ghost-field { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .28); }
+[data-portal="hoc"] .hero-field .btn.ghost-field:hover { background: rgb(255 255 255 / .2); }
+
+[data-portal="hoc"] .big { font-size: 40px; line-height: 44px; font-weight: var(--display); letter-spacing: -.03em; font-variant-numeric: lining-nums; }
+[data-portal="hoc"] .tint { --h: var(--c1); background: color-mix(in srgb, var(--h) 11%, #fff); }
+[data-portal="hoc"] .chipc { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--bg-sunken); color: var(--ink-2); }
+[data-portal="hoc"] .chipc.warn { background: var(--warn-bg); color: var(--warn); }
+[data-portal="hoc"] .chipc.ok { background: var(--ok-bg); color: var(--ok); }
+[data-portal="hoc"] .up { color: var(--ok); } [data-portal="hoc"] .dn { color: var(--danger); }
+
+@media (max-width: 720px) {
+  [data-portal="hoc"] .hero-field { padding: var(--s-6) var(--s-5); border-radius: 18px; }
+  [data-portal="hoc"] .hero-field h1 { font-size: 32px; line-height: 38px; }
+  [data-portal="hoc"] .card { padding: var(--s-5); }
+  [data-portal="hoc"] .page-head.hero-field .acts .btn:not(.primary) { width: auto; padding: 0 var(--s-4); }
+  [data-portal="hoc"] .page-head.hero-field .acts .btn:not(.primary) > span { display: inline; }
+  [data-portal="hoc"] .big { font-size: 34px; line-height: 38px; }
+}
+
+/* ---- Khung cổng Học trên máy tính: thanh bên kem, mục đang chọn là viên màu lục lam; nhóm "Môn học" có chấm màu nhận diện ---- */
+[data-portal="hoc"] { --side-w: 248px; }
+[data-portal="hoc"] .nav a { height: 40px; font-weight: 500; }
+[data-portal="hoc"] .subj-link .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--c); flex: none; margin: 0 5px; }
+[data-portal="hoc"] .streak-mini { margin: var(--s-2) var(--s-1) 0; padding: var(--s-3); border-radius: 12px; background: var(--bg-raised); box-shadow: var(--shadow-card); display: flex; align-items: center; gap: var(--s-3); }
+[data-portal="hoc"] .streak-mini b { font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--accent); }
+[data-portal="hoc"] .streak-mini small { display: block; font-size: 12px; color: var(--ink-3); line-height: 16px; }
+@media (max-width: 1180px) { [data-portal="hoc"] .streak-mini { display: none; } [data-portal="hoc"] .subj-link .dot { margin: 0; } }
+[data-portal="hoc"] .page-title { font-size: 28px; line-height: 34px; font-weight: 800; letter-spacing: -.02em; }
+@media (max-width: 720px) { [data-portal="hoc"] .page-title { font-size: 24px; line-height: 30px; } }

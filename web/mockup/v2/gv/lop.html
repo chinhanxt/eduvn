@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10A1 · Học sinh · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="../skin-gv.css">
+<style>
+  .code { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 4px 0 10px; border: 1px solid var(--line-2); border-radius: 6px; font: 600 12px/1 var(--font-mono); letter-spacing: .08em; }
+  .code button { border: 0; background: none; color: var(--ink-3); display: grid; place-items: center; width: 22px; height: 22px; border-radius: 4px; }
+  .code button:hover { background: var(--bg-hover); color: var(--ink); }
+  .ptabs { border-bottom: 1px solid var(--line); margin: -4px 0 var(--s-3); }
+  .kpis .gcell { grid-column: span 2; }
+  .split { grid-template-columns: minmax(0, 1fr) 360px; margin-top: var(--s-4); }
+  .fbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .fbar .input-ic { flex: 1 1 200px; max-width: 280px; } .fbar .input { height: 30px; font-size: 13px; }
+  .roster tr { cursor: pointer; }
+  .roster tbody tr:hover { background: var(--bg-hover); }
+  .roster tr[aria-selected="true"] { background: var(--accent-bg); box-shadow: inset 2px 0 0 var(--accent); }
+  .who { display: flex; align-items: center; gap: 10px; } .who small { display: block; color: var(--ink-3); font: 11px/14px var(--font-mono); }
+  .trk { width: 170px; }
+  .sp-hd { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .sp-hd .avatar { width: 40px; height: 40px; font-size: 14px; }
+  .sp-hd h2 { font-size: 15px; } .sp-hd small { color: var(--ink-3); font-size: 12px; }
+  .hist-list { list-style: none; margin: 0; padding: 0; font-size: 12px; }
+  .hist-list li { display: flex; justify-content: space-between; padding: 5px 0; border-top: 1px solid var(--line); }
+  .hist-list li:first-child { border-top: 0; }
+  .hist-list b { font-variant-numeric: tabular-nums; } .hist-list b.low { color: var(--danger); }
+  .note { font-size: 12px; line-height: 18px; color: var(--ink-2); background: var(--bg-sunken); border-radius: 6px; padding: 8px 10px; }
+  @media (max-width: 1180px) { .split { grid-template-columns: minmax(0, 1fr); } .kpis .gcell { grid-column: span 2; } }
+  @media (max-width: 720px) { .kpis .gcell { grid-column: span 2; } .roster .hide-sm { display: none; } .trk { width: 110px; } .who .avatar { display: none; } }
+</style>
+</head>
+<body data-nav="lop" data-crumb="Lớp học|10A1 · Toán 10">
+<script src="../icons.js"></script>
+<main id="main">
+  <div class="page-head bar">
+    <h1>10A1 · Toán 10</h1>
+    <span class="code hide-sm" title="Mã tham gia lớp">K7M4QX<button aria-label="Chép mã" data-busy="300" data-toast="Đã chép mã lớp K7M4QX"><svg class="i sm"><use href="#i-copy"/></svg></button></span>
+    <span class="grow"></span>
+    <div class="acts">
+      <button class="btn sm"><svg class="i sm"><use href="#i-upload"/></svg><span>Nhập Excel</span></button>
+      <button class="btn primary sm"><svg class="i sm"><use href="#i-send"/></svg><span>Giao bài</span><kbd class="k">G</kbd></button>
+    </div>
+  </div>
+  <nav class="tabs ptabs" aria-label="Mục lớp">
+    <a href="?tab=tong-quan">Tổng quan</a><a href="?tab=hoc-sinh" aria-current="page">Học sinh <span class="count">32</span></a><a href="?tab=bai-tap">Bài tập <span class="count">14</span></a><a href="?tab=so-diem">Sổ điểm</a><a href="?tab=diem-danh">Điểm danh</a>
+  </nav>
+
+  <section class="kpis" aria-label="Tóm tắt lớp">
+    <div><div class="k">Sĩ số</div><div class="v">32 <small class="mu">15 nữ</small></div></div>
+    <div><div class="k">Điểm TB HK I</div><div class="v">7,0 <small class="up">+0,4 / tháng</small></div></div>
+    <div><div class="k">Nộp đúng hạn</div><div class="v">94% <small class="up">+2</small></div></div>
+    <div><div class="k">Vắng tuần này</div><div class="v">2 <small class="mu">buổi · 1 có phép</small></div></div>
+    <div class="gcell"><div class="k">Học lực HK I · số HS</div><div id="gb" style="margin-top:6px"></div></div>
+  </section>
+
+  <div class="split">
+    <section class="pane" aria-label="Danh sách học sinh">
+      <div class="fbar" role="search">
+        <label class="input-ic"><svg class="i sm"><use href="#i-search"/></svg><input class="input" type="search" placeholder="Tên hoặc mã học sinh" aria-label="Tìm học sinh"></label>
+        <button class="chip" aria-pressed="false">Cần quan tâm · 2</button><button class="chip" aria-pressed="false">Yếu · 2</button><button class="chip" aria-pressed="false">Tổ 1</button>
+        <span class="grow"></span><span class="caption">Sắp theo tên</span>
+      </div>
+      <div data-region data-skel-rows="8" data-empty-icon="users" data-empty-title="Lớp chưa có học sinh" data-empty-text="Gửi mã K7M4QX cho học sinh hoặc nhập danh sách Excel." data-empty-act="Nhập Excel">
+        <table class="ctable roster">
+          <thead><tr><th>Học sinh</th><th class="r">TB</th><th>5 bài gần nhất · 0–10</th><th class="r hide-sm">Đúng hạn</th><th class="r hide-sm">Vắng</th><th class="hide-sm">Ghi chú</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="pager" style="padding:8px 12px;font-size:12px"><span class="num">1–8 trong 32</span><nav class="pages"><span aria-disabled="true"><svg class="i sm"><use href="#i-left"/></svg></span><a href="?trang=1" aria-current="page">1</a><a href="?trang=2">2</a><a href="?trang=3">3</a><a href="?trang=4">4</a><a href="?trang=2" aria-label="Trang sau"><svg class="i sm"><use href="#i-right"/></svg></a></nav></div>
+    </section>
+
+    <aside class="pane" aria-label="Hồ sơ học sinh" style="position:sticky;top:calc(var(--top-h) + 16px)">
+      <div class="sp-hd"><span class="avatar">GB</span><div><h2>Phạm Gia Bảo</h2><small>HS10A1-07 · Tổ 2 · PH: chị Hương (Zalo)</small></div></div>
+      <dl class="props" style="margin:0"><dt>TB HK I</dt><dd><b style="color:var(--danger)">4,6</b> · Yếu</dd><dt>Đúng hạn</dt><dd>12/14 bài (86%)</dd><dt>Vắng</dt><dd>1 buổi · 04/11 có phép</dd><dt>Gia sư</dt><dd>3 lần hỏi tuần này · “tìm m”</dd></dl>
+      <div class="dsec"><h3>5 bài gần nhất <span>thang 0–10</span></h3><div id="sp-trk"></div>
+        <ul class="hist-list" style="margin-top:8px"><li><span>KT 15′ · BPT bậc hai · 07/11</span><b class="low">2,5</b></li><li><span>BT · Dấu tam thức · 31/10</span><b class="low">3,5</b></li><li><span>BT · Hàm số bậc hai · 24/10</span><b class="low">4,25</b></li></ul></div>
+      <div class="dsec"><h3>Nhận xét nháp (AI, TT22) <span>chờ duyệt</span></h3><p class="note">Em chăm chỉ, nắm được dạng cơ bản; còn lúng túng ở bài tìm tham số. Cần luyện thêm dấu tam thức bậc hai.</p></div>
+      <div class="dact"><button class="btn primary" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắn phụ huynh Gia Bảo" data-toast-msg="qua Zalo"><svg class="i sm"><use href="#i-chat"/></svg><span>Nhắn phụ huynh</span></button><button class="btn"><svg class="i sm"><use href="#i-layers"/></svg><span>Giao 5 câu ôn “tìm m”</span></button></div>
+    </aside>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell2.js"></script>
+<script src="../charts.js"></script>
+<script>
+  const S = [
+    ["Nguyễn Minh Anh", "01", 8.5, "7.5,8,8.25,8,8.5", 100, 0, ""],
+    ["Bùi Quốc Huy", "02", 8.0, "7,7.5,8,8.5,8", 93, 0, ""],
+    ["Đỗ Hà Ngân", "05", 6.9, "7,7.5,7,6.75,6.75", 86, 0, "Chưa nộp KT 07/11"],
+    ["Phạm Gia Bảo", "07", 4.6, "5.5,5,4.25,3.5,2.5", 86, 1, "Giảm 3 bài liền"],
+    ["Hoàng Thu Hà", "11", 9.25, "9,9.5,9,9.25,9.75", 100, 0, ""],
+    ["Lê Thảo Vy", "21", 6.4, "6,6.5,5.75,6,3.75", 93, 0, "−2,25 bài cuối"],
+    ["Ngô Bảo Châu", "24", 7.6, "7.5,7,8,7.75,7.5", 100, 1, ""],
+    ["Trần Đăng Khoa", "28", 4.4, "4.5,4,4.75,4.5,4.25", 79, 0, "5/5 dưới 5,0"],
+  ];
+  const vn = (x) => x.toLocaleString("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+  document.getElementById("rows").innerHTML = S.map((s, i) => `<tr ${i === 3 ? 'aria-selected="true"' : ""}><td><div class="who"><span class="avatar sm">${s[0].split(" ").slice(-2).map((w) => w[0]).join("")}</span><span>${s[0]}<small>HS10A1-${s[1]}</small></span></div></td><td class="r" style="font-weight:600;${s[2] < 5 ? "color:var(--danger)" : ""}">${vn(s[2])}</td><td><div class="trk" data-v="${s[3]}"></div></td><td class="r hide-sm">${s[4]}%</td><td class="r hide-sm">${s[5] || "—"}</td><td class="hide-sm">${s[6] ? `<span class="badge warn"><svg class="i"><use href="#i-alert"/></svg>${s[6]}</span>` : ""}</td></tr>`).join("");
+  const lb = ["BT 10/10", "KT 17/10", "BT 24/10", "BT 31/10", "KT 07/11"];
+  document.querySelectorAll(".trk").forEach((el) => Charts.track(el, { vals: el.dataset.v.split(",").map(Number), labels: lb, threshold: 5, height: 32 }));
+  Charts.track(document.getElementById("sp-trk"), { vals: [5.5, 5, 4.25, 3.5, 2.5], labels: lb, threshold: 5, height: 34, showAxis: true });
+  Charts.gradeBar(document.getElementById("gb"), [9, 14, 7, 2], { height: 20 });
+  document.getElementById("rows").addEventListener("click", (e) => { const tr = e.target.closest("tr"); if (!tr) return; document.querySelectorAll("#rows tr").forEach((x) => x.removeAttribute("aria-selected")); tr.setAttribute("aria-selected", "true"); });
+  UI.states();
+</script>
+</body>
+</html>

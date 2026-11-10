@@ -1,193 +1,124 @@
 <!doctype html>
-<html lang="vi" data-portal="gv">
+<html lang="vi">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Thành phần · EDUVN v2</title>
+<title>Thành phần · 2 skin · EDUVN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="ui.css">
+<link rel="stylesheet" href="skin-gv.css">
+<link rel="stylesheet" href="skin-hoc.css">
 <style>
-  .sec { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--s-8); padding: var(--s-8) 0; border-top: var(--bw) solid var(--line); }
-  .sec:first-of-type { border-top: 0; padding-top: 0; }
-  .sec > header h2 { font-size: var(--fs-lg); }
-  .sec > header p { margin-top: var(--s-2); }
-  .demo { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
-  .demo + .demo { margin-top: var(--s-4); }
-  .lbl-s { font-size: var(--fs-xs); color: var(--ink-3); width: 100%; margin-bottom: -4px; }
-  .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--s-3); }
-  .sw div { border: var(--bw) solid var(--line-2); border-radius: var(--r-sm); overflow: hidden; font-size: var(--fs-xs); }
-  .sw i { display: block; height: 40px; }
-  .sw span { display: block; padding: 6px 8px; } .sw span b { display: block; font-size: var(--fs-sm); font-weight: 600; }
-  .scale > div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: var(--s-4); align-items: baseline; padding: 6px 0; border-top: var(--bw) solid var(--line); }
-  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 2px; }
-  .icons div { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: var(--s-3) 4px; border-radius: var(--r-sm); font-size: 11px; color: var(--ink-3); }
-  .icons div:hover { background: var(--bg-hover); color: var(--ink); }
-  .static-toasts { display: flex; flex-direction: column; gap: var(--s-2); width: min(380px, 100%); }
+  body { background: #fff; }
+  .wrap { max-width: 1440px; margin: 0 auto; padding: var(--s-10) var(--page-x) var(--s-16); }
+  header.ph h1 { font-family: var(--font-read); font-size: 34px; line-height: 42px; }
+  header.ph p { color: var(--ink-2); margin-top: 8px; max-width: 80ch; }
+  .heads { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 180px 1fr 1fr; gap: var(--s-4); background: #fff; padding: var(--s-3) 0; border-bottom: 1px solid var(--line-2); margin-top: var(--s-6); }
+  .heads b { font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .heads b i { width: 10px; height: 10px; border-radius: 3px; }
+  .sec { display: grid; grid-template-columns: 180px 1fr 1fr; gap: var(--s-4); padding: var(--s-6) 0; border-bottom: 1px solid var(--line); }
+  .sec > h2 { font-size: 15px; line-height: 22px; }
+  .sec > h2 small { display: block; font-weight: 400; color: var(--ink-3); font-size: 12px; line-height: 18px; margin-top: 4px; }
+  .skin { padding: var(--s-5); border-radius: 12px; background: var(--bg); border: 1px solid var(--line); min-width: 0; display: flex; flex-direction: column; gap: var(--s-4); }
+  [data-portal="hoc"].skin { border-radius: 20px; }
+  .row-d { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .lbl-s { font-size: 11px; color: var(--ink-3); width: 100%; margin-bottom: -2px; }
   .static-toasts .toast { animation: none; }
+  .dialog.static, .cmdk.static { animation: none; box-shadow: var(--shadow-2); width: 100%; }
   .is-focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-bg); }
-  .is-hover { background: var(--bg-hover) !important; border-color: var(--line-input) !important; }
-  .btn.primary.is-hover { background: var(--accent-hover) !important; border-color: var(--accent-hover) !important; }
-  .cmdk.static, .dialog.static { animation: none; box-shadow: var(--shadow-2); }
-  @media (max-width: 1180px) { .sec { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); } }
-  @media (max-width: 720px) { .sec .grid { grid-template-columns: 1fr; } .sec .grid > * { grid-column: auto !important; } }
+  .tok { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .tok td { padding: 4px 6px; border-bottom: 1px solid var(--line); } .tok td:first-child { color: var(--ink-3); font-family: var(--font-mono); }
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 2px; grid-column: 2 / -1; }
+  .icons div { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border-radius: 6px; font-size: 11px; color: var(--ink-3); }
+  @media (max-width: 1100px) { .heads { display: none; } .sec { grid-template-columns: minmax(0, 1fr); } .skin::before { content: attr(data-name); font: 700 11px/1 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); } .icons { grid-column: auto; } }
 </style>
 </head>
-<body data-shell="gv" data-nav="" data-crumb="Hệ thiết kế v2|Thành phần">
+<body>
 <script src="icons.js"></script>
-<main id="main">
-  <div class="page-head"><div class="t"><h1 style="font-family:var(--font-read)">Thành phần</h1><div class="caption">Mỗi thành phần ở mọi trạng thái. Bấm thử các nút có nhãn <b>thử</b>.</div></div>
-    <div class="acts"><div class="seg" role="group" aria-label="Cổng"><button aria-pressed="true" onclick="document.documentElement.dataset.portal='gv';this.setAttribute('aria-pressed',true);this.nextElementSibling.setAttribute('aria-pressed',false)">Cổng GV</button><button aria-pressed="false" onclick="document.documentElement.dataset.portal='hoc';this.setAttribute('aria-pressed',true);this.previousElementSibling.setAttribute('aria-pressed',false)">Cổng Học</button></div></div>
+<div class="wrap">
+  <header class="ph">
+    <div class="eyebrow">EDUVN · thành phần · vòng 3</div>
+    <h1>Một bộ thành phần, hai skin</h1>
+    <p>Cùng HTML, cùng token. Cổng GV dùng skin B (dày, sắc, phím tắt); cổng Học dùng skin C (mảng màu, chữ đậm, thẻ bo tròn). Code thật: gói <code>ui/</code>, skin chọn bằng <code>&lt;html data-portal&gt;</code>.</p>
+  </header>
+  <div class="heads"><span></span><b><i style="background:#3346d1"></i>GV · skin B “Công cụ chính xác”</b><b><i style="background:#0b7466"></i>Học · skin C “Học đường hiện đại”</b></div>
+  <div id="secs"></div>
+</div>
+
+<template id="t-buttons">
+  <div class="row-d"><span class="lbl-s">Kiểu</span><button class="btn primary">Chính</button><button class="btn">Phụ</button><button class="btn ghost">Nhẹ</button><button class="btn danger"><svg class="i sm"><use href="#i-trash"/></svg><span>Xoá</span></button><button class="btn icon" aria-label="Thêm"><svg class="i"><use href="#i-plus"/></svg></button></div>
+  <div class="row-d"><span class="lbl-s">Trạng thái: tiêu điểm · đang xử lý (khoá bấm) · xong · tắt · bật (pressed)</span><button class="btn primary" style="outline:2px solid var(--focus);outline-offset:2px">Tiêu điểm</button><button class="btn primary" aria-busy="true"><span>Đang lưu</span></button><button class="btn primary is-done"><svg class="i sm"><use href="#i-check"/></svg><span>Đã lưu</span></button><button class="btn primary" disabled>Tắt</button><button class="btn" aria-pressed="true">Bật</button></div>
+  <div class="row-d"><span class="lbl-s">Cỡ sm · md · lg</span><button class="btn sm">Nhỏ</button><button class="btn">Vừa</button><button class="btn lg">Lớn</button><button class="btn primary" data-busy="1200" data-done="Đã lưu" data-toast="Đã lưu" data-toast-msg="bấm 5 lần vẫn chỉ 1 yêu cầu"><svg class="i sm"><use href="#i-save"/></svg><span>Thử bấm liên tục</span></button></div>
+</template>
+<template id="t-inputs">
+  <div class="field"><label>Tên lớp</label><input class="input" value="10A1"><span class="hint">Hiện cho học sinh</span></div>
+  <div class="field"><label>Mã tham gia</label><input class="input is-focus" value="K7M4QX"></div>
+  <div class="field"><label>Hạn nộp</label><input class="input" aria-invalid="true" value="31/02/2026"><span class="err"><svg class="i sm"><use href="#i-alert"/></svg>Ngày không có thật — chọn từ lịch</span></div>
+  <div class="row-d"><select class="select" style="width:auto"><option>Lớp 10</option></select><label class="input-ic" style="flex:1"><svg class="i sm"><use href="#i-search"/></svg><input class="input" placeholder="Tìm…"></label></div>
+</template>
+<template id="t-chips">
+  <div class="row-d"><button class="chip" aria-pressed="false">NB</button><button class="chip" aria-pressed="true">TH</button><button class="chip" aria-pressed="true">VD</button><span class="badge ok"><svg class="i"><use href="#i-ok"/></svg>Đã nộp</span><span class="badge warn"><svg class="i"><use href="#i-clock"/></svg>Sắp hạn</span><span class="badge danger"><svg class="i"><use href="#i-err"/></svg>Quá hạn</span><span class="badge accent"><svg class="i"><use href="#i-spark"/></svg>AI</span></div>
+  <div class="row-d"><div class="seg"><button aria-pressed="true">Tuần</button><button aria-pressed="false">Tháng</button><button aria-pressed="false">Học kỳ</button></div><span class="lvl l1">NB</span><span class="lvl l2">TH</span><span class="lvl l3">VD</span><span class="lvl l4">VDC</span></div>
+  <nav class="tabs"><a href="#" aria-current="page">Tổng quan</a><a href="#">Học sinh <span class="count">32</span></a><a href="#">Bài tập <span class="count">14</span></a></nav>
+</template>
+<template id="t-states">
+  <div class="panel"><div class="skel-list"><div class="skel-row"><span class="skel circle" style="width:28px;height:28px"></span><div style="flex:1"><div class="skel line" style="width:70%"></div><div class="skel line" style="width:40%;height:8px"></div></div></div><div class="skel-row"><span class="skel circle" style="width:28px;height:28px"></span><div style="flex:1"><div class="skel line" style="width:55%"></div><div class="skel line" style="width:30%;height:8px"></div></div></div></div></div>
+  <div class="panel"><div class="empty" style="padding:24px"><div class="art"><svg class="i lg"><use href="#i-search"/></svg></div><h3>Không thấy câu nào</h3><p>Thử bỏ bớt bộ lọc.</p><div class="acts"><button class="btn sm">Xoá lọc</button></div></div></div>
+  <div class="panel"><div class="empty err" style="padding:24px"><div class="art"><svg class="i lg"><use href="#i-alert"/></svg></div><h3>Không tải được</h3><p>Máy chủ không phản hồi (503).</p><div class="acts"><button class="btn sm" data-busy="900"><svg class="i sm"><use href="#i-refresh"/></svg><span>Thử lại</span></button></div></div></div>
+  <div class="banner" style="border-radius:10px;padding:8px 12px"><svg class="i sm"><use href="#i-offline"/></svg><span><b>Mất kết nối.</b> Đang dùng dữ liệu đã lưu.</span></div>
+</template>
+<template id="t-toasts">
+  <div class="static-toasts" style="display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+    <div class="toast ok"><svg class="i"><use href="#i-ok"/></svg><div class="msg"><b>Đã giao bài cho 10A1</b><span>32 học sinh</span></div><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
+    <div class="toast info"><svg class="i"><use href="#i-info"/></svg><div class="msg"><b>Đã xoá 3 câu</b></div><button class="act">Hoàn tác</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
+    <div class="toast err"><svg class="i"><use href="#i-err"/></svg><div class="msg"><b>Không lưu được</b><span>đã giữ nháp</span></div><button class="act">Thử lại</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
   </div>
+  <div class="row-d"><button class="btn sm" onclick="UI.toast({title:'Đã lưu'})">Thử toast</button><button class="btn sm" onclick="for(let i=1;i<=4;i++)UI.toast({title:'Thông báo '+i,kind:'info'})">Hàng đợi 4 (hiện 2)</button></div>
+</template>
+<template id="t-dialog">
+  <div class="dialog static" role="dialog" aria-label="Xoá lớp"><div class="hd"><h2>Xoá lớp 10A3?</h2></div><div class="bd">41 học sinh và sổ điểm HK I sẽ bị xoá. Không thể hoàn tác.</div><div class="ft"><button class="btn">Huỷ</button><button class="btn primary" style="background:var(--danger);border-color:var(--danger)">Xoá lớp</button></div></div>
+</template>
+<template id="t-stream">
+  <div class="stream-bar"></div><div class="stream-bar det" style="--p:62%"></div>
+  <ol class="steps"><li class="done"><span class="dot"><svg class="i"><use href="#i-check"/></svg></span>Đọc tài liệu<span class="t">1,2 s</span></li><li class="now"><span class="dot"></span>Viết dàn ý</li><li><span class="dot"></span>Tạo slide</li></ol>
+  <p class="read" style="font-size:16px;line-height:26px"><span class="caret">Đồ thị hàm số bậc hai là một parabol có trục đối xứng x = −b/2a</span></p>
+</template>
+<template id="t-charts">
+  <div><div class="lbl-s">Điểm 5 bài · thang 0–10 · vạch 5,0</div><div class="c-track"></div></div>
+  <div><div class="lbl-s">Học lực · số HS</div><div class="c-grade"></div><div class="c-legend" style="margin-top:6px"></div></div>
+  <div><div class="lbl-s">Thành thạo theo chủ đề · vạch 50%</div><div class="c-dot"></div></div>
+</template>
 
-  <section class="sec">
-    <header><h2>Nút</h2><p class="caption">Một nút chính mỗi vùng. Đang xử lý: khoá bấm, giữ bề rộng, hiện vòng quay; xong: dấu ✓ 1,4 giây.</p></header>
-    <div>
-      <div class="demo"><span class="lbl-s">Kiểu</span><button class="btn primary">Chính</button><button class="btn">Phụ</button><button class="btn ghost">Nhẹ</button><button class="btn danger"><svg class="i sm"><use href="#i-trash"/></svg><span>Xoá</span></button><button class="btn icon" aria-label="Thêm"><svg class="i"><use href="#i-plus"/></svg></button></div>
-      <div class="demo"><span class="lbl-s">Trạng thái</span><button class="btn primary is-hover">Rê chuột</button><button class="btn primary" style="outline:2px solid var(--focus);outline-offset:2px">Tiêu điểm</button><button class="btn primary" aria-busy="true"><span>Đang lưu</span></button><button class="btn primary is-done"><svg class="i sm"><use href="#i-check"/></svg><span>Đã lưu</span></button><button class="btn primary" disabled>Tắt</button></div>
-      <div class="demo"><span class="lbl-s">Cỡ 30 · 36 · 44</span><button class="btn sm">Nhỏ</button><button class="btn">Vừa</button><button class="btn lg">Lớn</button></div>
-      <div class="demo"><span class="lbl-s">Thử: bấm liên tục — chỉ 1 yêu cầu được gửi</span><button class="btn primary" data-busy="1200" data-done="Đã lưu" data-toast="Đã lưu bài giảng" data-toast-msg="Chỉ 1 lần lưu dù bấm 5 lần"><svg class="i sm"><use href="#i-save"/></svg><span>Lưu (thử)</span></button></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Ô nhập & chọn</h2><p class="caption">Viền 3:1 với nền. Lỗi nói cách sửa, không chỉ đổi màu.</p></header>
-    <div class="grid" style="--grid-cols:3">
-      <div class="field span-1" style="grid-column:span 1"><label>Tên lớp</label><input class="input" value="10A1"><span class="hint">Hiện cho học sinh</span></div>
-      <div class="field" style="grid-column:span 1"><label>Mã tham gia</label><input class="input is-focus" value="K7M4"></div>
-      <div class="field" style="grid-column:span 1"><label>Hạn nộp</label><input class="input" aria-invalid="true" value="31/02/2026"><span class="err"><svg class="i sm"><use href="#i-alert"/></svg>Ngày không có thật — chọn từ lịch</span></div>
-      <div class="field" style="grid-column:span 1"><label>Khối</label><select class="select"><option>Lớp 10</option></select></div>
-      <div class="field" style="grid-column:span 1"><label>Tìm</label><label class="input-ic"><svg class="i sm"><use href="#i-search"/></svg><input class="input" placeholder="Tên học sinh…"></label></div>
-      <div class="field" style="grid-column:span 1"><span class="lbl">Chọn</span><div class="row" style="height:36px"><input type="checkbox" class="check" checked id="c1"><label for="c1">Trộn phương án</label></div></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Chip, nhãn, phân đoạn, tab</h2><p class="caption">Chip = bộ lọc bật/tắt (ghi vào URL). Nhãn trạng thái luôn có icon.</p></header>
-    <div>
-      <div class="demo"><button class="chip" aria-pressed="false">NB</button><button class="chip" aria-pressed="true">TH</button><button class="chip" aria-pressed="true">Đồ thị parabol <svg class="i sm x"><use href="#i-x"/></svg></button></div>
-      <div class="demo"><span class="badge ok"><svg class="i"><use href="#i-ok"/></svg>Đã nộp</span><span class="badge warn"><svg class="i"><use href="#i-clock"/></svg>Sắp hạn</span><span class="badge danger"><svg class="i"><use href="#i-err"/></svg>Quá hạn</span><span class="badge accent"><svg class="i"><use href="#i-spark"/></svg>AI</span><span class="badge">Nháp</span><span class="badge outline">90 phút</span><span class="lvl l1">NB</span><span class="lvl l2">TH</span><span class="lvl l3">VD</span><span class="lvl l4">VDC</span></div>
-      <div class="demo"><div class="seg"><button aria-pressed="true">Tuần</button><button aria-pressed="false">Tháng</button><button aria-pressed="false">Học kỳ</button></div></div>
-      <div class="demo" style="display:block"><nav class="tabs"><a href="#" aria-current="page">Tổng quan</a><a href="#">Học sinh <span class="count">32</span></a><a href="#">Bài tập <span class="count">14</span></a><a href="#">Sổ điểm</a></nav></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Bảng dữ liệu</h2><p class="caption">Đầu bảng dính khi cuộn, cột số căn phải + số tabular, sắp xếp ghi vào URL, phân trang có số.</p></header>
-    <div class="panel">
-      <div class="table-wrap" style="--table-max: 236px">
-        <table class="data">
-          <thead><tr><th><button class="sort">Học sinh<svg class="i"><use href="#i-sort"/></svg></button></th><th class="r"><button class="sort" aria-sort="descending">Điểm TB<svg class="i"><use href="#i-dn"/></svg></button></th><th class="r">Đã nộp</th><th>Trạng thái</th></tr></thead>
-          <tbody>
-            <tr><td>Hoàng Thu Hà</td><td class="r">9,25</td><td class="r">14/14</td><td><span class="badge ok"><svg class="i"><use href="#i-ok"/></svg>Đủ</span></td></tr>
-            <tr><td>Nguyễn Minh Anh</td><td class="r">8,50</td><td class="r">14/14</td><td><span class="badge ok"><svg class="i"><use href="#i-ok"/></svg>Đủ</span></td></tr>
-            <tr><td>Bùi Quốc Huy</td><td class="r">8,00</td><td class="r">13/14</td><td><span class="badge warn"><svg class="i"><use href="#i-clock"/></svg>Thiếu 1</span></td></tr>
-            <tr><td>Lê Thảo Vy</td><td class="r">6,75</td><td class="r">14/14</td><td><span class="badge ok"><svg class="i"><use href="#i-ok"/></svg>Đủ</span></td></tr>
-            <tr><td>Trần Đăng Khoa</td><td class="r">4,60</td><td class="r">12/14</td><td><span class="badge danger"><svg class="i"><use href="#i-err"/></svg>Thiếu 2</span></td></tr>
-            <tr><td>Phạm Gia Bảo</td><td class="r">4,10</td><td class="r">14/14</td><td><span class="badge ok"><svg class="i"><use href="#i-ok"/></svg>Đủ</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="pager"><span class="num">1–6 trong 32</span><nav class="pages"><span aria-disabled="true"><svg class="i sm"><use href="#i-left"/></svg></span><a href="#" aria-current="page">1</a><a href="#">2</a><a href="#">3</a><span>…</span><a href="#">6</a><a href="#"><svg class="i sm"><use href="#i-right"/></svg></a></nav></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Skeleton & làm tươi</h2><p class="caption">Skeleton chỉ ở lần tải đầu, đúng hình nội dung thật (không nhảy bố cục). Làm tươi nền: giữ dữ liệu cũ, mờ 55%.</p></header>
-    <div class="grid" style="--grid-cols:2">
-      <div class="panel" style="grid-column:span 1"><ul class="list"><li><span class="skel circle" style="width:32px;height:32px"></span><div class="grow"><div class="skel line w60"></div><div class="skel line w40" style="height:8px"></div></div></li><li><span class="skel circle" style="width:32px;height:32px"></span><div class="grow"><div class="skel line w80"></div><div class="skel line w40" style="height:8px"></div></div></li><li><span class="skel circle" style="width:32px;height:32px"></span><div class="grow"><div class="skel line w60"></div><div class="skel line w40" style="height:8px"></div></div></li></ul></div>
-      <div class="panel is-stale" style="grid-column:span 1"><ul class="list"><li><span class="lead-ic accent"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">10A1 · Toán 10</div><div class="s">32 HS</div></div></li><li><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">10A3 · Toán 10</div><div class="s">41 HS</div></div></li><li><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">11B2 · Toán 11</div><div class="s">40 HS</div></div></li></ul></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Toast</h2><p class="caption">Góc phải dưới (di động: trên thanh tab). Tối đa 3, còn lại xếp hàng. Tự tắt 5 giây, dừng khi rê chuột, có Hoàn tác cho thao tác xoá.</p></header>
-    <div>
-      <div class="static-toasts">
-        <div class="toast"><svg class="i ic-ok"><use href="#i-ok"/></svg><div class="msg"><b>Đã giao bài cho 10A1</b><span>32 học sinh nhận qua Zalo</span></div><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
-        <div class="toast"><svg class="i ic-info"><use href="#i-info"/></svg><div class="msg"><b>Đã xoá 3 câu</b><span>Có thể hoàn tác trong 8 giây</span></div><button class="act">Hoàn tác</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
-        <div class="toast"><svg class="i ic-err"><use href="#i-err"/></svg><div class="msg"><b>Không lưu được</b><span>Mất mạng — đã giữ bản nháp trên máy</span></div><button class="act">Thử lại</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
-      </div>
-      <div class="demo" style="margin-top:var(--s-4)"><button class="btn sm" onclick="UI.toast({title:'Đã lưu'})">Thành công (thử)</button><button class="btn sm" onclick="UI.toast({title:'Không gửi được',msg:'Thử lại sau ít phút',kind:'err'})">Lỗi (thử)</button><button class="btn sm" onclick="for(let i=1;i<=5;i++)UI.toast({title:'Thông báo '+i,kind:'info',life:2500})">Hàng đợi 5 (thử)</button></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Hộp thoại & bảng lệnh</h2><p class="caption">Hộp thoại chỉ cho việc không đảo ngược được; còn lại dùng Hoàn tác. <kbd>Ctrl</kbd> <kbd>K</kbd> mở bảng lệnh ở mọi trang.</p></header>
-    <div class="row wrap" style="align-items:flex-start;gap:var(--gutter)">
-      <div class="dialog static" role="dialog" aria-label="Xoá lớp"><div class="hd"><h2>Xoá lớp 10A3?</h2></div><div class="bd">41 học sinh, 14 bài tập và sổ điểm HK I sẽ bị xoá. Không thể hoàn tác.</div><div class="ft"><button class="btn">Huỷ</button><button class="btn primary" style="background:var(--danger);border-color:var(--danger)">Xoá lớp</button></div></div>
-      <div class="cmdk static"><div class="q"><svg class="i"><use href="#i-search"/></svg><input value="10a" aria-label="Tìm"><kbd>Esc</kbd></div><div class="res"><div class="grp eyebrow">Lớp</div><a href="#" aria-selected="true"><svg class="i"><use href="#i-users"/></svg><span>10A1 · Toán 10</span><kbd>↵</kbd></a><a href="#"><svg class="i"><use href="#i-users"/></svg><span>10A3 · Toán 10</span></a><div class="grp eyebrow">Thao tác</div><a href="#"><svg class="i"><use href="#i-plus"/></svg><span>Tạo đề cho 10A1</span></a></div><div class="foot"><span><kbd>↑</kbd> <kbd>↓</kbd> chọn</span><span><kbd>↵</kbd> mở</span></div></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Trống · lỗi · mất mạng</h2><p class="caption">Mỗi trạng thái nói điều gì xảy ra và một việc làm tiếp.</p></header>
-    <div class="grid" style="--grid-cols:3">
-      <div class="panel" style="grid-column:span 1"><div class="empty"><div class="art"><svg class="i lg"><use href="#i-inbox"/></svg></div><h3>Chưa có bài chờ chấm</h3><p>Bài học sinh nộp sẽ hiện ở đây.</p></div></div>
-      <div class="panel" style="grid-column:span 1"><div class="empty"><div class="art"><svg class="i lg"><use href="#i-search"/></svg></div><h3>Không thấy câu nào</h3><p>Không có câu VDC trong “Vectơ”.</p><div class="acts"><button class="btn sm">Xoá bộ lọc</button></div></div></div>
-      <div class="panel" style="grid-column:span 1"><div class="empty err"><div class="art"><svg class="i lg"><use href="#i-alert"/></svg></div><h3>Không tải được</h3><p>Máy chủ không phản hồi (mã 503).</p><div class="acts"><button class="btn sm" data-busy="900"><svg class="i sm"><use href="#i-refresh"/></svg><span>Thử lại</span></button></div></div></div>
-    </div>
-    <div></div>
-    <div class="banner" style="border-radius:var(--r-sm);padding:var(--s-2) var(--s-4)"><svg class="i sm"><use href="#i-offline"/></svg><span><b>Mất kết nối.</b> Thay đổi được lưu trên máy và tự gửi khi có mạng.</span><button class="btn sm">Thử lại</button></div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Streaming (AI đang viết)</h2><p class="caption">Thanh chạy khi chưa biết độ dài; có tiến độ khi biết. Luôn có nút Dừng; giữ phần đã viết.</p></header>
-    <div class="stack">
-      <div class="stream-bar"></div>
-      <div class="stream-bar det" style="--p:62%"></div>
-      <ol class="steps"><li class="done"><span class="dot"><svg class="i"><use href="#i-check"/></svg></span>Đọc tài liệu<span class="t">1,2 s</span></li><li class="now"><span class="dot"></span>Viết dàn ý<span class="t">…</span></li><li><span class="dot"></span>Tạo slide</li></ol>
-      <p class="read"><span id="demo-stream" class="caret">Hàm số bậc hai có dạng y = ax² + bx + c với a ≠ 0. Đồ thị là một parabol</span></p>
-      <div class="demo"><button class="btn sm" id="run-stream"><svg class="i sm"><use href="#i-play"/></svg><span>Chạy lại (thử)</span></button></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Màu</h2><p class="caption">Số là tỉ lệ tương phản WCAG với nền trắng. Nhấn đổi theo cổng.</p></header>
-    <div class="stack">
-      <div class="sw">
-        <div><i style="background:var(--ink)"></i><span><b>ink</b>#121826 · 17,7</span></div>
-        <div><i style="background:var(--ink-2)"></i><span><b>ink-2</b>#4a5266 · 7,8</span></div>
-        <div><i style="background:var(--ink-3)"></i><span><b>ink-3</b>#646c80 · 5,3</span></div>
-        <div><i style="background:var(--line-input)"></i><span><b>line-input</b>#8c93a3 · 3,1</span></div>
-        <div><i style="background:#3346d1"></i><span><b>accent GV</b>#3346d1 · 7,2</span></div>
-        <div><i style="background:#0b7466"></i><span><b>accent Học</b>#0b7466 · 5,7</span></div>
-        <div><i style="background:var(--ok)"></i><span><b>ok</b>#137a43 · 5,4</span></div>
-        <div><i style="background:var(--warn)"></i><span><b>warn</b>#9a5800 · 5,6</span></div>
-        <div><i style="background:var(--danger)"></i><span><b>danger</b>#c0302e · 5,7</span></div>
-      </div>
-      <div class="eyebrow">Dữ liệu · phân loại (thứ tự cố định)</div>
-      <div class="sw"><div><i style="background:var(--c1)"></i><span>c1</span></div><div><i style="background:var(--c2)"></i><span>c2</span></div><div><i style="background:var(--c3)"></i><span>c3</span></div><div><i style="background:var(--c4)"></i><span>c4</span></div><div><i style="background:var(--c5)"></i><span>c5</span></div><div><i style="background:var(--c6)"></i><span>c6</span></div><div><i style="background:var(--c7)"></i><span>c7</span></div><div><i style="background:var(--c8)"></i><span>c8</span></div></div>
-      <div class="eyebrow">Thứ bậc NB → VDC · tuần tự</div>
-      <div class="sw"><div><i style="background:var(--lvl-1)"></i><span>NB</span></div><div><i style="background:var(--lvl-2)"></i><span>TH</span></div><div><i style="background:var(--lvl-3)"></i><span>VD</span></div><div><i style="background:var(--lvl-4)"></i><span>VDC</span></div></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Chữ</h2><p class="caption">Inter cho giao diện (số tabular); Source Serif 4 cho tiêu đề trang và nội dung đọc.</p></header>
-    <div class="scale">
-      <div><span class="caption">36 · hero</span><span style="font-size:36px;line-height:44px;font-weight:600">7,25</span></div>
-      <div><span class="caption">28 · serif</span><span style="font-family:var(--font-read);font-size:28px;line-height:36px;font-weight:600">Bất phương trình bậc hai</span></div>
-      <div><span class="caption">18 · h2</span><span style="font-size:18px;font-weight:600">Việc hôm nay</span></div>
-      <div><span class="caption">17 · đọc</span><span class="read">Tam thức f(x) luôn dương khi a &gt; 0 và Δ &lt; 0 — Ặ ẵ Ỗ ữ ỹ Đ</span></div>
-      <div><span class="caption">14 · UI</span><span>Ngân hàng câu hỏi · 1.284 câu · Ặ ẵ Ỗ ữ ỹ Đ</span></div>
-      <div><span class="caption">12 · nhãn</span><span class="eyebrow">Thứ Hai · Tuần 10</span></div>
-    </div>
-  </section>
-
-  <section class="sec">
-    <header><h2>Icon</h2><p class="caption">Lucide, nét 1,75. Cỡ 16 trong nút nhỏ/nhãn, 20 mặc định, 24 cho trạng thái trống.</p></header>
-    <div class="icons" id="icons"></div>
-  </section>
-</main>
 <script src="ui.js"></script>
-<script src="shell.js"></script>
+<script src="charts.js"></script>
 <script>
-  const ids = [...document.querySelectorAll("symbol")].map((s) => s.id.slice(2));
-  document.getElementById("icons").innerHTML = ids.map((id) => `<div title="${id}"><svg class="i"><use href="#i-${id}"/></svg>${id}</div>`).join("");
-  const txt = document.getElementById("demo-stream").textContent + " có trục đối xứng x = −b/2a, quay lên khi a > 0.";
-  document.getElementById("run-stream").onclick = () => UI.stream(document.getElementById("demo-stream"), txt, { cps: 50 });
+  const SECS = [
+    ["Nút", "Một nút chính mỗi vùng; đang xử lý khoá bấm + Idempotency-Key.", "t-buttons"],
+    ["Ô nhập", "Nhãn luôn hiện; lỗi nói cách sửa; viền ≥ 3:1.", "t-inputs"],
+    ["Chip · nhãn · phân đoạn · tab", "Chip lọc ghi vào URL; nhãn trạng thái luôn có icon.", "t-chips"],
+    ["Trạng thái vùng dữ liệu", "Đang tải (skeleton cùng hình) · trống · lỗi · mất mạng. Mọi màn có ?trang-thai=…", "t-states"],
+    ["Toast", "Một dòng, tối đa 2, góc phải dưới; Hoàn tác 8 s.", "t-toasts"],
+    ["Hộp thoại", "Chỉ cho việc không đảo ngược.", "t-dialog"],
+    ["Streaming AI", "Thanh chạy / tiến độ / các bước / con trỏ; luôn có Dừng.", "t-stream"],
+    ["Biểu đồ", "Không sparkline; luôn có thang hoặc mốc + số.", "t-charts"],
+  ];
+  const host = document.getElementById("secs");
+  SECS.forEach(([t, d, tpl]) => {
+    const sec = document.createElement("section"); sec.className = "sec";
+    sec.innerHTML = `<h2>${t}<small>${d}</small></h2>`;
+    ["gv", "hoc"].forEach((p) => { const sk = document.createElement("div"); sk.className = "skin"; sk.dataset.portal = p; sk.dataset.name = p === "gv" ? "GV · skin B" : "Học · skin C"; sk.append(document.getElementById(tpl).content.cloneNode(true)); sec.append(sk); });
+    host.append(sec);
+  });
+  const ic = document.createElement("section"); ic.className = "sec";
+  ic.innerHTML = `<h2>Icon<small>Lucide nét 1,75; 16 / 20 / 24. Dùng chung hai cổng.</small></h2><div class="icons">${[...document.querySelectorAll("symbol")].map((s) => `<div><svg class="i"><use href="#${s.id}"/></svg>${s.id.slice(2)}</div>`).join("")}</div>`;
+  host.append(ic);
+  document.querySelectorAll(".c-track").forEach((el) => Charts.track(el, { vals: [5.5, 6.25, 6, 6.75, 7.25], threshold: 5, height: 34, showAxis: true }));
+  document.querySelectorAll(".c-grade").forEach((el) => Charts.gradeBar(el, [9, 14, 7, 2]));
+  document.querySelectorAll(".c-legend").forEach((el) => (el.innerHTML = Charts.gradeLegend()));
+  document.querySelectorAll(".c-dot").forEach((el) => Charts.dotplot(el, { rows: [{ label: "Hàm số bậc hai", v: 64 }, { label: "Dấu tam thức", v: 38 }], ref: 50, labelW: 120 }));
 </script>
 </body>
 </html>

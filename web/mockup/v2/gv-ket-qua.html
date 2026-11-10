@@ -2,6 +2,7 @@
 <html lang="vi" data-portal="gv">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kết quả lớp · EDUVN Giáo viên</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +23,7 @@
   .who { display: flex; align-items: center; gap: var(--s-3); }
   .why { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
   .who .nm { font-weight: var(--fw-medium); white-space: nowrap; }
-  .trend { width: 96px; }
+  .trend { width: 180px; }
   .score { font-weight: var(--fw-semibold); font-variant-numeric: tabular-nums; }
   .score.low { color: var(--danger); }
   @media (max-width: 720px) { .trend { display: none; } .who .avatar { display: none; } }
@@ -80,7 +81,7 @@
       <div class="hd"><h2>Học sinh cần quan tâm</h2><span class="badge warn"><svg class="i"><use href="#i-alert"/></svg>5</span><span class="grow"></span><span class="caption hide-sm">Quy tắc: dưới 5,0 · giảm ≥ 1,5 điểm · chưa nộp</span></div>
       <div class="table-wrap">
         <table class="data">
-          <thead><tr><th>Học sinh · lý do</th><th class="r">Bài này</th><th class="hide-sm">5 bài gần nhất</th><th class="r" style="width:110px"></th></tr></thead>
+          <thead><tr><th>Học sinh · lý do</th><th class="r">Bài này</th><th class="hide-sm">5 bài gần nhất <span style="font-weight:400">· thang 0–10, vạch = 5,0</span></th><th class="r" style="width:110px"></th></tr></thead>
           <tbody>
             <tr><td><div class="who"><span class="avatar sm">GB</span><div><div class="nm">Phạm Gia Bảo</div><div class="why"><span class="badge danger"><svg class="i"><use href="#i-trenddn"/></svg>Giảm 3 bài liền</span></div></div></div></td><td class="r"><span class="score low">2,5</span></td><td class="hide-sm"><div class="trend" data-v="5.5,5,4.25,3.5,2.5"></div></td><td class="r"><button class="btn sm" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắn phụ huynh Gia Bảo" data-toast-msg="Qua Zalo · kèm bài làm"><svg class="i sm"><use href="#i-chat"/></svg><span>Nhắn</span></button></td></tr>
             <tr><td><div class="who"><span class="avatar sm">TV</span><div><div class="nm">Lê Thảo Vy</div><div class="why"><span class="badge danger"><svg class="i"><use href="#i-trenddn"/></svg>Giảm 2,25</span></div></div></div></td><td class="r"><span class="score low">3,75</span></td><td class="hide-sm"><div class="trend" data-v="6,6.5,5.75,6,3.75"></div></td><td class="r"><button class="btn sm" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắn Thảo Vy"><svg class="i sm"><use href="#i-chat"/></svg><span>Nhắn</span></button></td></tr>
@@ -107,7 +108,8 @@
     ["Câu 4", 72, "Tập nghiệm"], ["Câu 3", 81, "Nghiệm nguyên"], ["Câu 2", 88, "Dấu tam thức"], ["Câu 1", 94, "Nhận dạng BPT"],
   ].map(([label, p, topic]) => ({ label, p, topic }));
   Charts.difficulty(document.getElementById("diff"), { rows, flag: 40, rowH: 26 });
-  document.querySelectorAll(".trend").forEach((el) => Charts.spark(el, el.dataset.v.split(",").map(Number), { min: 0, max: 10, height: 28 }));
+  const lb = ["BT 10/10", "KT 17/10", "BT 24/10", "BT 31/10", "KT 07/11"];
+  document.querySelectorAll(".trend").forEach((el) => Charts.track(el, { vals: el.dataset.v.split(",").map(Number), labels: lb, threshold: 5, height: 34 }));
 </script>
 </body>
 </html>

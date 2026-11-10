@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi" data-portal="hoc">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230b7466%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dấu của tam thức bậc hai · Giáo trình · EDUVN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="../skin-hoc.css">
+<style>
+  .readbar { position: sticky; top: var(--top-h); z-index: 5; height: 3px; background: var(--line); margin: calc(-1 * var(--s-6)) calc(-1 * var(--page-x)) var(--s-6); }
+  .readbar i { display: block; height: 100%; width: var(--v); background: var(--accent); }
+  .reader { display: grid; grid-template-columns: 250px minmax(0, 1fr) 240px; gap: var(--s-8); align-items: start; max-width: 1400px; }
+  .toc { position: sticky; top: calc(var(--top-h) + var(--s-6)); padding: var(--s-4); }
+  .toc .bk { display: flex; gap: 10px; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+  .toc .bk .cv { width: 34px; height: 44px; border-radius: 6px; background: linear-gradient(160deg, var(--c1), #1c5cab); flex: none; }
+  .toc .bk b { font-size: 14px; display: block; } .toc .bk small { color: var(--ink-3); font-size: 12px; }
+  .toc .ch { font-size: 11px; font-weight: 800; letter-spacing: .06em; color: var(--ink-3); text-transform: uppercase; margin: 12px 6px 4px; }
+  .toc a { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; align-items: center; padding: 7px 6px; border-radius: 8px; font-size: 13px; line-height: 18px; color: var(--ink-2); }
+  .toc a:hover { background: var(--bg-hover); }
+  .toc a[aria-current] { background: var(--accent-bg); color: var(--ink); font-weight: 700; }
+  .toc .s { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line-2); }
+  .toc .s.done { background: var(--ok); border-color: var(--ok); }
+  .toc .s.part { border-color: var(--accent); background: conic-gradient(var(--accent) 0 40%, transparent 0); }
+  article.doc { max-width: 70ch; padding: var(--s-2) 0 var(--s-12); }
+  .doc .eyebrow { color: var(--accent); }
+  .doc h1 { font-size: 34px; line-height: 40px; font-weight: 800; letter-spacing: -.02em; margin-top: 6px; }
+  .doc .meta { display: flex; gap: 14px; flex-wrap: wrap; color: var(--ink-3); font-size: 13px; margin-top: 10px; }
+  .doc .meta span { display: inline-flex; gap: 6px; align-items: center; }
+  .doc .body { font-family: var(--font-read); font-size: 18px; line-height: 30px; margin-top: var(--s-6); }
+  .doc .body p + p { margin-top: 14px; }
+  .doc h2 { font-size: 20px; line-height: 28px; font-weight: 800; margin: var(--s-8) 0 var(--s-3); }
+  .thm { margin: var(--s-5) 0; padding: var(--s-5) var(--s-5) 60px; border-radius: 16px; background: var(--accent-bg); }
+  .thm .lb { font: 800 12px/1 var(--font-ui); letter-spacing: .06em; color: var(--accent); text-transform: uppercase; }
+  .thm p { margin-top: 8px; }
+  mark.hl { background: #ffe9a8; color: inherit; padding: 1px 0; border-radius: 2px; position: relative; }
+  .thm { position: relative; }
+  .pop { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 2px; padding: 4px; border-radius: 12px; background: var(--ink); box-shadow: var(--shadow-2); white-space: nowrap; font-family: var(--font-ui); z-index: 3; }
+  .pop button { height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: #fff; font-size: 13px; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; }
+  .pop button:hover { background: rgb(255 255 255 / .12); }
+  figure.fig { margin: var(--s-6) 0; padding: var(--s-5); border-radius: 16px; background: var(--bg-raised); box-shadow: var(--shadow-card); }
+  figure.fig figcaption { font-family: var(--font-ui); font-size: 13px; line-height: 19px; color: var(--ink-2); margin-top: 10px; }
+  .quiz { margin: var(--s-6) 0; padding: var(--s-5); border-radius: 16px; background: var(--bg-raised); box-shadow: var(--shadow-card); font-family: var(--font-ui); }
+  .quiz h3 { font-size: 15px; font-weight: 800; display: flex; gap: 6px; align-items: center; }
+  .quiz p { font-family: var(--font-read); font-size: 17px; line-height: 27px; margin-top: 6px; }
+  .quiz .opts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .quiz .opts button { height: 40px; padding: 0 16px; border-radius: 12px; border: 2px solid var(--line-2); background: var(--bg-raised); font-weight: 600; }
+  .quiz .opts button:hover { border-color: var(--accent-line); }
+  .pn { display: flex; gap: 12px; margin-top: var(--s-8); font-family: var(--font-ui); }
+  .pn a { flex: 1; padding: 14px 16px; border-radius: 14px; background: var(--bg-raised); box-shadow: var(--shadow-card); font-size: 13px; color: var(--ink-3); }
+  .pn a b { display: block; font-size: 15px; color: var(--ink); }
+  .pn a.nx { text-align: right; }
+  .aside { position: sticky; top: calc(var(--top-h) + var(--s-6)); display: flex; flex-direction: column; gap: var(--s-4); font-size: 13px; }
+  .aside .eyebrow { margin-bottom: 6px; }
+  .otp a { display: block; padding: 4px 0 4px 12px; border-left: 2px solid var(--line-2); color: var(--ink-3); line-height: 18px; }
+  .otp a[aria-current] { border-color: var(--accent); color: var(--ink); font-weight: 700; }
+  .notes .n { padding: 10px 12px; border-radius: 12px; background: var(--bg-raised); box-shadow: var(--shadow-card); margin-top: 8px; }
+  .notes .n q { font-family: var(--font-read); display: block; border-left: 3px solid #f5c542; padding-left: 8px; }
+  .notes .n small { display: block; color: var(--ink-3); margin-top: 4px; }
+  .toc-btn { display: none; }
+  @media (max-width: 1180px) { .reader { grid-template-columns: 230px minmax(0, 1fr); gap: var(--s-6); } .aside { display: none; } }
+  @media (max-width: 720px) { .reader { grid-template-columns: minmax(0, 1fr); } .toc { display: none; } .toc-btn { display: inline-flex; } .doc h1 { font-size: 26px; line-height: 32px; } .doc .body { font-size: 17px; line-height: 28px; } .pop { right: 8px; left: 8px; justify-content: space-between; } .pn { flex-direction: column; } }
+</style>
+</head>
+<body data-nav="giao-trinh" data-crumb="Giáo trình|Toán 10|Dấu tam thức">
+<script src="../icons.js"></script>
+<main id="main">
+  <div class="readbar" aria-hidden="true"><i style="--v:40%"></i></div>
+  <div class="reader">
+    <nav class="card toc" aria-label="Mục lục">
+      <div class="bk"><span class="cv"></span><div><b>Toán 10 · Tập 1</b><small>KNTT · 68% thành thạo</small></div></div>
+      <div class="ch">Chương III · Hàm số bậc hai</div>
+      <a href="#"><span class="s done"></span>Khái niệm hàm số bậc hai</a>
+      <a href="#"><span class="s done"></span>Đồ thị và tính chất</a>
+      <a href="#" aria-current="page"><span class="s part"></span>Dấu của tam thức bậc hai</a>
+      <a href="#"><span class="s"></span>Bất phương trình bậc hai</a>
+      <a href="#"><span class="s"></span>Ôn tập chương III</a>
+      <div class="ch">Chương IV · Hệ thức lượng</div>
+      <a href="#"><span class="s"></span>Giá trị lượng giác của góc</a>
+      <a href="#"><span class="s"></span>Định lí côsin, định lí sin</a>
+    </nav>
+
+    <article class="doc" data-region data-skel-rows="8" data-empty-icon="book" data-empty-title="Bài này chưa có nội dung" data-empty-text="Cô Lan Anh chưa mở bài này cho lớp 10A1.">
+      <button class="btn sm toc-btn" style="margin-bottom:12px"><svg class="i sm"><use href="#i-list"/></svg><span>Mục lục · Bài 3/5</span></button>
+      <div class="eyebrow">Chương III · Bài 3</div>
+      <h1>Dấu của tam thức bậc hai</h1>
+      <div class="meta"><span><svg class="i sm"><use href="#i-clock"/></svg>12 phút đọc</span><span><svg class="i sm"><use href="#i-eye"/></svg>Đã đọc 40%</span><span><svg class="i sm"><use href="#i-layers"/></svg>5 thẻ ôn</span></div>
+      <div class="body">
+        <p>Tam thức bậc hai là biểu thức f(x) = ax² + bx + c với a <span class="m">≠</span> 0. Khi giải bất phương trình bậc hai, điều ta cần biết là <b>f(x) dương hay âm</b> trên từng khoảng.</p>
+        <div class="thm"><span class="lb">Định lí</span><p>Cho f(x) = ax² + bx + c (a <span class="m">≠</span> 0), Δ = b² − 4ac. Nếu Δ &lt; 0 thì f(x) cùng dấu với a với mọi x. Nếu Δ &gt; 0, f(x) có hai nghiệm x₁ &lt; x₂ và <mark class="hl">f(x) trái dấu với a khi x₁ &lt; x &lt; x₂, cùng dấu với a khi x nằm ngoài đoạn [x₁; x₂]</mark>.</p><span class="pop" role="toolbar" aria-label="Với đoạn đã chọn"><button><svg class="i sm"><use href="#i-chat"/></svg>Hỏi gia sư</button><button><svg class="i sm"><use href="#i-bookmark"/></svg>Tạo thẻ ôn</button><button><svg class="i sm"><use href="#i-pen"/></svg>Ghi chú</button></span></div>
+        <p>Cách nhớ ngắn gọn: <i>“trong trái, ngoài cùng”</i> — giữa hai nghiệm thì trái dấu a, ngoài hai nghiệm thì cùng dấu a.</p>
+        <figure class="fig">
+          <svg class="chart" viewBox="0 0 560 210" width="100%" role="img" aria-label="Đồ thị y = x² − 4x + 3, dương khi x < 1 hoặc x > 3, âm khi 1 < x < 3">
+            <rect x="40" y="20" width="96" height="150" fill="var(--ok-bg)"/><rect x="136" y="20" width="192" height="150" fill="var(--danger-bg)"/><rect x="328" y="20" width="192" height="150" fill="var(--ok-bg)"/>
+            <g class="axis"><line x1="40" x2="520" y1="146" y2="146"/></g>
+            <path d="M40.0,26.0 L49.6,41.6 L59.2,56.4 L68.8,70.4 L78.4,83.6 L88.0,96.0 L97.6,107.6 L107.2,118.4 L116.8,128.4 L126.4,137.6 L136.0,146.0 L145.6,153.6 L155.2,160.4 L164.8,166.4 L174.4,171.6 L184.0,176.0 L193.6,179.6 L203.2,182.4 L212.8,184.4 L222.4,185.6 L232.0,186.0 L241.6,185.6 L251.2,184.4 L260.8,182.4 L270.4,179.6 L280.0,176.0 L289.6,171.6 L299.2,166.4 L308.8,160.4 L318.4,153.6 L328.0,146.0 L337.6,137.6 L347.2,128.4 L356.8,118.4 L366.4,107.6 L376.0,96.0 L385.6,83.6 L395.2,70.4 L404.8,56.4 L414.4,41.6 L424.0,26.0" fill="none" stroke="var(--c1)" stroke-width="2.5"/>
+            <circle cx="136" cy="146" r="5" fill="var(--ink)" stroke="#fff" stroke-width="2"/><circle cx="328" cy="146" r="5" fill="var(--ink)" stroke="#fff" stroke-width="2"/>
+            <text x="136" y="162" text-anchor="middle" class="lbl-strong">x = 1</text><text x="328" y="162" text-anchor="middle" class="lbl-strong">x = 3</text>
+            <text x="84" y="134" text-anchor="middle" class="lbl-strong" style="fill:var(--ok)">f(x) &gt; 0</text><text x="232" y="110" text-anchor="middle" class="lbl-strong" style="fill:var(--danger)">f(x) &lt; 0</text><text x="384" y="134" text-anchor="middle" class="lbl-strong" style="fill:var(--ok)">f(x) &gt; 0</text>
+            <text x="512" y="140" text-anchor="end">x</text>
+          </svg>
+          <figcaption><b>Hình 3.4.</b> f(x) = x² − 4x + 3 (a = 1 &gt; 0, nghiệm 1 và 3). Vùng xanh: f(x) dương; vùng hồng: âm — đúng “trong trái, ngoài cùng”.</figcaption>
+        </figure>
+        <h2>Ví dụ 1</h2>
+        <p>Xét dấu f(x) = −x² + 4x − 3. Ta có a = −1 &lt; 0, hai nghiệm x = 1 và x = 3. Vậy f(x) &gt; 0 khi 1 &lt; x &lt; 3 và f(x) &lt; 0 khi x &lt; 1 hoặc x &gt; 3.</p>
+        <div class="quiz"><h3><svg class="i sm" style="color:var(--accent)"><use href="#i-target"/></svg>Kiểm tra nhanh · 1 câu</h3><p>f(x) = 2x² − x + 3 có Δ &lt; 0. Dấu của f(x) là</p><div class="opts"><button>Luôn dương</button><button>Luôn âm</button><button>Đổi dấu</button></div></div>
+      </div>
+      <div class="pn"><a href="#">← Bài trước<b>Đồ thị và tính chất</b></a><a class="nx" href="#">Bài sau →<b>Bất phương trình bậc hai</b></a></div>
+    </article>
+
+    <aside class="aside" aria-label="Trong bài">
+      <div class="otp"><div class="eyebrow">Trong bài</div><a href="#">Khái niệm</a><a href="#" aria-current="true">Định lí về dấu</a><a href="#">Ví dụ 1</a><a href="#">Ví dụ 2</a><a href="#">Bài tập</a></div>
+      <div class="notes"><div class="eyebrow">Ghi chú của em · 2</div><div class="n"><q>trong trái, ngoài cùng</q><small>Bài 3 · hôm nay</small></div><div class="n"><q>Δ′ = b′² − ac khi b chẵn</q><small>Bài 2 · 07/11</small></div></div>
+      <a class="btn" href="gia-su.html"><svg class="i sm"><use href="#i-chat"/></svg><span>Hỏi gia sư về bài này</span></a>
+    </aside>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell2.js"></script>
+<script>UI.states();</script>
+</body>
+</html>
