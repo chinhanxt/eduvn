@@ -14,6 +14,7 @@ function Landing() {
   const { user, ready } = useAuth();
   const [to, setTo] = useState<string | null>(null);
   const [anon, setAnon] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
   useEffect(() => {
     if (!ready) return;
     if (!user) {
@@ -24,13 +25,26 @@ function Landing() {
     let live = true;
     api<Me>("/api/me")
       .then((me) => live && setTo(portalForRole(me.role)))
-      .catch((e: unknown) => live && (e instanceof ApiError && e.status === 401 ? setAnon(true) : setTo("/gv")));
+      .catch((e: unknown) => {
+        if (!live) return;
+        // 401: phiên hỏng → đăng nhập lại; 403: không thuộc tổ chức nào với vai trò GV → cổng Học; lỗi khác: báo + thử lại.
+        if (e instanceof ApiError && e.status === 401) setAnon(true);
+        else if (e instanceof ApiError && e.status === 403) setTo("/hoc");
+        else setErr(e instanceof Error ? e.message : "Lỗi");
+      });
     return () => {
       live = false;
     };
   }, [ready, user]);
   if (to) return <GoTo here="index.html" to={to} />;
   if (anon) return <Login />;
+  if (err)
+    return (
+      <div className="center">
+        <p>Không tải được thông tin tài khoản: {err}</p>
+        <button className="btn" onClick={() => window.location.reload()}>Thử lại</button>
+      </div>
+    );
   return <div className="center">…</div>;
 }
 
