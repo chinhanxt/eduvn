@@ -74,7 +74,7 @@ const AiId = z.union([z.string(), z.number()]).transform((v) => String(v).slice(
 const AiNode = z.object({ id: AiId, label: z.string().trim().min(1).transform((v) => v.slice(0, 500)), parent: AiId.nullish() });
 const AiResultSchema = z.object({
   nodes: z.array(AiNode).min(1).max(AI_MAX_NODES),
-  links: z.array(z.object({ from: AiId, to: AiId, label: z.string().nullish().transform((v) => v?.slice(0, 200) || undefined) })).max(AI_MAX_NODES * 2).default([]),
+  links: z.array(z.object({ from: AiId, to: AiId, label: z.string().nullish().transform((v) => v?.slice(0, 200) || undefined) })).transform((l) => l.slice(0, AI_MAX_NODES * 2)).default([]),
 });
 export type AiDiagram = z.infer<typeof AiResultSchema>;
 
@@ -101,7 +101,8 @@ export function parseAiDiagram(raw: unknown, kind: "mind" | "flow" = "mind"): { 
     const pick = (x: Record<string, unknown>, ...ks: string[]) => ks.map((k) => x[k]).find((y) => y !== undefined);
     const arr = (x: unknown) => (Array.isArray(x) ? x.filter((i): i is Record<string, unknown> => !!i && typeof i === "object") : []);
     v = {
-      nodes: arr(o.nodes).map((n) => ({ id: n.id, label: pick(n, "label", "text", "name", "title"), parent: pick(n, "parent", "parentId") })),
+      // model hay vượt giới hạn nút (sơ đồ công thức nhiều công thức): giữ AI_MAX_NODES nút đầu, nối hỏng bị lọc phía dưới
+      nodes: arr(o.nodes).slice(0, AI_MAX_NODES).map((n) => ({ id: n.id, label: pick(n, "label", "text", "name", "title"), parent: pick(n, "parent", "parentId") })),
       links: arr(o.links ?? o.edges).map((l) => ({ from: pick(l, "from", "source"), to: pick(l, "to", "target"), label: pick(l, "label", "text") })),
     };
   }

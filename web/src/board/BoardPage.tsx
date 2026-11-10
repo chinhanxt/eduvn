@@ -276,8 +276,8 @@ export function BoardPage() {
       {picker && (
         <SolidPicker
           onClose={() => setPicker(false)}
-          onPick={(k) => {
-            const s = newSolid(k);
+          onPick={(k, spec, view) => {
+            const s = newSolid(k, spec, view);
             b.addObj(s);
             setSelected(s.id);
             setTool("pointer");

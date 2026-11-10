@@ -13,6 +13,13 @@ const MATH_MSG = "Công thức thiếu dấu $ đóng (ký hiệu đô la thư�
 /** Chuỗi bắt buộc, cho phép công thức $…$. */
 const mathText = () => z.string().trim().min(1).refine(hasBalancedMath, MATH_MSG);
 
+/** Hình vẽ kèm câu hỏi (PNG đen trắng, vd hình không gian dựng ở bảng giảng): data URL, tối đa 400 KB. */
+export const MAX_FIGURE_BYTES = 400 * 1024;
+const Figure = z
+  .string()
+  .regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/, "Hình vẽ phải là ảnh PNG (data URL)")
+  .refine((s) => Math.floor(((s.length - 22) * 3) / 4) <= MAX_FIGURE_BYTES, "Hình vẽ tối đa 400 KB");
+
 const base = {
   subject: z.string().trim().normalize("NFC").min(1),
   /** 1–12: lớp phổ thông; 13–16: năm 1–4 đại học. */
@@ -22,6 +29,7 @@ const base = {
   stem: mathText(),
   explanation: z.string().refine(hasBalancedMath, MATH_MSG).optional(),
   tags: z.array(z.string()).default([]),
+  figure: Figure.optional(),
 };
 
 export const McqQuestion = z.object({

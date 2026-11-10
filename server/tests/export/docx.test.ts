@@ -44,6 +44,21 @@ describe("renderExamDocx", () => {
   });
 });
 
+describe("hình vẽ kèm câu hỏi", () => {
+  it("PNG trong câu hỏi được nhúng vào Word (word/media + drawing), giữ tỉ lệ", async () => {
+    // PNG 4×2 px hợp lệ
+    const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAACNGVk/AAAAEElEQVR4nGP4z8DwHxkzEAAA7w/xAVQ6cYcAAAAASUVORK5CYII=", "base64");
+    const figure = `data:image/png;base64,${png.toString("base64")}`;
+    const [v] = makeVariants([stored(essay({ stem: "Cho hình chóp S.ABCD như hình vẽ.", figure }), "e9")], 1, 1);
+    const buf = await renderExamDocx(meta, v!);
+    const zip = await JSZip.loadAsync(buf);
+    expect(Object.keys(zip.files).some((f) => f.startsWith("word/media/") && f.endsWith(".png"))).toBe(true);
+    const xml = await documentXml(buf);
+    expect(xml).toContain("<w:drawing>");
+    expect(xml).toContain("Hình vẽ kèm câu hỏi");
+  });
+});
+
 describe("renderAnswerKeyDocx", () => {
   it("bảng đáp án cho từng mã đề", async () => {
     const vs = makeVariants(pool, 2, 1);

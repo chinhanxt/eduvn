@@ -1,34 +1,23 @@
-// web/src/board/exportPng.ts — xuất trang bảng ra PNG. Chữ công thức (foreignObject) thay bằng chữ thường vì canvas không mang được font MathLive.
-const plain = (s: string) => s.replace(/\$/g, "").replace(/\\d?frac\{([^}]*)\}\{([^}]*)\}/g, "($1)/($2)").replace(/\\Delta/g, "Δ").replace(/\\neq/g, "≠").replace(/\\pm/g, "±").replace(/\\sqrt\{([^}]*)\}/g, "√($1)").replace(/\\[a-zA-Z]+\s?/g, "").replace(/[{}]/g, "");
+// web/src/board/exportPng.ts — xuất trang bảng ra PNG. Ô chữ/công thức giữ nguyên bản render MathLive (CSS + font KaTeX nhúng);
+// hình không gian vẽ bằng thuộc tính nội tuyến nên đi theo file nguyên vẹn. Thanh công cụ (foreignObject khác) bị bỏ.
+import { mathExportCss } from "../math/exportMath";
 
 export async function boardPng(svg: SVGSVGElement, w: number, h: number, scale = 1.5): Promise<Blob> {
+  const css = await mathExportCss(svg);
   const c = svg.cloneNode(true) as SVGSVGElement;
   c.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   c.setAttribute("width", String(w));
   c.setAttribute("height", String(h));
-  for (const fo of Array.from(c.querySelectorAll("foreignObject"))) {
-    const src = fo.getAttribute("data-plain");
-    if (src) {
-      const size = Number(fo.getAttribute("data-size") ?? 24);
-      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      t.setAttribute("fill", fo.getAttribute("data-color") ?? "#f3f0e6");
-      t.setAttribute("font-family", "Be Vietnam Pro, sans-serif");
-      t.setAttribute("font-size", String(size));
-      src.split("\n").forEach((l, i) => {
-        const s = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-        s.setAttribute("x", String(Number(fo.getAttribute("x")) + 12));
-        s.setAttribute("y", String(Number(fo.getAttribute("y")) + 4 + size * (1.1 + i * 1.4)));
-        s.textContent = plain(l);
-        t.appendChild(s);
-      });
-      fo.replaceWith(t);
-    } else fo.remove();
-  }
+  for (const fo of Array.from(c.querySelectorAll("foreignObject"))) if (!fo.hasAttribute("data-plain")) fo.remove();
+  for (const el of Array.from(c.querySelectorAll("[data-noexport]"))) el.remove();
+  const style = document.createElementNS("http://www.w3.org/2000/svg", "style");
+  style.textContent = `${css}\n.bd-text{line-height:1.5;padding:2px 12px;white-space:nowrap;font-family:'Be Vietnam Pro',Arial,sans-serif}.me-tex{display:inline-block;vertical-align:middle}`;
+  c.insertBefore(style, c.firstChild);
   const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   bg.setAttribute("width", String(w));
   bg.setAttribute("height", String(h));
   bg.setAttribute("fill", "#242b35");
-  c.insertBefore(bg, c.firstChild);
+  c.insertBefore(bg, style.nextSibling);
   const img = new Image();
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(c))}`;
   await img.decode();

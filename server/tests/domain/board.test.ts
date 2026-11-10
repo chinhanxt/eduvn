@@ -24,7 +24,7 @@ describe("validateBoard", () => {
     const r1 = validateBoard({ ...meta, doc: { version: 1, pages } }, "save");
     expect(!r1.ok && r1.issues.join()).toContain("Tối đa 30 trang");
     const bad = sampleDoc();
-    (bad.pages[0]!.objects[2] as { kind: string }).kind = "sphere";
+    (bad.pages[0]!.objects[2] as { kind: string }).kind = "Hình cầu!"; // mã loại hình chỉ gồm chữ thường, số, _
     expect(validateBoard({ ...meta, doc: bad }, "save").ok).toBe(false);
     const bad2 = sampleDoc();
     (bad2.pages[0]!.objects[0] as { color: string }).color = "red";

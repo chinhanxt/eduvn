@@ -1,13 +1,15 @@
 // web/src/diagram/DiagramPage.tsx — trình soạn sơ đồ tư duy / lưu đồ (toàn màn).
 import { memo, type PointerEvent as RPE, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { api, type AiDiagramResult, errText, gradeLabel } from "../api";
 import { Icon } from "../Icon";
 import { MathText } from "../math/MathText";
 import "./diagram.css";
+import { hasMath, mathCssFor, mathHtml, xhtml } from "../math/exportMath";
 import { diagramSvg, download, svgToPng } from "./export";
+import { mathFontsReady } from "./measure";
 import { placeLabels } from "./labels";
-import { addChild, addLink, addSibling, arrange, BRANCH, buildDoc, makeNode, removeNodes, sampleDoc, setLabel, setShape } from "./ops";
+import { addChild, addLink, addSibling, arrange, BRANCH, buildDoc, makeNode, removeNodes, resizeAll, sampleDoc, setLabel, setShape } from "./ops";
 import { pathD, type Route, routeAll } from "./route";
 import { shapeSvg, tint } from "./shapes";
 import { type DEdge, type DNode, type Rect, SHAPES, type Shape } from "./types";
@@ -108,6 +110,7 @@ async function shrinkImage(file: File): Promise<{ url: string; w: number; h: num
 
 export function DiagramPage() {
   const { id = "" } = useParams();
+  const [search, setSearch] = useSearchParams();
   const b = useDiagram(id);
   const d = b.doc;
   const [sel, setSel] = useState<Sel>(null);
@@ -353,24 +356,38 @@ export function DiagramPage() {
     setSel(null);
     setTimeout(fit, 30);
   };
-  const askAi = async () => {
-    if (!d || !b.meta || !topic.trim()) return;
+  const askAi = async (formulas = false, topicIn = topic) => {
+    if (!d || !b.meta || !topicIn.trim()) return;
     setBusy(true);
     b.setError(null);
     try {
-      const r = await api<AiDiagramResult>("/api/diagrams/ai", { method: "POST", body: { topic: topic.trim(), kind: d.kind, subject: b.meta.subject, grade: b.meta.grade } });
-      applyDoc(buildDoc(d.kind, r.nodes, r.links));
+      const [r] = await Promise.all([
+        api<AiDiagramResult>("/api/diagrams/ai", { method: "POST", body: { topic: topicIn.trim(), kind: formulas ? "mind" : d.kind, formulas, subject: b.meta.subject, grade: b.meta.grade } }),
+        mathFontsReady(),
+      ]);
+      applyDoc(buildDoc(formulas ? "mind" : d.kind, r.nodes, r.links));
     } catch (e) {
       b.setError(errText(e));
     } finally {
       setBusy(false);
     }
   };
+  // mở từ nút "Sơ đồ công thức" ở danh sách: AI vẽ ngay một lần
+  const autoTopic = search.get("cong-thuc");
+  const autoRan = useRef(false);
+  useEffect(() => {
+    if (!autoTopic || autoRan.current || !d || !b.meta) return;
+    autoRan.current = true;
+    setTopic(autoTopic);
+    setSearch({}, { replace: true });
+    if (d.nodes.length <= 1) void askAi(true, autoTopic);
+  });
   const exportAs = async (fmt: "svg" | "png") => {
     if (!d || !b.meta) return;
-    const { svg, w, h } = diagramSvg(d, geo.routes, geo.labels, (n) => n.id === rootOf);
     const name = b.meta.title.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "so-do";
     try {
+      const css = await mathCssFor([...d.nodes.map((n) => n.label), ...d.edges.map((e) => e.label ?? "")].flatMap((l) => l.split("\n")));
+      const { svg, w, h } = diagramSvg(d, geo.routes, geo.labels, (n) => n.id === rootOf, { css, html: (v) => (hasMath(v) ? xhtml(mathHtml(v)) : null) });
       if (fmt === "svg") download(`${name}.svg`, new Blob([svg], { type: "image/svg+xml" }));
       else download(`${name}.png`, await svgToPng(svg, w, h));
     } catch (e) {
@@ -460,7 +477,7 @@ export function DiagramPage() {
         </section>
         <section>
           <h3>Bố cục</h3>
-          <button className="dg-wide" onClick={() => b.change(arrange)} data-testid="dg-arrange"><Icon name="rotate" />Sắp xếp lại</button>
+          <button className="dg-wide" onClick={() => b.change((doc) => arrange(resizeAll(doc)))} data-testid="dg-arrange"><Icon name="rotate" />Sắp xếp lại</button>
           <div className="dg-row">
             <button className="dg-wide" onClick={() => (!d.nodes.length || confirm("Thay sơ đồ hiện tại bằng mẫu sơ đồ tư duy?")) && applyDoc(sampleDoc("mind"))} data-testid="dg-tpl-mind">Mẫu tư duy</button>
             <button className="dg-wide" onClick={() => (!d.nodes.length || confirm("Thay sơ đồ hiện tại bằng mẫu lưu đồ?")) && applyDoc(sampleDoc("flow"))} data-testid="dg-tpl-flow">Mẫu lưu đồ</button>
@@ -470,6 +487,7 @@ export function DiagramPage() {
           <h3>AI vẽ giúp</h3>
           <input className="inp" placeholder="Nhập chủ đề, ví dụ: Quang hợp" value={topic} onChange={(e) => setTopic(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void askAi()} data-testid="dg-ai-topic" />
           <button className="dg-wide pri" disabled={busy || !topic.trim()} onClick={() => void askAi()} data-testid="dg-ai"><Icon name="spark" />{busy ? "Đang vẽ…" : "Vẽ bằng AI"}</button>
+          <button className="dg-wide" disabled={busy || !topic.trim()} onClick={() => void askAi(true)} title="Mỗi nhánh là một nhóm công thức, mỗi nút là một công thức LaTeX" data-testid="dg-ai-formula"><Icon name="graph" />Sơ đồ công thức</button>
         </section>
         <section>
           <h3>Xuất file</h3>

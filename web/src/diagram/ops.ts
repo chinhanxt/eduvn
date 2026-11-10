@@ -80,6 +80,9 @@ export function setShape(doc: DiagramDoc, id: string, shape: Shape): DiagramDoc 
   return { ...doc, nodes: doc.nodes.map((n) => (n.id === id ? { ...n, shape, ...(n.image ? {} : estimateSize(n.label, shape)) } : n)) };
 }
 
+/** Đo lại kích thước mọi hình theo chữ/công thức (ảnh giữ nguyên). */
+export const resizeAll = (doc: DiagramDoc): DiagramDoc => ({ ...doc, nodes: doc.nodes.map((n) => (n.image ? n : { ...n, ...estimateSize(n.label, n.shape) })) });
+
 /** Sắp xếp lại toàn bộ theo kiểu sơ đồ. */
 export const arrange = (doc: DiagramDoc): DiagramDoc => (doc.kind === "mind" ? layoutMind(doc) : layoutFlow(doc));
 
