@@ -72,22 +72,21 @@ const fakeTts: Tts = {
   },
 };
 
+let ttsImpl: Tts = fakeTts;
 let dataDir: string;
 let t: Awaited<ReturnType<typeof testApp>>;
 let ai: ReturnType<typeof fakeAi>;
 let auth: Record<string, string>;
-let svc: Awaited<ReturnType<typeof boot>>["svc"];
 
 async function boot() {
   dataDir = mkdtempSync(path.join(tmpdir(), "eduvn-ail-"));
   ai = fakeAi();
-  const { buildApp } = await import("../../src/http/app");
-  void buildApp;
-  const app = await testApp({ ai, aiLessons: { dataDir, tts: fakeTts, sceneConcurrency: 3, chromePath: CHROME } });
-  return { app, svc: undefined as never };
+  const app = await testApp({ ai, aiLessons: { dataDir, tts: { synth: (a, b, c) => ttsImpl.synth(a, b, c) }, sceneConcurrency: 3, chromePath: CHROME } });
+  return { app };
 }
 
 beforeEach(async () => {
+  ttsImpl = fakeTts;
   const b = await boot();
   t = b.app;
   auth = { authorization: `Bearer ${await t.sign({ sub: "gv-1", email: "gv1@example.test", name: "Cô Lan" })}` };
@@ -95,7 +94,6 @@ beforeEach(async () => {
 afterEach(async () => {
   await t.app.close();
 });
-void svc;
 
 const call = (method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload?: unknown) => t.app.inject({ method, url, headers: auth, payload: payload as object });
 async function waitDone(id: string) {
@@ -145,6 +143,19 @@ describe("sinh bài giảng AI", () => {
     const s2 = await waitDone(id);
     expect(s2).toMatchObject({ status: "done", done: 3, failed: [] });
     expect(ai.calls.filter((c) => c === "slide_dan_y")).toHaveLength(1);
+  });
+
+  it("giọng đọc lỗi tạm thời: bài vẫn xong, 'sinh tiếp' bù lại các câu còn thiếu tiếng", async () => {
+    ttsImpl = { synth: async () => null };
+    const { id } = await makeLesson();
+    const speechOf = async () => ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[]).flatMap((s) => (s.actions ?? []).filter((a) => a.type === "speech"));
+    expect((await speechOf()).every((a) => !(a as { audioFile?: string }).audioFile)).toBe(true);
+    ttsImpl = fakeTts;
+    await call("POST", `/api/ai-lessons/${id}/sinh-tiep`);
+    await waitDone(id);
+    const after = await speechOf();
+    expect(after.length).toBeGreaterThan(0);
+    expect(after.every((a) => (a as { audioFile?: string }).audioFile)).toBe(true);
   });
 
   it("sửa nhanh: đổi chữ, xoá cảnh, sinh lại 1 cảnh", async () => {

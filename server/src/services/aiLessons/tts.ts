@@ -36,28 +36,52 @@ async function durationOf(file: string, bytes: number): Promise<number> {
 // mp3 24kHz 48kbps mono = 6000 byte/giây (CBR)
 const BYTES_PER_SEC = 6000;
 
+/** Dịch vụ đọc chỉ nhận vài kết nối cùng lúc: giới hạn 2 và thử lại tối đa 5 lần. */
+const MAX_PARALLEL = 2;
+let active = 0;
+const waiters: (() => void)[] = [];
+async function slot<T>(fn: () => Promise<T>): Promise<T> {
+  while (active >= MAX_PARALLEL) await new Promise<void>((r) => waiters.push(r));
+  active++;
+  try {
+    return await fn();
+  } finally {
+    active--;
+    waiters.shift()?.();
+  }
+}
+
 export function createEdgeTts(voice: string): Tts {
   return {
     async synth(text, dir, name) {
-      const t = speakable(text);
-      if (!t) return null;
-      await mkdir(dir, { recursive: true });
-      const tts = new MsEdgeTTS();
-      try {
-        await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
-        const { audioStream } = tts.toStream(t);
-        const chunks: Buffer[] = [];
-        for await (const c of audioStream) chunks.push(c as Buffer);
-        const buf = Buffer.concat(chunks);
-        if (buf.length < 500) return null;
-        const file = `${name}.mp3`;
-        await writeFile(path.join(dir, file), buf);
-        return { file, durationMs: await durationOf(path.join(dir, file), buf.length) };
-      } catch {
-        return null;
-      } finally {
-        tts.close();
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const r = await slot(() => once(voice, text, dir, name));
+        if (r || !speakable(text)) return r;
+        await new Promise((res) => setTimeout(res, 700 * (attempt + 1)));
       }
+      return null;
     },
   };
+}
+
+async function once(voice: string, text: string, dir: string, name: string): Promise<{ file: string; durationMs: number } | null> {
+  const t = speakable(text);
+  if (!t) return null;
+  await mkdir(dir, { recursive: true });
+  const tts = new MsEdgeTTS();
+  try {
+    await tts.setMetadata(voice, OUTPUT_FORMAT.AUDIO_24KHZ_48KBITRATE_MONO_MP3);
+    const { audioStream } = tts.toStream(t);
+    const chunks: Buffer[] = [];
+    for await (const c of audioStream) chunks.push(c as Buffer);
+    const buf = Buffer.concat(chunks);
+    if (buf.length < 500) return null;
+    const file = `${name}.mp3`;
+    await writeFile(path.join(dir, file), buf);
+    return { file, durationMs: await durationOf(path.join(dir, file), buf.length) };
+  } catch {
+    return null;
+  } finally {
+    tts.close();
+  }
 }
