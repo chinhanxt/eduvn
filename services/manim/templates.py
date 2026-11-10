@@ -1,87 +1,11 @@
-"""Mẫu hoạt hình toán CỐ ĐỊNH của EDUVN (Manim Community, MIT).
+"""Mẫu hoạt hình toán CỐ ĐỊNH của EDUVN (Manim Community, MIT) — nhóm 1: đồ thị, công thức, hình học diện tích, trục số.
 
-AI chỉ chọn mẫu + tham số JSON (đã kiểm bằng zod phía máy chủ); tệp này KHÔNG bao giờ nhận mã Python từ ngoài.
-Chạy:  EDUVN_SPEC=spec.json manim render -r 1280,720 --fps 30 templates.py <TênCảnh>
-spec.json = {"template": ..., "thoiLuong": giây, "tieuDe": ..., "params": {...}}
-Biểu thức hàm số đến dưới dạng cây AST (danh sách lồng nhau) do bộ phân tích của máy chủ sinh ra; ev() chỉ chấp nhận danh sách phép toán dưới đây.
+AI chỉ chọn mẫu + tham số JSON (đã kiểm bằng zod phía máy chủ); các tệp mẫu KHÔNG bao giờ nhận mã Python từ ngoài.
+Chạy:  EDUVN_SPEC=spec.json PYTHONPATH=services/manim manim render -r 1280,720 --fps 30 <tệp>.py <TênCảnh>
+spec.json = {"template": ..., "thoiLuong": giây, "tieuDe": ..., "params": {...}}; phần dùng chung ở common.py.
 """
-import json
-import math
-import os
-
-from manim import (
-    BLUE_C, DOWN, GREEN_C, LEFT, RED_C, RIGHT, UP, WHITE, YELLOW, ORANGE, GREY_B,
-    Axes, Brace, Create, CurvedArrow, DecimalNumber, Dot, FadeIn, FadeOut, Line, MathTex, NumberLine,
-    Rectangle, Scene, Text, TransformMatchingTex, UR, VMobject, ValueTracker, VGroup, Write, always_redraw, config,
-    linear, smooth, Transform,
-)
-
-SPEC = json.load(open(os.environ["EDUVN_SPEC"], encoding="utf-8"))
-P = SPEC["params"]
-TOTAL = float(SPEC["thoiLuong"])
-config.background_color = "#10142b"
-BIG = 1e4
-_CONST = {"pi": math.pi, "e": math.e}
-_FN = {
-    "sin": math.sin, "cos": math.cos, "tan": math.tan, "sqrt": math.sqrt, "abs": abs,
-    "ln": math.log, "log": math.log10, "exp": math.exp,
-}
-
-
-def ev(n, x, a=0.0):
-    """Tính cây biểu thức. Lỗi miền xác định → nan (đoạn đó không vẽ)."""
-    k = n[0]
-    try:
-        if k == "num":
-            return float(n[1])
-        if k == "x":
-            return x
-        if k == "a":
-            return a
-        if k == "const":
-            return _CONST[n[1]]
-        if k == "neg":
-            return -ev(n[1], x, a)
-        if k == "fn":
-            return _FN[n[1]](ev(n[2], x, a))
-        l, r = ev(n[1], x, a), ev(n[2], x, a)
-        if k == "add":
-            return l + r
-        if k == "sub":
-            return l - r
-        if k == "mul":
-            return l * r
-        if k == "div":
-            return l / r
-        if k == "pow":
-            v = l ** r
-            return float("nan") if isinstance(v, complex) else v
-    except (ValueError, ZeroDivisionError, OverflowError):
-        return float("nan")
-    raise ValueError("phép toán không hợp lệ")
-
-
-class Base(Scene):
-    """Khung chung: tiêu đề, chia thời lượng, đệm cho đủ TOTAL giây."""
-
-    def setup(self):
-        self.title_obj = None
-        self.top = 3.2
-
-    def head(self):
-        t = SPEC.get("tieuDe")
-        if t:
-            self.title_obj = Text(t, font_size=32, color=WHITE).to_edge(UP, buff=0.3)
-            self.play(FadeIn(self.title_obj), run_time=0.01)
-            self.top = 2.7
-
-    def step(self, n):
-        return max(0.3, TOTAL * 0.92 / max(n, 1))
-
-    def finish(self):
-        left = TOTAL - self.renderer.time
-        if left > 0.02:
-            self.wait(left)
+from common import *  # noqa: F401,F403
+from common import Base, P, SPEC, TOTAL, ev, plot_runs  # noqa: F401
 
 
 class DoThiHamSo(Base):

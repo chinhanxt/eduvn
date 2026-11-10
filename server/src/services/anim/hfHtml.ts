@@ -1,12 +1,15 @@
 /** Mẫu HyperFrames CỐ ĐỊNH: spec đã kiểm → index.html (GSAP + KaTeX). Mọi chữ của AI đều được escape; không có mã nào của AI đi vào trang. */
 import katex from "katex";
+import { moreHtml } from "./hfHtmlMore";
 import type { AnimSpec } from "./spec";
 
 export const HF_W = 1280;
 export const HF_H = 720;
+export const HF_TEMPLATES = ["dien_giai_tung_buoc", "so_do_quy_trinh", "so_sanh_bang", "dong_thoi_gian", "so_do_venn", "bieu_do_so_lieu", "the_ghi_nho", "trich_dan_van_ban", "tu_vung", "can_bang_phuong_trinh_hoa_hoc", "cay_xac_suat"] as const;
+export type HfSpec = Extract<AnimSpec, { template: (typeof HF_TEMPLATES)[number] }>;
 type Spec = Extract<AnimSpec, { template: "dien_giai_tung_buoc" | "so_do_quy_trinh" | "so_sanh_bang" }>;
 
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** Chữ thường + công thức $…$ → HTML (KaTeX dựng sẵn phía máy chủ). */
 export function richText(s: string): string {
@@ -25,7 +28,7 @@ export function richText(s: string): string {
     .join("");
 }
 
-const CSS = `
+export const CSS = `
 @font-face{font-family:"Noto Sans";src:local("Noto Sans"),local("NotoSans-Regular")}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:${HF_W}px;height:${HF_H}px;overflow:hidden;background:#10142b}
@@ -44,7 +47,7 @@ html,body{width:${HF_W}px;height:${HF_H}px;overflow:hidden;background:#10142b}
 .katex{font-size:1.05em}
 `;
 
-const doc = (spec: Spec, css: string, inner: string, script: string) => `<!doctype html>
+export const doc = (spec: { thoiLuong: number; tieuDe?: string }, css: string, inner: string, script: string) => `<!doctype html>
 <html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=${HF_W}, height=${HF_H}">
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 <link rel="stylesheet" href="assets/katex/katex.min.css">
@@ -62,9 +65,10 @@ tl.seek(0);
 `;
 
 /** Thời điểm hiện của phần tử thứ i trong n (chừa 0,4 s đầu và 0,5 s cuối). */
-const at = (i: number, n: number, total: number) => Math.round((0.4 + (i * Math.max(total - 1.2, 0.5)) / n) * 100) / 100;
+export const at = (i: number, n: number, total: number) => Math.round((0.4 + (i * Math.max(total - 1.2, 0.5)) / n) * 100) / 100;
 
-export function hyperframesHtml(spec: Spec): string {
+export function hyperframesHtml(spec: HfSpec): string {
+  if (spec.template !== "dien_giai_tung_buoc" && spec.template !== "so_do_quy_trinh" && spec.template !== "so_sanh_bang") return moreHtml(spec);
   const T = spec.thoiLuong;
   const top = spec.tieuDe ? 100 : 40;
   const css = (extra: Record<string, string>) => Object.entries({ __TOP__: String(top), __BW__: "180", __AW__: "50", __COLS__: "2", ...extra }).reduce((c, [k, v]) => c.replaceAll(k, v), CSS);

@@ -7,16 +7,36 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import { hyperframesHtml } from "./hfHtml";
+import { HF_TEMPLATES, type HfSpec, hyperframesHtml } from "./hfHtml";
 import { AnimSpec, TEMPLATES, type TemplateName } from "./spec";
 
 export { AnimSpec, TEMPLATES, type TemplateName } from "./spec";
+export { CATALOG, prefilter } from "./catalog";
 const run = promisify(execFile);
 const here = path.dirname(fileURLToPath(import.meta.url));
-const MANIM_CLASS: Record<string, string> = { do_thi_ham_so: "DoThiHamSo", bien_doi_cong_thuc: "BienDoiCongThuc", hinh_hoc_dien_tich: "HinhHocDienTich", truc_so: "TrucSo" };
+/** Mẫu → [tệp Python, lớp Scene] trong services/manim. */
+const MANIM_CLASS: Record<string, [string, string]> = {
+  do_thi_ham_so: ["templates.py", "DoThiHamSo"],
+  bien_doi_cong_thuc: ["templates.py", "BienDoiCongThuc"],
+  hinh_hoc_dien_tich: ["templates.py", "HinhHocDienTich"],
+  truc_so: ["templates.py", "TrucSo"],
+  vong_tron_luong_giac: ["templates_toan.py", "VongTronLuongGiac"],
+  do_thi_luong_giac: ["templates_toan.py", "DoThiLuongGiac"],
+  vecto: ["templates_toan.py", "Vecto"],
+  hinh_khong_gian_xoay: ["templates_toan.py", "HinhKhongGianXoay"],
+  dao_ham_tiep_tuyen: ["templates_toan.py", "DaoHamTiepTuyen"],
+  tich_phan_dien_tich: ["templates_toan.py", "TichPhanDienTich"],
+  giao_diem_he_pt: ["templates_toan.py", "GiaoDiemHePt"],
+  phep_bien_hinh: ["templates_toan.py", "PhepBienHinh"],
+  day_so: ["templates_toan.py", "DaySo"],
+  dao_dong_dieu_hoa: ["templates_ly.py", "DaoDongDieuHoa"],
+  chuyen_dong_thang: ["templates_ly.py", "ChuyenDongThang"],
+  song_co: ["templates_ly.py", "SongCo"],
+  tong_hop_luc: ["templates_ly.py", "TongHopLuc"],
+};
 export const HF_VERSION = "0.9.28";
 /** Đổi khi sửa mẫu → cache cũ không dùng lại. */
-const TEMPLATE_VERSION = "1";
+const TEMPLATE_VERSION = "2";
 
 export type AnimCfg = {
   dataDir: string;
@@ -24,8 +44,8 @@ export type AnimCfg = {
   wrap?: string[];
   manimHome: string;
   tinytexBin: string;
-  /** Đường dẫn templates.py (mặc định: services/manim trong repo). */
-  manimTemplates?: string;
+  /** Thư mục chứa các tệp mẫu Python (mặc định: services/manim trong repo). */
+  manimDir?: string;
   /** Lệnh HyperFrames (mặc định npx --yes hyperframes@bản đã ghim). */
   hfCmd?: string[];
   /** low = thử nhanh (360p/15fps, draft); normal = 720p/30fps. */
@@ -55,7 +75,7 @@ async function findFile(dir: string, name: string): Promise<string | null> {
 export function createAnimService(cfg: AnimCfg) {
   const quality = cfg.quality ?? "normal";
   const dir = path.join(cfg.dataDir, "anim");
-  const templates = cfg.manimTemplates ?? path.resolve(here, "../../../../services/manim/templates.py");
+  const manimDir = cfg.manimDir ?? path.resolve(here, "../../../../services/manim");
   const hfCmd = cfg.hfCmd ?? ["npx", "--yes", `hyperframes@${HF_VERSION}`];
   const inflight = new Map<string, Promise<AnimResult>>();
   let tail: Promise<unknown> = Promise.resolve();
@@ -72,25 +92,26 @@ export function createAnimService(cfg: AnimCfg) {
   const fileOf = (hash: string) => path.join(dir, `${hash}.mp4`);
 
   async function manim(spec: AnimSpec, work: string, out: string): Promise<void> {
-    const cls = MANIM_CLASS[spec.template] as string;
+    const [file, cls] = MANIM_CLASS[spec.template] as [string, string];
     const specFile = path.join(work, "spec.json");
     await writeFile(specFile, JSON.stringify(spec), "utf8");
     const low = quality === "low";
-    const [bin, args] = wrapped(path.join(cfg.manimHome, "bin/manim"), ["render", "-r", low ? "640,360" : "1280,720", "--fps", low ? "15" : "30", "--media_dir", path.join(work, "media"), "--progress_bar", "none", "-o", "clip.mp4", templates, cls]);
-    await run(bin, args, { cwd: work, timeout: 20 * 60_000, maxBuffer: 16 * 1024 * 1024, env: { ...process.env, EDUVN_SPEC: specFile, PATH: `${cfg.tinytexBin}:${process.env.PATH ?? ""}` } });
+    const [bin, args] = wrapped(path.join(cfg.manimHome, "bin/manim"), ["render", "-r", low ? "640,360" : "1280,720", "--fps", low ? "15" : "30", "--media_dir", path.join(work, "media"), "--progress_bar", "none", "-o", "clip.mp4", path.join(manimDir, file), cls]);
+    await run(bin, args, { cwd: work, timeout: 20 * 60_000, maxBuffer: 16 * 1024 * 1024, env: { ...process.env, EDUVN_SPEC: specFile, PYTHONPATH: manimDir, PATH: `${cfg.tinytexBin}:${process.env.PATH ?? ""}` } });
     const made = await findFile(path.join(work, "media", "videos"), "clip.mp4");
     if (!made) throw new Error("Manim không tạo ra video");
     await cp(made, out);
   }
 
   async function hyperframes(spec: AnimSpec, work: string, out: string): Promise<void> {
-    if (spec.template !== "dien_giai_tung_buoc" && spec.template !== "so_do_quy_trinh" && spec.template !== "so_sanh_bang") throw new Error("Mẫu không thuộc HyperFrames");
+    if (!(HF_TEMPLATES as readonly string[]).includes(spec.template)) throw new Error("Mẫu không thuộc HyperFrames");
+    const hf = spec as HfSpec;
     const proj = path.join(work, "proj");
     await mkdir(path.join(proj, "assets", "katex"), { recursive: true });
     const katexDist = path.join(path.dirname(createRequire(import.meta.url).resolve("katex/package.json")), "dist");
     await cp(path.join(katexDist, "katex.min.css"), path.join(proj, "assets/katex/katex.min.css"));
     await cp(path.join(katexDist, "fonts"), path.join(proj, "assets/katex/fonts"), { recursive: true });
-    await writeFile(path.join(proj, "index.html"), hyperframesHtml(spec), "utf8");
+    await writeFile(path.join(proj, "index.html"), hyperframesHtml(hf), "utf8");
     await writeFile(path.join(proj, "hyperframes.json"), JSON.stringify({ paths: { blocks: "compositions", components: "compositions/components", assets: "assets" } }), "utf8");
     const [bin, args] = wrapped(hfCmd[0] as string, [...hfCmd.slice(1), "render", proj, "--output", out, "--fps", quality === "low" ? "15" : "30", "--quality", quality === "low" ? "draft" : "looks", "--workers", "2", "--quiet"]);
     await run(bin, args, { cwd: work, timeout: 20 * 60_000, maxBuffer: 16 * 1024 * 1024 });
