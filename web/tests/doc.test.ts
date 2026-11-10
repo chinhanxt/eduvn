@@ -21,3 +21,23 @@ describe("boardKeywords", () => {
     for (const w of ["hình lập phương", "thiết diện", "đồ thị hàm số", "bậc hai", "lượng giác"]) expect(kw).toContain(w);
   });
 });
+
+import { arrowHead, moveObj, shapeD, textBox, type ShapeObj, type TextObj } from "../src/board/doc";
+
+describe("hình phẳng và ô chữ", () => {
+  const sh = (kind: ShapeObj["kind"], pts: number[]): ShapeObj => ({ type: "shape", id: "s", kind, color: "#ff7a6b", width: 3, fill: false, pts });
+  it("đường viền theo loại hình", () => {
+    expect(shapeD(sh("line", [0, 0, 10, 20]))).toBe("M0 0L10 20");
+    expect(shapeD(sh("rect", [0, 0, 10, 20]))).toBe("M0 0H10V20H0Z");
+    expect(shapeD(sh("triangle", [0, 0, 10, 20]))).toBe("M5 0L10 20L0 20Z");
+    expect(shapeD(sh("polygon", [0, 0, 10, 0, 5, 8]))).toBe("M0 0L10 0L5 8Z");
+    expect(shapeD(sh("circle", [0, 0, 20, 20]))).toContain("A10 10");
+    expect(arrowHead(sh("arrow", [0, 0, 100, 0]))).toMatch(/^M/);
+  });
+  it("dời hình/ô chữ; kích thước ô chữ tăng khi có phân số", () => {
+    expect(moveObj(sh("line", [0, 0, 10, 20]), 5, 7)).toEqual({ pts: [5, 7, 15, 27] });
+    const t: TextObj = { type: "text", id: "t", x: 10, y: 10, size: 30, color: "#f3f0e6", text: "x+1" };
+    expect(moveObj(t, 3, 4)).toEqual({ x: 13, y: 14 });
+    expect(textBox({ ...t, text: "$\\frac{a}{b}$" }).h).toBeGreaterThan(textBox(t).h);
+  });
+});

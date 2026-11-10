@@ -114,3 +114,13 @@
 .bd-po em { margin-left: auto; font-style: normal; font-weight: 600; }
 .bd-po em.ok { color: var(--green); } .bd-po em.no { color: #b42318; }
 .bd-proj-card > .bd-btn { justify-self: start; }
+
+/* P10 đợt 4 — hình phẳng, ô chữ */
+.bd-tool-line .bd-obj, .bd-tool-arrow .bd-obj, .bd-tool-rect .bd-obj, .bd-tool-triangle .bd-obj, .bd-tool-circle .bd-obj, .bd-tool-polygon .bd-obj, .bd-tool-text .bd-obj { pointer-events: none; }
+.bd-tool-line, .bd-tool-arrow, .bd-tool-rect, .bd-tool-triangle, .bd-tool-circle, .bd-tool-polygon { cursor: crosshair; }
+.bd-tool-text { cursor: text; }
+.bd-text { color: #f3f0e6; line-height: 1.5; padding: 2px 12px; white-space: nowrap; }
+.bd-text .me-text { font-size: inherit; }
+.bd-text-prev { min-height: 44px; padding: 8px 12px; border-radius: 10px; background: #242b35; color: #f3f0e6; font-size: 22px; }
+.bd-rb.sh svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bd-rb.tx { font-weight: 700; font-size: 17px; font-family: serif; }
