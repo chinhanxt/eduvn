@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { Db } from "../../db/client";
 import type { Ai } from "../../services/ai";
 import { createSolutionService } from "../../services/solutions";
+import { parseOverrides, withTaskOverrides } from "../../tutor/tasks";
 import type { Actor } from "../../service";
 
 export type SolutionRouteCtx = { db: Db; ai: Ai; publicUrl: string; webUrl?: string; authenticate: (req: FastifyRequest) => Promise<Actor> };
@@ -13,7 +14,7 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 const plain = (s: string) => s.replace(/\$([^$]*)\$/g, "$1").replace(/[*_#`>]/g, "").replace(/\s+/g, " ").trim();
 
 export function registerSolutionRoutes(app: FastifyInstance, ctx: SolutionRouteCtx) {
-  const svc = createSolutionService(ctx.db, ctx.ai);
+  const svc = createSolutionService(ctx.db, withTaskOverrides(ctx.ai, parseOverrides(process.env.AI_TASK_OVERRIDES)));
   const { authenticate } = ctx;
 
   app.post("/api/solutions/solve", async (req, reply) => {
