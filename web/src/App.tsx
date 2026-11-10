@@ -20,6 +20,12 @@ import { Connect } from "./pages/Connect";
 import { Placeholder } from "./pages/Placeholder";
 import { MathKeyboard } from "./math/MathKeyboard";
 import { TOOLS } from "./tools";
+import { Books } from "./hoc/Books";
+import { HocLayout } from "./hoc/HocLayout";
+import { KhoTriThuc } from "./hoc/KhoTriThuc";
+import { Paths } from "./hoc/Paths";
+import { Practice } from "./hoc/Practice";
+import { Tutor } from "./hoc/Tutor";
 
 export function App() {
   const { user, ready } = useAuth();
@@ -51,10 +57,20 @@ export function App() {
           <Route path="tro-choi" element={<Games />} />
           <Route path="van-ban" element={<VanBan />} />
           <Route path="ket-noi" element={<Connect />} />
-          {TOOLS.filter((t) => t.pill).map((t) => (
+          <Route path="kho-tri-thuc" element={<KhoTriThuc />} />
+          <Route path="hoc" element={<HocLayout />}>
+            <Route index element={<Navigate to="gia-su" replace />} />
+            <Route path="gia-su" element={<Tutor />} />
+            <Route path="luyen-tap" element={<Practice />} />
+            <Route path="lo-trinh" element={<Paths />} />
+            <Route path="giao-trinh" element={<Books />} />
+          </Route>
+          {TOOLS.filter((t) => t.pill && !["/gia-su", "/giao-trinh"].includes(t.to)).map((t) => (
             <Route key={t.to} path={t.to.slice(1)} element={<Placeholder tool={t} />} />
           ))}
           <Route path="to-chuc" element={<Placeholder tool={{ to: "/to-chuc", name: "Tổ chức", icon: "org", color: "amber", pill: "Sắp có" }} />} />
+          <Route path="gia-su" element={<Navigate to="/hoc/gia-su" replace />} />
+          <Route path="giao-trinh" element={<Navigate to="/hoc/giao-trinh" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
         </>

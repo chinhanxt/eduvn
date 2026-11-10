@@ -29,6 +29,8 @@ import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
 import { StudentItem } from "../domain/roster";
+import { createTutor } from "../tutor";
+import { registerTutorRoutes } from "./routes/tutor";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string; ai?: Ai; aiLessons?: AiLessonsCfg };
@@ -332,6 +334,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   });
 
   registerAiLessonRoutes(app, { db: deps.db, ai: deps.ai, cfg: deps.aiLessons ?? { dataDir: "./data" }, service, authenticate });
+  registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

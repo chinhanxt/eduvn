@@ -69,6 +69,17 @@
       "timeoutMs": 120000,
       "description": "Đọc chữ từ ảnh bài làm"
     },
+    "gia_su_phu": {
+      "model": ["gemini-3.8-flash-low", "gemini-4-argon-low", "claude-sonnet-4-6"],
+      "priority": "interactive",
+      "timeoutMs": 30000,
+      "description": "Việc phụ rẻ của gia sư: tên phiên, câu gợi mở, tóm tắt hội thoại, viết lại truy vấn, chấm câu trả lời ngắn"
+    },
+    "gia_su_luyen": {
+      "model": ["claude-sonnet-5-5-medium", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
+      "timeoutMs": 180000,
+      "description": "Lộ trình thành thạo và dựng giáo trình: chẩn đoán, giải thích, luyện, chẩn lỗi, dàn chương, khối nội dung (JSON khi gọi với json=true)"
+    },
     "giam_khao": {
       "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-medium"],
       "json": true,
