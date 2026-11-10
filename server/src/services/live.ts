@@ -46,6 +46,8 @@ type Player = {
   res: Set<ServerResponse>;
   lastPost: number;
   rank: number;
+  prevRank: number;
+  delta: number;
 };
 type Phase = "lobby" | "question" | "reveal" | "ended";
 type Room = {
@@ -129,8 +131,26 @@ export function createLiveService(deps: LiveDeps) {
     return it && r.phase !== "lobby" ? { i: r.qi, q: it.q, kind: it.kind, options: it.options } : null;
   };
   const answerText = (it: GameItem) => (it.kind === "choice" ? (it.options?.[it.answer as number] ?? "") : String(it.answer));
-  const top = (r: Room, n: number) => r.ranked.slice(0, n).map((p) => ({ name: p.name, score: p.score }));
+  const top = (r: Room, n: number) => r.ranked.slice(0, n).map((p) => ({ name: p.name, score: p.score, delta: p.delta, prevRank: p.prevRank, rank: p.rank, streak: p.streak }));
   const timing = (r: Room) => ({ now: now(), endsAt: r.phase === "question" ? r.qEnd : 0, paused: r.pausedLeft !== null, leftMs: r.pausedLeft ?? Math.max(0, r.qEnd - now()), limitMs: r.limitMs });
+
+  /** Tổng kết lớp: tỉ lệ đúng, câu khó nhất, câu trả lời đúng nhanh nhất. */
+  function summary(r: Room) {
+    let ok = 0;
+    let slots = 0;
+    let fastest: { name: string; ms: number } | null = null;
+    for (const p of r.players.values()) {
+      for (const a of p.answers) {
+        slots++;
+        if (a.ok) {
+          ok++;
+          if (!fastest || a.ms < fastest.ms) fastest = { name: p.name, ms: a.ms };
+        }
+      }
+    }
+    const hard = [...r.qstats].filter((q) => q.answered > 0).sort((a, b) => (b.answered - b.correct) / b.answered - (a.answered - a.correct) / a.answered)[0];
+    return { accuracy: slots ? Math.round((ok / slots) * 100) : 0, hardest: hard ? { n: hard.i + 1, q: hard.q, wrongPct: Math.round(((hard.answered - hard.correct) / hard.answered) * 100) } : null, fastest };
+  }
 
   function hostState(r: Room) {
     const it = r.items[r.qi];
@@ -150,6 +170,7 @@ export function createLiveService(deps: LiveDeps) {
       ...timing(r),
       reveal: shown && it && r.qi >= 0 && r.qstats[r.qstats.length - 1]?.i === r.qi ? { answer: answerText(it), correctIndex: it.kind === "choice" ? it.answer : null, explain: it.explain, counts: r.counts, correct: r.qstats[r.qstats.length - 1]?.correct ?? 0, answeredCount: r.answered, top: top(r, 5) } : null,
       podium: r.phase === "ended" ? top(r, 3) : null,
+      summary: r.phase === "ended" ? summary(r) : null,
       sessionId: r.sessionId,
       classId: r.classId,
     };
@@ -170,8 +191,8 @@ export function createLiveService(deps: LiveDeps) {
       question: publicQ(r),
       ...timing(r),
       answered: r.phase === "question" && p.cur !== null,
-      me: { score: p.score, rank: p.rank, streak: p.streak, of: r.players.size },
-      result: shown && it && last && last.i === r.qi ? { ok: last.ok, pts: last.pts, answer: answerText(it), explain: it.explain } : null,
+      me: { score: p.score, rank: p.rank, prevRank: p.prevRank, delta: p.delta, streak: p.streak, of: r.players.size },
+      result: shown && it && last && last.i === r.qi ? { ok: last.ok, answered: p.cur !== null, pts: last.pts, answer: answerText(it), explain: it.explain } : null,
       podium: r.phase === "ended" ? top(r, 3) : null,
     };
   }
@@ -244,6 +265,8 @@ export function createLiveService(deps: LiveDeps) {
         correct++;
       } else p.streak = 0;
       p.answers.push({ i: r.qi, ok: c?.ok ?? false, pts: c?.pts ?? 0, ms: c?.ms ?? r.limitMs });
+      p.prevRank = p.rank;
+      p.delta = c?.ok ? c.pts : 0;
     }
     r.qstats.push({ i: r.qi, q: it.q, kind: it.kind, answered: r.answered, correct, counts: r.counts });
     rankAll(r);
@@ -450,7 +473,7 @@ export function createLiveService(deps: LiveDeps) {
   function add(r: Room, name: string, studentId: string | null): string {
     if (r.players.size >= MAX_PLAYERS) throw new LiveHttpError(409, "Phòng đã đầy");
     const id = randomBytes(8).toString("hex");
-    r.players.set(id, { id, name, studentId, score: 0, streak: 0, correct: 0, answers: [], cur: null, res: new Set(), lastPost: 0, rank: 0 });
+    r.players.set(id, { id, name, studentId, score: 0, streak: 0, correct: 0, answers: [], cur: null, res: new Set(), lastPost: 0, rank: 0, prevRank: 0, delta: 0 });
     // vào giữa trận: coi như chưa trả lời các câu đã qua
     touch(r);
     hostSoon(r);

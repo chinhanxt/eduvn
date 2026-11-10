@@ -28,7 +28,7 @@ const DiagramPage = lazy(() => import("./diagram/DiagramPage").then((m) => ({ de
 const Games = lazy(() => import("./pages/Games").then((m) => ({ default: m.Games })));
 const Arena = lazy(() => import("./live/Host").then((m) => ({ default: m.Arena })));
 const SessionPage = lazy(() => import("./live/Host").then((m) => ({ default: m.SessionPage })));
-const HostScreen = lazy(() => import("./live/Host").then((m) => ({ default: m.HostScreen })));
+const HostScreen = lazy(() => import("./live/HostScreen").then((m) => ({ default: m.HostScreen })));
 const Play = lazy(() => import("./live/Play").then((m) => ({ default: m.Play })));
 const Connect = lazy(() => import("./pages/Connect").then((m) => ({ default: m.Connect })));
 const MathKeyboard = lazy(() => import("./math/MathKeyboard").then((m) => ({ default: m.MathKeyboard })));

@@ -1,18 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
-export type Q = { i: number; q: string; kind: "choice" | "text"; options?: string[] };
+export type Q = { i: number; q: string; kind: "choice" | "text"; options?: string[]; image?: string };
 type Timing = { now: number; endsAt: number; paused: boolean; leftMs: number; limitMs: number };
-export type Top = { name: string; score: number };
+export type Top = { name: string; score: number; delta: number; prevRank: number; rank: number; streak: number };
+export type Summary = { accuracy: number; hardest: { n: number; q: string; wrongPct: number } | null; fastest: { name: string; ms: number } | null };
 export type HostState = Timing & {
   role: "host"; pin: string; title: string; className: string | null; phase: "lobby" | "question" | "reveal" | "ended";
   qi: number; total: number; playerCount: number; names?: string[]; answered: number; question: Q | null;
   reveal: { answer: string; correctIndex: number | null; explain: string; counts: number[]; correct: number; answeredCount: number; top: Top[] } | null;
-  podium: Top[] | null; sessionId: string | null; classId: string | null;
+  podium: Top[] | null; summary: Summary | null; sessionId: string | null; classId: string | null;
 };
 export type PlayerState = Timing & {
   role: "player"; pin: string; title: string; name: string; phase: HostState["phase"]; qi: number; total: number; question: Q | null;
-  answered: boolean; me: { score: number; rank: number; streak: number; of: number };
-  result: { ok: boolean; pts: number; answer: string; explain: string } | null; podium: Top[] | null;
+  answered: boolean; me: { score: number; rank: number; prevRank: number; delta: number; streak: number; of: number };
+  result: { ok: boolean; answered: boolean; pts: number; answer: string; explain: string } | null; podium: Top[] | null;
 };
 
 /** Mở luồng SSE; trình duyệt tự nối lại khi rớt mạng và máy chủ gửi ngay trạng thái hiện tại. `gone` = phòng không còn. */
