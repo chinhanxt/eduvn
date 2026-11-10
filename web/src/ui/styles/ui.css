@@ -428,3 +428,20 @@ table.data.dense td { height: var(--row-h-dense); padding-top: var(--s-1); paddi
 .skel-row:last-child { border-bottom: 0; }
 /* Ký hiệu toán trong đoạn serif: Source Serif 4 và subset Inter của Google thiếu ≠ → dùng font toán hệ thống */
 .m { font-family: "Cambria Math", "STIX Two Math", "DejaVu Sans", "Segoe UI Symbol", sans-serif; font-style: normal; font-size: .95em; }
+
+/* ======================= Bổ sung cho code thật (không có trong mockup) ======================= */
+/* Nút nguy hiểm trong hộp xác nhận: đỏ đặc */
+.btn.primary.danger-solid { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn.primary.danger-solid:hover { background: color-mix(in srgb, var(--danger) 88%, #000); }
+/* Biểu đồ: bản bảng tương đương */
+.chart-table { margin-top: var(--s-2); font-size: var(--fs-sm); color: var(--ink-3); }
+.chart-table summary { cursor: pointer; width: max-content; border-radius: var(--r-xs); }
+.chart-table summary:hover { color: var(--ink); }
+.chart-table table { margin-top: var(--s-2); width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.chart-table th, .chart-table td { text-align: left; padding: 4px 8px; border-bottom: var(--bw) solid var(--line); }
+.chart-table th { font-weight: var(--fw-semibold); color: var(--ink-2); }
+.chart-table td.r, .chart-table th.r { text-align: right; }
+.chart-box { position: relative; width: 100%; }
+/* StreamingText: nút Dừng + trạng thái đã dừng */
+.stream-wrap { display: flex; flex-direction: column; gap: var(--s-2); }
+.stream-wrap .stream-acts { display: flex; align-items: center; gap: var(--s-2); font-size: var(--fs-sm); color: var(--ink-3); }
