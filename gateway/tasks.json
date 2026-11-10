@@ -56,6 +56,16 @@
       "timeoutMs": 300000,
       "description": "Cảnh tương tác HTML (mô phỏng, sơ đồ, trò chơi, 3D) của bài giảng OpenMAIC — trả HTML, không ép JSON"
     },
+    "hoat_hinh_toan": {
+      "model": [
+        "claude-sonnet-5-5-medium",
+        "gemini-3.8-flash-medium",
+        "claude-sonnet-4-6"
+      ],
+      "json": true,
+      "description": "Chọn tối đa một hoạt hình trong danh sách mẫu đã lọc + điền tham số JSON (không viết mã)",
+      "system": "Bạn là biên tập viên hoạt hình cho bài giảng của giáo viên Việt Nam. Với MỘT cảnh bài giảng, bạn CHỌN TỐI ĐA MỘT mẫu hoạt hình trong danh sách \"các mẫu được phép\" ở tin nhắn người dùng và điền tham số JSON cho mẫu đó. Tuyệt đối không viết mã, không tự đặt mẫu ngoài danh sách.\nQuy tắc:\n1. Chọn 0 hoặc 1 mẫu. Chỉ chọn khi hoạt hình giúp học sinh hiểu hơn (hình dung, chuyển động, so sánh, các bước nối tiếp). Cảnh chỉ là định nghĩa suông, câu hỏi, giới thiệu, tổng kết không cần hoạt hình thì trả template null.\n2. Hoạt hình phải khớp nội dung và THỨ TỰ lời giảng của cảnh: các bước/dòng/mốc xuất hiện theo đúng trình tự giáo viên nói.\n3. Điền tham số bằng chính con số, công thức, tên gọi có trong slide và lời giảng của cảnh; không bịa số liệu khác. Chữ hiển thị là tiếng Việt có dấu, ngắn gọn; công thức LaTeX viết ASCII thuần và không đặt tiếng Việt trong LaTeX.\n4. Tuân đúng giới hạn tham số ghi trong mô tả mẫu (số lượng phần tử, độ dài chữ, khoảng giá trị). Biểu thức hàm số chỉ dùng + - * / ^ ( ), x, a, pi, e, sin cos tan sqrt abs ln log exp.\n5. Đặt thoiLuong bằng đúng thời lượng lời giảng đã cho.\n6. confidence là số từ 0 đến 1: mức chắc chắn rằng mẫu này đúng và hữu ích cho cảnh. Dưới 0,6 nghĩa là không chắc; khi đó thà trả template null.\nTrả về đúng một JSON, không kèm chữ nào khác: {\"template\": string|null, \"thoiLuong\": number, \"tieuDe\": string (≤80 ký tự, tuỳ chọn), \"params\": object, \"reason\": \"một câu vì sao chọn mẫu này\", \"confidence\": number}."
+    },
     "loi_giang": {
       "model": ["gemini-3.8-flash-low", "gemini-4-argon-low", "claude-sonnet-4-6"],
       "description": "Lời giảng đọc kèm slide"

@@ -3,7 +3,8 @@ import { loadConfig } from "./config";
 import { connectDb } from "./db/client";
 import { buildApp } from "./http/app";
 import { createAi } from "./services/ai";
-import { createEdgeTts, disabledTts } from "./services/aiLessons/tts";
+import { createAnimService } from "./services/anim";
+import { createVieneuTts, disabledTts } from "./services/aiLessons/tts";
 
 const cfg = loadConfig();
 const db = await connectDb(cfg.DATABASE_URL);
@@ -19,7 +20,8 @@ const app = buildApp({
   ai: createAi({ url: cfg.GATEWAY_URL, token: cfg.GATEWAY_TOKEN }),
   aiLessons: {
     dataDir: cfg.DATA_DIR,
-    tts: cfg.TTS_PROVIDER === "edge" ? createEdgeTts(cfg.TTS_VOICE) : disabledTts,
+    anim: createAnimService({ dataDir: cfg.DATA_DIR, wrap: cfg.HEAVY_BIN ? [cfg.HEAVY_BIN, "run", "eduvn-anim", "--"] : undefined, manimHome: cfg.MANIM_HOME, tinytexBin: cfg.TINYTEX_BIN }),
+    tts: cfg.TTS_PROVIDER === "vieneu" ? createVieneuTts({ cmd: cfg.VIENEU_CMD, ref: cfg.VIENEU_VOICE ? undefined : cfg.VIENEU_REF, voice: cfg.VIENEU_VOICE, wrap: cfg.HEAVY_BIN ? [cfg.HEAVY_BIN, "run", "eduvn-tts", "--"] : undefined }) : disabledTts,
     taskOverrides: cfg.AI_TASK_OVERRIDES ? (JSON.parse(cfg.AI_TASK_OVERRIDES) as Record<string, string>) : undefined,
     chromePath: cfg.CHROME_PATH,
     markStaleOnStart: true,

@@ -90,29 +90,32 @@ export async function generateLesson(deps: GenDeps, req: AiLessonRequest, state:
     done++;
     await hooks.onProgress({ done, total: outline.length, stage: done >= outline.length ? "Hoàn tất" : "Đang soạn các cảnh", failed });
   });
+  await hooks.onProgress({ done, total: outline.length, stage: "Đang đọc lời giảng", failed });
   await fillMissingAudio(deps, state, hooks);
   return { failed, title };
 }
 
-/** Giọng đọc lỗi tạm thời ở lượt trước → thử lại các câu còn thiếu tiếng (khi sinh tiếp cũng chạy). */
-export async function fillMissingAudio(deps: GenDeps, state: GenState, hooks: Pick<GenHooks, "onScene">): Promise<number> {
-  let fixed = 0;
+/** Đọc lời giảng còn thiếu tiếng (cả bài gom một lần gọi VieNeu); cũng bù lại các câu lỗi ở lượt trước. `only` = chỉ các cảnh này. */
+export async function fillMissingAudio(deps: GenDeps, state: GenState, hooks: Pick<GenHooks, "onScene">, only?: Set<string>): Promise<number> {
+  const todo: StoredAction[] = [];
   for (const sc of state.scenes) {
-    for (const a of sc.actions ?? []) {
-      if (a.type !== "speech" || (a as StoredAction).audioFile) continue;
-      const r = await deps.tts.synth(a.text, deps.audioDir, safe(a.id)).catch(() => null);
-      if (r) {
-        (a as StoredAction).audioFile = r.file;
-        (a as StoredAction).durationMs = r.durationMs;
-        fixed++;
-      }
-    }
+    if (only && !only.has(sc.id)) continue;
+    for (const a of sc.actions ?? []) if (a.type === "speech" && !(a as StoredAction).audioFile) todo.push(a as StoredAction);
   }
+  if (todo.length === 0) return 0;
+  const res = await deps.tts.synthMany(todo.map((a) => ({ text: (a as { text: string }).text, name: safe(a.id) })), deps.audioDir).catch(() => todo.map(() => null));
+  let fixed = 0;
+  res.forEach((r, i) => {
+    if (!r) return;
+    (todo[i] as StoredAction).audioFile = r.file;
+    (todo[i] as StoredAction).durationMs = r.durationMs;
+    fixed++;
+  });
   if (fixed > 0) await hooks.onScene(state.scenes);
   return fixed;
 }
 
-/** Dựng 1 cảnh hoàn chỉnh: nội dung → lời giảng → giọng đọc. `edit` dùng cho "sinh lại cảnh". */
+/** Dựng 1 cảnh: nội dung → lời giảng (giọng đọc gom sau, xem fillMissingAudio). `edit` dùng cho "sinh lại cảnh". */
 export async function buildScene(deps: GenDeps, o: SceneOutline, all: SceneOutline[], stageId: string, edit: { directive?: string }): Promise<StoredScene | null> {
   const kind = o.type === "interactive" ? TASKS.interactive : o.type === "quiz" ? TASKS.quiz : TASKS.slide;
   const content = await retry(
@@ -141,14 +144,6 @@ export async function buildScene(deps: GenDeps, o: SceneOutline, all: SceneOutli
   const built = buildCompleteScene(o, content, actions as never, stageId);
   if (!built) return null;
   const scene = built as StoredScene;
-  for (const a of scene.actions ?? []) {
-    if (a.type !== "speech") continue;
-    const r = await deps.tts.synth(a.text, deps.audioDir, safe(a.id)).catch(() => null);
-    if (r) {
-      (a as StoredAction).audioFile = r.file;
-      (a as StoredAction).durationMs = r.durationMs;
-    }
-  }
   return scene;
 }
 

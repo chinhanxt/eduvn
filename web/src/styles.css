@@ -185,3 +185,13 @@ td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middl
 .ail-handle.on { border: 1.5px solid var(--brand); }
 .ail-props { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
 @media (max-width: 900px) { .ail-edit, .ail-canvas-wrap { grid-template-columns: 1fr; } }
+
+.ail-gal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; max-height: 520px; overflow: auto; }
+.ail-gal-item { display: grid; gap: 4px; text-align: left; border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: 8px; cursor: pointer; }
+.ail-gal-item:hover { border-color: var(--brand); }
+.ail-gal-item img { width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 8px; background: #10142b; object-fit: cover; }
+.ail-gal-item small { color: var(--muted); }
+.ail-gal-item span { font-size: 13px; }
+.ail-gal-form { display: grid; grid-template-columns: 320px 1fr; gap: 16px; align-items: start; }
+.ail-gal-form img { width: 100%; height: auto; border-radius: 10px; background: #10142b; }
+@media (max-width: 900px) { .ail-gal-form { grid-template-columns: 1fr; } }
