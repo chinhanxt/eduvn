@@ -152,7 +152,7 @@ function addElement(pptx: PptxGenJS, s: Slide, e: El, fontColor: string): void {
       const rows = data.map((r, ri) =>
         r.map((c) => ({
           text: c.text.includes("$") ? toPlainText(c.text) : c.text,
-          options: { colspan: c.colspan, rowspan: c.rowspan, bold: c.style?.bold || (theme?.rowHeader && ri === 0) || undefined, color: c.style?.color ? hex(c.style.color) : theme?.rowHeader && ri === 0 ? "FFFFFF" : fontColor, fill: c.style?.backcolor ? { color: hex(c.style.backcolor, "FFFFFF") } : theme?.rowHeader && ri === 0 ? { color: hex(theme.color, "4472C4") } : undefined, fontFace: FONT, fontSize: 12, border: { type: "solid" as const, color: "BBBBBB", pt: 1 } },
+          options: { colspan: c.colspan, rowspan: c.rowspan, bold: c.style?.bold || (theme?.rowHeader && ri === 0) || undefined, color: c.style?.color ? hex(c.style.color) : theme?.rowHeader && ri === 0 ? "FFFFFF" : c.style?.backcolor ? textOnHex(hex(c.style.backcolor, "FFFFFF")) : fontColor, fill: c.style?.backcolor ? { color: hex(c.style.backcolor, "FFFFFF") } : theme?.rowHeader && ri === 0 ? { color: hex(theme.color, "4472C4") } : undefined, fontFace: FONT, fontSize: 12, border: { type: "solid" as const, color: "BBBBBB", pt: 1 } },
         })),
       );
       if (rows.length > 0) s.addTable(rows, { x: b.x, y: b.y, w: b.w, colW: (e.colWidths as number[] | undefined)?.map((w) => w * b.w) });
@@ -233,4 +233,10 @@ export async function renderAiLessonPptx(title: string, scenes: StoredScene[]): 
   }
   const out = await pptx.write({ outputType: "nodebuffer" });
   return out as Buffer;
+}
+
+/** Chữ trắng trên nền tối, mực đậm trên nền sáng (hex "RRGGBB"). */
+function textOnHex(bg: string): string {
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(bg.slice(i, i + 2), 16) || 255) as [number, number, number];
+  return 0.299 * r + 0.587 * g + 0.114 * b < 150 ? "FFFFFF" : "232842";
 }

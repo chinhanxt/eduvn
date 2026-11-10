@@ -113,7 +113,7 @@ export function elementHtml(e: El, o: Pick<HtmlOpts, "latex">): string {
       const data = (e.data as { text: string; colspan?: number; rowspan?: number; style?: { bold?: boolean; color?: string; backcolor?: string } }[][]) ?? [];
       const th = (e.theme as { color?: string; rowHeader?: boolean } | undefined) ?? {};
       const rows = data
-        .map((r, ri) => `<tr>${r.map((c) => `<td colspan="${c.colspan ?? 1}" rowspan="${c.rowspan ?? 1}" style="border:1px solid #bbb;padding:${cq(4)};${c.style?.bold || (th.rowHeader && ri === 0) ? "font-weight:700;" : ""}${th.rowHeader && ri === 0 ? `background:${css(th.color, "#4472c4")};color:#fff;` : c.style?.backcolor ? `background:${css(c.style.backcolor)};` : ""}">${esc(c.text).replace(/\$([^$]+)\$/g, (_m, t: string) => o.latex(t))}</td>`).join("")}</tr>`)
+        .map((r, ri) => `<tr>${r.map((c) => `<td colspan="${c.colspan ?? 1}" rowspan="${c.rowspan ?? 1}" style="border:1px solid #bbb;padding:${cq(4)};${c.style?.bold || (th.rowHeader && ri === 0) ? "font-weight:700;" : ""}${th.rowHeader && ri === 0 ? `background:${css(th.color, "#4472c4")};color:#fff;` : c.style?.backcolor ? `background:${css(c.style.backcolor)};color:${c.style.color ? css(c.style.color) : textOn(css(c.style.backcolor))};` : c.style?.color ? `color:${css(c.style.color)};` : ""}">${esc(c.text).replace(/\$([^$]+)\$/g, (_m, t: string) => o.latex(t))}</td>`).join("")}</tr>`)
         .join("");
       return `<div ${id} class="el" style="${base}overflow:hidden;font-size:${cq(14)}"><table style="width:100%;border-collapse:collapse;color:#232842">${rows}</table></div>`;
     }
@@ -164,4 +164,16 @@ export function quizHtml(title: string, questions: QuizQ[], o: { latex: (t: stri
     .map((q, i) => `<div style="margin:0 0 ${cq(14)}"><div style="font-weight:600">Câu ${i + 1}. ${m(q.question)}</div>${(q.options ?? []).map((op) => `<div style="margin-left:${cq(20)};${o.reveal && q.answer?.includes(op.value) ? "color:#0a8a4a;font-weight:700" : ""}">${esc(op.value)}. ${m(op.label)}</div>`).join("")}${o.reveal && q.analysis ? `<div style="margin-left:${cq(20)};color:#5b6290;font-size:${cq(15)}">${m(q.analysis)}</div>` : ""}</div>`)
     .join("");
   return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><style>${BASE_CSS}</style>${o.extraHead ?? ""}</head><body><div class="stage" style="background:#fff;color:#232842;padding:${cq(40)};font-size:${cq(21)}"><div style="display:inline-block;background:#4f6bed;color:#fff;font-size:${cq(14)};font-weight:700;padding:${cq(4)} ${cq(14)};border-radius:${cq(20)}">CÂU HỎI</div><h1 style="font-size:${cq(34)};margin:${cq(10)} 0 ${cq(18)};color:#1e2340">${esc(title)}</h1>${qs}${o.subtitle ? `<div class="sub" style="color:#fff">${esc(o.subtitle)}</div>` : ""}</div></body></html>`;
+}
+
+/** Màu chữ đọc được trên nền `bg` (#rgb/#rrggbb/rgb()): nền tối → trắng, nền sáng → mực đậm. */
+function textOn(bg: string): string {
+  let r = 255, g = 255, b = 255;
+  const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(bg.trim());
+  const rgb = /^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/i.exec(bg.trim());
+  if (hex) {
+    const h = hex[1]!.length === 3 ? [...hex[1]!].map((c) => c + c).join("") : hex[1]!;
+    [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)) as [number, number, number];
+  } else if (rgb) [r, g, b] = [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+  return 0.299 * r + 0.587 * g + 0.114 * b < 150 ? "#ffffff" : "#232842";
 }
