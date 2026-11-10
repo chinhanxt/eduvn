@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi" data-portal="hoc">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hôm nay · EDUVN Học sinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  .hello { font-family: var(--font-read); font-weight: 600; }
+  .next { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-4) var(--s-8); align-items: center; padding: var(--s-6); border: var(--bw) solid var(--accent-line); background: linear-gradient(180deg, var(--accent-bg), var(--bg-raised) 85%); border-radius: var(--r-md); }
+  .next h2 { font-size: var(--fs-2xl); line-height: var(--lh-2xl); margin-top: var(--s-1); }
+  .next .meta { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); margin-top: var(--s-3); font-size: var(--fs-sm); color: var(--ink-2); }
+  .next .meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .next .bar { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--s-3); font-size: var(--fs-sm); color: var(--ink-3); }
+  .next .bar .meter { flex: 1; max-width: 420px; }
+  .due { font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
+  .mastery { display: grid; grid-template-columns: minmax(120px, 200px) minmax(0, 1fr) 44px; gap: var(--s-3) var(--s-4); align-items: center; font-size: var(--fs-sm); }
+  .mastery .m { height: 8px; border-radius: var(--r-pill); background: var(--chart-grid); position: relative; }
+  .mastery .m i { position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--c1); border-radius: inherit; }
+  .mastery .m.weak i { background: var(--c2); }
+  .mastery .pct { text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--fw-medium); }
+  .review { display: flex; align-items: center; gap: var(--s-4); }
+  .review .big { font-size: var(--fs-4xl); line-height: var(--lh-4xl); font-weight: var(--fw-semibold); letter-spacing: -.02em; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--s-3); }
+  @media (max-width: 720px) { .next { grid-template-columns: 1fr; padding: var(--s-5); } .next .btn { width: 100%; } .mastery { grid-template-columns: minmax(0, 1fr) 80px 40px; } }
+</style>
+</head>
+<body data-shell="hoc" data-nav="trang-chu">
+<script src="icons.js"></script>
+<main id="main">
+  <div class="page-head">
+    <div class="t">
+      <div class="eyebrow">Thứ Hai · 10/11 · Lớp 10A1</div>
+      <h1 class="hello" style="margin-top:4px">Chào Minh Anh</h1>
+    </div>
+  </div>
+
+  <!-- một việc chính, một nút chính -->
+  <section class="next" aria-label="Việc tiếp theo">
+    <div>
+      <div class="eyebrow" style="color:var(--accent)">Làm tiếp</div>
+      <h2>Luyện tập · Hàm số bậc hai</h2>
+      <div class="meta"><span><svg class="i sm"><use href="#i-clock"/></svg>Hạn 21:00 hôm nay</span><span><svg class="i sm"><use href="#i-timer"/></svg>Khoảng 12 phút</span><span><svg class="i sm"><use href="#i-users"/></svg>Cô Lan Anh</span></div>
+    </div>
+    <a class="btn primary lg" href="hoc-lam-bai.html"><span>Làm tiếp câu 7</span><svg class="i sm"><use href="#i-right"/></svg></a>
+    <div class="bar"><div class="meter"><i style="--v:50%"></i></div><span class="num">6/12 câu</span></div>
+  </section>
+
+  <div class="grid" style="margin-top:var(--gutter)">
+    <section class="panel span-7 md-12">
+      <div class="hd"><h2>Bài cần làm</h2><span class="badge">3</span><span class="grow"></span><a class="btn ghost sm" href="hoc-lam-bai.html">Tất cả</a></div>
+      <ul class="list">
+        <li class="link-row"><span class="lead-ic accent"><svg class="i sm"><use href="#i-layers"/></svg></span><div class="grow"><div class="t">Luyện tập · Hàm số bậc hai</div><div class="s">Toán · 6/12 câu</div></div><span class="badge warn"><svg class="i"><use href="#i-clock"/></svg>Hôm nay 21:00</span></li>
+        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-exam"/></svg></span><div class="grow"><div class="t">Kiểm tra 15′ · Tích vô hướng</div><div class="s">Toán · 10 câu · làm 1 lần</div></div><span class="due muted">Thứ Tư 07:30</span></li>
+        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-pen"/></svg></span><div class="grow"><div class="t">Viết đoạn văn nghị luận · 200 chữ</div><div class="s">Ngữ văn · tự luận</div></div><span class="due muted">Thứ Sáu</span></li>
+      </ul>
+    </section>
+
+    <section class="panel span-5 md-12">
+      <div class="hd"><h2>Ôn hôm nay</h2><span class="grow"></span><span class="caption">lặp lại ngắt quãng</span></div>
+      <div class="bd">
+        <div class="review">
+          <div class="big">12</div>
+          <div class="grow"><div class="t" style="font-weight:500">thẻ đến hạn</div><div class="caption">khoảng 5 phút · 3 thẻ hay quên</div></div>
+          <a class="btn primary" href="hoc-luyen-tap.html"><svg class="i sm"><use href="#i-play"/></svg><span>Ôn ngay</span></a>
+        </div>
+        <div class="chips"><span class="badge outline">Dấu tam thức · 5</span><span class="badge outline">Vectơ · 4</span><span class="badge outline">Từ vựng Unit 3 · 3</span></div>
+      </div>
+    </section>
+
+    <section class="panel span-7 md-12">
+      <div class="hd"><h2>Mức thành thạo</h2><span class="grow"></span><span class="caption">Toán 10 · theo chủ đề</span></div>
+      <div class="bd">
+        <div class="mastery">
+          <span>Mệnh đề, tập hợp</span><span class="m" tabindex="0" data-tip="92%|Mệnh đề, tập hợp"><i style="--v:92%"></i></span><span class="pct">92%</span>
+          <span>BPT bậc nhất 2 ẩn</span><span class="m" tabindex="0" data-tip="78%|BPT bậc nhất 2 ẩn"><i style="--v:78%"></i></span><span class="pct">78%</span>
+          <span>Hàm số bậc hai</span><span class="m" tabindex="0" data-tip="64%|Hàm số bậc hai"><i style="--v:64%"></i></span><span class="pct">64%</span>
+          <span><b style="font-weight:600">Dấu tam thức</b> <svg class="i sm" style="color:var(--warn)" aria-label="cần ôn"><use href="#i-alert"/></svg></span><span class="m weak" tabindex="0" data-tip="38%|Dấu tam thức · cần ôn"><i style="--v:38%"></i></span><span class="pct">38%</span>
+          <span class="muted">Hệ thức lượng</span><span class="m"><i style="--v:0%"></i></span><span class="pct muted">—</span>
+        </div>
+        <p class="caption" style="margin-top:var(--s-4)">Tính từ bài làm và thẻ ôn 30 ngày qua. Cam: dưới 50% — gia sư sẽ gợi ý bài luyện.</p>
+      </div>
+    </section>
+
+    <section class="panel span-5 md-12">
+      <div class="hd"><h2>14 ngày qua</h2><span class="grow"></span><span class="streak"><svg class="i sm"><use href="#i-flame"/></svg>12 ngày liền</span></div>
+      <div class="bd">
+        <div id="act"></div>
+        <p class="caption" style="margin-top:var(--s-2)">Số câu đã làm mỗi ngày · hôm nay <b>18</b> câu.</p>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="ui.js"></script>
+<script src="shell.js"></script>
+<script src="charts.js"></script>
+<script>
+  const vals = [12, 0, 8, 15, 22, 9, 30, 14, 18, 25, 11, 7, 16, 18];
+  const labels = ["28/10", "29/10", "30/10", "31/10", "01/11", "02/11", "03/11", "04/11", "05/11", "06/11", "07/11", "08/11", "09/11", "Hôm nay"];
+  Charts.columns(document.getElementById("act"), { vals, labels, height: 128 });
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kết quả lớp · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  .scope { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; margin-bottom: var(--gutter); }
+  .scope .select { width: auto; }
+  .fig-title { display: flex; align-items: baseline; gap: var(--s-2); }
+  .fig-no { font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--ink-3); letter-spacing: .04em; }
+  details.tbl { margin-top: var(--s-3); }
+  details.tbl summary { cursor: pointer; font-size: var(--fs-sm); color: var(--ink-3); list-style: none; display: inline-flex; gap: 6px; align-items: center; }
+  details.tbl summary::-webkit-details-marker { display: none; }
+  details.tbl summary:hover { color: var(--ink); }
+  details.tbl[open] summary svg { transform: rotate(180deg); }
+  details.tbl table { margin-top: var(--s-2); }
+  .who { display: flex; align-items: center; gap: var(--s-3); }
+  .why { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .who .nm { font-weight: var(--fw-medium); white-space: nowrap; }
+  .trend { width: 96px; }
+  .score { font-weight: var(--fw-semibold); font-variant-numeric: tabular-nums; }
+  .score.low { color: var(--danger); }
+  @media (max-width: 720px) { .trend { display: none; } .who .avatar { display: none; } }
+</style>
+</head>
+<body data-shell="gv" data-nav="ket-qua" data-crumb="Kết quả|10A1|KT 15′ · Bất phương trình bậc hai">
+<script src="icons.js"></script>
+<main id="main">
+  <div class="page-head">
+    <div class="t">
+      <h1 style="font-family:var(--font-read)">Bất phương trình bậc hai</h1>
+      <div class="caption">Kiểm tra 15′ · 10A1 · làm ngày 07/11/2026 · 10 câu</div>
+    </div>
+    <div class="acts">
+      <button class="btn"><svg class="i sm"><use href="#i-down"/></svg><span>Sổ điểm</span></button>
+      <button class="btn primary" data-busy="900" data-done="Đã gửi" data-toast="Đã gửi kết quả cho 31 học sinh" data-toast-msg="Kèm lời giải từng câu"><svg class="i sm"><use href="#i-send"/></svg><span>Gửi kết quả</span></button>
+    </div>
+  </div>
+
+  <!-- một hàng lọc phía trên mọi thứ nó tác động -->
+  <div class="scope" role="group" aria-label="Phạm vi">
+    <div class="seg" role="group"><button aria-pressed="true">Cả lớp</button><button aria-pressed="false">Tổ 1</button><button aria-pressed="false">Tổ 2</button><button aria-pressed="false">Tổ 3</button></div>
+    <select class="select" aria-label="Bài"><option>KT 15′ · Bất phương trình bậc hai</option><option>BTVN · Tích vô hướng</option></select>
+    <span class="caption">So với: <b>10A3</b> (cùng đề)</span>
+  </div>
+
+  <section class="stats" aria-label="Số liệu chính">
+    <div class="stat"><div class="lbl">Đã nộp</div><div class="val">31<small>/32</small></div><div class="delta">1 em vắng</div></div>
+    <div class="stat"><div class="lbl">Điểm trung bình</div><div class="val">6,4</div><div class="delta up"><svg class="i sm"><use href="#i-trend"/></svg>+0,5 so với 10A3</div></div>
+    <div class="stat"><div class="lbl">Trung vị</div><div class="val">6,5</div><div class="delta">Độ lệch chuẩn 1,9</div></div>
+    <div class="stat"><div class="lbl">Đạt (≥ 5,0)</div><div class="val">77<small>%</small></div><div class="delta">24/31 em</div></div>
+  </section>
+
+  <div class="grid" style="margin-top:var(--gutter)">
+    <figure class="panel figure span-7 md-12">
+      <div class="hd"><div class="fig-title"><span class="fig-no">HÌNH 1</span><h2>Phổ điểm</h2></div><span class="grow"></span><div class="legend"><span><i style="--c:var(--seq-dim)"></i>Dưới ngưỡng</span><span><i style="--c:var(--c1)"></i>Đạt</span></div></div>
+      <div class="bd">
+        <div id="hist"></div>
+        <figcaption class="caption">Số học sinh theo khoảng 1 điểm. Vạch dọc: ngưỡng đạt 5,0. Tam giác: trung vị. Lệch phải — đa số nắm bài, <b>7 em dưới ngưỡng</b>.</figcaption>
+        <details class="tbl"><summary><svg class="i sm"><use href="#i-chev"/></svg>Xem dạng bảng</summary>
+          <table class="data dense"><thead><tr><th>Khoảng điểm</th><th class="r">Số HS</th></tr></thead><tbody id="hist-t"></tbody></table>
+        </details>
+      </div>
+    </figure>
+
+    <figure class="panel figure span-5 md-12">
+      <div class="hd"><div class="fig-title"><span class="fig-no">HÌNH 2</span><h2>Độ khó từng câu</h2></div></div>
+      <div class="bd">
+        <div id="diff"></div>
+        <figcaption class="caption">Tỉ lệ làm đúng, khó nhất ở trên. Nền xám: dưới 40% — câu cần chữa lại trên lớp (⚑): <b>Câu 10, 9, 8</b> — cùng chủ đề <b>tìm m</b>.</figcaption>
+      </div>
+    </figure>
+
+    <section class="panel span-12">
+      <div class="hd"><h2>Học sinh cần quan tâm</h2><span class="badge warn"><svg class="i"><use href="#i-alert"/></svg>5</span><span class="grow"></span><span class="caption hide-sm">Quy tắc: dưới 5,0 · giảm ≥ 1,5 điểm · chưa nộp</span></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Học sinh · lý do</th><th class="r">Bài này</th><th class="hide-sm">5 bài gần nhất</th><th class="r" style="width:110px"></th></tr></thead>
+          <tbody>
+            <tr><td><div class="who"><span class="avatar sm">GB</span><div><div class="nm">Phạm Gia Bảo</div><div class="why"><span class="badge danger"><svg class="i"><use href="#i-trenddn"/></svg>Giảm 3 bài liền</span></div></div></div></td><td class="r"><span class="score low">2,5</span></td><td class="hide-sm"><div class="trend" data-v="5.5,5,4.25,3.5,2.5"></div></td><td class="r"><button class="btn sm" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắn phụ huynh Gia Bảo" data-toast-msg="Qua Zalo · kèm bài làm"><svg class="i sm"><use href="#i-chat"/></svg><span>Nhắn</span></button></td></tr>
+            <tr><td><div class="who"><span class="avatar sm">TV</span><div><div class="nm">Lê Thảo Vy</div><div class="why"><span class="badge danger"><svg class="i"><use href="#i-trenddn"/></svg>Giảm 2,25</span></div></div></div></td><td class="r"><span class="score low">3,75</span></td><td class="hide-sm"><div class="trend" data-v="6,6.5,5.75,6,3.75"></div></td><td class="r"><button class="btn sm" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắn Thảo Vy"><svg class="i sm"><use href="#i-chat"/></svg><span>Nhắn</span></button></td></tr>
+            <tr><td><div class="who"><span class="avatar sm">ĐK</span><div><div class="nm">Trần Đăng Khoa</div><div class="why"><span class="badge warn"><svg class="i"><use href="#i-alert"/></svg>Dưới 5 lần 5</span></div></div></div></td><td class="r"><span class="score low">4,25</span></td><td class="hide-sm"><div class="trend" data-v="4.5,4,4.75,4.5,4.25"></div></td><td class="r"><button class="btn sm" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắn Đăng Khoa"><svg class="i sm"><use href="#i-chat"/></svg><span>Nhắn</span></button></td></tr>
+            <tr><td><div class="who"><span class="avatar sm">MT</span><div><div class="nm">Võ Minh Tuấn</div><div class="why"><span class="badge warn"><svg class="i"><use href="#i-trenddn"/></svg>Giảm 2,25</span></div></div></div></td><td class="r"><span class="score">5,5</span></td><td class="hide-sm"><div class="trend" data-v="8,8.25,7.5,7.75,5.5"></div></td><td class="r"><button class="btn sm" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắn Minh Tuấn"><svg class="i sm"><use href="#i-chat"/></svg><span>Nhắn</span></button></td></tr>
+            <tr><td><div class="who"><span class="avatar sm">HN</span><div><div class="nm">Đỗ Hà Ngân</div><div class="why"><span class="badge"><svg class="i"><use href="#i-clock"/></svg>Chưa nộp</span></div></div></div></td><td class="r"><span class="muted">—</span></td><td class="hide-sm"><div class="trend" data-v="7,7.5,7,6.75,6.75"></div></td><td class="r"><button class="btn sm" data-busy="700" data-done="Đã gửi" data-toast="Đã nhắc Hà Ngân nộp bài"><svg class="i sm"><use href="#i-bell"/></svg><span>Nhắc</span></button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="ui.js"></script>
+<script src="shell.js"></script>
+<script src="charts.js"></script>
+<script>
+  const counts = [0, 1, 1, 2, 3, 6, 7, 6, 4, 1];
+  const bins = counts.map((n, i) => ({ x0: i, x1: i + 1, n }));
+  Charts.histogram(document.getElementById("hist"), { bins, threshold: 5, median: 6.5, height: 240 });
+  document.getElementById("hist-t").innerHTML = bins.map((b) => `<tr><td>${b.x0}–${b.x1}</td><td class="r">${b.n}</td></tr>`).join("");
+  const rows = [
+    ["Câu 10", 19, "Tìm m để BPT vô nghiệm"], ["Câu 9", 31, "Tìm m, nghiệm đúng ∀x"], ["Câu 8", 39, "Tìm m, có nghiệm"],
+    ["Câu 7", 47, "BPT tích"], ["Câu 6", 58, "BPT chứa ẩn ở mẫu"], ["Câu 5", 66, "Dấu tam thức"],
+    ["Câu 4", 72, "Tập nghiệm"], ["Câu 3", 81, "Nghiệm nguyên"], ["Câu 2", 88, "Dấu tam thức"], ["Câu 1", 94, "Nhận dạng BPT"],
+  ].map(([label, p, topic]) => ({ label, p, topic }));
+  Charts.difficulty(document.getElementById("diff"), { rows, flag: 40, rowH: 26 });
+  document.querySelectorAll(".trend").forEach((el) => Charts.spark(el, el.dataset.v.split(",").map(Number), { min: 0, max: 10, height: 28 }));
+</script>
+</body>
+</html>

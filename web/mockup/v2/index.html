@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDUVN v2 · Mockup 2 cổng</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  body { max-width: 1120px; margin: 0 auto; padding: var(--s-12) var(--page-x) var(--s-16); }
+  header h1 { font-family: var(--font-read); font-size: 36px; line-height: 44px; }
+  header p { margin-top: var(--s-3); max-width: 60ch; color: var(--ink-2); font-size: var(--fs-lg); line-height: var(--lh-lg); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-8); margin-top: var(--s-10); }
+  .portal h2 { display: flex; align-items: center; gap: var(--s-2); padding-bottom: var(--s-3); border-bottom: 2px solid var(--pc); }
+  .portal h2 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--pc); }
+  .portal .why { margin: var(--s-3) 0 var(--s-2); }
+  .portal ol { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+  .portal li { border-bottom: var(--bw) solid var(--line); }
+  .portal li a { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: var(--s-3); align-items: baseline; padding: var(--s-3) 0; }
+  .portal li a::before { counter-increment: s; content: counter(s, decimal-leading-zero); font-size: var(--fs-xs); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .portal li a:hover b { color: var(--pc); }
+  .portal li b { font-weight: var(--fw-semibold); }
+  .portal li small { display: block; color: var(--ink-3); font-size: var(--fs-sm); }
+  .portal li code { font: 12px/18px var(--font-mono); color: var(--ink-3); white-space: nowrap; }
+  .foot { margin-top: var(--s-10); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
+  .foot a { display: block; padding: var(--s-4); border: var(--bw) solid var(--line-2); border-radius: var(--r-md); }
+  .foot a:hover { border-color: var(--line-input); }
+  .foot a b { display: flex; align-items: center; gap: var(--s-2); }
+  @media (max-width: 720px) { .cols, .foot { grid-template-columns: 1fr; } body { padding-top: var(--s-6); } header h1 { font-size: 28px; line-height: 36px; } .portal li code { display: none; } }
+</style>
+</head>
+<body>
+<script src="icons.js"></script>
+<header>
+  <div class="eyebrow">EDUVN · Mockup v2 · 10/11/2026 · chờ duyệt</div>
+  <h1>Hai cổng, một hệ thiết kế</h1>
+  <p>Giáo viên làm việc trên máy tính: cổng dày thông tin, thanh bên. Học sinh học trên điện thoại: cổng thoáng, thanh tab dưới. Dùng chung chữ, màu, thành phần.</p>
+  <div class="row" style="margin-top:var(--s-5)"><button class="btn sm" data-act="theme"><svg class="i sm"><use href="#i-moon"/></svg><span>Sáng / tối</span></button><span class="caption"><kbd>Ctrl</kbd> <kbd>K</kbd> trong mọi màn</span></div>
+</header>
+
+<div class="cols">
+  <section class="portal" style="--pc:#3346d1">
+    <h2><span class="dot"></span>Cổng Giáo viên <code style="margin-left:auto;font:12px var(--font-mono);color:var(--ink-3)">/gv</code></h2>
+    <p class="caption why">Máy tính trước · thanh bên 240 → 64 px · bảng dày</p>
+    <ol>
+      <li><a href="gv-trang-chu.html"><span><b>Hôm nay</b><small>Việc trong ngày, lớp, bài chờ chấm, số liệu nhỏ</small></span><code>/gv</code></a></li>
+      <li><a href="gv-ngan-hang.html"><span><b>Ngân hàng câu hỏi</b><small>Lọc theo chủ đề + mức độ, bảng, chọn hàng loạt, phân trang</small></span><code>/gv/ngan-hang?…</code></a></li>
+      <li><a href="gv-soan-de.html"><span><b>Soạn đề với AI</b><small>Ma trận → đề viết dần (streaming), kiểm tra tự động</small></span><code>/gv/de-thi/:id</code></a></li>
+      <li><a href="gv-ket-qua.html"><span><b>Kết quả lớp</b><small>Phổ điểm, độ khó từng câu, học sinh cần quan tâm</small></span><code>/gv/lop/:lop/bai/:bai</code></a></li>
+    </ol>
+  </section>
+  <section class="portal" style="--pc:#0b7466">
+    <h2><span class="dot"></span>Cổng Học sinh · Sinh viên <code style="margin-left:auto;font:12px var(--font-mono);color:var(--ink-3)">/hoc</code></h2>
+    <p class="caption why">Điện thoại trước · 5 tab dưới · một nút chính mỗi màn</p>
+    <ol>
+      <li><a href="hoc-trang-chu.html"><span><b>Hôm nay</b><small>Việc tiếp theo, bài cần làm, ôn hôm nay, thành thạo</small></span><code>/hoc</code></a></li>
+      <li><a href="hoc-gia-su.html"><span><b>Gia sư AI</b><small>Hỏi đáp streaming, gợi ý từng bước, trích nguồn</small></span><code>/hoc/gia-su/:id</code></a></li>
+      <li><a href="hoc-luyen-tap.html"><span><b>Luyện tập</b><small>Thẻ ôn ngắt quãng, phản hồi ngay, giải thích</small></span><code>/hoc/luyen</code></a></li>
+      <li><a href="hoc-lam-bai.html"><span><b>Phòng làm bài</b><small>Tập trung, đồng hồ, lưu trên máy khi mất mạng</small></span><code>/hoc/bai/:id/cau/4</code></a></li>
+      <li><a href="hoc-ket-qua.html"><span><b>Kết quả</b><small>Điểm, từng câu, nên ôn gì tiếp</small></span><code>/hoc/ket-qua/:id</code></a></li>
+    </ol>
+  </section>
+</div>
+
+<div class="foot">
+  <a href="thanh-phan.html"><b><svg class="i sm"><use href="#i-box"/></svg>Thành phần</b><span class="caption">Nút, bảng, toast, skeleton, trống/lỗi, streaming, icon</span></a>
+  <a href="../../../docs/design/eduvn-design-system.md"><b><svg class="i sm"><use href="#i-book"/></svg>Hệ thiết kế</b><span class="caption">Token, lý do, kiến trúc frontend</span></a>
+  <a href="../../../docs/research/2026-11-10-ui-survey.md"><b><svg class="i sm"><use href="#i-chart"/></svg>Khảo sát 26 trang</b><span class="caption">Số đo + nguyên tắc rút ra</span></a>
+</div>
+<script src="ui.js"></script>
+</body>
+</html>

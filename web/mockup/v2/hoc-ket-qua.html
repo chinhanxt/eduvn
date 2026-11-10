@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="vi" data-portal="hoc">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kết quả · EDUVN Học sinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  .res { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: var(--gutter); align-items: start; max-width: 1200px; }
+  .hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-8); align-items: center; padding: var(--s-6); }
+  .hero .fig { font-size: 64px; line-height: 64px; font-weight: var(--fw-semibold); letter-spacing: -.03em; }
+  .hero .fig small { font-size: var(--fs-xl); color: var(--ink-3); font-weight: var(--fw-regular); letter-spacing: 0; margin-left: 4px; }
+  .parts { display: grid; grid-template-columns: minmax(120px, auto) minmax(0, 1fr) auto; gap: var(--s-3) var(--s-4); align-items: center; font-size: var(--fs-sm); }
+  .parts .meter { height: 8px; background: var(--chart-grid); }
+  .parts .meter > i { background: var(--c1); }
+  .parts b { font-variant-numeric: tabular-nums; font-weight: var(--fw-semibold); text-align: right; }
+  .rq { border-top: var(--bw) solid var(--line); }
+  .rq:first-child { border-top: 0; }
+  .rq > summary { list-style: none; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto 20px; gap: var(--s-3); align-items: center; min-height: 56px; padding: var(--s-2) var(--s-5); cursor: pointer; }
+  .rq > summary::-webkit-details-marker { display: none; }
+  .rq > summary:hover { background: var(--bg-hover); }
+  .rq .ico { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; }
+  .rq .ico svg.i { width: 14px; height: 14px; stroke-width: 2.5; }
+  .rq.ok .ico { background: var(--ok-bg); color: var(--ok); } .rq.bad .ico { background: var(--danger-bg); color: var(--danger); } .rq.part .ico { background: var(--warn-bg); color: var(--warn); }
+  .rq .pts { font-variant-numeric: tabular-nums; font-size: var(--fs-sm); color: var(--ink-2); white-space: nowrap; }
+  .rq .chev { color: var(--ink-3); transition: transform var(--dur-2) var(--ease-out); }
+  .rq[open] .chev { transform: rotate(180deg); }
+  .rq .body { padding: 0 var(--s-5) var(--s-5) calc(var(--s-5) + 28px + var(--s-3)); }
+  .rq .ans { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-6); font-size: var(--fs-sm); margin: var(--s-2) 0 var(--s-3); }
+  .rq .ans span { display: inline-flex; gap: 6px; align-items: center; }
+  .rq .read { font-size: 16px; line-height: 26px; }
+  @media (max-width: 1180px) { .res { grid-template-columns: 1fr; } }
+  @media (max-width: 720px) { .hero { grid-template-columns: 1fr; gap: var(--s-4); padding: var(--s-5); } .hero .fig { font-size: 52px; line-height: 56px; } .rq > summary { padding: var(--s-2) var(--s-4); } .rq .body { padding: 0 var(--s-4) var(--s-4); } }
+</style>
+</head>
+<body data-shell="hoc" data-nav="ket-qua">
+<script src="icons.js"></script>
+<main id="main">
+  <div class="page-head" style="max-width:1200px">
+    <div class="t">
+      <div class="eyebrow">Kết quả · nộp 07/11 lúc 07:44</div>
+      <h1 style="font-family:var(--font-read);margin-top:4px">Bất phương trình bậc hai</h1>
+    </div>
+    <div class="acts"><a class="btn" href="hoc-gia-su.html"><svg class="i sm"><use href="#i-chat"/></svg><span>Hỏi gia sư</span></a></div>
+  </div>
+
+  <div class="res">
+    <div class="stack" style="gap:var(--gutter)">
+      <section class="panel">
+        <div class="hero">
+          <div>
+            <div class="fig">7,25<small>/ 10</small></div>
+            <div class="caption" style="margin-top:var(--s-2)">7/10 câu đúng hoàn toàn · 12 phút 40 giây</div>
+          </div>
+          <div class="parts" aria-label="Điểm theo phần">
+            <span>I · Nhiều lựa chọn</span><div class="meter" data-tip="2,5 / 3|Phần I"><i style="--v:83%"></i></div><b>2,5 / 3</b>
+            <span>II · Đúng/Sai</span><div class="meter" data-tip="2,75 / 4|Phần II"><i style="--v:69%"></i></div><b>2,75 / 4</b>
+            <span>III · Trả lời ngắn</span><div class="meter" data-tip="2 / 3|Phần III"><i style="--v:67%"></i></div><b>2 / 3</b>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="hd"><h2>Từng câu</h2><span class="grow"></span><div class="seg"><button aria-pressed="true">Tất cả</button><button aria-pressed="false">Chưa đúng · 3</button></div></div>
+        <div>
+          <details class="rq ok"><summary><span class="ico"><svg class="i"><use href="#i-check"/></svg></span><span><b style="font-weight:500">Câu 1</b> <span class="muted">· Nhận dạng BPT bậc hai</span></span><span class="pts">0,25 / 0,25</span><svg class="i sm chev"><use href="#i-chev"/></svg></summary></details>
+          <details class="rq ok"><summary><span class="ico"><svg class="i"><use href="#i-check"/></svg></span><span><b style="font-weight:500">Câu 2</b> <span class="muted">· Dấu tam thức</span></span><span class="pts">0,25 / 0,25</span><svg class="i sm chev"><use href="#i-chev"/></svg></summary></details>
+          <details class="rq bad" open>
+            <summary><span class="ico"><svg class="i"><use href="#i-x"/></svg></span><span><b style="font-weight:500">Câu 8</b> <span class="muted">· Tìm m để BPT có nghiệm</span></span><span class="pts">0 / 0,5</span><svg class="i sm chev"><use href="#i-chev"/></svg></summary>
+            <div class="body">
+              <p class="read">Tìm m để bất phương trình x² − 2x + m ≤ 0 có nghiệm.</p>
+              <div class="ans"><span><svg class="i sm" style="color:var(--danger)"><use href="#i-err"/></svg>Em trả lời: <b>m &lt; 1</b></span><span><svg class="i sm" style="color:var(--ok)"><use href="#i-ok"/></svg>Đáp án: <b>m ≤ 1</b></span></div>
+              <p class="read muted" style="color:var(--ink-2)">BPT có nghiệm khi Δ′ = 1 − m ≥ 0. Dấu “=” vẫn cho nghiệm x = 1 — em bỏ sót trường hợp bằng.</p>
+              <div class="row" style="margin-top:var(--s-3)"><a class="btn sm" href="hoc-gia-su.html"><svg class="i sm"><use href="#i-chat"/></svg><span>Hỏi gia sư câu này</span></a><button class="btn ghost sm" data-busy="500" data-toast="Đã thêm vào thẻ ôn" data-toast-msg="Câu 8 sẽ quay lại ngày mai"><svg class="i sm"><use href="#i-bookmark"/></svg><span>Thêm vào ôn</span></button></div>
+            </div>
+          </details>
+          <details class="rq part"><summary><span class="ico"><svg class="i"><use href="#i-alert"/></svg></span><span><b style="font-weight:500">Câu 4</b> <span class="muted">· Đúng/Sai · 3/4 ý</span></span><span class="pts">0,5 / 1</span><svg class="i sm chev"><use href="#i-chev"/></svg></summary></details>
+          <details class="rq bad"><summary><span class="ico"><svg class="i"><use href="#i-x"/></svg></span><span><b style="font-weight:500">Câu 10</b> <span class="muted">· Tìm m để BPT vô nghiệm</span></span><span class="pts">0 / 0,5</span><svg class="i sm chev"><use href="#i-chev"/></svg></summary></details>
+        </div>
+        <div class="ft caption">Hiện 5 / 10 câu · <a class="link" href="#">xem cả 10</a></div>
+      </section>
+    </div>
+
+    <aside class="stack" style="gap:var(--gutter)">
+      <section class="panel">
+        <div class="hd"><h2>Nên ôn tiếp</h2></div>
+        <div class="bd stack" style="gap:var(--s-3)">
+          <div class="row"><svg class="i sm" style="color:var(--warn)"><use href="#i-alert"/></svg><span class="grow">Tìm m (dấu “=” khi Δ = 0)</span><span class="caption">2 câu sai</span></div>
+          <a class="btn primary" href="hoc-luyen-tap.html"><svg class="i sm"><use href="#i-layers"/></svg><span>Luyện 5 câu tương tự</span></a>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="hd"><h2>So với lần trước</h2></div>
+        <div class="bd">
+          <div id="trend"></div>
+          <p class="caption" style="margin-top:var(--s-2)">5 bài kiểm tra Toán gần nhất · thang 0–10. Bài này <b>7,25</b>.</p>
+        </div>
+      </section>
+      <p class="caption">Lời nhận xét của cô sẽ hiện ở đây khi cô chấm xong.</p>
+    </aside>
+  </div>
+</main>
+<script src="ui.js"></script>
+<script src="shell.js"></script>
+<script src="charts.js"></script>
+<script>Charts.spark(document.getElementById("trend"), [5.5, 6.25, 6, 6.75, 7.25], { height: 56, min: 0, max: 10 });</script>
+</body>
+</html>

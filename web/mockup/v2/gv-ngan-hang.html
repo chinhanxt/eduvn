@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ngân hàng câu hỏi · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  .bank { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--gutter); align-items: start; }
+  .facets { position: sticky; top: calc(var(--top-h) + var(--s-6)); }
+  .facets h3 { margin: 0 0 var(--s-2) var(--s-3); }
+  .facets a { display: flex; align-items: center; gap: var(--s-2); height: 32px; padding: 0 var(--s-3); border-radius: var(--r-sm); color: var(--ink-2); font-size: var(--fs-sm); }
+  .facets a:hover { background: var(--bg-hover); }
+  .facets a[aria-current="true"] { background: var(--accent-bg); color: var(--accent); font-weight: var(--fw-medium); }
+  .facets a .n { margin-left: auto; color: var(--ink-3); font-variant-numeric: tabular-nums; font-size: var(--fs-xs); }
+  .facets a[aria-current="true"] .n { color: var(--accent); }
+  .facets .sub { padding-left: var(--s-6); }
+  .facets .mix { margin: var(--s-6) var(--s-3) 0; }
+  .filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); padding: var(--s-3) var(--s-5); border-bottom: var(--bw) solid var(--line); }
+  .filters .input-ic { flex: 1 1 260px; max-width: 380px; }
+  .filters .select { width: auto; }
+  .filters .sep { width: 1px; height: 20px; background: var(--line-2); margin: 0 var(--s-1); }
+  .q { display: flex; flex-direction: column; gap: 2px; }
+  .q .stem { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+  .q .tp { font-size: var(--fs-xs); color: var(--ink-3); }
+  .rate { display: flex; align-items: center; gap: var(--s-2); justify-content: flex-end; }
+  .rate i { display: block; width: 48px; height: 4px; border-radius: 2px; background: var(--chart-grid); position: relative; overflow: hidden; }
+  .rate i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--c1); border-radius: 2px; }
+  .url { font: 12px/18px var(--font-mono); color: var(--ink-3); background: var(--bg-sunken); border: var(--bw) solid var(--line); border-radius: var(--r-xs); padding: 1px 6px; }
+  .bulkbar[hidden] { display: none; }
+  @media (max-width: 1180px) { .bank { grid-template-columns: 1fr; } .facets { display: none; } .url { display: none; } }
+  @media (max-width: 720px) { .filters { padding: var(--s-3) var(--s-4); } .filters .input-ic { max-width: none; flex-basis: 100%; } .q .stem { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; } .rate i { display: none; } }
+</style>
+</head>
+<body data-shell="gv" data-nav="ngan-hang" data-crumb="Soạn|Ngân hàng câu hỏi">
+<script src="icons.js"></script>
+<main id="main">
+  <div class="page-head">
+    <div class="t">
+      <h1>Ngân hàng câu hỏi</h1>
+      <div class="caption"><b>1.284</b> câu · Toán · 3 khối · cập nhật 2 phút trước</div>
+    </div>
+    <div class="acts">
+      <button class="btn"><svg class="i sm"><use href="#i-upload"/></svg><span>Nhập Word</span></button>
+      <button class="btn"><svg class="i sm"><use href="#i-spark"/></svg><span>AI soạn</span></button>
+      <button class="btn primary"><svg class="i sm"><use href="#i-plus"/></svg><span>Thêm câu</span></button>
+    </div>
+  </div>
+
+  <div class="bank">
+    <nav class="facets" aria-label="Chủ đề">
+      <h3 class="eyebrow">Toán 10 · chủ đề</h3>
+      <a href="#" >Tất cả<span class="n">412</span></a>
+      <a href="#">Mệnh đề và tập hợp<span class="n">38</span></a>
+      <a href="#">Bất phương trình bậc nhất 2 ẩn<span class="n">44</span></a>
+      <a href="#" aria-current="true">Hàm số bậc hai<span class="n">96</span></a>
+      <a href="#" class="sub">Đồ thị parabol<span class="n">41</span></a>
+      <a href="#" class="sub">Dấu tam thức bậc hai<span class="n">33</span></a>
+      <a href="#" class="sub">Bất phương trình bậc hai<span class="n">22</span></a>
+      <a href="#">Hệ thức lượng trong tam giác<span class="n">57</span></a>
+      <a href="#">Vectơ<span class="n">71</span></a>
+      <a href="#">Thống kê<span class="n">40</span></a>
+      <a href="#">Xác suất<span class="n">66</span></a>
+      <div class="mix">
+        <div class="eyebrow" style="margin-bottom:8px">Cơ cấu mức độ</div>
+        <div id="mix"></div>
+        <div class="legend" style="margin-top:10px;gap:8px;font-size:12px"><span><i style="--c:var(--lvl-1)"></i>NB 38</span><span><i style="--c:var(--lvl-2)"></i>TH 31</span><span><i style="--c:var(--lvl-3)"></i>VD 19</span><span><i style="--c:var(--lvl-4)"></i>VDC 8</span></div>
+      </div>
+    </nav>
+
+    <section class="panel">
+      <div class="filters" role="search">
+        <label class="input-ic"><svg class="i sm"><use href="#i-search"/></svg><input class="input" type="search" placeholder="Tìm nội dung câu hỏi…" aria-label="Tìm câu hỏi"></label>
+        <select class="select" aria-label="Khối"><option>Lớp 10</option><option>Lớp 11</option><option>Lớp 12</option></select>
+        <select class="select hide-sm" aria-label="Dạng câu"><option>Mọi dạng</option><option>Nhiều lựa chọn</option><option>Đúng/Sai</option><option>Trả lời ngắn</option><option>Tự luận</option></select>
+        <span class="sep hide-sm"></span>
+        <button class="chip" aria-pressed="false" data-muc="NB">NB</button>
+        <button class="chip" aria-pressed="true" data-muc="TH">TH</button>
+        <button class="chip" aria-pressed="true" data-muc="VD">VD</button>
+        <button class="chip" aria-pressed="false" data-muc="VDC">VDC</button>
+      </div>
+      <div class="bulkbar" id="bulk" hidden><span><b id="nsel">0</b> câu đã chọn</span><span class="grow"></span><button class="btn sm"><svg class="i sm"><use href="#i-exam"/></svg><span>Thêm vào đề</span></button><button class="btn sm danger" id="del"><svg class="i sm"><use href="#i-trash"/></svg><span>Xoá</span></button></div>
+
+      <div class="table-wrap" style="--table-max: none">
+        <div data-skel>
+          <table class="data"><tbody id="skel"></tbody></table>
+        </div>
+        <table class="data" hidden id="tbl">
+          <thead><tr>
+            <th class="w-check"><input class="check" type="checkbox" aria-label="Chọn tất cả" id="all"></th>
+            <th>Câu hỏi</th>
+            <th class="hide-sm">Mức độ</th>
+            <th class="r hide-sm"><button class="sort">Đã dùng<svg class="i"><use href="#i-sort"/></svg></button></th>
+            <th class="r"><button class="sort" aria-sort="ascending">Tỉ lệ đúng<svg class="i"><use href="#i-up"/></svg></button></th>
+            <th class="hide-sm"><button class="sort">Cập nhật<svg class="i"><use href="#i-sort"/></svg></button></th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <span class="num">21–40 trong 96</span><span class="url hide-sm" data-url title="URL giữ bộ lọc + trang">/gv/ngan-hang?lop=10&amp;chu-de=ham-so-bac-hai&amp;muc=TH,VD&amp;trang=2</span>
+        <select class="select hide-sm" style="width:auto;height:30px" aria-label="Số dòng mỗi trang"><option>20 / trang</option><option>50 / trang</option></select>
+        <nav class="pages" aria-label="Phân trang">
+          <a href="?trang=1" aria-label="Trang trước"><svg class="i sm"><use href="#i-left"/></svg></a>
+          <a href="?trang=1">1</a><a href="?trang=2" aria-current="page">2</a><a href="?trang=3">3</a><a href="?trang=4">4</a><a href="?trang=5">5</a>
+          <a href="?trang=3" aria-label="Trang sau"><svg class="i sm"><use href="#i-right"/></svg></a>
+        </nav>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="ui.js"></script>
+<script src="shell.js"></script>
+<script src="charts.js"></script>
+<script>
+  const Q = [
+    ["Parabol (P): y = x² − 4x + 3 có đỉnh là điểm nào?", "Đồ thị parabol", 1, "Nhiều lựa chọn", 41, 23, "2 giờ"],
+    ["Tìm m để x² − 2mx + m + 2 > 0 với mọi x ∈ ℝ.", "Dấu tam thức bậc hai", 3, "Trả lời ngắn", 12, 31, "Hôm qua"],
+    ["Cho f(x) = −x² + 6x − 5. Xét tính đúng/sai của 4 mệnh đề a) … d)", "Dấu tam thức bậc hai", 2, "Đúng/Sai", 18, 38, "Hôm qua"],
+    ["Một cổng hình parabol rộng 8 m, cao 6 m. Tính chiều cao tại điểm cách chân cổng 1 m.", "Đồ thị parabol", 3, "Trả lời ngắn", 9, 42, "08/11"],
+    ["Tập nghiệm của bất phương trình x² − 5x + 6 ≤ 0 là", "Bất phương trình bậc hai", 2, "Nhiều lựa chọn", 37, 47, "08/11"],
+    ["Hàm số y = 2x² + 4x − 1 đồng biến trên khoảng nào?", "Đồ thị parabol", 2, "Nhiều lựa chọn", 29, 52, "07/11"],
+    ["Xác định a, b, c biết parabol y = ax² + bx + c đi qua A(0; 1), B(1; 2), C(2; 5).", "Đồ thị parabol", 3, "Tự luận", 6, 55, "06/11"],
+    ["Bất phương trình (x − 1)(3 − x) > 0 có bao nhiêu nghiệm nguyên?", "Bất phương trình bậc hai", 2, "Trả lời ngắn", 22, 58, "05/11"],
+    ["Giá trị nhỏ nhất của y = x² − 2x + 5 trên ℝ bằng", "Đồ thị parabol", 2, "Nhiều lựa chọn", 33, 61, "05/11"],
+    ["Một doanh nghiệp có lợi nhuận L(x) = −x² + 40x − 300 (triệu đồng). Tìm x để lợi nhuận lớn nhất.", "Đồ thị parabol", 4, "Tự luận", 4, 63, "03/11"],
+  ];
+  const lvl = ["", "NB", "TH", "VD", "VDC"];
+  const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  document.getElementById("rows").innerHTML = Q.map((q, i) => `<tr data-i="${i}">
+    <td class="w-check"><input class="check" type="checkbox" aria-label="Chọn câu ${i + 21}"></td>
+    <td class="clip"><div class="q"><span class="stem">${esc(q[0])}</span><span class="tp">#${1040 + i} · ${q[1]} · ${q[3]}</span></div></td>
+    <td class="hide-sm"><span class="lvl l${q[2]}">${lvl[q[2]]}</span></td>
+    <td class="r hide-sm">${q[4]}</td>
+    <td class="r"><span class="rate" data-tip="${q[5]}% làm đúng|${q[4]} lượt"><i style="--v:${q[5]}%"></i><span class="num">${q[5]}%</span></span></td>
+    <td class="hide-sm muted" style="white-space:nowrap">${q[6]}</td></tr>`).join("");
+  document.getElementById("skel").innerHTML = Array.from({ length: 8 }, () => `<tr><td class="w-check"><span class="skel" style="display:block;width:16px;height:16px"></span></td><td><div class="skel line w80"></div><div class="skel line w40" style="height:8px"></div></td><td class="hide-sm"><div class="skel line" style="width:40px"></div></td><td class="r"><div class="skel line" style="width:64px;margin-left:auto"></div></td></tr>`).join("");
+  UI.reveal(650);
+  Charts.segbar(document.getElementById("mix"), [{ l: "NB", v: 38, c: "var(--lvl-1)" }, { l: "TH", v: 31, c: "var(--lvl-2)" }, { l: "VD", v: 19, c: "var(--lvl-3)" }, { l: "VDC", v: 8, c: "var(--lvl-4)" }]);
+
+  // chip lọc → URL (replaceState: lọc không làm đầy lịch sử; đổi trang dùng pushState)
+  document.querySelectorAll("[data-muc]").forEach((c) => c.addEventListener("click", () => {
+    c.setAttribute("aria-pressed", c.getAttribute("aria-pressed") !== "true");
+    const on = [...document.querySelectorAll('[data-muc][aria-pressed="true"]')].map((x) => x.dataset.muc).join(",");
+    UI.setQuery("muc", on);
+    const t = document.getElementById("tbl"); t.classList.add("is-stale"); setTimeout(() => t.classList.remove("is-stale"), 350);
+  }));
+  // chọn hàng → thanh thao tác hàng loạt
+  const bulk = document.getElementById("bulk");
+  function sync() { const s = [...document.querySelectorAll("#rows .check")].filter((c) => c.checked); document.querySelectorAll("#rows tr").forEach((tr) => tr.setAttribute("aria-selected", tr.querySelector(".check").checked)); bulk.hidden = !s.length; document.getElementById("nsel").textContent = s.length; }
+  document.getElementById("rows").addEventListener("change", sync);
+  document.getElementById("all").addEventListener("change", (e) => { document.querySelectorAll("#rows .check").forEach((c) => (c.checked = e.target.checked)); sync(); });
+  document.getElementById("del").addEventListener("click", () => {
+    const rows = [...document.querySelectorAll('#rows tr[aria-selected="true"]')]; rows.forEach((r) => (r.hidden = true));
+    UI.toast({ title: `Đã xoá ${rows.length} câu`, msg: "Có thể hoàn tác trong 8 giây", life: 8000, undo: () => { rows.forEach((r) => { r.hidden = false; r.querySelector(".check").checked = false; }); sync(); } });
+    document.querySelectorAll("#rows .check").forEach((c) => (c.checked = false)); sync();
+  });
+  // ảnh mockup: chọn sẵn 2 hàng để thấy trạng thái chọn
+  setTimeout(() => { [1, 3].forEach((i) => (document.querySelectorAll("#rows .check")[i].checked = true)); sync(); }, 700);
+</script>
+</body>
+</html>

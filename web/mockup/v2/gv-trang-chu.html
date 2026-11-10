@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hôm nay · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  .hello { font-family: var(--font-read); font-weight: 600; letter-spacing: -.01em; }
+  .agenda > li { align-items: flex-start; padding-top: var(--s-3); padding-bottom: var(--s-3); }
+  .agenda .when { width: 76px; flex: none; font-variant-numeric: tabular-nums; color: var(--ink-3); font-size: var(--fs-sm); padding-top: 2px; }
+  .agenda .when b { display: block; color: var(--ink); font-size: var(--fs-md); font-weight: var(--fw-semibold); }
+  .agenda .body { flex: 1; min-width: 0; }
+  .agenda .body .s { white-space: normal; }
+  .agenda .act { flex: none; align-self: center; }
+  .agenda li.now { box-shadow: inset 2px 0 0 var(--accent); }
+  .cls > li { gap: var(--s-4); }
+  .cls .sp { width: 88px; flex: none; }
+  .cls .avg { width: 48px; text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--fw-semibold); flex: none; }
+  .cls .avg small { display: block; font-weight: 400; color: var(--ink-3); font-size: var(--fs-xs); line-height: 14px; }
+  .prog { display: flex; align-items: center; gap: var(--s-2); min-width: 140px; }
+  .prog .meter { flex: 1; }
+  .prog span { font-size: var(--fs-sm); color: var(--ink-3); font-variant-numeric: tabular-nums; width: 44px; text-align: right; }
+  @media (max-width: 720px) {
+    .cls .sp { display: none; } .agenda .act .txt { display: none; }
+    .agenda > li { flex-wrap: wrap; row-gap: 2px; }
+    .agenda .when { width: 100%; display: flex; gap: 6px; align-items: baseline; padding: 0; }
+    .agenda .when b { display: inline; font-size: var(--fs-sm); }
+    .agenda .body { flex-basis: 0; }
+    .prog { min-width: 0; } .prog .meter { display: none; }
+  }
+</style>
+</head>
+<body data-shell="gv" data-nav="trang-chu" data-crumb="Hôm nay">
+<script src="icons.js"></script>
+<main id="main">
+  <div class="page-head">
+    <div class="t">
+      <div class="eyebrow">Thứ Hai · 10/11/2026 · Tuần 10, HK I</div>
+      <h1 class="hello" style="margin-top:4px">Chào cô Lan Anh</h1>
+    </div>
+    <div class="acts">
+      <a class="btn" href="gv-ngan-hang.html"><svg class="i sm"><use href="#i-plus"/></svg><span>Câu hỏi</span></a>
+      <a class="btn primary" href="gv-soan-de.html"><svg class="i sm"><use href="#i-spark"/></svg><span>Tạo đề</span></a>
+    </div>
+  </div>
+
+  <section class="stats" aria-label="Tóm tắt">
+    <div class="stat"><div class="lbl">Chờ chấm</div><div class="val">23<small>bài</small></div><div class="delta"><svg class="i sm"><use href="#i-up"/></svg>8 từ sáng nay</div></div>
+    <div class="stat"><div class="lbl">Nộp đúng hạn · 4 tuần</div><div class="val">91<small>%</small></div><div class="spark stat-spark" data-v="84,86,85,88,87,90,89,91"></div></div>
+    <div class="stat"><div class="lbl">Điểm TB tuần này</div><div class="val">6,9</div><div class="delta up"><svg class="i sm"><use href="#i-trend"/></svg>+0,3 so với tuần trước</div></div>
+    <div class="stat"><div class="lbl">HS cần quan tâm</div><div class="val">7</div><div class="delta">ở 3 lớp · <a class="link" href="gv-ket-qua.html">xem</a></div></div>
+  </section>
+
+  <div class="grid" style="margin-top:var(--gutter)">
+    <section class="panel span-7 md-12">
+      <div class="hd"><h2>Việc hôm nay</h2><span class="badge">4</span><span class="grow"></span><a class="btn ghost sm" href="#">Lịch tuần</a></div>
+      <ul class="list agenda">
+        <li class="now">
+          <div class="when"><b>07:30</b>Tiết 2</div>
+          <div class="body"><div class="t">Lên lớp 10A1 · Bất phương trình bậc hai</div><div class="s">Bảng giảng đã soạn · 3 đồ thị</div></div>
+          <a class="btn sm act" href="#"><svg class="i sm"><use href="#i-present"/></svg><span class="txt">Trình chiếu</span></a>
+        </li>
+        <li>
+          <div class="when"><b>Trước 17:00</b></div>
+          <div class="body"><div class="t">Chấm Kiểm tra 15′ · 10A3</div><div class="s">40/41 đã nộp · trắc nghiệm đã tự chấm, còn 23 câu trả lời ngắn</div></div>
+          <a class="btn primary sm act" href="#"><svg class="i sm"><use href="#i-grade"/></svg><span class="txt">Chấm</span></a>
+        </li>
+        <li>
+          <div class="when"><b>21:00</b>hạn</div>
+          <div class="body"><div class="t">Luyện tập Hàm số bậc hai · 11B2</div><div class="s">28/40 đã nộp · 12 em chưa mở bài</div></div>
+          <button class="btn sm act" data-busy="700" data-toast="Đã nhắc 12 học sinh" data-toast-msg="Gửi qua Zalo nhóm lớp 11B2" data-undo="1"><svg class="i sm"><use href="#i-bell"/></svg><span class="txt">Nhắc</span></button>
+        </li>
+        <li>
+          <div class="when"><b>Tuần này</b></div>
+          <div class="body"><div class="t">Nhận xét giữa kỳ · 10A1</div><div class="s">AI đã soạn nháp 32 nhận xét theo TT22 · chờ cô duyệt</div></div>
+          <a class="btn sm act" href="#"><svg class="i sm"><use href="#i-eye"/></svg><span class="txt">Duyệt</span></a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="panel span-5 md-12">
+      <div class="hd"><h2>Lớp của tôi</h2><span class="grow"></span><a class="btn ghost sm" href="#">Tất cả</a></div>
+      <ul class="list cls">
+        <li class="link-row" onclick="location.href='gv-ket-qua.html'"><span class="lead-ic accent"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">10A1 · Toán 10</div><div class="s">32 HS · 2 cần quan tâm</div></div><div class="sp" data-v="6.1,6.4,6.2,6.8,6.6,7.0"></div><div class="avg">7,0<small>TB</small></div></li>
+        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">10A3 · Toán 10</div><div class="s">41 HS · 3 cần quan tâm</div></div><div class="sp" data-v="6.5,6.3,6.0,6.2,5.9,6.1"></div><div class="avg">6,1<small>TB</small></div></li>
+        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">11B2 · Toán 11</div><div class="s">40 HS · 2 cần quan tâm</div></div><div class="sp" data-v="7.2,7.0,7.3,7.1,7.4,7.5"></div><div class="avg">7,5<small>TB</small></div></li>
+        <li class="link-row"><span class="lead-ic"><svg class="i sm"><use href="#i-users"/></svg></span><div class="grow"><div class="t">Giải tích 1 · K68 CNTT</div><div class="s">86 SV · Đại học</div></div><div class="sp" data-v="6.8,6.9,7.1,6.7,7.0,7.2"></div><div class="avg">7,2<small>TB</small></div></li>
+      </ul>
+    </section>
+
+    <section class="panel span-12">
+      <div class="hd"><h2>Bài chờ chấm</h2><span class="badge accent">23</span><span class="grow"></span><a class="btn ghost sm" href="#">Mở hàng chấm</a></div>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Bài</th><th class="hide-sm">Lớp</th><th class="r hide-sm">Đã nộp</th><th class="hide-sm">Hạn</th><th>Tiến độ chấm</th><th class="r" style="width:96px"></th></tr></thead>
+          <tbody>
+            <tr><td><b style="font-weight:500">Kiểm tra 15′ · Bất phương trình</b></td><td class="hide-sm">10A3</td><td class="r hide-sm">40/41</td><td class="hide-sm">Hôm nay 17:00</td><td><div class="prog"><div class="meter"><i style="--v:44%"></i></div><span>18/41</span></div></td><td class="r"><a class="btn sm" href="#">Chấm</a></td></tr>
+            <tr><td><b style="font-weight:500">Bài tập về nhà · Tích vô hướng</b></td><td class="hide-sm">10A1</td><td class="r hide-sm">31/32</td><td class="hide-sm">12/11</td><td><div class="prog"><div class="meter"><i style="--v:84%"></i></div><span>27/32</span></div></td><td class="r"><a class="btn sm" href="#">Chấm</a></td></tr>
+            <tr><td><b style="font-weight:500">Bài luận ngắn · Ứng dụng đạo hàm</b></td><td class="hide-sm">K68 CNTT</td><td class="r hide-sm">79/86</td><td class="hide-sm">15/11</td><td><div class="prog"><div class="meter"><i style="--v:10%"></i></div><span>8/86</span></div></td><td class="r"><a class="btn sm" href="#">Chấm</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="ui.js"></script>
+<script src="shell.js"></script>
+<script src="charts.js"></script>
+<script>
+  document.querySelectorAll(".sp, .stat-spark").forEach((el) => Charts.spark(el, el.dataset.v.split(",").map(Number), { height: el.classList.contains("stat-spark") ? 24 : 28 }));
+</script>
+</body>
+</html>
