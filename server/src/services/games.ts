@@ -102,6 +102,13 @@ export function createGameService(db: Db) {
     return (await load(actor.orgId, id)).id;
   }
 
-  return { create, list, remove, loadForExport, idFor };
+  /** Câu hỏi của một trò chơi đã lưu (cho phòng chơi trực tiếp). */
+  async function loadItems(actor: Actor, id: string): Promise<{ title: string; items: GameBody["items"]; timerSeconds: number }> {
+    assertCan(actor.role, "game:read");
+    const r = await load(actor.orgId, id);
+    return { title: r.title, items: r.body.items, timerSeconds: r.body.timerSeconds };
+  }
+
+  return { create, list, remove, loadForExport, idFor, resolveSource, loadItems };
 }
 export type GameService = ReturnType<typeof createGameService>;

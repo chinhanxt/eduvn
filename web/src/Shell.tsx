@@ -20,6 +20,7 @@ const NAV: ({ group: string } | { to: string; label: string; icon: string; soon?
   { to: "/bang-giang", label: "Bảng giảng", icon: "board" },
   { to: "/slide", label: "Slide", icon: "slide" },
   { to: "/tro-choi", label: "Trò chơi", icon: "spark" },
+  { to: "/dau-truong", label: "Đấu trường", icon: "game" },
   { to: "/video", label: "Video bài giảng", icon: "video" },
   { group: "Lớp học" },
   { to: "/lop-hoc", label: "Lớp & học viên", icon: "users" },

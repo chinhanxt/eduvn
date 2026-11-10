@@ -26,6 +26,10 @@ const BoardPage = lazy(() => import("./board/BoardPage").then((m) => ({ default:
 const Diagrams = lazy(() => import("./pages/Diagrams").then((m) => ({ default: m.Diagrams })));
 const DiagramPage = lazy(() => import("./diagram/DiagramPage").then((m) => ({ default: m.DiagramPage })));
 const Games = lazy(() => import("./pages/Games").then((m) => ({ default: m.Games })));
+const Arena = lazy(() => import("./live/Host").then((m) => ({ default: m.Arena })));
+const SessionPage = lazy(() => import("./live/Host").then((m) => ({ default: m.SessionPage })));
+const HostScreen = lazy(() => import("./live/Host").then((m) => ({ default: m.HostScreen })));
+const Play = lazy(() => import("./live/Play").then((m) => ({ default: m.Play })));
 const Connect = lazy(() => import("./pages/Connect").then((m) => ({ default: m.Connect })));
 const MathKeyboard = lazy(() => import("./math/MathKeyboard").then((m) => ({ default: m.MathKeyboard })));
 const Books = lazy(() => import("./hoc/Books").then((m) => ({ default: m.Books })));
@@ -42,6 +46,7 @@ export function App() {
     <Suspense fallback={<div className="center">…</div>}>
     <Routes>
       <Route path="/callback" element={<Callback />} />
+      <Route path="/choi" element={<Play />} />
       {!ready ? (
         <Route path="*" element={<div className="center">…</div>} />
       ) : !user ? (
@@ -50,6 +55,7 @@ export function App() {
         <>
         <Route path="bang-giang/:id" element={<BoardPage />} />
         <Route path="so-do/:id" element={<DiagramPage />} />
+        <Route path="dau-truong/:pin" element={<HostScreen />} />
         <Route element={<Shell />}>
           <Route path="bang-giang" element={<Boards />} />
           <Route path="so-do" element={<Diagrams />} />
@@ -67,6 +73,8 @@ export function App() {
           <Route path="bai-giang-ai" element={<AiLessons />} />
           <Route path="bai-giang-ai/:id" element={<AiLessonPage />} />
           <Route path="tro-choi" element={<Games />} />
+          <Route path="dau-truong" element={<Arena />} />
+          <Route path="dau-truong/phien/:id" element={<SessionPage />} />
           <Route path="van-ban" element={<VanBan />} />
           <Route path="ket-noi" element={<Connect />} />
           <Route path="kho-tri-thuc" element={<KhoTriThuc />} />
