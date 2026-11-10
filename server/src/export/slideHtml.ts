@@ -155,7 +155,7 @@ export function slideHtml(canvas: Canvas, o: HtmlOpts): string {
   return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><style>${BASE_CSS}</style>${o.extraHead ?? ""}</head><body>${slideBody(canvas, o)}</body></html>`;
 }
 
-export type QuizQ = { type: string; question: string; options?: { value: string; label: string }[]; answer?: string[]; analysis?: string };
+export type QuizQ = { id?: string; type: string; question: string; options?: { value: string; label: string }[]; answer?: string[]; analysis?: string };
 
 /** Khung cho cảnh quiz: danh sách câu hỏi (có thể kèm đáp án). */
 export function quizHtml(title: string, questions: QuizQ[], o: { latex: (t: string) => string; reveal?: boolean; subtitle?: string; extraHead?: string }): string {

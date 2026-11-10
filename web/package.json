@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@cortex-js/compute-engine": "^0.181.1",
+    "katex": "0.16.38",
     "mathlive": "^0.111.4",
     "oidc-client-ts": "^3.5.0",
     "perfect-freehand": "^1.2.3",

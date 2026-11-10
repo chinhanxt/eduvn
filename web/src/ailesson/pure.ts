@@ -1,0 +1,33 @@
+import type { QuizQ } from "../../../server/src/export/slideHtml";
+
+export const estimateMs = (text: string) => Math.max(1500, Math.round((text.length / 14) * 1000));
+
+/** Chia lời giảng theo câu (khớp server/src/export/aiLessonTimeline.ts). */
+export function splitCues(text: string, durationMs: number): { text: string; startMs: number; durationMs: number }[] {
+  const parts = (text.match(/[^.!?…;\n]+[.!?…;]*/g) ?? [text]).map((s) => s.trim()).filter(Boolean);
+  const merged: string[] = [];
+  for (const p of parts) {
+    const last = merged[merged.length - 1];
+    if (last !== undefined && last.length < 40) merged[merged.length - 1] = `${last} ${p}`;
+    else merged.push(p);
+  }
+  const chunks = merged.length > 0 ? merged : [text];
+  const total = chunks.reduce((n, c) => n + c.length, 0) || 1;
+  let t = 0;
+  return chunks.map((c, i) => {
+    const d = i === chunks.length - 1 ? durationMs - t : Math.round((c.length / total) * durationMs);
+    const cue = { text: c, startMs: t, durationMs: Math.max(d, 200) };
+    t += d;
+    return cue;
+  });
+}
+
+/** Chấm quiz: single/multiple so đáp án; short_answer không chấm. */
+export function gradeQuestion(q: QuizQ, picked: string[]): "dung" | "sai" | "khong-cham" {
+  if (q.type === "short_answer" || !q.answer?.length) return "khong-cham";
+  const a = [...q.answer].sort().join("|");
+  return [...picked].sort().join("|") === a ? "dung" : "sai";
+}
+
+/** px ⇄ cqw trong HTML phần tử khi sửa chữ trực tiếp. */
+export const cqwToPx = (html: string) => html.replace(/(-?\d*\.?\d+)cqw/g, (_m, n: string) => `${Math.round(Number(n) * 100) / 10}px`);

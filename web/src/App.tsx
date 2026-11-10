@@ -11,6 +11,8 @@ import { Gradebook } from "./pages/Gradebook";
 import { LessonDetailPage, Lessons } from "./pages/Lessons";
 import { VanBan } from "./pages/VanBan";
 import { Slides } from "./pages/Slides";
+import { AiLessons } from "./pages/AiLessons";
+import { AiLessonPage } from "./pages/AiLessonPage";
 import { Boards } from "./pages/Boards";
 import { BoardPage } from "./board/BoardPage";
 import { Games } from "./pages/Games";
@@ -44,6 +46,8 @@ export function App() {
           <Route path="giao-an" element={<Lessons />} />
           <Route path="giao-an/:id" element={<LessonDetailPage />} />
           <Route path="slide" element={<Slides />} />
+          <Route path="bai-giang-ai" element={<AiLessons />} />
+          <Route path="bai-giang-ai/:id" element={<AiLessonPage />} />
           <Route path="tro-choi" element={<Games />} />
           <Route path="van-ban" element={<VanBan />} />
           <Route path="ket-noi" element={<Connect />} />
