@@ -33,6 +33,14 @@ describe("authz", () => {
     expect(can("assistant", "board:manage")).toBe(false);
   });
 
+  it("bài giao, thẻ lớp: GV giao + cấp mã; trợ giảng chỉ xem bài giao", () => {
+    expect(can("teacher", "assignment:manage")).toBe(true);
+    expect(can("teacher", "student:credentials")).toBe(true);
+    expect(can("assistant", "assignment:read")).toBe(true);
+    expect(can("assistant", "assignment:manage")).toBe(false);
+    expect(can("assistant", "student:credentials")).toBe(false);
+    expect(can("student", "assignment:read")).toBe(false);
+  });
   it("assertCan ném ForbiddenError có tên vai trò", () => {
     expect(() => assertCan("student", "exam:read_key")).toThrow(ForbiddenError);
     expect(() => assertCan("student", "exam:read_key")).toThrow(/student/);
