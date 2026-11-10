@@ -8,7 +8,8 @@ import type { Db } from "../db/client";
 import { ForbiddenError } from "../domain/authz";
 import { ResponseValue } from "../domain/scoring";
 import { answerKey } from "../domain/variants";
-import { NotFoundError, UnauthorizedError, ValidationError } from "../errors";
+import { AiUnavailableError, NotFoundError, UnauthorizedError, ValidationError } from "../errors";
+import type { Ai } from "../services/ai";
 import { renderAnswerKeyDocx, renderExamDocx } from "../export/docx";
 import { renderLessonDocx } from "../export/lesson";
 import { renderMatrixDocx } from "../export/matrix";
@@ -28,7 +29,7 @@ import { createClassService } from "../services/classes";
 import { StudentItem } from "../domain/roster";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
-export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string };
+export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string; ai?: Ai };
 
 const GradeBody = z.object({ code: z.string().min(1), responses: z.record(z.string(), ResponseValue) });
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -54,6 +55,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     }
     if (err instanceof ForbiddenError) return reply.code(403).send({ error: err.message });
     if (err instanceof NotFoundError) return reply.code(404).send({ error: err.message });
+    if (err instanceof AiUnavailableError) return reply.code(503).header("retry-after", "5").send({ error: err.message });
     if (err instanceof ValidationError) return reply.code(400).send({ error: err.message, issues: err.issues });
     if (err instanceof ZodError) return reply.code(400).send({ error: "Dữ liệu không hợp lệ", issues: err.issues });
     if ((err as { code?: string }).code === "FST_ERR_CTP_BODY_TOO_LARGE") return reply.code(413).send({ error: "Bài giảng quá lớn (tối đa 4 MB) — xoá bớt nét vẽ hoặc tách trang." });
