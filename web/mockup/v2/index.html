@@ -2,6 +2,7 @@
 <html lang="vi" data-portal="gv">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EDUVN v2 · Mockup 2 cổng</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,10 +26,12 @@
   .portal li small { display: block; color: var(--ink-3); font-size: var(--fs-sm); }
   .portal li code { font: 12px/18px var(--font-mono); color: var(--ink-3); white-space: nowrap; }
   .foot { margin-top: var(--s-10); display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
+  .foot.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .foot a { display: block; padding: var(--s-4); border: var(--bw) solid var(--line-2); border-radius: var(--r-md); }
   .foot a:hover { border-color: var(--line-input); }
   .foot a b { display: flex; align-items: center; gap: var(--s-2); }
-  @media (max-width: 720px) { .cols, .foot { grid-template-columns: 1fr; } body { padding-top: var(--s-6); } header h1 { font-size: 28px; line-height: 36px; } .portal li code { display: none; } }
+  @media (max-width: 1024px) { .foot.four { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 720px) { .cols, .foot, .foot.four { grid-template-columns: 1fr; } body { padding-top: var(--s-6); } header h1 { font-size: 28px; line-height: 36px; } .portal li code { display: none; } }
 </style>
 </head>
 <body>
@@ -64,7 +67,8 @@
   </section>
 </div>
 
-<div class="foot">
+<div class="foot four">
+  <a href="huong.html" style="border-color:var(--accent)"><b><svg class="i sm"><use href="#i-layers"/></svg>3 hướng · vòng 2</b><span class="caption">A tạp chí · B công cụ · C học đường — chọn một</span></a>
   <a href="thanh-phan.html"><b><svg class="i sm"><use href="#i-box"/></svg>Thành phần</b><span class="caption">Nút, bảng, toast, skeleton, trống/lỗi, streaming, icon</span></a>
   <a href="../../../docs/design/eduvn-design-system.md"><b><svg class="i sm"><use href="#i-book"/></svg>Hệ thiết kế</b><span class="caption">Token, lý do, kiến trúc frontend</span></a>
   <a href="../../../docs/research/2026-11-10-ui-survey.md"><b><svg class="i sm"><use href="#i-chart"/></svg>Khảo sát 26 trang</b><span class="caption">Số đo + nguyên tắc rút ra</span></a>

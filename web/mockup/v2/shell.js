@@ -5,15 +5,19 @@
   const b = document.body, main = document.getElementById("main");
   const shell = b.dataset.shell, cur = b.dataset.nav;
   if (!shell || !main) return;
+  // trang trong huong-a|b|c/: link tương đối lùi 1 cấp; "Hôm nay" trỏ về chính hướng đó
+  const inDir = /\/huong-[abc]\//.test(location.pathname);
+  const here = location.pathname.split("/").pop();
+  const href = (h, key) => (h === "#" ? "#" : inDir ? (key === "trang-chu" ? here : "../" + h) : h);
 
   const GV = [
-    ["trang-chu", "home", "Hôm nay", "gv-trang-chu.html"],
-    ["lop", "users", "Lớp học", "#", "4"],
-    ["cham", "inbox", "Chấm bài", "#", "23", true],
-    ["ket-qua", "chart", "Kết quả", "gv-ket-qua.html"],
+    ["trang-chu", "home", "Hôm nay", "gv-trang-chu.html", "", false, "G H"],
+    ["lop", "users", "Lớp học", "#", "4", false, "G L"],
+    ["cham", "inbox", "Chấm bài", "#", "23", true, "G C"],
+    ["ket-qua", "chart", "Kết quả", "gv-ket-qua.html", "", false, "G K"],
     ["-", "Soạn"],
-    ["ngan-hang", "bank", "Ngân hàng câu hỏi", "gv-ngan-hang.html"],
-    ["de-thi", "exam", "Đề thi", "gv-soan-de.html"],
+    ["ngan-hang", "bank", "Ngân hàng câu hỏi", "gv-ngan-hang.html", "", false, "G N"],
+    ["de-thi", "exam", "Đề thi", "gv-soan-de.html", "", false, "G D"],
     ["bai-giang", "spark", "Bài giảng AI", "#"],
     ["giao-an", "book", "Giáo án", "#"],
     ["bang-giang", "board", "Bảng giảng", "#"],
@@ -45,14 +49,14 @@
   ];
 
   const crumbs = (b.dataset.crumb || "").split("|").filter(Boolean);
-  const crumbHtml = crumbs.map((c, i) => (i < crumbs.length - 1 ? `<a href="#">${c}</a><span class="sep">/</span>` : `<span aria-current="page">${c}</span>`)).join("");
-  const themeBtn = `<button class="btn ghost icon" data-act="theme" aria-label="Đổi sáng/tối">${ic("moon")}</button>`;
+  const crumbHtml = crumbs.map((c, i) => (i < crumbs.length - 1 ? `<a href="#" ${i === crumbs.length - 2 ? 'class="parent"' : ""}>${c}</a><span class="sep">/</span>` : `<span aria-current="page">${c}</span>`)).join("");
+  const themeBtn = `<button class="btn ghost icon hide-sm" data-act="theme" aria-label="Đổi sáng/tối">${ic("moon")}</button>`;
 
   if (shell === "gv") {
     const nav = GV.map((n) =>
       n[0] === "-"
         ? `<div class="grp eyebrow">${n[1]}</div><div class="grp-line"></div>`
-        : `<a href="${n[3]}" ${n[0] === cur ? 'aria-current="page"' : ""} title="${n[2]}">${ic(n[1])}<span>${n[2]}</span>${n[4] ? `<em class="count ${n[5] ? "hot" : ""}" style="font-style:normal">${n[4]}</em>` : ""}</a>`
+        : `<a href="${href(n[3], n[0])}" ${n[0] === cur ? 'aria-current="page"' : ""} title="${n[2]}">${ic(n[1])}<span>${n[2]}</span>${n[4] ? `<em class="count ${n[5] ? "hot" : ""}" style="font-style:normal">${n[4]}</em>` : ""}${n[6] ? `<kbd class="nk">${n[6]}</kbd>` : ""}</a>`
     ).join("");
     const wrap = document.createElement("div");
     wrap.className = "app";
@@ -70,6 +74,7 @@
           <button class="btn ghost icon menu-btn" data-act="drawer" aria-label="Mở menu">${ic("menu")}</button>
           <nav class="crumb" aria-label="Vị trí">${crumbHtml}</nav>
           <div class="grow"></div>
+          <div class="ctx" aria-hidden="true"></div>
           <button class="cmd-trigger" data-act="cmdk" aria-label="Tìm nhanh">${ic("search", "sm")}<span class="txt">Tìm nhanh…</span><kbd>Ctrl K</kbd></button>
           ${themeBtn}
           <button class="btn ghost icon" aria-label="Thông báo (3 mới)" style="position:relative">${ic("bell")}<i style="position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 2px var(--bg)"></i></button>
@@ -80,13 +85,14 @@
     b.prepend(wrap);
     wrap.lastElementChild.append(main);
     if (b.dataset.banner) wrap.lastElementChild.querySelector(".top").insertAdjacentHTML("afterend", b.dataset.banner);
+    compactHeader(wrap.querySelector(".top"));
   }
 
   if (shell === "hoc") {
-    const nav = HOC.map((n) => `<a href="${n[3]}" ${n[0] === cur ? 'aria-current="page"' : ""}>${ic(n[1])}<span>${n[2]}</span></a>`).join("");
+    const nav = HOC.map((n) => `<a href="${href(n[3], n[0])}" ${n[0] === cur ? 'aria-current="page"' : ""}>${ic(n[1])}<span>${n[2]}</span></a>`).join("");
     const top = document.createElement("header");
     top.className = "hoc-top";
-    top.innerHTML = `<a class="brand" href="hoc-trang-chu.html" style="padding:0"><span class="mark">${ic("cap")}</span><span class="txt">EDUVN</span></a>
+    top.innerHTML = `<a class="brand" href="${href("hoc-trang-chu.html", "trang-chu")}" style="padding:0"><span class="mark">${ic("cap")}</span><span class="txt">EDUVN</span></a>
       <nav class="hoc-nav" aria-label="Điều hướng">${nav}</nav>
       <div class="grow" style="flex:1"></div>
       <span class="streak" title="Chuỗi ngày học liên tiếp">${ic("flame", "sm")}12 ngày</span>
@@ -100,5 +106,19 @@
     b.prepend(top);
     top.after(main);
     b.append(tab);
+    b.classList.add("has-tabbar");
+  }
+
+  /* Đầu trang cuộn khỏi màn hình → thanh trên hiện nút chính của trang (bản sao, cùng hành vi).
+     Không bao giờ chồng: thanh trên đặc, đầu trang chỉ cuộn bên dưới nó. */
+  function compactHeader(top) {
+    const head = document.querySelector(".page-head");
+    const primary = head && head.querySelector(".acts .btn.primary");
+    if (!head || !primary) return;
+    const ctx = top.querySelector(".ctx");
+    const clone = primary.cloneNode(true); clone.className = "btn primary sm"; clone.removeAttribute("id");
+    clone.addEventListener("click", (e) => { e.preventDefault(); primary.click(); });
+    ctx.append(clone);
+    new IntersectionObserver(([en]) => { const on = !en.isIntersecting; top.classList.toggle("compact", on); ctx.setAttribute("aria-hidden", !on); }, { rootMargin: `-${top.offsetHeight}px 0px 0px 0px` }).observe(head.querySelector(".acts") || head);
   }
 })();

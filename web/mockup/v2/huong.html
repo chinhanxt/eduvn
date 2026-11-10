@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDUVN v2 · 3 hướng giao diện</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  body { padding: var(--s-10) var(--page-x) var(--s-16); max-width: 1600px; margin: 0 auto; }
+  header h1 { font-family: var(--font-read); font-size: 36px; line-height: 44px; }
+  header p { margin-top: var(--s-3); max-width: 70ch; color: var(--ink-2); font-size: 16px; line-height: 25px; }
+  .dirs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-6); margin-top: var(--s-8); }
+  .dir { border-top: 3px solid var(--dc); padding-top: var(--s-4); display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
+  .dir .tag { font: 700 12px/16px var(--font-ui); letter-spacing: .1em; color: var(--ink-3); }
+  .dir h2 { font-size: 22px; line-height: 28px; }
+  .dir .idea { color: var(--ink-2); }
+  .dir dl { margin: 0; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px 12px; font-size: 13px; line-height: 19px; }
+  .dir dt { color: var(--ink-3); font-weight: 600; } .dir dd { margin: 0; color: var(--ink-2); }
+  .prev { display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: var(--s-3); align-items: start; }
+  .shot { position: relative; border: 1px solid var(--line-2); border-radius: var(--r-sm); overflow: hidden; background: var(--bg-sunken); }
+  .shot iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none; }
+  .shot.d { aspect-ratio: 1440 / 900; } .shot.d iframe { width: 1440px; height: 900px; transform: scale(var(--s)); }
+  .shot.m { aspect-ratio: 390 / 760; } .shot.m iframe { width: 390px; height: 760px; transform: scale(var(--s)); }
+  .shot a { position: absolute; inset: 0; z-index: 1; }
+  .links { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .fixes { margin-top: var(--s-12); border-top: 1px solid var(--line-2); padding-top: var(--s-6); display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: var(--s-8); }
+  .fixes ol { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; color: var(--ink-2); max-width: 90ch; }
+  .fixes b { color: var(--ink); }
+  @media (max-width: 1180px) { .dirs { grid-template-columns: minmax(0, 1fr); } .fixes { grid-template-columns: 1fr; gap: var(--s-3); } }
+  @media (max-width: 720px) { header h1 { font-size: 28px; line-height: 36px; } .prev { grid-template-columns: minmax(0, 1fr) 96px; } }
+</style>
+</head>
+<body>
+<script src="icons.js"></script>
+<header>
+  <div class="eyebrow">EDUVN · vòng 2 · 10/11/2026 · chọn một hướng</div>
+  <h1>Ba hướng cho “Hôm nay”</h1>
+  <p>Cùng dữ liệu, cùng khung đã sửa, cùng bảng màu dữ liệu. Khác nhau ở giọng: đọc như tạp chí, thao tác như công cụ, hay ấm áp như trường học. Bấm ảnh để mở trang thật.</p>
+</header>
+
+<div class="dirs">
+  <section class="dir" style="--dc:#17181c">
+    <div class="tag">HƯỚNG A</div>
+    <h2>Tạp chí nghiên cứu</h2>
+    <p class="idea">Mỗi ngày là một số báo: tiêu đề tóm tắt cả ngày, phần đánh số La Mã, Hình/Bảng có chú thích kết luận, ghi chú lề nói vì sao.</p>
+    <div class="prev">
+      <div class="shot d" style="--s:.2"><iframe src="huong-a/gv-hom-nay.html" loading="lazy" tabindex="-1" title="A GV"></iframe><a href="huong-a/gv-hom-nay.html" aria-label="Mở A · GV"></a></div>
+      <div class="shot m" style="--s:.338"><iframe src="huong-a/hoc-hom-nay.html" loading="lazy" tabindex="-1" title="A Học"></iframe><a href="huong-a/hoc-hom-nay.html" aria-label="Mở A · Học"></a></div>
+    </div>
+    <div class="links"><a class="btn sm" href="huong-a/gv-hom-nay.html">GV · Hôm nay</a><a class="btn sm" href="huong-a/hoc-hom-nay.html">Học · Hôm nay</a></div>
+    <dl>
+      <dt>Dựa trên</dt><dd>Distill (Georgia 20/31, chú thích hình 13 px), colah, OWID (hình có bảng); nguyên tắc 1, 10, 13, 14 trong khảo sát.</dd>
+      <dt>Lệch mặc định</dt><dd>Nền giấy ấm #FBFAF7 thay trắng; nút phụ thành liên kết “Chấm →” để chỉ còn 1 nút chính ở đầu trang.</dd>
+      <dt>Mạnh</dt><dd>Kể được câu chuyện; dữ liệu có ngữ cảnh; rất sang khi trình chiếu, in.</dd>
+      <dt>Rủi ro</dt><dd>Dài khi cuộn; GV thao tác nhanh nhiều việc sẽ thấy chậm.</dd>
+    </dl>
+  </section>
+
+  <section class="dir" style="--dc:#3346d1">
+    <div class="tag">HƯỚNG B</div>
+    <h2>Công cụ chính xác</h2>
+    <p class="idea">Hộp việc theo nhóm, chọn một dòng là thấy chi tiết + phổ điểm bên phải; mọi việc có phím tắt; chỉ số gọn một dải.</p>
+    <div class="prev">
+      <div class="shot d" style="--s:.2"><iframe src="huong-b/gv-hom-nay.html" loading="lazy" tabindex="-1" title="B GV"></iframe><a href="huong-b/gv-hom-nay.html" aria-label="Mở B · GV"></a></div>
+      <div class="shot m" style="--s:.338"><iframe src="huong-b/hoc-hom-nay.html" loading="lazy" tabindex="-1" title="B Học"></iframe><a href="huong-b/hoc-hom-nay.html" aria-label="Mở B · Học"></a></div>
+    </div>
+    <div class="links"><a class="btn sm" href="huong-b/gv-hom-nay.html">GV · Hôm nay</a><a class="btn sm" href="huong-b/hoc-hom-nay.html">Học · Hôm nay</a></div>
+    <dl>
+      <dt>Dựa trên</dt><dd>Linear/Observable (Inter, motion 0,1–0,16 s, dày); nguyên tắc 2, 3, 6, 11.</dd>
+      <dt>Lệch mặc định</dt><dd>Chữ 13 px, hàng 36–38 px, thanh trên 48 px; mã việc đơn cách (KT-0711-10A3) để gõ tìm.</dd>
+      <dt>Mạnh</dt><dd>Nhanh nhất cho GV dạy nhiều lớp; ít cuộn; nhìn một màn biết hết.</dd>
+      <dt>Rủi ro</dt><dd>Khô với HS phổ thông; cần người dùng học phím tắt mới nhanh.</dd>
+    </dl>
+  </section>
+
+  <section class="dir" style="--dc:#0b7466">
+    <div class="tag">HƯỚNG C</div>
+    <h2>Học đường hiện đại</h2>
+    <p class="idea">Một mảng màu lớn nói việc quan trọng nhất; chữ đậm, số to; thẻ lớp/môn có màu nhận diện; HS có vòng tiến độ và chuỗi ngày.</p>
+    <div class="prev">
+      <div class="shot d" style="--s:.2"><iframe src="huong-c/gv-hom-nay.html" loading="lazy" tabindex="-1" title="C GV"></iframe><a href="huong-c/gv-hom-nay.html" aria-label="Mở C · GV"></a></div>
+      <div class="shot m" style="--s:.338"><iframe src="huong-c/hoc-hom-nay.html" loading="lazy" tabindex="-1" title="C Học"></iframe><a href="huong-c/hoc-hom-nay.html" aria-label="Mở C · Học"></a></div>
+    </div>
+    <div class="links"><a class="btn sm" href="huong-c/gv-hom-nay.html">GV · Hôm nay</a><a class="btn sm" href="huong-c/hoc-hom-nay.html">Học · Hôm nay</a></div>
+    <dl>
+      <dt>Dựa trên</dt><dd>Brilliant/Khan (màu + chữ lớn cho người học); nguyên tắc 7, 11; mọi số liệu vẫn có thang hoặc mốc.</dd>
+      <dt>Lệch mặc định</dt><dd>Thẻ bo 16 + bóng mềm, nền kem, chữ 800 thay serif — để “chạm được”, bắt mắt trên điện thoại.</dd>
+      <dt>Mạnh</dt><dd>Bắt mắt nhất; HS thấy ngay việc tiếp theo; thân thiện.</dd>
+      <dt>Rủi ro</dt><dd>Nhiều màu dễ loãng nếu thêm màn; phải giữ kỷ luật: một mảng màu lớn mỗi màn.</dd>
+    </dl>
+  </section>
+</div>
+
+<section class="fixes">
+  <h2 style="font-size:18px">Đã sửa trong khung chung</h2>
+  <ol>
+    <li><b>Khung cố định.</b> Thanh bên <code>position: fixed</code>, cao 100%, tự cuộn; thanh trên đặc, không trong suốt, không blur; tiêu đề trang cuộn sạch dưới nó và nút chính hiện gọn trên thanh trên khi đầu trang đã khuất. Bỏ hiệu ứng ghép thanh trên giữa các trang (nguồn vệt mờ cạnh breadcrumb).</li>
+    <li><b>Bỏ sparkline trang trí.</b> Thay bằng: 5 điểm gần nhất trên thang 0–10 có vạch 5,0 và số; thanh học lực Giỏi/Khá/TB/Yếu có số HS; chênh lệch ghi bằng số; cột theo ngày có trục số và vạch mục tiêu.</li>
+    <li><b>Toast nhẹ.</b> Nền thẻ, một dòng, vạch + icon màu trạng thái, tối đa 2, luôn góc phải dưới (di động: sát đáy, trên thanh tab).</li>
+    <li><b>Màu chàm.</b> Máy đang ở chế độ tối nên trang tự đổi sang nhấn tối #8B97FF (tím). Nay mặc định luôn sáng (#3346D1 đã kiểm bằng getComputedStyle), tối chỉ bật bằng nút; nhấn tối đổi sang lam #7AA0FF.</li>
+  </ol>
+</section>
+<script src="ui.js"></script>
+<script>
+  // tỉ lệ thu nhỏ theo bề rộng thật của khung ảnh
+  const fit = () => document.querySelectorAll(".shot").forEach((el) => el.style.setProperty("--s", el.clientWidth / (el.classList.contains("d") ? 1440 : 390)));
+  new ResizeObserver(fit).observe(document.body); fit();
+</script>
+</body>
+</html>

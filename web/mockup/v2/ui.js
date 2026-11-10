@@ -31,30 +31,30 @@
     if (act === "cmdk") UI.openCmdk();
   });
 
-  /* ---------- Toast: hàng đợi, tối đa 3 hiển thị, tự tắt, dừng khi rê chuột, hoàn tác ---------- */
-  let region = null; const queue = []; const MAX = 3;
+  /* ---------- Toast: nhẹ, một dòng, tối đa 2 hiển thị, còn lại xếp hàng; tự tắt, dừng khi rê chuột; Hoàn tác ---------- */
+  let region = null; const queue = []; const MAX = 2;
   function ensureRegion() {
     if (!region) { region = document.createElement("div"); region.className = "toasts"; region.setAttribute("role", "status"); region.setAttribute("aria-live", "polite"); document.body.append(region); }
     return region;
   }
   UI.toast = (opt) => { queue.push(opt); pump(); };
-  function pump() {
-    const r = ensureRegion();
-    while (queue.length && r.children.length < MAX) show(queue.shift());
-  }
-  function show({ title, msg = "", kind = "ok", undo, life = 5000 }) {
+  function pump() { const r = ensureRegion(); while (queue.length && r.children.length < MAX) show(queue.shift()); }
+  function show({ title, msg = "", kind = "ok", undo, action, life }) {
+    life = life || (undo ? 8000 : 4000);
     const el = document.createElement("div");
-    el.className = "toast"; el.style.setProperty("--life", life + "ms");
-    const icon = { ok: ["ok", "ic-ok"], err: ["err", "ic-err"], info: ["info", "ic-info"] }[kind];
-    el.innerHTML = `${ic(icon[0], icon[1])}<div class="msg"><b></b><span></span></div>${undo ? '<button class="act">Hoàn tác</button>' : ""}<button class="close" aria-label="Đóng">${ic("x", "sm")}</button><i class="life"></i>`;
+    el.className = "toast " + kind;
+    const icon = { ok: "ok", err: "err", info: "info" }[kind];
+    const act = undo ? "Hoàn tác" : action ? action.label : "";
+    el.innerHTML = `${ic(icon)}<div class="msg"><b></b><span></span></div>${act ? `<button class="act">${act}</button>` : ""}<button class="close" aria-label="Đóng">${ic("x", "sm")}</button>`;
     el.querySelector("b").textContent = title; el.querySelector(".msg span").textContent = msg;
+    el.title = msg ? title + " — " + msg : title;
     let left = life, start = Date.now(), timer;
     const close = () => { clearTimeout(timer); el.classList.add("out"); el.addEventListener("animationend", () => { el.remove(); pump(); }, { once: true }); };
     const arm = () => { start = Date.now(); timer = setTimeout(close, left); };
     el.addEventListener("mouseenter", () => { clearTimeout(timer); left -= Date.now() - start; });
     el.addEventListener("mouseleave", arm);
     el.querySelector(".close").onclick = close;
-    if (undo) el.querySelector(".act").onclick = () => { undo(); close(); };
+    if (act) el.querySelector(".act").onclick = () => { (undo || action.run)(); close(); };
     ensureRegion().append(el); arm();
   }
 

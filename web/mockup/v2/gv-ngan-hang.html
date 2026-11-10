@@ -2,6 +2,7 @@
 <html lang="vi" data-portal="gv">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ngân hàng câu hỏi · EDUVN Giáo viên</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +25,7 @@
   .filters .select { width: auto; }
   .filters .sep { width: 1px; height: 20px; background: var(--line-2); margin: 0 var(--s-1); }
   .q { display: flex; flex-direction: column; gap: 2px; }
-  .q .stem { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+  .q .stem { color: var(--ink); }
   .q .tp { font-size: var(--fs-xs); color: var(--ink-3); }
   .rate { display: flex; align-items: center; gap: var(--s-2); justify-content: flex-end; }
   .rate i { display: block; width: 48px; height: 4px; border-radius: 2px; background: var(--chart-grid); position: relative; overflow: hidden; }
@@ -32,7 +33,7 @@
   .url { font: 12px/18px var(--font-mono); color: var(--ink-3); background: var(--bg-sunken); border: var(--bw) solid var(--line); border-radius: var(--r-xs); padding: 1px 6px; }
   .bulkbar[hidden] { display: none; }
   @media (max-width: 1180px) { .bank { grid-template-columns: 1fr; } .facets { display: none; } .url { display: none; } }
-  @media (max-width: 720px) { .filters { padding: var(--s-3) var(--s-4); } .filters .input-ic { max-width: none; flex-basis: 100%; } .q .stem { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; } .rate i { display: none; } }
+  @media (max-width: 720px) { .filters { padding: var(--s-3) var(--s-4); } .filters .input-ic { max-width: none; flex-basis: 100%; } .rate i { display: none; } }
 </style>
 </head>
 <body data-shell="gv" data-nav="ngan-hang" data-crumb="Soạn|Ngân hàng câu hỏi">
@@ -132,7 +133,7 @@
   const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
   document.getElementById("rows").innerHTML = Q.map((q, i) => `<tr data-i="${i}">
     <td class="w-check"><input class="check" type="checkbox" aria-label="Chọn câu ${i + 21}"></td>
-    <td class="clip"><div class="q"><span class="stem">${esc(q[0])}</span><span class="tp">#${1040 + i} · ${q[1]} · ${q[3]}</span></div></td>
+    <td><div class="q"><span class="stem">${esc(q[0])}</span><span class="tp">#${1040 + i} · ${q[1]} · ${q[3]}</span></div></td>
     <td class="hide-sm"><span class="lvl l${q[2]}">${lvl[q[2]]}</span></td>
     <td class="r hide-sm">${q[4]}</td>
     <td class="r"><span class="rate" data-tip="${q[5]}% làm đúng|${q[4]} lượt"><i style="--v:${q[5]}%"></i><span class="num">${q[5]}%</span></span></td>

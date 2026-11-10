@@ -2,6 +2,7 @@
 <html lang="vi" data-portal="gv">
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Thành phần · EDUVN v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +25,7 @@
   .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 2px; }
   .icons div { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: var(--s-3) 4px; border-radius: var(--r-sm); font-size: 11px; color: var(--ink-3); }
   .icons div:hover { background: var(--bg-hover); color: var(--ink); }
-  .static-toasts { display: flex; flex-direction: column; gap: var(--s-2); width: min(380px, 100%); }
+  .static-toasts { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-2); max-width: 100%; }
   .static-toasts .toast { animation: none; }
   .is-focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-bg); }
   .is-hover { background: var(--bg-hover) !important; border-color: var(--line-input) !important; }
@@ -102,12 +103,12 @@
   </section>
 
   <section class="sec">
-    <header><h2>Toast</h2><p class="caption">Góc phải dưới (di động: trên thanh tab). Tối đa 3, còn lại xếp hàng. Tự tắt 5 giây, dừng khi rê chuột, có Hoàn tác cho thao tác xoá.</p></header>
+    <header><h2>Toast</h2><p class="caption">Nhẹ, một dòng, vạch + icon màu trạng thái. Luôn góc phải dưới (di động: sát đáy, trên thanh tab). Tối đa 2, còn lại xếp hàng. Tự tắt 4 s (8 s nếu có Hoàn tác), dừng khi rê chuột.</p></header>
     <div>
       <div class="static-toasts">
-        <div class="toast"><svg class="i ic-ok"><use href="#i-ok"/></svg><div class="msg"><b>Đã giao bài cho 10A1</b><span>32 học sinh nhận qua Zalo</span></div><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
-        <div class="toast"><svg class="i ic-info"><use href="#i-info"/></svg><div class="msg"><b>Đã xoá 3 câu</b><span>Có thể hoàn tác trong 8 giây</span></div><button class="act">Hoàn tác</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
-        <div class="toast"><svg class="i ic-err"><use href="#i-err"/></svg><div class="msg"><b>Không lưu được</b><span>Mất mạng — đã giữ bản nháp trên máy</span></div><button class="act">Thử lại</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
+        <div class="toast ok"><svg class="i"><use href="#i-ok"/></svg><div class="msg"><b>Đã giao bài cho 10A1</b><span>32 học sinh nhận qua Zalo</span></div><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
+        <div class="toast info"><svg class="i"><use href="#i-info"/></svg><div class="msg"><b>Đã xoá 3 câu</b></div><button class="act">Hoàn tác</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
+        <div class="toast err"><svg class="i"><use href="#i-err"/></svg><div class="msg"><b>Không lưu được</b><span>đã giữ bản nháp trên máy</span></div><button class="act">Thử lại</button><button class="close" aria-label="Đóng"><svg class="i sm"><use href="#i-x"/></svg></button></div>
       </div>
       <div class="demo" style="margin-top:var(--s-4)"><button class="btn sm" onclick="UI.toast({title:'Đã lưu'})">Thành công (thử)</button><button class="btn sm" onclick="UI.toast({title:'Không gửi được',msg:'Thử lại sau ít phút',kind:'err'})">Lỗi (thử)</button><button class="btn sm" onclick="for(let i=1;i<=5;i++)UI.toast({title:'Thông báo '+i,kind:'info',life:2500})">Hàng đợi 5 (thử)</button></div>
     </div>

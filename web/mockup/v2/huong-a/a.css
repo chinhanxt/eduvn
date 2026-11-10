@@ -1,0 +1,113 @@
+/* Hướng A — "Tạp chí nghiên cứu"
+   Giấy ấm, serif dẫn dắt, hình/bảng đánh số, ghi chú lề kiểu Distill, khoảng trắng rộng.
+   Chỉ ghi đè token; thành phần vẫn từ ui.css. */
+:root {
+  --bg: #fbfaf7; --bg-sunken: #f3f1ec; --bg-raised: #fbfaf7; --bg-hover: #f0ede6; --bg-active: #e9e5dc;
+  --ink: #17181c; --ink-2: #45474f; --ink-3: #63666f;          /* 5,5:1 trên giấy */
+  --line: #e6e2d9; --line-2: #d6d1c6; --line-input: #8a8578;     /* 3,5:1 */
+  --chart-grid: #e6e2d9; --chart-axis: #b9b3a6; --chart-label: #63666f;
+  --grade-mid: #d6d1c6;
+}
+body { background: var(--bg); }
+.side { background: var(--bg-sunken); }
+.nav a[aria-current="page"] { background: transparent; box-shadow: none; color: var(--ink); font-weight: 600; }
+.nav a[aria-current="page"]::before { content: ""; position: absolute; left: -8px; top: 8px; bottom: 8px; width: 2px; background: var(--accent); }
+.brand .txt { font-family: var(--font-read); font-weight: 600; font-size: 19px; letter-spacing: .01em; }
+
+/* Khối báo: mỗi phần = cột chính 8 + cột lề 4 (ghi chú nằm đúng hàng với đoạn nó chú thích) */
+.paper { max-width: 1180px; }
+.band { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 0 var(--s-12); padding: var(--s-8) 0; border-top: 1px solid var(--line-2); }
+.band.first { border-top: 0; padding-top: var(--s-4); }
+.band > .main { min-width: 0; }
+.band > .note { font-size: var(--fs-sm); line-height: 21px; color: var(--ink-2); padding-top: 34px; }
+.note p + p { margin-top: var(--s-3); }
+.note .n { font: 600 11px/1 var(--font-ui); color: var(--accent); vertical-align: 1px; margin-right: 4px; }
+.ref { font: 600 10px/1 var(--font-ui); color: var(--accent); vertical-align: super; margin-left: 1px; }
+
+.dateline { font: 600 12px/16px var(--font-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); display: flex; gap: var(--s-3); align-items: center; }
+.dateline::after { content: ""; flex: 1; height: 1px; background: var(--line-2); }
+.lede { font-family: var(--font-read); font-weight: 600; font-size: 44px; line-height: 52px; letter-spacing: -.015em; margin-top: var(--s-5); max-width: 30ch; text-wrap: balance; }
+.deck { font-family: var(--font-read); font-size: 20px; line-height: 31px; color: var(--ink-2); margin-top: var(--s-4); max-width: 54ch; }
+.deck b { color: var(--ink); font-weight: 600; }
+.page-head.mast { display: block; margin: 0; }
+.mast .acts { display: flex; gap: var(--s-2); margin-top: var(--s-6); flex-wrap: wrap; }
+
+/* Số liệu: một hàng kẻ, số lớn, nhãn chữ hoa nhỏ */
+.facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line-2); }
+.facts > div { padding: var(--s-4) var(--s-5) var(--s-4) 0; }
+.facts > div + div { padding-left: var(--s-5); border-left: 1px solid var(--line); }
+.facts .k { font: 600 11px/16px var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.facts .v { font-size: 34px; line-height: 40px; font-weight: 600; letter-spacing: -.02em; margin-top: 6px; }
+.facts .v small { font-size: 15px; font-weight: 400; color: var(--ink-3); margin-left: 3px; letter-spacing: 0; }
+.facts .d { font-size: var(--fs-sm); color: var(--ink-3); margin-top: 2px; }
+.facts .d .up { color: var(--ok); font-weight: 600; } .facts .d .dn { color: var(--danger); font-weight: 600; }
+
+/* Tiêu đề phần: số La Mã + serif */
+.sh { display: flex; align-items: baseline; gap: var(--s-3); margin-bottom: var(--s-4); }
+.sh .no { font: 600 12px/1 var(--font-ui); letter-spacing: .08em; color: var(--ink-3); width: 24px; flex: none; }
+.sh h2 { font-family: var(--font-read); font-size: 24px; line-height: 32px; font-weight: 600; }
+.sh .more { margin-left: auto; font-size: var(--fs-sm); }
+
+/* Lịch: dòng thời gian có nhịp */
+.sched { list-style: none; margin: 0; padding: 0; }
+.sched li { display: grid; grid-template-columns: 24px 96px minmax(0, 1fr) auto; gap: var(--s-3); align-items: baseline; padding: var(--s-4) 0; border-top: 1px solid var(--line); }
+.sched li:first-child { border-top: 0; }
+.sched .tm { font-variant-numeric: tabular-nums; font-weight: 600; grid-column: 2; }
+.sched .tm small { display: block; font-weight: 400; color: var(--ink-3); font-size: var(--fs-sm); }
+.sched .what { font-family: var(--font-read); font-size: 18px; line-height: 27px; }
+.sched .what small { display: block; font-family: var(--font-ui); font-size: var(--fs-sm); line-height: 20px; color: var(--ink-3); margin-top: 2px; }
+.sched .go { font-weight: 600; color: var(--accent); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.sched .go:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sched li.now .tm { color: var(--accent); }
+.sched li.now::before { content: "Đang tới"; grid-column: 1; grid-row: 1; writing-mode: vertical-rl; transform: rotate(180deg); font: 600 10px/1 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); align-self: center; }
+
+/* Hình: số hình + tiêu đề + chú thích dưới */
+figure.fig { margin: 0; }
+.fig .cap-top { display: flex; align-items: baseline; gap: var(--s-3); margin-bottom: var(--s-4); }
+.fig .cap-top .no { font: 600 12px/1 var(--font-ui); letter-spacing: .08em; color: var(--ink-3); white-space: nowrap; }
+.fig .cap-top h2 { font-family: var(--font-read); font-size: 24px; line-height: 32px; font-weight: 600; }
+.fig figcaption { font-size: var(--fs-sm); line-height: 21px; color: var(--ink-2); margin-top: var(--s-4); max-width: 68ch; }
+.fig figcaption b { color: var(--ink); }
+.crow { display: grid; grid-template-columns: 170px minmax(0, 1fr) 110px; gap: var(--s-4); align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.crow:first-of-type { border-top: 0; }
+.crow .nm { font-weight: 500; } .crow .nm small { display: block; color: var(--ink-3); font-weight: 400; font-size: var(--fs-xs); }
+.crow .tb { text-align: right; font-variant-numeric: tabular-nums; font-size: var(--fs-sm); color: var(--ink-3); }
+.crow .tb b { color: var(--ink); font-size: 16px; font-weight: 600; }
+.up { color: var(--ok); } .dn { color: var(--danger); }
+.srow { display: grid; grid-template-columns: 170px minmax(0, 1fr) 150px; gap: var(--s-4); align-items: center; padding: 4px 0; border-top: 1px solid var(--line); }
+.srow:first-of-type { border-top: 0; }
+.srow .why { font-size: var(--fs-sm); color: var(--ink-2); }
+.srow .why b { color: var(--danger); font-weight: 600; }
+.axisrow { display: grid; grid-template-columns: 170px minmax(0, 1fr) 150px; gap: var(--s-4); font-size: 11px; color: var(--ink-3); }
+.axisrow .ticks { display: flex; justify-content: space-between; padding: 0 10px; font-variant-numeric: tabular-nums; }
+
+/* Bảng kiểu bài báo (booktabs): kẻ đậm trên/dưới, mảnh giữa, không kẻ dọc */
+table.book { width: 100%; border-collapse: collapse; font-size: var(--fs-md); }
+table.book caption { caption-side: top; text-align: left; margin-bottom: var(--s-3); }
+table.book thead th { text-align: left; font-weight: 600; font-size: var(--fs-sm); padding: 8px 12px 8px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+table.book td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); vertical-align: baseline; }
+table.book tbody tr:last-child td { border-bottom: 2px solid var(--ink); }
+table.book .r { text-align: right; font-variant-numeric: tabular-nums; }
+table.book a.go { color: var(--accent); font-weight: 600; }
+
+@media (max-width: 1180px) {
+  .band { grid-template-columns: minmax(0, 1fr); }
+  .band > .note { padding: var(--s-4) 0 0 var(--s-4); border-left: 2px solid var(--line-2); margin-top: var(--s-4); }
+  .lede { font-size: 38px; line-height: 46px; }
+}
+@media (max-width: 720px) {
+  .lede { font-size: 30px; line-height: 38px; margin-top: var(--s-4); }
+  .deck { font-size: 17px; line-height: 27px; }
+  .facts { grid-template-columns: 1fr 1fr; }
+  .facts > div:nth-child(3) { padding-left: 0; border-left: 0; }
+  .facts > div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .facts .v { font-size: 28px; line-height: 34px; }
+  .band { padding: var(--s-6) 0; }
+  .sched li { grid-template-columns: 64px minmax(0, 1fr); row-gap: 6px; }
+  .sched li.now::before { display: none; }
+  .sched .tm { grid-column: 1; } .sched .what { grid-column: 2; font-size: 17px; line-height: 25px; } .sched .act { grid-column: 2; }
+  .crow { grid-template-columns: minmax(0, 1fr) auto; } .crow .gb { grid-column: 1 / -1; grid-row: 2; }
+  .srow, .axisrow { grid-template-columns: minmax(0, 1fr) 140px; } .srow .why { grid-column: 1 / -1; grid-row: 2; margin-bottom: 6px; } .axisrow .sp { display: none; }
+  .srow .nm, .axisrow > span:first-child { grid-column: 1; }
+  table.book .hide-sm { display: none; }
+}

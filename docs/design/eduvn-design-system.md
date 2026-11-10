@@ -173,3 +173,25 @@ web/
 - Thanh bên cổng GV: nền sáng.
 - Màu nhấn theo cổng: GV `#3346D1`, Học `#0B7466`.
 - Phòng làm bài: chế độ tập trung (ẩn menu chính, giữ nút thoát rõ ràng).
+
+## 6. Vòng 2 (2026-11-10, sau góp ý chinhan)
+
+**Sửa khung chung**
+- Thanh bên GV `position: fixed`, cao 100dvh, tự cuộn (`overscroll-behavior: contain`); nội dung đẩy `padding-left = --sw`. Thanh trên **đặc** (`background: var(--bg)`), bỏ `backdrop-filter`. Khi khối nút của đầu trang cuộn khuất (IntersectionObserver), nút chính được nhân bản lên thanh trên (`.top.compact .ctx`). Bỏ `view-transition-name` của thanh trên (nội dung khác nhau giữa các trang → trình duyệt co giãn ảnh chụp, gây vệt mờ cạnh breadcrumb); chỉ thanh bên và tab dưới giữ tên.
+- Di động: breadcrumb chỉ còn nút lùi về trang cha; tiêu đề đầy đủ nằm ở h1.
+- Toast: nền thẻ, một dòng, vạch trái + icon màu trạng thái, tối đa 2, góc phải dưới (di động: sát đáy, trên thanh tab), 4 s / 8 s nếu có Hoàn tác.
+- Màu: **mặc định luôn sáng**; bản trước theo `prefers-color-scheme` nên máy đang tối hiện nhấn `#8B97FF` (tím). Nhấn tối GV đổi sang `#7AA0FF` (lam, 7,0:1 trên `#151922`).
+
+**Quy tắc biểu đồ bổ sung**: không sparkline. Mỗi biểu đồ trả lời một câu hỏi ghi rõ và có thang hoặc mốc + số đọc được:
+- `Charts.track`: 5 điểm gần nhất trên thang 0–10, vùng dưới 5,0 tô hồng, vạch 5,0, số của bài mới nhất.
+- `Charts.gradeBar`: Giỏi / Khá / TB / Yếu, có số học sinh trong từng khối (khối tối thiểu 22 px để luôn in được số).
+- `Charts.dotplot`: chủ đề trên thang 0–100% có vạch 50%.
+- `Charts.columns`: trục số + vạch mục tiêu.
+- `Charts.heatmap`: thang 4 bậc có chú giải số.
+- `Charts.dayline`: trục giờ có nhãn + mốc việc.
+- Chênh lệch ghi bằng số có dấu (+0,4 / −0,4).
+
+**Ba hướng** (`web/mockup/v2/huong.html`, mỗi hướng 2 màn "Hôm nay"):
+- **A · Tạp chí nghiên cứu** (`huong-a/`): giấy ấm, serif dẫn dắt, phần đánh số La Mã, Hình/Bảng có chú thích kết luận, ghi chú lề.
+- **B · Công cụ chính xác** (`huong-b/`): chữ 13 px, hộp việc nhóm + khung chi tiết, mã việc, phím tắt, dải chỉ số.
+- **C · Học đường hiện đại** (`huong-c/`): mảng màu lớn, chữ 800, thẻ bo 16 có bóng mềm, màu nhận diện lớp/môn, vòng tiến độ, chuỗi ngày.

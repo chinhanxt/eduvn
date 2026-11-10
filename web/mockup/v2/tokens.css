@@ -118,6 +118,7 @@
   --lvl-1: #86b6ef; --lvl-2: #3987e5; --lvl-3: #1c5cab; --lvl-4: #0d366b;
   /* phân kỳ lam ↔ đỏ, điểm giữa xám trung tính */
   --div-neg-2: #c4372f; --div-neg-1: #ec9a8f; --div-mid: #eeeeec; --div-pos-1: #86b6ef; --div-pos-2: #1c5cab;
+  --grade-mid: #d3d6dc; /* 'TB' trong cơ cấu học lực: xám trung tính, đủ thấy trên nền trắng */
   /* khung biểu đồ */
   --chart-grid: #e8eaee; --chart-axis: #c3c8d2; --chart-label: #646c80;
 }
@@ -133,37 +134,19 @@
 }
 
 /* ---------- Chế độ tối: bậc riêng, không đảo ngược máy móc ---------- */
-/* Hai phạm vi giống nhau: media query theo hệ điều hành; data-theme cho nút đổi giao diện (luôn thắng). */
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) {
-    color-scheme: dark;
-    --bg: #0e1117; --bg-sunken: #151922; --bg-raised: #1a1f2b; --bg-hover: #1f2532; --bg-active: #262d3c;
-    --overlay: rgb(0 0 0 / .6);
-    --ink: #e9ecf3; --ink-2: #b3b9c7; --ink-3: #8e96a8; --ink-disabled: #5c6478; --ink-on-accent: #0e1117;
-    --line: #232937; --line-2: #2e3545; --line-input: #646c82; --focus: #8b97ff;
-    --ok: #4fc285; --ok-bg: #12291e; --warn: #e6a23c; --warn-bg: #2b2112; --danger: #ff7b72; --danger-bg: #2f1716;
-    --accent: #8b97ff; --accent-hover: #a3adff; --accent-press: #b8c0ff; --accent-bg: #1d2245; --accent-line: #343d7a;
-    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
-    --lvl-1: #1c5cab; --lvl-2: #3987e5; --lvl-3: #86b6ef; --lvl-4: #cde2fb;
-    --div-mid: #383835; --seq-dim: #1c5cab;
-    --chart-grid: #232937; --chart-axis: #3a4252; --chart-label: #8e96a8;
-    --shadow-1: 0 1px 2px rgb(0 0 0 / .4); --shadow-2: 0 8px 28px rgb(0 0 0 / .5); --shadow-3: 0 16px 48px rgb(0 0 0 / .6);
-  }
-  :root[data-portal="hoc"]:where(:not([data-theme="light"])) {
-    --accent: #3cc2ae; --accent-hover: #5fd0bf; --accent-press: #84ddcf; --accent-bg: #10302b; --accent-line: #1f5a51; --focus: #3cc2ae;
-  }
-}
+/* Mặc định SÁNG kể cả khi hệ điều hành đang tối (bản trước tự theo OS → nút chàm thành tím #8B97FF trên máy chinhan).
+   Tối chỉ bật bằng data-theme="dark" (nút đổi giao diện / cài đặt "Theo hệ thống" làm sau). */
 :root[data-theme="dark"] {
   color-scheme: dark;
   --bg: #0e1117; --bg-sunken: #151922; --bg-raised: #1a1f2b; --bg-hover: #1f2532; --bg-active: #262d3c;
   --overlay: rgb(0 0 0 / .6);
   --ink: #e9ecf3; --ink-2: #b3b9c7; --ink-3: #8e96a8; --ink-disabled: #5c6478; --ink-on-accent: #0e1117;
-  --line: #232937; --line-2: #2e3545; --line-input: #646c82; --focus: #8b97ff;
+  --line: #232937; --line-2: #2e3545; --line-input: #646c82; --focus: #7aa0ff;
   --ok: #4fc285; --ok-bg: #12291e; --warn: #e6a23c; --warn-bg: #2b2112; --danger: #ff7b72; --danger-bg: #2f1716;
-  --accent: #8b97ff; --accent-hover: #a3adff; --accent-press: #b8c0ff; --accent-bg: #1d2245; --accent-line: #343d7a;
+  --accent: #7aa0ff; --accent-hover: #94b3ff; --accent-press: #adc4ff; --accent-bg: #18223f; --accent-line: #2f4374;
   --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c6: #008300; --c7: #9085e9; --c8: #e66767;
   --lvl-1: #1c5cab; --lvl-2: #3987e5; --lvl-3: #86b6ef; --lvl-4: #cde2fb;
-  --div-mid: #383835; --seq-dim: #1c5cab;
+  --div-mid: #383835; --seq-dim: #1c5cab; --grade-mid: #4a5060;
   --chart-grid: #232937; --chart-axis: #3a4252; --chart-label: #8e96a8;
   --shadow-1: 0 1px 2px rgb(0 0 0 / .4); --shadow-2: 0 8px 28px rgb(0 0 0 / .5); --shadow-3: 0 16px 48px rgb(0 0 0 / .6);
 }
