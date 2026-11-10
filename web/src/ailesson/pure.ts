@@ -31,3 +31,11 @@ export function gradeQuestion(q: QuizQ, picked: string[]): "dung" | "sai" | "kho
 
 /** px ⇄ cqw trong HTML phần tử khi sửa chữ trực tiếp. */
 export const cqwToPx = (html: string) => html.replace(/(-?\d*\.?\d+)cqw/g, (_m, n: string) => `${Math.round(Number(n) * 100) / 10}px`);
+
+/** Giá trị trường nhập → giá trị thật theo kiểu của ví dụ (số, chữ, bật/tắt, còn lại là JSON). */
+export function coerceField(example: unknown, raw: string | boolean): unknown {
+  if (typeof example === "number") return Number(raw);
+  if (typeof example === "boolean") return raw === true || raw === "true";
+  if (typeof example === "string") return String(raw);
+  return JSON.parse(String(raw));
+}

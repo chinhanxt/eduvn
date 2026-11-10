@@ -10,6 +10,7 @@ import type { Db } from "../../db/client";
 import { NotFoundError, ValidationError } from "../../errors";
 import type { Ai } from "../../services/ai";
 import { audioDirOf } from "../../services/aiLessons/generate";
+import { CATALOG } from "../../services/anim/catalog";
 import { extractMaterialText } from "../../services/aiLessons/material";
 import { type AiLessonService, type AiLessonsCfg, createAiLessonService } from "../../services/aiLessons/service";
 import { readVendor } from "../../services/aiLessons/vendor";
@@ -73,6 +74,11 @@ export function registerAiLessonRoutes(app: FastifyInstance, ctx: Ctx): AiLesson
     return reply.header("content-type", "audio/mpeg").header("cache-control", "private, max-age=3600").header("content-length", st.size).send(createReadStream(p));
   });
 
+  // Danh mục mẫu hoạt hình cho thư viện "Chọn hoạt hình" (bỏ từ khoá nội bộ)
+  app.get(`${P}/mau-hoat-hinh`, async (req) => {
+    await ctx.authenticate(req);
+    return CATALOG.map(({ tuKhoa: _k, ...rest }) => rest);
+  });
   // Hoạt hình toán gắn vào cảnh: tạo (AI chọn mẫu hoặc gửi spec) / bỏ / tải clip
   app.post(`${P}/:id/canh/:sceneId/hoat-hinh`, async (req, reply) => reply.code(202).send(await svc.animate(await ctx.authenticate(req), id(req), (req.params as { sceneId: string }).sceneId, req.body)));
   app.delete(`${P}/:id/canh/:sceneId/hoat-hinh`, async (req) => svc.removeAnimation(await ctx.authenticate(req), id(req), (req.params as { sceneId: string }).sceneId));

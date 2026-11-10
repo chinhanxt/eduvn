@@ -13,6 +13,7 @@ import { type GenDeps, audioDirOf, buildScene, fillMissingAudio, generateLesson 
 import { lessonPlanText } from "./material";
 import { estimateMs } from "./types";
 import { type AnimService, AnimSpec } from "../anim";
+import { prefilter } from "../anim/catalog";
 import { type Tts, disabledTts } from "./tts";
 import type { SceneAnim, StoredScene } from "./types";
 
@@ -136,28 +137,46 @@ export function createAiLessonService(db: Db, ai: Ai | undefined, cfg: AiLessons
     return els.map((e) => (e.content ? e.content.replace(/<[^>]+>/g, " ") : e.latex ? `$${e.latex}$` : "")).join(" ").replace(/\s+/g, " ").trim().slice(0, 1500);
   }
 
-  async function proposeAnim(sc: StoredScene, seconds: number): Promise<Record<string, unknown>> {
+  /** AI chọn hoạt hình: bước 1 lọc sơ bộ tất định (môn, lớp, từ khoá) còn ≤6 mẫu → bước 2 hỏi AI. Độ tin cậy < 0,6 hoặc sai zod → thử lại 1 lần kèm lý do, rồi bỏ. */
+  async function proposeAnim(sc: StoredScene, seconds: number, subject: string, grade: number | null): Promise<{ spec: Record<string, unknown>; reason?: string; confidence?: number }> {
     if (!ai) throw new AiUnavailableError("Chưa bật cổng AI");
     const task = cfg.taskOverrides?.hoat_hinh_toan ?? "hoat_hinh_toan";
     const speech = (sc.actions ?? []).flatMap((a) => (a.type === "speech" ? [a.text] : [])).join(" ").slice(0, 2500);
-    const base = `Cảnh: ${sc.title}\nNội dung slide: ${slideText(sc)}\nLời giảng: ${speech}\nThời lượng lời giảng: ${seconds} giây (đặt thoiLuong = ${seconds}).`;
+    const cands = prefilter({ subject, grade, title: sc.title, slideText: slideText(sc), speech });
+    if (cands.length === 0) throw new ValidationError(["Cảnh này chưa có mẫu hoạt hình nào hợp (không trúng từ khoá môn/chủ đề). Bạn có thể chọn mẫu thủ công."]);
+    const list = cands.map(({ entry: e }) => `### ${e.id} — ${e.ten}\nDùng khi: ${e.dungKhi}\nKhông dùng khi: ${e.khongDungKhi}\nThamSo: ${e.thamSo}\nVí dụ params: ${JSON.stringify(e.viDu)}`).join("\n\n");
+    const base = `Môn: ${subject || "?"}${grade ? `, lớp ${grade}` : ""}\nCảnh: ${sc.title}\nNội dung slide: ${slideText(sc)}\nLời giảng: ${speech}\nThời lượng lời giảng: ${seconds} giây (đặt thoiLuong = ${seconds}).\n\nCác mẫu được phép (chỉ chọn trong danh sách này):\n${list}`;
+    const allowed = new Set<string>(cands.map((c) => c.entry.id));
     let feedback = "";
     for (let attempt = 0; attempt < 2; attempt++) {
       const raw = await ai.chat(task, [{ role: "user", content: base + feedback }], { json: true });
-      let obj: unknown;
+      let obj: { template?: unknown; params?: unknown; reason?: unknown; confidence?: unknown; tieuDe?: unknown };
       try {
-        obj = (JSON.parse(raw) as { hoatHinh?: unknown }).hoatHinh;
+        obj = JSON.parse(raw) as typeof obj;
       } catch {
         feedback = "\nLần trước trả không phải JSON hợp lệ. Trả đúng JSON.";
         continue;
       }
-      if (obj === null || obj === undefined) throw new ValidationError(["AI thấy cảnh này không cần hoạt hình toán"]);
-      const spec = { ...(obj as Record<string, unknown>), thoiLuong: seconds };
+      if (obj.template === null || obj.template === undefined) throw new ValidationError(["AI thấy cảnh này không cần hoạt hình"]);
+      const conf = typeof obj.confidence === "number" ? obj.confidence : 0;
+      const reason = typeof obj.reason === "string" ? obj.reason.slice(0, 200) : undefined;
+      if (typeof obj.template !== "string" || !allowed.has(obj.template)) {
+        feedback = `\nMẫu "${String(obj.template)}" không nằm trong danh sách được phép. Chọn trong danh sách hoặc trả template null.`;
+        continue;
+      }
+      const spec = { template: obj.template, thoiLuong: seconds, ...(typeof obj.tieuDe === "string" && obj.tieuDe.trim() && { tieuDe: obj.tieuDe.trim().slice(0, 80) }), params: obj.params ?? {} };
       const ok = AnimSpec.safeParse(spec);
-      if (ok.success) return spec;
-      feedback = `\nĐề xuất trước bị từ chối: ${ok.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}. Sửa lại cho đúng mẫu.`;
+      if (!ok.success) {
+        feedback = `\nĐề xuất trước bị từ chối: ${ok.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}. Sửa lại cho đúng mẫu.`;
+        continue;
+      }
+      if (conf < 0.6) {
+        feedback = `\nĐộ tin cậy ${conf} quá thấp${reason ? ` (${reason})` : ""}. Nếu có mẫu khác hợp hơn thì chọn, nếu không trả template null.`;
+        continue;
+      }
+      return { spec, reason, confidence: conf };
     }
-    throw new ValidationError(["AI chưa đề xuất được hoạt hình hợp lệ, hãy thử lại"]);
+    throw new ValidationError(["AI chưa đề xuất được hoạt hình đủ chắc chắn cho cảnh này — hãy chọn mẫu thủ công."]);
   }
 
   /** GV bấm "Tạo hoạt hình": spec (tuỳ chọn, nếu có sẽ không hỏi AI) → kiểm → dựng nền. */
@@ -172,19 +191,21 @@ export function createAiLessonService(db: Db, ai: Ai | undefined, cfg: AiLessons
     if (sc.animation?.status === "dang_dung") return sc;
     const seconds = Math.min(60, Math.max(3, Math.round(speechMs(sc) / 1000)));
     const given = z.object({ spec: z.record(z.string(), z.unknown()).optional() }).parse(body ?? {}).spec;
-    const spec = given ? { ...given, thoiLuong: seconds } : await proposeAnim(sc, seconds);
+    const picked = given ? { spec: { ...given, thoiLuong: seconds } as Record<string, unknown>, reason: undefined, confidence: undefined } : await proposeAnim(sc, seconds, r.subject, r.grade);
+    const spec = picked.spec;
     let prepared: ReturnType<AnimService["prepare"]>;
     try {
       prepared = anim.prepare(spec);
     } catch (e) {
       throw new ValidationError([e instanceof z.ZodError ? e.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ") : (e as Error).message]);
     }
-    const next: SceneAnim = { spec, status: "dang_dung", hash: prepared.hash };
+    const meta = { ...(picked.reason && { reason: picked.reason }), ...(picked.confidence !== undefined && { confidence: picked.confidence }) };
+    const next: SceneAnim = { spec, status: "dang_dung", hash: prepared.hash, ...meta };
     await patchAnim(id, sceneId, "", next);
     const job = anim
       .render(spec)
-      .then((res) => patchAnim(id, sceneId, prepared.hash, { spec, status: "xong", hash: res.hash, durationMs: res.durationMs }))
-      .catch((e: unknown) => patchAnim(id, sceneId, prepared.hash, { spec, status: "loi", hash: prepared.hash, error: String((e as Error).message).slice(0, 300) }))
+      .then((res) => patchAnim(id, sceneId, prepared.hash, { spec, status: "xong", hash: res.hash, durationMs: res.durationMs, ...meta }))
+      .catch((e: unknown) => patchAnim(id, sceneId, prepared.hash, { spec, status: "loi", hash: prepared.hash, error: String((e as Error).message).slice(0, 300), ...meta }))
       .then(() => undefined)
       .catch(() => undefined);
     animJobs.add(job);

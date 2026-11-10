@@ -41,7 +41,7 @@ const QUIZ = [
 const HTML = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Mô phỏng</title></head><body><h1>Kéo a và b</h1><input id="a" type="range" min="1" max="10" value="3"><div id="out">9</div><script>document.getElementById('a').addEventListener('input',function(e){document.getElementById('out').textContent=String(e.target.value*e.target.value)});</script></body></html>`;
 const ACTIONS = (id: string) => [{ type: "action", name: "spotlight", params: { elementId: id } }, { type: "text", content: "Chúng ta cùng xem công thức bình phương của một tổng." }, { type: "text", content: "Hãy ghi nhớ: a cộng b, tất cả bình phương." }];
 
-function fakeAi(opts: { failInteractive?: boolean; noAnim?: boolean; badAnim?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
+function fakeAi(opts: { failInteractive?: boolean; noAnim?: boolean; badAnim?: boolean; lowConf?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
   const calls: string[] = [];
   const ai = {
     calls,
@@ -57,9 +57,10 @@ function fakeAi(opts: { failInteractive?: boolean; noAnim?: boolean; badAnim?: b
       if (task === "slide_noi_dung") return user.includes("Luyện tập nhanh") ? JSON.stringify(QUIZ) : JSON.stringify(SLIDE);
       if (task === "loi_giang") return JSON.stringify(ACTIONS("t1"));
       if (task === "hoat_hinh_toan") {
-        if (ai.opts.noAnim) return JSON.stringify({ hoatHinh: null });
-        if (ai.opts.badAnim) return JSON.stringify({ hoatHinh: { template: "do_thi_ham_so", thoiLuong: 5, params: { bieuThuc: "__import__('os').system('x')" } } });
-        return JSON.stringify({ hoatHinh: { template: "bien_doi_cong_thuc", thoiLuong: 99, params: { cacBuoc: [{ latex: "(a+b)^2" }, { latex: "a^2+2ab+b^2", ghiChu: "Khai triển" }], toMau: ["2ab"] } } });
+        if (ai.opts.noAnim) return JSON.stringify({ template: null });
+        if (ai.opts.badAnim) return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "\\input{x}" }, { latex: "y" }] }, reason: "x", confidence: 0.9 });
+        if (ai.opts.lowConf) return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "x" }, { latex: "y" }] }, reason: "không chắc", confidence: 0.3 });
+        return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 99, params: { cacBuoc: [{ latex: "(a+b)^2" }, { latex: "a^2+2ab+b^2", ghiChu: "Khai triển" }], toMau: ["2ab"] }, reason: "Cảnh khai triển bình phương một tổng", confidence: 0.92 });
       }
       throw new Error(`task lạ ${task}`);
     },
@@ -218,6 +219,14 @@ describe("sinh bài giảng AI", () => {
     expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/luu-ngan-hang`, {})).statusCode).toBe(404);
   });
 
+  it("danh mục mẫu hoạt hình cho thư viện chọn", async () => {
+    const r = await call("GET", "/api/ai-lessons/mau-hoat-hinh");
+    expect(r.statusCode).toBe(200);
+    const list = r.json() as { id: string; viDu: unknown; tuKhoa?: unknown }[];
+    expect(list.length).toBeGreaterThanOrEqual(28);
+    expect(list.every((e) => e.tuKhoa === undefined && e.viDu !== undefined)).toBe(true);
+  });
+
   it("hoạt hình toán: AI chọn mẫu → kiểm zod → dựng nền → gắn vào cảnh; spec xấu bị chặn; bỏ hoạt hình", async () => {
     const { id } = await makeLesson();
     const scenes = (await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[];
@@ -230,6 +239,11 @@ describe("sinh bài giảng AI", () => {
     ai.opts.badAnim = true;
     expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).statusCode).toBe(400);
     ai.opts.badAnim = false;
+    ai.opts.lowConf = true;
+    const low = await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {});
+    expect(low.statusCode).toBe(400);
+    expect(ai.calls.filter((c) => c === "hoat_hinh_toan").length).toBeGreaterThanOrEqual(5); // 1 + 2 (sai zod) + 2 (tin cậy thấp), mỗi lần thử lại 1 lượt
+    ai.opts.lowConf = false;
     expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, { spec: { template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "\\input{/etc/passwd}" }, { latex: "x" }] } } })).statusCode).toBe(400);
     const r = await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {});
     expect(r.statusCode).toBe(202);
@@ -239,7 +253,7 @@ describe("sinh bài giảng AI", () => {
       await new Promise((r) => setTimeout(r, 25));
     }
     const got = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0] as StoredScene;
-    expect(got.animation).toMatchObject({ status: "xong", durationMs: 1000 });
+    expect(got.animation).toMatchObject({ status: "xong", durationMs: 1000, confidence: 0.92 });
     expect((got.animation?.spec as { thoiLuong: number }).thoiLuong).toBe(4); // = tổng lời giảng 2 × 2 s, không theo số AI đưa ra (99)
     const hash = got.animation?.hash as string;
     const clip = await call("GET", `/api/ai-lessons/${id}/hoat-hinh/${hash}`);

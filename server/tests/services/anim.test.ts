@@ -6,7 +6,8 @@ import { afterAll, describe, expect, it } from "vitest";
 import { evalAst, parseExpr } from "../../src/services/anim/expr";
 import { hyperframesHtml, richText } from "../../src/services/anim/hfHtml";
 import { createAnimService } from "../../src/services/anim";
-import { AnimSpec, safeLatex } from "../../src/services/anim/spec";
+import { AnimSpec, TEMPLATES, safeLatex } from "../../src/services/anim/spec";
+import { CATALOG, prefilter, subjectKey } from "../../src/services/anim/catalog";
 
 const tmp: string[] = [];
 afterAll(() => {
@@ -60,8 +61,72 @@ describe("đặc tả hoạt hình (zod)", () => {
   });
 
   it("mẫu Manim là mã cố định: không exec/eval/subprocess/open ngoài spec", () => {
-    const py = readFileSync(path.resolve(__dirname, "../../../services/manim/templates.py"), "utf8");
-    for (const bad of ["exec(", "eval(", "subprocess", "os.system", "__import__", "compile("]) expect(py, bad).not.toContain(bad);
+    for (const f of ["templates.py", "templates_toan.py", "templates_ly.py", "common.py"]) {
+      const py = readFileSync(path.resolve(__dirname, "../../../services/manim", f), "utf8");
+      for (const bad of ["exec(", "eval(", "subprocess", "os.system", "__import__", "compile(", "open("]) if (!(f === "common.py" && bad === "open(")) expect(py, `${f}: ${bad}`).not.toContain(bad);
+    }
+  });
+});
+
+describe("danh mục mẫu", () => {
+  it("đủ mọi mẫu, ví dụ của từng mẫu qua được zod, thời lượng điển hình 5–15 giây", () => {
+    expect(CATALOG.map((c) => c.id).sort()).toEqual(Object.keys(TEMPLATES).sort());
+    for (const c of CATALOG) {
+      const r = AnimSpec.safeParse({ template: c.id, thoiLuong: c.thoiLuong[0], params: c.viDu });
+      expect(r.success, `${c.id}: ${r.success ? "" : JSON.stringify(r.error.issues)}`).toBe(true);
+      expect(c.thoiLuong[0]).toBeGreaterThanOrEqual(5);
+      expect(c.thoiLuong[1]).toBeLessThanOrEqual(15);
+      expect(c.engine).toBe(TEMPLATES[c.id].engine);
+    }
+  });
+
+  it("chặn tham số xấu của các mẫu mới", () => {
+    const bad = (template: string, params: unknown) => AnimSpec.safeParse({ template, thoiLuong: 8, params }).success;
+    expect(bad("vecto", { loai: "tong_hbh", a: [5, 3], b: [4, 3] })).toBe(false); // tổng vượt khung
+    expect(bad("do_thi_luong_giac", { ham: "tan", tuVongTron: true })).toBe(false);
+    expect(bad("tich_phan_dien_tich", { bieuThuc: "x", a: 3, b: 1 })).toBe(false);
+    expect(bad("day_so", { loai: "cap_so_cong", u1: 1, n: 5 })).toBe(false);
+    expect(bad("bieu_do_so_lieu", { nhan: ["a", "b"], cacChuoi: [{ ten: "x", giaTri: [1, 2, 3] }] })).toBe(false);
+    expect(bad("can_bang_phuong_trinh_hoa_hoc", { chatThamGia: ["H2", "O2"], sanPham: ["H2O"], heSoCuoi: [2, 1] })).toBe(false);
+    expect(bad("can_bang_phuong_trinh_hoa_hoc", { chatThamGia: ["H2;rm"], sanPham: ["H2O"], heSoCuoi: [2, 1] })).toBe(false);
+    expect(bad("giao_diem_he_pt", { f: "x", g: "__import__('os')" })).toBe(false);
+    expect(bad("tong_hop_luc", { cacLuc: [{ doLon: 3, gocDo: 0 }] })).toBe(false);
+    expect(bad("hinh_khong_gian_xoay", { hinh: "tetrahedron" })).toBe(false);
+  });
+
+  // 15 cảnh mẫu qua 6 môn: bộ lọc sơ bộ phải đưa mẫu đúng vào danh sách ≤6 mẫu
+  const cases: [string, number, string, string, string][] = [
+    ["Toán", 8, "Bình phương một tổng", "Khai triển (a+b)^2 bằng hình vuông diện tích", "hinh_hoc_dien_tich"],
+    ["Toán", 9, "Parabol y = ax^2", "Đồ thị hàm số bậc hai, hệ số a và đỉnh", "do_thi_ham_so"],
+    ["Toán", 10, "Giá trị lượng giác", "Vòng tròn lượng giác, sin cos tan của góc 60 độ", "vong_tron_luong_giac"],
+    ["Toán", 10, "Tổng hai vectơ", "Quy tắc hình bình hành để cộng hai vecto", "vecto"],
+    ["Toán", 12, "Hình chóp tứ giác", "Hình không gian: đỉnh, chiều cao và thể tích khối chóp", "hinh_khong_gian_xoay"],
+    ["Toán", 11, "Ý nghĩa của đạo hàm", "Cát tuyến tiến tới tiếp tuyến, hệ số góc là đạo hàm", "dao_ham_tiep_tuyen"],
+    ["Toán", 12, "Tích phân", "Tích phân xác định là diện tích dưới đường cong, tổng Riemann", "tich_phan_dien_tich"],
+    ["Toán", 11, "Cấp số cộng", "Dãy số có công sai d, tổng n số hạng đầu", "day_so"],
+    ["Vật lí", 11, "Dao động điều hoà", "Con lắc lò xo dao động, li độ, chu kỳ và biên độ", "dao_dong_dieu_hoa"],
+    ["Vật lí", 10, "Chuyển động thẳng biến đổi đều", "Vận tốc, gia tốc và đồ thị v-t của vật", "chuyen_dong_thang"],
+    ["Vật lí", 8, "Hợp lực", "Tổng hợp lực của hai lực tác dụng lên vật, đơn vị Newton", "tong_hop_luc"],
+    ["Hoá học", 8, "Cân bằng phương trình", "Cân bằng phương trình hoá học: hệ số của chất tham gia và sản phẩm", "can_bang_phuong_trinh_hoa_hoc"],
+    ["Ngữ văn", 7, "Phân tích câu thơ", "Phân tích hình ảnh trong câu thơ và biện pháp tu từ của tác giả", "trich_dan_van_ban"],
+    ["Lịch sử", 12, "Cách mạng tháng Tám", "Các sự kiện năm 1945 theo dòng thời gian lịch sử", "dong_thoi_gian"],
+    ["Tiếng Anh", 9, "Từ vựng chủ đề môi trường", "Học từ vựng mới: nghĩa là gì, cách phát âm và ví dụ", "tu_vung"],
+  ];
+  it.each(cases)("bộ lọc: %s lớp %i — %s → %s", (subject, grade, title, speech, want) => {
+    const ids = prefilter({ subject, grade, title, slideText: "", speech }).map((c) => c.entry.id);
+    expect(ids.length).toBeLessThanOrEqual(6);
+    expect(ids).toContain(want);
+    expect(ids[0]).toBe(want); // mẫu đúng đứng đầu
+  });
+
+  it("bộ lọc: phạt lệch môn; cảnh trơn không trúng từ khoá thì không có ứng viên; nhận diện tên môn", () => {
+    expect(prefilter({ subject: "Ngữ văn", grade: 8, title: "Mở bài", slideText: "", speech: "Hôm nay chúng ta cùng tìm hiểu." })).toEqual([]);
+    const ids = prefilter({ subject: "Lịch sử", grade: 9, title: "Đồ thị", slideText: "", speech: "đồ thị hàm số parabol" }).map((c) => c.entry.id);
+    expect(ids.indexOf("do_thi_ham_so")).toBeGreaterThanOrEqual(0);
+    expect(subjectKey("Vật lý")).toBe("ly");
+    expect(subjectKey("Tiếng Anh")).toBe("anh");
+    expect(subjectKey("Lịch sử")).toBe("su");
+    expect(subjectKey("")).toBe("");
   });
 });
 
@@ -87,6 +152,20 @@ describe("HTML HyperFrames từ mẫu (snapshot)", () => {
   });
 });
 
+describe("HTML HyperFrames — các mẫu mới (snapshot)", () => {
+  const hf = ["dong_thoi_gian", "so_do_venn", "bieu_do_so_lieu", "the_ghi_nho", "trich_dan_van_ban", "tu_vung", "can_bang_phuong_trinh_hoa_hoc", "cay_xac_suat"];
+  it.each(hf)("%s: dựng đủ, đúng thời lượng, escape chữ AI, khớp snapshot", (id) => {
+    const c = CATALOG.find((x) => x.id === id);
+    if (!c) throw new Error(id);
+    const spec = AnimSpec.parse({ template: id, thoiLuong: 10, tieuDe: "Tiêu đề <b>x</b>", params: JSON.parse(JSON.stringify(c.viDu)) });
+    const html = hyperframesHtml(spec as never);
+    expect(html).toContain('data-duration="10"');
+    expect(html).toContain("&lt;b&gt;x&lt;/b&gt;");
+    expect(html).not.toMatch(/<script>(?!\s*const tl)[^]*alert/);
+    expect(html).toMatchSnapshot();
+  });
+});
+
 // Dựng thật (chất lượng thấp). Test chạy trong khoá nặng của ngoài; không bọc heavy lần nữa ở đây.
 const MANIM = path.join(homedir(), "Apps/manim/bin/manim");
 const TEX = path.join(homedir(), "Apps/tinytex/bin/x86_64-linux");
@@ -105,6 +184,12 @@ describe.skipIf(!existsSync(MANIM) || process.env.EDUVN_SKIP_RENDER === "1")("d�
     const r2 = await a.render(spec);
     expect(r2.hash).toBe(r.hash);
     expect(Date.now() - t1).toBeLessThan(first / 2);
+  });
+
+  it.each(["vecto", "hinh_khong_gian_xoay", "bieu_do_so_lieu", "cay_xac_suat"])("mẫu mới %s dựng thật (thấp) đúng thời lượng", { timeout: 400_000 }, async (id) => {
+    const c = CATALOG.find((x) => x.id === id);
+    const r = await real().render({ template: id, thoiLuong: 5, params: c?.viDu });
+    expect(Math.abs(probe(r.file) - 5)).toBeLessThan(0.3);
   });
 
   it("HyperFrames: sơ đồ quy trình 3 giây → mp4 đúng thời lượng", { timeout: 300_000 }, async () => {

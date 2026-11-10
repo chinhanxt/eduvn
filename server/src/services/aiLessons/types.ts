@@ -4,7 +4,7 @@ type Act = NonNullable<CompleteScene["actions"]>[number];
 /** Hành động đã lưu: speech có thêm file âm thanh + thời lượng (ms) do TTS tạo. */
 export type StoredAction = Act & { audioFile?: string; durationMs?: number };
 /** Hoạt hình toán gắn vào cảnh slide: `spec` là đặc tả đã kiểm (mẫu cố định + tham số), `hash` trỏ tới clip đã dựng. */
-export type SceneAnim = { spec: Record<string, unknown>; status: "dang_dung" | "xong" | "loi"; hash?: string; durationMs?: number; error?: string };
+export type SceneAnim = { spec: Record<string, unknown>; status: "dang_dung" | "xong" | "loi"; hash?: string; durationMs?: number; error?: string; reason?: string; confidence?: number };
 export type StoredScene = Omit<CompleteScene, "actions"> & { actions?: StoredAction[]; animation?: SceneAnim };
 
 /** Cảnh slide dạng ngắn gọn để các hàm xuất/trình phát dùng chung. */

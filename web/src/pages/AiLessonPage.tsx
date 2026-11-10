@@ -85,13 +85,13 @@ export function AiLessonPage() {
       setBusy(false);
     }
   };
-  const animate = async (sceneId: string) => {
+  const animate = async (sceneId: string, spec?: Record<string, unknown>) => {
     setBusy(true);
     setError(null);
     try {
       await api(`${BASE}/${id}`, { method: "PUT", body: { title, scenes } });
       setDirty(false);
-      const s = await api<Scene>(`${BASE}/${id}/canh/${sceneId}/hoat-hinh`, { method: "POST", body: {} });
+      const s = await api<Scene>(`${BASE}/${id}/canh/${sceneId}/hoat-hinh`, { method: "POST", body: spec ? { spec } : {} });
       setScenes((cur) => cur.map((x) => (x.id === sceneId ? { ...x, animation: s.animation } : x)));
       setMsg("AI đã chọn mẫu hoạt hình, đang dựng…");
     } catch (e) {
@@ -187,7 +187,7 @@ export function AiLessonPage() {
       )}
 
       {scenes.length > 0 && tab === "play" && <Player lessonId={id} scenes={scenes} />}
-      {scenes.length > 0 && tab === "edit" && <Editor scenes={scenes} busy={busy} onChange={(s) => { setScenes(s); setDirty(true); }} onRegenerate={(sid, dir) => void regen(sid, dir)} onAnimate={(sid) => void animate(sid)} onRemoveAnim={(sid) => void unanimate(sid)} />}
+      {scenes.length > 0 && tab === "edit" && <Editor scenes={scenes} busy={busy} onChange={(s) => { setScenes(s); setDirty(true); }} onRegenerate={(sid, dir) => void regen(sid, dir)} onAnimate={(sid, sp) => void animate(sid, sp)} onRemoveAnim={(sid) => void unanimate(sid)} />}
 
       {!active && scenes.length > 0 && (
         <div className="card" style={{ marginTop: 16 }} data-testid="ail-export">
