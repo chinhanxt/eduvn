@@ -1,26 +1,11 @@
 /** Trích chữ từ tài liệu GV tải lên (PDF/DOCX/TXT) làm `pdfText` cho dàn ý. Ý tưởng từ lib/server/material-extraction của OpenMAIC (MIT), viết lại gọn. */
-import { execFile } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
 import path from "node:path";
-import { promisify } from "node:util";
 import JSZip from "jszip";
 import { ValidationError } from "../../errors";
+import { pdfPages } from "../../tutor/extract";
+import type { Ai } from "../ai";
 
-const run = promisify(execFile);
 export const MAX_MATERIAL_CHARS = 40_000;
-
-async function pdfText(buf: Buffer): Promise<string> {
-  const dir = await mkdtemp(path.join(tmpdir(), "eduvn-mat-"));
-  try {
-    const f = path.join(dir, "in.pdf");
-    await writeFile(f, buf);
-    const { stdout } = await run("pdftotext", ["-enc", "UTF-8", f, "-"], { maxBuffer: 32 * 1024 * 1024, timeout: 60_000 });
-    return stdout;
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-}
 
 const unxml = (s: string) => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
 
@@ -37,10 +22,10 @@ async function docxText(buf: Buffer): Promise<string> {
 }
 
 /** Trả văn bản đã gọn, cắt ở MAX_MATERIAL_CHARS. */
-export async function extractMaterialText(name: string, buf: Buffer): Promise<string> {
+export async function extractMaterialText(name: string, buf: Buffer, ai?: Ai): Promise<string> {
   const ext = path.extname(name).toLowerCase();
   let text: string;
-  if (ext === ".pdf") text = await pdfText(buf);
+  if (ext === ".pdf") text = (await pdfPages(buf, { ai })).join("\n\n"); // trang scan → OCR LLM-vision
   else if (ext === ".docx") text = await docxText(buf);
   else if (ext === ".txt" || ext === ".md") text = buf.toString("utf8");
   else throw new ValidationError(["Chỉ hỗ trợ tài liệu PDF, DOCX, TXT"]);

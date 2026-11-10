@@ -43,7 +43,7 @@ export function registerAiLessonRoutes(app: FastifyInstance, ctx: Ctx): AiLesson
     await ctx.authenticate(req);
     const b = z.object({ name: z.string().min(1).max(200), contentBase64: z.string().min(1) }).parse(req.body);
     if (b.contentBase64.length > 14 * 1024 * 1024) throw new ValidationError(["Tài liệu quá lớn (tối đa 10 MB)"]);
-    const text = await extractMaterialText(b.name, Buffer.from(b.contentBase64, "base64"));
+    const text = await extractMaterialText(b.name, Buffer.from(b.contentBase64, "base64"), ctx.ai);
     return { name: b.name, chars: text.length, text };
   });
 
