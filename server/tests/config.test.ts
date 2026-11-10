@@ -19,6 +19,10 @@ describe("loadConfig", () => {
       HOST: "127.0.0.1",
       PORT: 4310,
       GATEWAY_URL: "http://127.0.0.1:4340",
+      DATA_DIR: "./data",
+      TTS_PROVIDER: "edge",
+      TTS_VOICE: "vi-VN-HoaiMyNeural",
+      CHROME_PATH: "/usr/bin/google-chrome",
     });
   });
 
