@@ -1,7 +1,8 @@
 // web/src/math/MathEditor.tsx
 import "./setup";
-import { type ClipboardEvent, type KeyboardEvent, useEffect, useRef } from "react";
+import { type ClipboardEvent, type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { MathfieldElement } from "mathlive";
+import { InkPad } from "./InkPad";
 import { VN_SHORTCUTS } from "./keyboard";
 import { mathStore } from "./mathStore";
 import { escapeText, splitMath } from "./segments";
@@ -54,6 +55,7 @@ type EditorProps = { value: string; onChange: (v: string) => void; placeholder?:
 /** Ô chữ + công thức chen giữa. Không điều khiển: muốn nạp giá trị mới thì đổi `key`. */
 export function MathEditor({ value, onChange, placeholder, testId }: EditorProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [ink, setInk] = useState(false);
   const changeRef = useRef(onChange);
   changeRef.current = onChange;
   const emit = () => {
@@ -163,7 +165,11 @@ export function MathEditor({ value, onChange, placeholder, testId }: EditorProps
           <i>ƒx</i>
         </button>
         <VoiceButton onLatex={(l) => insertMath(l, false)} />
+        <button type="button" className="me-fx" title="Viết tay công thức (AI đọc thành LaTeX)" data-testid="me-ink" onMouseDown={(e) => e.preventDefault()} onClick={() => setInk((v) => !v)}>
+          ✎
+        </button>
       </div>
+      {ink && <InkPad onLatex={(l) => insertMath(l, false)} onClose={() => setInk(false)} />}
     </div>
   );
 }

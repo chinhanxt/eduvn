@@ -116,7 +116,8 @@
 .bd-proj-card > .bd-btn { justify-self: start; }
 
 /* P10 đợt 4 — hình phẳng, ô chữ */
-.bd-tool-line .bd-obj, .bd-tool-arrow .bd-obj, .bd-tool-rect .bd-obj, .bd-tool-triangle .bd-obj, .bd-tool-circle .bd-obj, .bd-tool-polygon .bd-obj, .bd-tool-text .bd-obj { pointer-events: none; }
+.bd-tool-line .bd-obj, .bd-tool-arrow .bd-obj, .bd-tool-rect .bd-obj, .bd-tool-triangle .bd-obj, .bd-tool-circle .bd-obj, .bd-tool-polygon .bd-obj, .bd-tool-text .bd-obj, .bd-tool-formula .bd-obj { pointer-events: none; }
+.bd-tool-formula { cursor: crosshair; }
 .bd-tool-line, .bd-tool-arrow, .bd-tool-rect, .bd-tool-triangle, .bd-tool-circle, .bd-tool-polygon { cursor: crosshair; }
 .bd-tool-text { cursor: text; }
 .bd-text { color: #f3f0e6; line-height: 1.5; padding: 2px 12px; white-space: nowrap; }

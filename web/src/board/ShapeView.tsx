@@ -56,7 +56,7 @@ export function TextView({ obj, tool, selected, onSelect, onEdit, b, toBoard }: 
   return (
     <g className="bd-obj" data-testid="bd-text" {...h} onLostPointerCapture={h.onPointerUp} onDoubleClick={onEdit}>
       <rect x={obj.x} y={obj.y} width={w} height={bh} fill="transparent" stroke={selected ? "#8fa2ff" : "none"} strokeDasharray="6 4" rx={6} />
-      <foreignObject x={obj.x} y={obj.y} width={w} height={bh} pointerEvents="none" data-plain={obj.text} data-color={obj.color} data-size={obj.size}>
+      <foreignObject x={obj.x} y={obj.y} width={w} height={bh} style={{ overflow: "visible" }} pointerEvents="none" data-plain={obj.text} data-color={obj.color} data-size={obj.size}>
         <div className="bd-text" style={{ color: obj.color, fontSize: obj.size }}>
           {obj.text.split("\n").map((l, i) => (
             <div key={i}><MathText value={l} /></div>
