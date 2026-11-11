@@ -126,9 +126,15 @@ importers:
       '@fontsource-variable/source-serif-4':
         specifier: ^5.3.1
         version: 5.3.1
+      '@techstark/opencv-js':
+        specifier: 5.0.0-release.1
+        version: 5.0.0-release.1
       dexie:
         specifier: ^4.4.7
         version: 4.4.7
+      jsqr:
+        specifier: ^1.4.0
+        version: 1.4.0
       katex:
         specifier: 0.16.38
         version: 0.16.38
@@ -854,6 +860,9 @@ packages:
 
   '@tailwindcss/browser@4.1.18':
     resolution: {integrity: sha512-cnAUsj2TXGslPmDEnM469b4MAFT/ifxjt+Bla/2vBTBzp/PIPo6pjKxRrd8x+S84/S1bAtEIlzbJaaJxgZUV8Q==}
+
+  '@techstark/opencv-js@5.0.0-release.1':
+    resolution: {integrity: sha512-PIm+eB0MFtieXoNC2GRao0dv/02sehG+Nv2nSW5D6pQm6J/4WqvDHm0RyoqOmGYQm67jdGiaOdIeTShCY3PIUg==}
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
@@ -1908,6 +1917,9 @@ packages:
   jsonrepair@3.15.0:
     resolution: {integrity: sha512-wy8OTjwsJwQRnQJkKnMJJ9vcytRdBPAgIF/Hy6+s1dAj42BHMKiyL8JzEieIl3JY7idt8eyHwBWTO8mh/+mtwA==}
     hasBin: true
+
+  jsqr@1.4.0:
+    resolution: {integrity: sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==}
 
   jszip@3.10.2:
     resolution: {integrity: sha512-3l+rb15IOWtUhU0H5MFqES/T6Kh7abYwjosBey/vD6hDt8zoEffkSC5Ws5SGtgVw3gBx2NEbhTeSW1+kWkpyTQ==}
@@ -3306,6 +3318,8 @@ snapshots:
 
   '@tailwindcss/browser@4.1.18': {}
 
+  '@techstark/opencv-js@5.0.0-release.1': {}
+
   '@types/chai@5.2.3':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -4447,6 +4461,8 @@ snapshots:
   json-schema-typed@8.0.2: {}
 
   jsonrepair@3.15.0: {}
+
+  jsqr@1.4.0: {}
 
   jszip@3.10.2:
     dependencies:

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { api, type ExamSummary, type KeyEntry } from "../api";
 import { Icon } from "../Icon";
 
@@ -59,6 +60,8 @@ export function Grade() {
             <select className="inp" value={code} onChange={(e) => { setCode(e.target.value); setResp({}); setResult(null); }} data-testid="g-code" aria-label="Mã đề">
               {(exam?.codes ?? []).map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
+            <span className="sp" />
+            <Link to="/cham-anh" className="btn ghost" data-testid="g-photo"><Icon name="upload" size={18} />Chấm từ ảnh</Link>
           </div>
           <div className="card">
             {entries.map((en) => (

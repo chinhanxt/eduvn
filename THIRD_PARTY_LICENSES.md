@@ -176,6 +176,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## Chấm từ ảnh (P7) — OMR và QR
+
+Không vendor mã nguồn nguyên repo; thuật toán và UX tham khảo, mã tự viết lại bằng TypeScript (`web/src/omr/`):
+
+- **OMRChecker** (Udayraj123/OMRChecker) — MIT. Ý tưởng: cắt/nắn trang theo mốc, đọc độ đậm từng ô, so tương đối trong nhóm.
+- **bubble-sheet-omr** (sjreeves/bubble-sheet-omr) — MIT. Ý tưởng: quét OMR chạy hoàn toàn trong trình duyệt bằng OpenCV.js.
+- **LazyOMR** (Dilshan-H/LazyOMR) — MIT. Tham khảo luồng quét bằng camera và sinh lưới phiếu.
+- **opencv-js** (`@techstark/opencv-js`, bản dựng OpenCV 5.0 của TechStark) — Apache License 2.0. Tải lười, chỉ ở trang `/cham-anh`.
+- **jsQR** (`jsqr`, cozmo/jsQR) — Apache License 2.0. Đọc QR mã đề trên phiếu.
+- **node-qrcode** (`qrcode`, soldair/node-qrcode) — MIT. Sinh QR in trên phiếu.
+
+Phần chấm bài viết tay lấy ý tưởng tách hai bước (phiên âm → giáo viên sửa → chấm theo rubric) từ nghiên cứu về chấm bài viết tay bằng LLM; không sao chép mã.
+
 ## Bộ skill sư phạm `skills/` (P8) — nguồn tái chế
 
 Các skill được EDUVN tự viết bằng tiếng Việt; chỉ mượn **khung cấu trúc và ý tưởng quy trình** từ các dự án sau (không chép nguyên văn):

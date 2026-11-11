@@ -49,6 +49,8 @@ import { registerTutorRoutes } from "./routes/tutor";
 import { registerTodayRoutes } from "./routes/today";
 import { registerIdempotency } from "./idempotency";
 import { createTodayService } from "../services/today";
+import { registerPhotoGradingRoutes } from "./routes/photoGrading";
+import { createPhotoGradingService } from "../services/photoGrading";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -419,6 +421,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerLiveRoutes(app, { live, authenticate });
   registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
   registerTodayRoutes(app, { db: deps.db, today: createTodayService(deps.db, { now }), authenticate, studentAuth });
+  registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, geoAi, classes), authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
