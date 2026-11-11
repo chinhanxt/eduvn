@@ -11,6 +11,7 @@ import { mathInline, quizQuestionHtml, slideHtml } from "../../src/export/slideH
 import type { Ai } from "../../src/services/ai";
 import { type AnimService, createAnimService } from "../../src/services/anim";
 import { extractMaterialText } from "../../src/services/aiLessons/material";
+import { createAiLessonService } from "../../src/services/aiLessons/service";
 import { createVieneuTts, speakable } from "../../src/services/aiLessons/tts";
 import type { Tts } from "../../src/services/aiLessons/tts";
 import type { StoredScene } from "../../src/services/aiLessons/types";
@@ -41,25 +42,40 @@ const QUIZ = [
 const HTML = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Mô phỏng</title></head><body><h1>Kéo a và b</h1><input id="a" type="range" min="1" max="10" value="3"><div id="out">9</div><script>document.getElementById('a').addEventListener('input',function(e){document.getElementById('out').textContent=String(e.target.value*e.target.value)});</script></body></html>`;
 const ACTIONS = (id: string) => [{ type: "action", name: "spotlight", params: { elementId: id } }, { type: "text", content: "Chúng ta cùng xem công thức bình phương của một tổng." }, { type: "text", content: "Hãy ghi nhớ: a cộng b, tất cả bình phương." }];
 
-function fakeAi(opts: { failInteractive?: boolean; noAnim?: boolean; badAnim?: boolean; lowConf?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
+type FakeOpts = { failInteractive?: boolean; noAnim?: boolean; badAnim?: boolean; lowConf?: boolean; rewrite?: boolean; gradeRef?: boolean; animNums?: "once" | "always" };
+function fakeAi(opts: FakeOpts = {}): Ai & { calls: string[]; msgs: { task: string; all: string }[]; opts: FakeOpts } {
   const calls: string[] = [];
+  const msgs: { task: string; all: string }[] = [];
+  let numsLeft = 1;
   const ai = {
     calls,
+    msgs,
     opts,
     async chat(task: string, messages: { content: unknown }[]) {
       calls.push(task);
       const user = String(messages[messages.length - 1]?.content);
+      const all = messages.map((m) => String(m.content)).join("\n");
+      msgs.push({ task, all });
       if (task === "slide_dan_y") return JSON.stringify(OUTLINE);
       if (task === "slide_tuong_tac") {
         if (ai.opts.failInteractive) return "Xin lỗi, tôi không làm được.";
         return HTML;
       }
-      if (task === "slide_noi_dung") return user.includes("Luyện tập nhanh") ? JSON.stringify(QUIZ) : JSON.stringify(SLIDE);
-      if (task === "loi_giang") return JSON.stringify(ACTIONS("t1"));
+      if (task === "slide_noi_dung") {
+        if (!all.includes("# Quiz Content Generator")) return JSON.stringify(SLIDE);
+        // lần đầu lời giải nhắc nhầm sách lớp khác; lần sinh lại (có nhắc lớp) vẫn nhắc nhầm một chỗ → máy sửa
+        if (ai.opts.gradeRef) return JSON.stringify(QUIZ.map((q, i) => (i === 0 ? { ...q, analysis: all.includes("Lần trước câu hỏi/lời giải nhắc") ? "Xem SGK Toán 9, áp dụng hằng đẳng thức." : "Theo SGK Toán 12, áp dụng hằng đẳng thức." } : q)));
+        return JSON.stringify(QUIZ);
+      }
+      if (task === "loi_giang") {
+        if (all.includes("VIẾT LẠI LỜI GIẢNG")) return ai.opts.rewrite ? JSON.stringify({ loiGiang: ["Trên màn hình, công thức bình phương của một tổng hiện dần từng bước.", "Hãy ghi nhớ: a cộng b, tất cả bình phương."] }) : "không phải JSON";
+        return JSON.stringify(ACTIONS("t1"));
+      }
       if (task === "hoat_hinh_toan") {
         if (ai.opts.noAnim) return JSON.stringify({ template: null });
         if (ai.opts.badAnim) return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "\\input{x}" }, { latex: "y" }] }, reason: "x", confidence: 0.9 });
         if (ai.opts.lowConf) return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "x" }, { latex: "y" }] }, reason: "không chắc", confidence: 0.3 });
+        if (ai.opts.animNums && (ai.opts.animNums === "always" || numsLeft-- > 0)) return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "(a+b)^2" }, { latex: "a^2+2ab+b^2", ghiChu: "Ví dụ với 37 và 59" }] }, reason: "x", confidence: 0.9 });
         return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 99, params: { cacBuoc: [{ latex: "(a+b)^2" }, { latex: "a^2+2ab+b^2", ghiChu: "Khai triển" }], toMau: ["2ab"] }, reason: "Cảnh khai triển bình phương một tổng", confidence: 0.92 });
       }
       throw new Error(`task lạ ${task}`);
@@ -67,7 +83,7 @@ function fakeAi(opts: { failInteractive?: boolean; noAnim?: boolean; badAnim?: b
     // biome-ignore lint: không dùng
     async *stream() {},
   };
-  return ai as unknown as Ai & { calls: string[]; opts: typeof opts };
+  return ai as unknown as Ai & { calls: string[]; msgs: { task: string; all: string }[]; opts: FakeOpts };
 }
 
 const fakeTts: Tts = {
@@ -203,6 +219,85 @@ describe("sinh bài giảng AI", () => {
     expect(re.statusCode).toBe(200);
     expect(JSON.stringify(re.json())).not.toContain("Tiêu đề mới");
     expect(ai.calls.length).toBeGreaterThan(before);
+  });
+
+  it("[demo 11/11] cảnh tương tác/quiz soạn sau slide, prompt có lớp + CTGDPT 2018, dàn ý cả bài và dữ kiện slide trước; luật bố cục cảnh tương tác", async () => {
+    await makeLesson();
+    const order = ai.msgs.filter((m) => m.task === "slide_noi_dung" || m.task === "slide_tuong_tac").map((m) => (m.task === "slide_tuong_tac" ? "tt" : m.all.includes("# Quiz Content Generator") ? "quiz" : "slide"));
+    expect(order.indexOf("slide")).toBeLessThan(order.indexOf("tt"));
+    expect(order.indexOf("slide")).toBeLessThan(order.indexOf("quiz"));
+    const tt = ai.msgs.find((m) => m.task === "slide_tuong_tac")?.all ?? "";
+    expect(tt).toContain("lớp 8, theo Chương trình giáo dục phổ thông 2018");
+    expect(tt).toContain("Dàn ý cả bài");
+    expect(tt).toContain("PHẢI dùng đúng các số liệu này");
+    expect(tt).toContain("Công thức: $(a+b)^2 = a^2 + 2ab + b^2$"); // chữ của slide cảnh 1
+    expect(tt).toContain("cỡ chữ tối thiểu 16px");
+    expect(tt).toContain("Không dùng localStorage");
+  });
+
+  it("[demo 11/11] quiz nhắc 'SGK Toán 12' trong bài lớp 8 → sinh lại 1 lần kèm nhắc lớp, vẫn lệch thì sửa về đúng lớp; có lời đọc câu hỏi/đáp án", async () => {
+    ai.opts.gradeRef = true;
+    const { id } = await makeLesson();
+    expect(ai.msgs.filter((m) => m.task === "slide_noi_dung" && m.all.includes("# Quiz Content Generator"))).toHaveLength(2);
+    const quiz = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[]).find((s) => s.type === "quiz") as StoredScene;
+    const qs = (quiz.content as unknown as { questions: { analysis: string }[] }).questions;
+    expect(qs[0]?.analysis).toBe("Xem SGK Toán 8, áp dụng hằng đẳng thức.");
+    expect(quiz.quizVoice).toHaveLength(2);
+    expect(quiz.quizVoice?.[0]?.q.text.startsWith("Câu 1. Khai triển $(x+1)^2$ bằng Phương án A:")).toBe(true);
+    expect(quiz.quizVoice?.[0]?.q).toMatchObject({ durationMs: 2000 }); // đã đọc giọng cùng lượt với lời giảng
+    expect(quiz.quizVoice?.[0]?.a.text.startsWith("Đáp án đúng: B.")).toBe(true);
+  });
+
+  it("[demo 11/11] bài cũ chưa có lời đọc quiz: trước khi dựng video máy tự sinh + đọc giọng", async () => {
+    const { id } = await makeLesson();
+    const d = (await call("GET", `/api/ai-lessons/${id}`)).json();
+    const scenes = (d.scenes as StoredScene[]).map(({ quizVoice: _q, ...s }) => s);
+    await call("PUT", `/api/ai-lessons/${id}`, { scenes });
+    expect(((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[]).some((s) => s.quizVoice)).toBe(false);
+    const orgId = (await t.app.inject({ method: "GET", url: "/api/me", headers: auth })).json().org.id as string;
+    const svc = createAiLessonService(t.db, ai, { dataDir, tts: fakeTts });
+    const prepared = await svc.prepareVideo({ userId: "gv", orgId, role: "owner" }, id);
+    const quiz = prepared.find((s) => s.type === "quiz") as StoredScene;
+    expect(quiz.quizVoice?.every((v) => v.q.audioFile && v.a.audioFile)).toBe(true);
+    const tl = compileTimeline("Bài", prepared);
+    const qsegs = tl.segments.filter((s) => s.kind === "quiz" && s.quizIndex !== undefined && s.audioFile?.startsWith("qv_"));
+    expect(qsegs).toHaveLength(4); // 2 câu × (đọc câu hỏi, đọc đáp án)
+  });
+
+  it("[demo 11/11] gắn hoạt hình: lời giảng nhắc thứ chỉ có trên slide được viết lại cho khớp màn hình, đọc lại giọng câu đổi", async () => {
+    ai.opts.rewrite = true;
+    const { id } = await makeLesson();
+    const slide = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0] as StoredScene;
+    const before = slide.actions?.filter((a) => a.type === "speech") as { audioFile: string; text: string }[];
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).statusCode).toBe(202);
+    let got: StoredScene | undefined;
+    for (let i = 0; i < 200; i++) {
+      got = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0];
+      if (got?.animation?.status !== "dang_dung") break;
+      await new Promise((r) => setTimeout(r, 25));
+    }
+    expect(got?.animation?.status).toBe("xong");
+    const after = got?.actions?.filter((a) => a.type === "speech") as { audioFile?: string; text: string; durationMs?: number }[];
+    expect(after.map((a) => a.text)).toEqual(["Trên màn hình, công thức bình phương của một tổng hiện dần từng bước.", "Hãy ghi nhớ: a cộng b, tất cả bình phương."]);
+    expect(after[0]?.durationMs).toBe(2000); // câu đổi đã được đọc lại giọng
+    expect(after[1]?.audioFile).toBe(before[1]?.audioFile); // câu giữ nguyên không đọc lại
+    expect(ai.msgs.find((m) => m.all.includes("VIẾT LẠI LỜI GIẢNG"))?.all).toContain('Hoạt hình "Biến đổi công thức"');
+  });
+
+  it("[demo 11/11] AI chọn hoạt hình: prompt có dữ kiện bài + ưu tiên phân số; số lệch với bài → chọn lại 1 lần, vẫn lệch thì từ chối", async () => {
+    const { id } = await makeLesson();
+    const slide = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0] as StoredScene;
+    ai.opts.animNums = "always";
+    const r1 = await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {});
+    expect(r1.statusCode).toBe(400);
+    expect(r1.json().error).toContain("số liệu không có trong bài");
+    const asks = ai.msgs.filter((m) => m.task === "hoat_hinh_toan");
+    expect(asks).toHaveLength(2);
+    expect(asks[0]?.all).toContain('xác suất ghi dạng phân số chuỗi như trong bài (vd "5/8", "4/7")');
+    expect(asks[1]?.all).toContain("Đề xuất trước dùng các số 37; 59");
+    ai.opts.animNums = "once";
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).statusCode).toBe(202);
+    await new Promise((r) => setTimeout(r, 200));
   });
 
   it("lưu quiz vào ngân hàng: trắc nghiệm 4 phương án lưu, nhiều đáp án bị bỏ qua có lý do", async () => {
@@ -406,11 +501,13 @@ describe("dòng thời gian video (IR) và phụ đề", () => {
   it("quiz: mỗi câu hai đoạn (câu hỏi rồi đáp án), lời giải ngắn nằm ở phụ đề; lời giảng đầu hiện câu 1", () => {
     const quiz = { id: "q", outlineId: "s2", type: "quiz", title: "Luyện tập", order: 1, stageId: "x", content: { type: "quiz", questions: QUIZ }, actions: [{ id: "1", type: "speech", text: "Làm thử nhé.", durationMs: 3000 }] } as unknown as StoredScene;
     const tl = compileTimeline("Bài", [quiz]);
-    expect(tl.segments.map((x) => [x.quizIndex, x.reveal ?? false, x.durationMs])).toEqual([[0, false, 3000], [0, true, 4000], [1, false, 6200], [1, true, 4000]]);
-    const cue = tl.segments[1]?.cues[0]?.text ?? "";
-    expect(cue.startsWith("Đáp án B.")).toBe(true);
+    // thời lượng theo nội dung (đọc câu hỏi + phương án + 2,5 s nghĩ; đáp án + lời giải), không cố định 5 s/4 s
+    expect(tl.segments.map((x) => [x.quizIndex, x.reveal ?? false])).toEqual([[0, false], [0, false], [0, true], [1, false], [1, true]]);
+    expect(tl.segments[1]?.durationMs).toBeGreaterThan(5000);
+    const cue = tl.segments[2]?.cues[0]?.text ?? "";
+    expect(cue.startsWith("Đáp án đúng: B.")).toBe(true);
     expect(cue.length).toBeLessThanOrEqual(150);
-    expect(tl.segments[1]?.cues[0]?.text).not.toContain("$");
+    expect(tl.segments[2]?.cues[0]?.text).not.toContain("$");
     const q2 = { ...QUIZ[0], analysis: "Ta có (x+1)^2 = x^2 + 2x + 1 nên chọn B." };
     expect(shortExplain(q2 as never)).toBe("Đáp án B. Ta có (x+1)² = x² + 2x + 1 nên chọn B.");
   });
@@ -478,7 +575,11 @@ describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () =
     expect(probe).toContain("video,1280,720");
     expect(probe).toContain("audio");
     expect(readFileSync(r.srt, "utf8")).toContain("Công thức bình phương");
-    expect(r.totalMs).toBe(23100); // 1500 + (7400 + 4000) + (6200 + 4000): mỗi câu quiz một đoạn câu hỏi + một đoạn đáp án
+    // mỗi câu quiz: đoạn đọc câu hỏi + nghĩ, đoạn đáp án — thời lượng theo nội dung; hình và tiếng dài đúng bằng dòng thời gian
+    expect(r.totalMs).toBe(compileTimeline("Thử", sc).totalMs);
+    expect(r.totalMs).toBeGreaterThan(1500 + 2 * (2500 + 3200));
+    const dur = Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", r.video]).toString()) * 1000;
+    expect(Math.abs(dur - r.totalMs)).toBeLessThan(400);
   });
 });
 

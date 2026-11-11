@@ -10,6 +10,10 @@ import {
   withGenerationRetry,
 } from "@openmaic/generation";
 import type { AiLessonRequest } from "../../db/schema";
+import { curriculumNote, fixGradeRefs, lessonFacts, wrongGradeRefs } from "../../domain/lessonFacts";
+import { INTERACTIVE_LAYOUT_RULES } from "../../export/interactiveHtml";
+import { quizVoiceLines } from "../../export/aiLessonTimeline";
+import type { QuizQ } from "../../export/slideHtml";
 import type { Ai } from "../ai";
 import type { Tts } from "./tts";
 import type { StoredAction, StoredScene } from "./types";
@@ -27,7 +31,7 @@ export type GenHooks = {
   onScene(scenes: StoredScene[]): Promise<void>;
 };
 
-export type GenDeps = { ai: Ai; tts: Tts; audioDir: string; taskOverrides?: Record<string, string>; sceneConcurrency?: number };
+export type GenDeps = { ai: Ai; tts: Tts; audioDir: string; taskOverrides?: Record<string, string>; sceneConcurrency?: number; /** Môn, lớp của bài (đưa vào prompt: CTGDPT 2018, đúng lớp). */ subject?: string | null; grade?: number | null };
 
 export type GenState = { outline: SceneOutline[] | null; scenes: StoredScene[] };
 
@@ -74,18 +78,27 @@ export async function generateLesson(deps: GenDeps, req: AiLessonRequest, state:
     await hooks.onOutline(state.outline, title);
   }
   const outline = state.outline;
-  const todo = outline.filter((o) => !state.scenes.some((s) => s.outlineId === o.id));
+  // cảnh quiz/tương tác soạn sau các cảnh slide đứng trước nó để dùng đúng đề + số liệu của bài (5 đỏ 3 xanh → 5/8, 4/7)
+  const late = (o: SceneOutline) => o.type === "quiz" || o.type === "interactive";
+  const todo = outline.filter((o) => !state.scenes.some((s) => s.outlineId === o.id)).sort((a, b) => Number(late(a)) - Number(late(b)) || a.order - b.order);
+  const settled = new Map<string, Promise<void>>();
+  const release = new Map<string, () => void>();
+  for (const o of todo) if (!late(o)) settled.set(o.id, new Promise((r) => release.set(o.id, r)));
   const failed: string[] = [];
   let done = outline.length - todo.length;
   await hooks.onProgress({ done, total: outline.length, stage: "Đang soạn các cảnh", failed });
   await pool(todo, deps.sceneConcurrency ?? 3, async (o) => {
     try {
-      const scene = await buildScene(deps, o, outline, stageId, {});
+      if (late(o)) await Promise.all(todo.filter((x) => !late(x) && x.order < o.order).map((x) => settled.get(x.id)));
+      const facts = late(o) ? lessonFacts(state.scenes, o.order) : "";
+      const scene = await buildScene(deps, o, outline, stageId, { facts });
       if (!scene) throw new Error("Không dựng được cảnh");
       state.scenes = [...state.scenes.filter((s) => s.outlineId !== o.id), scene].sort((a, b) => a.order - b.order);
       await hooks.onScene(state.scenes);
     } catch (e) {
       failed.push(`${o.order}. ${o.title}: ${(e as Error).message}`);
+    } finally {
+      release.get(o.id)?.();
     }
     done++;
     await hooks.onProgress({ done, total: outline.length, stage: done >= outline.length ? "Hoàn tất" : "Đang soạn các cảnh", failed });
@@ -97,33 +110,66 @@ export async function generateLesson(deps: GenDeps, req: AiLessonRequest, state:
 
 /** Đọc lời giảng còn thiếu tiếng (cả bài gom một lần gọi VieNeu); cũng bù lại các câu lỗi ở lượt trước. `only` = chỉ các cảnh này. */
 export async function fillMissingAudio(deps: GenDeps, state: GenState, hooks: Pick<GenHooks, "onScene">, only?: Set<string>): Promise<number> {
-  const todo: StoredAction[] = [];
+  const todo: { id: string; text: string; audioFile?: string; durationMs?: number }[] = [];
   for (const sc of state.scenes) {
     if (only && !only.has(sc.id)) continue;
-    for (const a of sc.actions ?? []) if (a.type === "speech" && !(a as StoredAction).audioFile) todo.push(a as StoredAction);
+    for (const a of sc.actions ?? []) if (a.type === "speech" && !(a as StoredAction).audioFile) todo.push(a as StoredAction & { text: string });
+    // lời đọc câu hỏi/đáp án của cảnh quiz (video)
+    for (const v of sc.quizVoice ?? []) for (const line of [v.q, v.a]) if (!line.audioFile && line.text) todo.push(line);
   }
   if (todo.length === 0) return 0;
-  const res = await deps.tts.synthMany(todo.map((a) => ({ text: (a as { text: string }).text, name: safe(a.id) })), deps.audioDir).catch(() => todo.map(() => null));
+  const res = await deps.tts.synthMany(todo.map((a) => ({ text: a.text, name: safe(a.id) })), deps.audioDir).catch(() => todo.map(() => null));
   let fixed = 0;
   res.forEach((r, i) => {
     if (!r) return;
-    (todo[i] as StoredAction).audioFile = r.file;
-    (todo[i] as StoredAction).durationMs = r.durationMs;
+    (todo[i] as { audioFile?: string }).audioFile = r.file;
+    (todo[i] as { durationMs?: number }).durationMs = r.durationMs;
     fixed++;
   });
   if (fixed > 0) await hooks.onScene(state.scenes);
   return fixed;
 }
 
-/** Dựng 1 cảnh: nội dung → lời giảng (giọng đọc gom sau, xem fillMissingAudio). `edit` dùng cho "sinh lại cảnh". */
-export async function buildScene(deps: GenDeps, o: SceneOutline, all: SceneOutline[], stageId: string, edit: { directive?: string }): Promise<StoredScene | null> {
+/** Chỉ dẫn ngôn ngữ + bối cảnh bài cho một cảnh: lớp/CTGDPT 2018, dàn ý cả bài, dữ kiện các cảnh trước (quiz/tương tác), luật bố cục cảnh tương tác. */
+export function sceneDirective(deps: Pick<GenDeps, "subject" | "grade">, o: SceneOutline, all: SceneOutline[], facts = "", extra = ""): string {
+  const parts = [VI_DIRECTIVE];
+  const cur = curriculumNote(deps.subject, deps.grade);
+  if (cur) parts.push(cur);
+  if (all.length > 1) parts.push(`Dàn ý cả bài (giữ mạch và số liệu thống nhất giữa các cảnh, không lặp nội dung cảnh khác):\n${all.map((x) => `${x.order}. [${x.type}] ${x.title}${x.description ? ` — ${x.description}` : ""}`).join("\n")}`);
+  if (facts) parts.push(`Dữ kiện, đề bài và số liệu ĐÃ dùng ở các cảnh trước của bài — cảnh này PHẢI dùng đúng các số liệu này (cùng đề, cùng số lượng; xác suất ghi dạng phân số như trong bài), không tự đặt đề/số khác:\n${facts}`);
+  if (o.type === "interactive") parts.push(INTERACTIVE_LAYOUT_RULES);
+  if (extra) parts.push(extra);
+  return parts.join("\n\n");
+}
+
+/** Chữ của một cảnh quiz dùng để kiểm tên sách/lớp. */
+const quizText = (qs: QuizQ[]) => qs.map((q) => [q.question, ...(q.options ?? []).map((x) => x.label), q.analysis ?? ""].join(" ")).join(" ");
+
+/** Dựng 1 cảnh: nội dung → lời giảng (giọng đọc gom sau, xem fillMissingAudio). `edit` dùng cho "sinh lại cảnh"; `facts` = dữ kiện các cảnh trước. */
+export async function buildScene(deps: GenDeps, o: SceneOutline, all: SceneOutline[], stageId: string, edit: { directive?: string; facts?: string }): Promise<StoredScene | null> {
   const kind = o.type === "interactive" ? TASKS.interactive : o.type === "quiz" ? TASKS.quiz : TASKS.slide;
-  const content = await retry(
-    `noi-dung:${o.id}`,
-    () => generateSceneContent(o, caller(deps, kind, o.type !== "interactive"), { languageDirective: VI_DIRECTIVE, logger: noLog, ...(edit.directive && o.type === "slide" ? { editDirective: edit.directive } : {}) }),
-    (r) => r === null,
-  );
+  const gen = (extra = "") =>
+    retry(
+      `noi-dung:${o.id}`,
+      () => generateSceneContent(o, caller(deps, kind, o.type !== "interactive"), { languageDirective: sceneDirective(deps, o, all, edit.facts, extra), logger: noLog, ...(edit.directive && o.type === "slide" ? { editDirective: edit.directive } : {}) }),
+      (r) => r === null,
+    );
+  let content = await gen();
   if (!content) throw new Error("AI trả nội dung cảnh không hợp lệ");
+  if (o.type === "quiz") {
+    // kiểm tên SGK/lớp trong câu hỏi + lời giải: lệch lớp của bài → sinh lại 1 lần kèm nhắc, vẫn lệch thì sửa về đúng lớp
+    const qs = () => ((content as { questions?: QuizQ[] }).questions ?? []);
+    const wrong = wrongGradeRefs(quizText(qs()), deps.grade);
+    if (wrong.length) {
+      const again = await gen(`Lần trước câu hỏi/lời giải nhắc "${wrong.join('", "')}" nhưng bài dành cho lớp ${deps.grade}. Chỉ nhắc đúng lớp ${deps.grade} hoặc không nhắc tên sách.`).catch(() => null);
+      if (again) content = again;
+    }
+    for (const q of qs()) {
+      q.question = fixGradeRefs(q.question, deps.grade);
+      if (q.analysis) q.analysis = fixGradeRefs(q.analysis, deps.grade);
+      for (const op of q.options ?? []) op.label = fixGradeRefs(op.label, deps.grade);
+    }
+  }
   const idx = all.findIndex((x) => x.id === o.id);
   let actions: unknown[] = [];
   try {
@@ -131,7 +177,7 @@ export async function buildScene(deps: GenDeps, o: SceneOutline, all: SceneOutli
       `loi-giang:${o.id}`,
       () =>
         generateSceneActions(o, content, caller(deps, TASKS.actions, false), {
-          languageDirective: VI_DIRECTIVE,
+          languageDirective: sceneDirective(deps, o, [], ""),
           logger: noLog,
           ctx: { pageIndex: Math.max(idx, 0) + 1, totalPages: all.length, allTitles: all.map((x) => x.title), previousSpeeches: [] },
         }),
@@ -144,6 +190,7 @@ export async function buildScene(deps: GenDeps, o: SceneOutline, all: SceneOutli
   const built = buildCompleteScene(o, content, actions as never, stageId);
   if (!built) return null;
   const scene = built as StoredScene;
+  if (scene.type === "quiz") scene.quizVoice = quizVoiceLines((scene.content as { questions?: QuizQ[] }).questions ?? [], scene.id);
   return scene;
 }
 

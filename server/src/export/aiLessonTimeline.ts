@@ -1,7 +1,7 @@
 // Port ý tưởng từ OpenMAIC lib/video-export/compile.ts + passes/timeline.ts (MIT), viết lại gọn:
 // bài giảng → dòng thời gian (IR) thuần, không đụng Chrome/FFmpeg. Trình dựng video chỉ việc "phát" IR này.
 import { estimateMs } from "../services/aiLessons/types";
-import type { StoredScene } from "../services/aiLessons/types";
+import type { QuizVoice, StoredScene } from "../services/aiLessons/types";
 import type { QuizQ } from "./slideHtml";
 
 export type Cue = { text: string; startMs: number; durationMs: number };
@@ -26,8 +26,9 @@ export type Timeline = { title: string; segments: Segment[]; totalMs: number; di
 
 const SILENT_MS = 4000;
 const REVEAL_MS = 4000;
-const QUESTION_MS = 5000;
-const OPTION_MS = 600;
+/** Thời gian nghĩ sau khi đọc xong câu hỏi, và nghỉ sau lời giải. */
+const THINK_MS = 2500;
+const AFTER_REVEAL_MS = 800;
 const MAX_CUE = 140;
 
 /** Câu quá dài (> MAX_CUE ký tự) chia tiếp ở dấu phẩy/hai chấm hoặc khoảng trắng gần giữa, để phụ đề tối đa 2 dòng. */
@@ -64,6 +65,45 @@ export function shortExplain(q: QuizQ): string {
     body = `${cut.slice(0, Math.max(cut.lastIndexOf(" "), 10))}…`;
   }
   return `${head} ${body}`.trim();
+}
+
+const SYM: Record<string, string> = { cap: "∩", cup: "∪", cdot: "·", times: "×", le: "≤", leq: "≤", ge: "≥", geq: "≥", neq: "≠", ne: "≠", approx: "≈", pm: "±", in: "∈", infty: "∞", pi: "π", alpha: "α", beta: "β", Omega: "Ω", omega: "ω", Rightarrow: "⇒", to: "→", mid: "|", emptyset: "∅", varnothing: "∅", subset: "⊂", Delta: "Δ" };
+/** Chữ cho phụ đề: công thức LaTeX → ký hiệu đọc được (P(A∩B) = 5/8 · 4/7), bỏ ** của markdown. */
+export function plainText(t: string): string {
+  return t
+    .replace(/\$+([^$]*)\$+/g, (_m, f: string) =>
+      f
+        .replace(/\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, "$1/$2")
+        .replace(/\\[dt]?frac\s*(\d)(\d)/g, "$1/$2")
+        .replace(/\\overline\s*\{([^{}]*)\}/g, "$1\u0305")
+        .replace(/\\(?:left|right|,|;|!|quad|qquad)\s?/g, "")
+        .replace(/\\text\s*\{([^{}]*)\}/g, "$1")
+        .replace(/\\([a-zA-Z]+)\s?/g, (_x, k: string) => SYM[k] ?? "")
+        .replace(/\^\{?2\}?/g, "²")
+        .replace(/\^\{?3\}?/g, "³")
+        .replace(/[{}]/g, ""),
+    )
+    .replace(/\^2/g, "²")
+    .replace(/\^3/g, "³")
+    .replace(/\*\*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Lời đọc cho từng câu quiz trong video: câu hỏi + các phương án, rồi đáp án + 1–2 câu lời giải (≤ ~260 ký tự). */
+export function quizVoiceLines(qs: QuizQ[], sceneId: string): QuizVoice[] {
+  return qs.map((q, i) => {
+    const opts = (q.options ?? []).map((o) => `Phương án ${o.value}: ${o.label.trim()}`).join(". ");
+    const ask = `Câu ${i + 1}. ${q.question.trim()}${opts ? ` ${opts}.` : ""}`.replace(/([.?!:])\./g, "$1");
+    const ans = q.answer ?? [];
+    const head = ans.length ? `Đáp án đúng: ${ans.length > 1 ? `${ans.slice(0, -1).join(", ")} và ${ans[ans.length - 1]}` : ans[0]}.` : "Các em so với lời giải nhé.";
+    let body = "";
+    for (const sent of (q.analysis ?? "").replace(/\s+/g, " ").trim().split(/(?<=[.!?])\s+/)) {
+      if (!sent || (body + sent).length > 260) break;
+      body += `${body ? " " : ""}${sent}`;
+    }
+    return { q: { id: `qv_${sceneId}_${i}_q`, text: ask }, a: { id: `qv_${sceneId}_${i}_a`, text: `${head}${body ? ` ${body}` : ""}` } };
+  });
 }
 
 /** Chia lời giảng theo câu, thời lượng theo tỉ lệ số ký tự. */
@@ -122,10 +162,18 @@ export function compileTimeline(title: string, scenes: StoredScene[]): Timeline 
       }
     }
     if (kind === "quiz" && qs.length > 0) {
-      // mỗi câu hỏi một đoạn: câu + phương án, rồi tô đáp án đúng kèm lời giải ngắn ở phụ đề
+      // mỗi câu hỏi hai đoạn, thời lượng theo nội dung: đọc câu hỏi + phương án rồi chờ nghĩ; đọc đáp án + lời giải ngắn.
+      // Có giọng đọc (quizVoice) thì theo đúng độ dài tiếng; chưa có thì ước lượng theo số chữ.
+      const voice = sc.quizVoice ?? quizVoiceLines(qs, sc.id);
       qs.forEach((q, qi) => {
-        if (qi > 0 || !spoke) push({ sceneIndex, sceneId: sc.id, kind, quizIndex: qi, durationMs: QUESTION_MS + (q.options?.length ?? 0) * OPTION_MS, cues: [] });
-        push({ sceneIndex, sceneId: sc.id, kind, quizIndex: qi, reveal: true, durationMs: REVEAL_MS, cues: [{ text: shortExplain(q), startMs: 0, durationMs: REVEAL_MS }] });
+        const v = voice[qi];
+        const ask = v?.q.text ?? "";
+        const askMs = v?.q.durationMs ?? estimateMs(ask);
+        push({ sceneIndex, sceneId: sc.id, kind, quizIndex: qi, audioFile: v?.q.audioFile, durationMs: askMs + THINK_MS, cues: [...splitCues(plainText(ask), askMs), { text: "", startMs: askMs, durationMs: THINK_MS }] });
+        const ans = v?.a.text || shortExplain(q);
+        const ansMs = v?.a.durationMs ?? Math.max(REVEAL_MS - AFTER_REVEAL_MS, estimateMs(ans));
+        push({ sceneIndex, sceneId: sc.id, kind, quizIndex: qi, reveal: true, audioFile: v?.a.audioFile, durationMs: ansMs + AFTER_REVEAL_MS, cues: [...splitCues(plainText(ans), ansMs), { text: "", startMs: ansMs, durationMs: AFTER_REVEAL_MS }] });
+        if (!v?.q.audioFile) diagnostics.push(`Cảnh ${sceneIndex + 1}: câu hỏi ${qi + 1} chưa có giọng đọc, ước lượng thời lượng`);
       });
       return;
     }
@@ -147,6 +195,6 @@ const ts = (ms: number) => {
 export function toSrt(tl: Timeline): string {
   let n = 0;
   const out: string[] = [];
-  for (const s of tl.segments) for (const c of s.cues) out.push(`${++n}\n${ts(s.startMs + c.startMs)} --> ${ts(s.startMs + c.startMs + c.durationMs)}\n${c.text}\n`);
+  for (const s of tl.segments) for (const c of s.cues) if (c.text) out.push(`${++n}\n${ts(s.startMs + c.startMs)} --> ${ts(s.startMs + c.startMs + c.durationMs)}\n${c.text}\n`);
   return out.join("\n");
 }

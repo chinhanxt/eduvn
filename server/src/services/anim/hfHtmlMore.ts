@@ -1,6 +1,7 @@
 /** Mẫu HyperFrames nhóm 2 (dòng thời gian, Venn, biểu đồ, thẻ ghi nhớ, trích dẫn, từ vựng, cân bằng hoá học, cây xác suất). HTML sinh từ mẫu cố định; chữ của AI luôn được escape. */
 import { CSS, HF_H, HF_W, at, doc, esc, richText } from "./hfHtml";
 import type { HfSpec } from "./hfHtml";
+import { fracMul } from "./spec";
 
 // Bảng màu an toàn cho người mù màu (Okabe–Ito) trên nền tối
 const PAL = ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#CC79A7", "#D55E00"];
@@ -209,10 +210,11 @@ export function moreHtml(spec: HfSpec): string {
   const p = spec.params;
   const branches = p.cacNhanh;
   type Leaf = { label: string; prob: number; y: number };
-  const leaves: { b: number; label: string; prob: number; edge?: number }[] = [];
+  // nhãn xác suất: giữ phân số AI ghi ("5/8"), lá là tích phân số tối giản; không có thì số thập phân
+  const leaves: { b: number; label: string; prob: number; edge?: number; probNhan?: string; edgeNhan?: string }[] = [];
   branches.forEach((b, bi) => {
-    if (b.con?.length) for (const c of b.con) leaves.push({ b: bi, label: `${b.ten}, ${c.ten}`, prob: b.xs * c.xs, edge: c.xs });
-    else leaves.push({ b: bi, label: b.ten, prob: b.xs });
+    if (b.con?.length) for (const c of b.con) leaves.push({ b: bi, label: `${b.ten}, ${c.ten}`, prob: b.xs * c.xs, edge: c.xs, probNhan: fracMul(b.xsNhan, c.xsNhan) ?? undefined, edgeNhan: c.xsNhan });
+    else leaves.push({ b: bi, label: b.ten, prob: b.xs, probNhan: b.xsNhan });
   });
   const y0 = spec.tieuDe ? 170 : 110;
   const y1 = HF_H - 90;
@@ -247,7 +249,7 @@ export function moreHtml(spec: HfSpec): string {
   branches.forEach((b, bi) => {
     const t = at(k++, total, T);
     line(`e${bi}`, X0 + 80, rootY, X1 - 80, bY[bi] as number, t);
-    lab(`p${bi}`, (X0 + X1) / 2, ((rootY + (bY[bi] as number)) / 2), fmtP(b.xs), t);
+    lab(`p${bi}`, (X0 + X1) / 2, ((rootY + (bY[bi] as number)) / 2), b.xsNhan ?? fmtP(b.xs), t);
     node(`n${bi}`, X1, bY[bi] as number, esc(b.ten), "nd", t);
   });
   placed.forEach((l, i) => {
@@ -255,9 +257,9 @@ export function moreHtml(spec: HfSpec): string {
     const edge = leaves[i]?.edge;
     if (edge !== undefined) {
       line(`f${i}`, X1 + 80, bY[leaves[i]?.b as number] as number, X2 - 80, l.y, t);
-      lab(`q${i}`, (X1 + X2) / 2, ((bY[leaves[i]?.b as number] as number) + l.y) / 2, fmtP(edge), t);
+      lab(`q${i}`, (X1 + X2) / 2, ((bY[leaves[i]?.b as number] as number) + l.y) / 2, leaves[i]?.edgeNhan ?? fmtP(edge), t);
     }
-    node(`l${i}`, X2, l.y, `${esc(l.label)}<br><small>= ${fmtP(l.prob)}</small>`, "nd leaf", t);
+    node(`l${i}`, X2, l.y, `${esc(l.label)}<br><small>= ${esc(leaves[i]?.probNhan ?? fmtP(l.prob))}</small>`, "nd leaf", t);
   });
   const extra = `.nd{position:absolute;text-align:center;font-size:22px;padding:8px 6px;border-radius:12px;background:#1c2350;border:3px solid #56B4E9}.root{border-color:#ffd166;font-weight:700}.leaf{border-color:#009E73;background:#14392f;font-size:20px}.leaf small{font-size:22px;color:#F0E442;font-weight:700}.pl2{position:absolute;text-align:center;font-size:22px;color:#F0E442;font-weight:700}.ln2{position:absolute}`;
   return doc(spec, css(top, extra), els.join("\n"), js);

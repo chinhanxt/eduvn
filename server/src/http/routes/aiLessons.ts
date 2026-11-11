@@ -102,12 +102,19 @@ export function registerAiLessonRoutes(app: FastifyInstance, ctx: Ctx): AiLesson
     if (l.scenes.length === 0) throw new ValidationError(["Bài giảng chưa có cảnh nào"]);
     const st: VideoState = { status: "running", done: 0, total: 1 };
     videos.set(key, st);
-    void renderLessonVideo(l.title, l.scenes, audioDirOf(ctx.cfg.dataDir, key), {
-      chromePath: ctx.cfg.chromePath ?? "/usr/bin/google-chrome",
-      outDir: path.join(l.dir, "video"),
-      animDir: ctx.cfg.anim?.dir,
-      onProgress: (d, t) => Object.assign(st, { done: d, total: t }),
-    })
+    const actor = await ctx.authenticate(req);
+    // cảnh quiz: sinh + đọc lời câu hỏi/đáp án nếu thiếu để thời lượng theo nội dung (không câm), rồi dựng
+    void svc
+      .prepareVideo(actor, key)
+      .catch(() => l.scenes)
+      .then((scenes) =>
+        renderLessonVideo(l.title, scenes, audioDirOf(ctx.cfg.dataDir, key), {
+          chromePath: ctx.cfg.chromePath ?? "/usr/bin/google-chrome",
+          outDir: path.join(l.dir, "video"),
+          animDir: ctx.cfg.anim?.dir,
+          onProgress: (d, t) => Object.assign(st, { done: d, total: t }),
+        }),
+      )
       .then((r) => Object.assign(st, { status: "done", durationMs: r.totalMs }))
       .catch((e: unknown) => Object.assign(st, { status: "error", error: (e as Error).message }));
     return reply.code(202).send(st);

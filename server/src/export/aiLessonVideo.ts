@@ -2,6 +2,7 @@
 // IR chụp khung bằng Chrome headless (playwright-core + trình duyệt có sẵn) rồi FFmpeg ghép giọng đọc.
 import { execFile } from "node:child_process";
 import { mkdir, mkdtemp, rm, stat, writeFile } from "node:fs/promises";
+import http from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
@@ -10,12 +11,12 @@ import { chromium } from "playwright-core";
 import { readVendor } from "../services/aiLessons/vendor";
 import type { StoredScene } from "../services/aiLessons/types";
 import { type Timeline, compileTimeline, toSrt } from "./aiLessonTimeline";
+import { interactiveDoc } from "./interactiveHtml";
 import { type Canvas, type QuizQ, quizHtml, quizQuestionHtml, slideHtml } from "./slideHtml";
 
 const run = promisify(execFile);
 const W = 1280;
 const H = 720;
-const ORIGIN = "http://eduvn.local";
 const KATEX_CSS = '<link rel="stylesheet" href="/vendor/interactive/katex@0.16.38/dist/katex.min.css">';
 
 // Khung video: 1280×720, phần hình (slide/câu hỏi/hoạt hình) thu vào 1100×619 ở trên, dải phụ đề 101 px nền đặc ở dưới (tối đa 2 dòng) — phụ đề không đè nội dung.
@@ -24,7 +25,7 @@ const STAGE_H = 619;
 const BAND_BG = "#0d1024";
 const BAND_CSS = `html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden}#v{position:absolute;left:${(W - STAGE_W) / 2}px;top:0;width:${STAGE_W}px;height:${STAGE_H}px;border:0;background:#fff}#band{position:absolute;left:0;right:0;top:${STAGE_H}px;height:${H - STAGE_H}px;display:flex;align-items:center;justify-content:center;padding:0 48px;box-sizing:border-box;background:${BAND_BG};color:#fff;text-align:center;font:600 25px/1.3 'Be Vietnam Pro','Segoe UI',Roboto,'Noto Sans','DejaVu Sans',sans-serif}#s{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}`;
 /** Trang khung: slide/câu hỏi (tài liệu HTML do ta dựng, đã escape) nhúng thẳng vào ô 1100×619 + dải phụ đề; cảnh tương tác (mã AI) vào iframe sandbox "allow-scripts". */
-const framed = (inner: string, sub: string, sandbox: string) => {
+export const framed = (inner: string, sub: string, sandbox: string) => {
   const subHtml = sub.replace(/&/g, "&amp;").replace(/</g, "&lt;");
   const band = `<div id="band"><span id="s">${subHtml}</span></div>`;
   if (sandbox) return `<!doctype html><html><head><meta charset="utf-8"><style>body{background:${BAND_BG}}${BAND_CSS}</style></head><body><iframe id="v" sandbox="${sandbox}" srcdoc="${inner.replace(/&/g, "&amp;").replace(/"/g, "&quot;")}"></iframe>${band}</body></html>`;
@@ -46,6 +47,60 @@ const latex = (tex: string) => {
 export type VideoOpts = { chromePath: string; outDir: string; /** Thư mục clip hoạt hình toán (<hash>.mp4). */ animDir?: string; onProgress?: (done: number, total: number) => void };
 export type VideoResult = { video: string; srt: string; totalMs: number; frames: number; diagnostics: string[] };
 
+/** Máy chủ HTTP tạm trên 127.0.0.1 phục vụ khung hiện tại + /vendor/interactive. (page.route của Playwright không chặn
+ *  được yêu cầu từ iframe srcdoc sandbox gốc mờ → KaTeX/Chart.js của cảnh tương tác không tải, công thức hiện thô.) */
+export async function frameServer(): Promise<{ origin: string; set(html: string): void; close(): Promise<void> }> {
+  let current = "";
+  const srv = http.createServer((req, res) => {
+    const url = new URL(req.url ?? "/", "http://127.0.0.1");
+    if (url.pathname === "/frame") {
+      res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" });
+      res.end(current);
+      return;
+    }
+    void readVendor(url.pathname).then((v) => {
+      if (!v) {
+        res.writeHead(404);
+        res.end();
+        return;
+      }
+      res.writeHead(200, { "content-type": v.mime, "access-control-allow-origin": "*", "cache-control": "max-age=3600" });
+      res.end(v.body);
+    }, () => {
+      res.writeHead(500);
+      res.end();
+    });
+  });
+  await new Promise<void>((ok, bad) => srv.once("error", bad).listen(0, "127.0.0.1", () => ok()));
+  const { port } = srv.address() as { port: number };
+  return { origin: `http://127.0.0.1:${port}`, set: (h) => void (current = h), close: () =>
+      new Promise((ok) => {
+        srv.close(() => ok());
+        srv.closeAllConnections();
+      }) };
+}
+
+/** Chờ cảnh tương tác ổn định trước khi chụp: phông xong, KaTeX đã dựng (không còn \(…\) thô), DOM thôi đổi ~0,7 s; tối thiểu 1,2 s, tối đa 6 s. */
+export async function settleInteractive(page: import("playwright-core").Page): Promise<void> {
+  const t0 = Date.now();
+  const f = page.frames().find((x) => x !== page.mainFrame());
+  if (!f) return;
+  await f.evaluate(() => document.fonts.ready).catch(() => undefined);
+  let last = "";
+  let since = Date.now();
+  while (Date.now() - t0 < 6000) {
+    const sig = await f.evaluate(() => {
+      const t = document.body?.innerText ?? "";
+      return `${document.body?.innerHTML.length ?? 0}|${/\\\(|\\\[/.test(t) ? "raw" : "ok"}`;
+    }).catch(() => "x|raw");
+    if (sig !== last) {
+      last = sig;
+      since = Date.now();
+    } else if (sig.endsWith("ok") && Date.now() - since >= 700 && Date.now() - t0 >= 1200) return;
+    await page.waitForTimeout(150);
+  }
+}
+
 let busy: Promise<unknown> = Promise.resolve();
 /** Mỗi lúc chỉ dựng một video (tránh treo máy khi nhiều GV bấm cùng lúc). */
 export function renderLessonVideo(title: string, scenes: StoredScene[], audioDir: string, opts: VideoOpts): Promise<VideoResult> {
@@ -60,20 +115,13 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
   await mkdir(opts.outDir, { recursive: true });
   const work = await mkdtemp(path.join(tmpdir(), "eduvn-video-"));
   const browser = await chromium.launch({ executablePath: opts.chromePath, args: ["--no-sandbox", "--disable-gpu", "--hide-scrollbars"] });
+  const fs = await frameServer();
   try {
     const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
     const page = await ctx.newPage();
-    let current = "";
-    await page.route(`${ORIGIN}/**`, async (route) => {
-      const url = new URL(route.request().url());
-      if (url.pathname === "/frame") return route.fulfill({ status: 200, contentType: "text/html; charset=utf-8", body: current });
-      const v = await readVendor(url.pathname);
-      if (v) return route.fulfill({ status: 200, contentType: v.mime, body: v.body, headers: { "access-control-allow-origin": "*" } });
-      return route.fulfill({ status: 404, body: "" });
-    });
     const show = async (html: string) => {
-      current = html;
-      await page.goto(`${ORIGIN}/frame`, { waitUntil: "load" });
+      fs.set(html);
+      await page.goto(`${fs.origin}/frame`, { waitUntil: "load" });
       for (const f of page.frames()) await f.evaluate(() => document.fonts.ready).catch(() => undefined);
     };
     const setSub = (t: string) => page.evaluate((x) => { const el = document.getElementById("s"); if (el) el.textContent = x; }, t);
@@ -122,8 +170,8 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
           await show(framed(q ? quizQuestionHtml(sc.title, q, seg.quizIndex as number, qs.length, { latex, reveal: seg.reveal, extraHead: KATEX_CSS }) : quizHtml(sc.title, qs, { latex, reveal: seg.reveal, extraHead: KATEX_CSS }), sub, ""));
         } else if (!interactiveReady) {
           const html = (sc.content as { html?: string }).html ?? "";
-          await show(framed(html, sub, "allow-scripts"));
-          await page.waitForTimeout(1800);
+          await show(framed(interactiveDoc(html), sub, "allow-scripts"));
+          await settleInteractive(page);
           interactiveReady = true;
         }
         if (seg.kind === "interactive") await setSub(sub);
@@ -150,6 +198,7 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
     return { video, srt, totalMs: tl.totalMs, frames: frameN, diagnostics: tl.diagnostics };
   } finally {
     await browser.close().catch(() => undefined);
+    await fs.close().catch(() => undefined);
     await rm(work, { recursive: true, force: true });
   }
 }

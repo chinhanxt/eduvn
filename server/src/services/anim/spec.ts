@@ -55,6 +55,34 @@ const Expr = z.string().trim().min(1).max(120).transform((s, ctx): Ast => {
   }
 });
 
+/** Xác suất: số 0–1 hoặc phân số dạng chuỗi "5/8" (ưu tiên — giữ nguyên dạng phân số khi hiển thị). */
+const Prob = z.union([Num(0, 1), z.string().trim().regex(/^\d{1,4}\s*\/\s*\d{1,4}$/, "Xác suất là số 0–1 hoặc phân số dạng \"a/b\"")]).transform((v, ctx): { v: number; nhan?: string } => {
+  if (typeof v === "number") return { v };
+  const [a, b] = v.split("/").map((x) => Number(x.trim())) as [number, number];
+  if (!b || a > b) {
+    ctx.addIssue({ code: "custom", message: "Phân số xác suất phải có tử ≤ mẫu, mẫu khác 0" });
+    return z.NEVER;
+  }
+  return { v: a / b, nhan: `${a}/${b}` };
+});
+/** Nhánh cây xác suất: xs luôn là số sau kiểm; nếu AI ghi phân số thì giữ nhãn xsNhan "5/8". */
+type ProbOut = { ten: string; xs: number; xsNhan?: string };
+const probLeaf = ({ ten, xs }: { ten: string; xs: { v: number; nhan?: string } }): ProbOut => ({ ten, xs: xs.v, ...(xs.nhan && { xsNhan: xs.nhan }) });
+const ProbChild = z.object({ ten: Short(20), xs: Prob }).transform(probLeaf);
+const ProbBranch = z.object({ ten: Short(20), xs: Prob, con: z.array(ProbChild).max(3).optional() }).transform((b): ProbOut & { con?: ProbOut[] } => ({ ...probLeaf(b), ...(b.con && { con: b.con }) }));
+
+/** Tích hai xác suất dạng nhãn: hai phân số → phân số tối giản ("5/8" · "4/7" → "5/14"); thiếu nhãn → null. */
+export function fracMul(a?: string, b?: string): string | null {
+  if (!a || !b) return null;
+  const [p, q] = a.split("/").map(Number) as [number, number];
+  const [r, s] = b.split("/").map(Number) as [number, number];
+  const gcd = (x: number, y: number): number => (y ? gcd(y, x % y) : x);
+  const n = p * r;
+  const d = q * s;
+  const g = gcd(n, d) || 1;
+  return `${n / g}/${d / g}`;
+}
+
 const Vec = (x: number, y: number) => z.tuple([Num(-x, x), Num(-y, y)]);
 const Bounds = { xMin: Num(-50, 0).default(-5), xMax: Num(1, 50).default(5), yMin: Num(-100, 0).default(-5), yMax: Num(1, 100).default(5) };
 /** Công thức hoá học đơn giản: chữ cái, số, ngoặc (vd H2O, Ca(OH)2). */
@@ -136,7 +164,7 @@ export const AnimSpec = z.discriminatedUnion("template", [
   z.object({ template: z.literal("trich_dan_van_ban"), ...Base, params: z.object({ vanBan: Short(400), tuKhoa: z.array(Short(40)).max(5).default([]), tacGia: Short(60).optional(), ghiChu: Short(160).optional() }) }),
   z.object({ template: z.literal("tu_vung"), ...Base, params: z.object({ tu: Short(40), phienAm: Short(40).optional(), loaiTu: Short(20).optional(), nghia: Short(100), viDu: Short(160).optional(), viDuDich: Short(160).optional() }) }),
   z.object({ template: z.literal("can_bang_phuong_trinh_hoa_hoc"), ...Base, params: z.object({ chatThamGia: z.array(Formula).min(1).max(3), sanPham: z.array(Formula).min(1).max(3), heSoCuoi: z.array(z.number().int().min(1).max(12)).min(2).max(6) }) }),
-  z.object({ template: z.literal("cay_xac_suat"), ...Base, params: z.object({ goc: Short(20).optional(), cacNhanh: z.array(z.object({ ten: Short(20), xs: Num(0, 1), con: z.array(z.object({ ten: Short(20), xs: Num(0, 1) })).max(3).optional() })).min(2).max(3) }) }),
+  z.object({ template: z.literal("cay_xac_suat"), ...Base, params: z.object({ goc: Short(20).optional(), cacNhanh: z.array(ProbBranch).min(2).max(3) }) }),
 ]).superRefine((s, ctx) => {
   if (s.template === "so_sanh_bang") {
     const n = s.params.cotTieuDe.length;
