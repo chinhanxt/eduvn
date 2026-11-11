@@ -141,7 +141,7 @@
 [data-portal="gv"] .tools-grid a:hover .lead { background: var(--accent-bg); color: var(--accent); }
 [data-portal="gv"] .tools-grid b { font-weight: 500; display: block; }
 [data-portal="gv"] .tools-grid small { color: var(--ink-3); font-size: 12px; display: block; }
-[data-portal="gv"] .tools-grid kbd { margin-left: auto; font: 500 10px/16px var(--font-mono); color: var(--ink-3); border: 0; background: none; }
+[data-portal="gv"] .tools-grid kbd { white-space: nowrap; margin-left: auto; font: 500 10px/16px var(--font-mono); color: var(--ink-3); border: 0; background: none; }
 [data-portal="gv"] .sec-t { font-size: 12px; font-weight: 600; color: var(--ink-3); margin: var(--s-5) 0 var(--s-2); }
 [data-portal="gv"] .sec-t:first-of-type { margin-top: 0; }
 
@@ -282,3 +282,9 @@
 [data-portal="gv"] .ai-run .steps { flex-direction: row; flex-wrap: wrap; gap: 2px 18px; }
 [data-portal="gv"] .ai-run .steps li { height: 24px; font-size: 12px; }
 @media (max-width: 1180px) { [data-portal="gv"] .work.toc-l { grid-template-columns: minmax(0, 1fr); } [data-portal="gv"] .work.toc-l > aside { display: none; } }
+
+/* Kết nối AI */
+[data-portal="gv"] .code-pill.url { letter-spacing: 0; font-weight: 500; height: 32px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+[data-portal="gv"] .connect-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 13px; }
+[data-portal="gv"] .connect-steps li { display: flex; gap: 10px; align-items: flex-start; }
+[data-portal="gv"] .connect-steps .n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--accent-bg); color: var(--accent); font-size: 12px; font-weight: 600; }

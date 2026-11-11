@@ -1,7 +1,6 @@
 import { type ComponentType, type ReactNode, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router";
 import { useAuth } from "../../auth";
-import type { Tool } from "../../tools";
 import { ToastProvider } from "../../ui/components/Toast";
 import { prefetch } from "../../ui/data/query";
 import { PageSkeleton } from "../../ui/shell/PageSkeleton";
@@ -15,7 +14,7 @@ const pick = <M,>(load: () => Promise<M>, f: (m: M) => ComponentType): Page => l
 
 const P = {
   homNay: pick(() => import("./HomNay"), (m) => m.HomNay),
-  home: pick(() => import("../../pages/Home"), (m) => m.Home),
+  congCu: pick(() => import("./CongCu"), (m) => m.CongCu),
   bank: pick(() => import("../../pages/Bank"), (m) => m.Bank),
   exams: pick(() => import("../../pages/Exams"), (m) => m.Exams),
   grade: pick(() => import("../../pages/Grade"), (m) => m.Grade),
@@ -41,14 +40,17 @@ const P = {
   connect: pick(() => import("../../pages/Connect"), (m) => m.Connect),
   // trang P6 dùng hoc.css (trước đây nạp qua HocLayout)
   kho: pick(() => Promise.all([import("../../hoc/KhoTriThuc"), import("../../hoc/hoc.css")]), ([m]) => m.KhoTriThuc),
-  placeholder: lazyPage(() => import("../../pages/Placeholder").then((m) => m.Placeholder as ComponentType)),
+  video: pick(() => import("./CongCu"), (m) => () => <m.SapCo name="Video bài giảng" icon="video" text="Dựng video bài giảng từ giáo án và bảng giảng. Trong lúc chờ, dùng Bài giảng AI để có bài giảng có lời thoại." />),
+  toChuc: pick(() => import("./CongCu"), (m) => () => <m.SapCo name="Tổ chức" icon="org" text="Quản lý trường, tổ chuyên môn và phân quyền giáo viên. Hiện tổ chức được tạo khi đăng nhập lần đầu." />),
   books: pick(() => Promise.all([import("../../hoc/Books"), import("../../hoc/hoc.css")]), ([m]) => m.Books),
 };
 
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
 /** legacy: trang chưa chuyển sang v2 (bọc .legacy giữ kiểu cũ). */
 const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
-  { path: "/cong-cu", page: P.home, legacy: true },
+  { path: "/cong-cu", page: P.congCu },
+  { path: "/video", page: P.video },
+  { path: "/to-chuc", page: P.toChuc },
   { path: "/ngan-hang", page: P.bank },
   { path: "/de-thi", page: P.exams },
   { path: "/cham-bai", page: P.grade },
@@ -58,17 +60,17 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/so-diem", page: P.gradebook },
   { path: "/giao-an", page: P.lessons },
   { path: "/giao-an/:id", page: P.lessonDetail },
-  { path: "/de-cuong", page: P.deCuong, legacy: true },
-  { path: "/slide", page: P.slides, legacy: true },
+  { path: "/de-cuong", page: P.deCuong },
+  { path: "/slide", page: P.slides },
   { path: "/bai-giang-ai", page: P.aiLessons, legacy: true },
   { path: "/bai-giang-ai/:id", page: P.aiLesson, legacy: true },
-  { path: "/bang-giang", page: P.boards, legacy: true },
-  { path: "/so-do", page: P.diagrams, legacy: true },
-  { path: "/tro-choi", page: P.games, legacy: true },
+  { path: "/bang-giang", page: P.boards },
+  { path: "/so-do", page: P.diagrams },
+  { path: "/tro-choi", page: P.games },
   { path: "/dau-truong", page: P.arena, legacy: true },
   { path: "/dau-truong/phien/:id", page: P.session, legacy: true },
-  { path: "/van-ban", page: P.vanBan, legacy: true },
-  { path: "/ket-noi", page: P.connect, legacy: true },
+  { path: "/van-ban", page: P.vanBan },
+  { path: "/ket-noi", page: P.connect },
   { path: "/kho-tri-thuc", page: P.kho, legacy: true },
   { path: "/giao-trinh", page: P.books, legacy: true },
 ];
@@ -111,7 +113,6 @@ export function GvApp() {
   }, [ready, user]);
   if (!ready || !user) return <PageSkeleton variant="full" />;
   const Home = P.homNay.Component;
-  const Ph = P.placeholder.Component as unknown as ComponentType<{ tool: Tool }>;
   return (
     <ToastProvider>
       <Routes>
@@ -133,9 +134,6 @@ export function GvApp() {
           {SHELL_ROUTES.map(({ path, legacy, page: { Component: C } }) => (
             <Route key={path} path={path} element={legacy ? <Legacy><C /></Legacy> : <C />} />
           ))}
-          {/* công cụ chưa xong (trước đây sinh từ TOOLS có nhãn "Thử") */}
-          <Route path="/video" element={<Legacy><Ph tool={{ to: "/video", name: "Video bài giảng", icon: "video", color: "violet", pill: "Thử" }} /></Legacy>} />
-          <Route path="/to-chuc" element={<Legacy><Ph tool={{ to: "/to-chuc", name: "Tổ chức", icon: "org", color: "amber", pill: "Sắp có" }} /></Legacy>} />
         </Route>
         <Route path="*" element={<OutOfGv />} />
       </Routes>

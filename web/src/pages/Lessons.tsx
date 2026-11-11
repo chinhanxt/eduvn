@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { aiSkill, type LessonBody, type LessonDetail, type LessonSummary } from "../api";
-import { dateVi, del, errorOf, FilterBar, FormPane, get, gradeVi, openLink, post, SearchBox, statusOf, useKeyN, useListView, useOpenParam, useRun } from "../portal/gv/kit";
+import { LESSONS_KEY, fetchLessons, dateVi, del, errorOf, FilterBar, FormPane, get, gradeVi, openLink, post, SearchBox, statusOf, useKeyN, useListView, useOpenParam, useRun } from "../portal/gv/kit";
 import { Icon } from "../ui/Icon";
 import { Button } from "../ui/components/Button";
 import { Chip } from "../ui/components/Chip";
@@ -17,8 +17,6 @@ import { PageHead } from "../ui/shell/PageHead";
 
 const TITLES = ["Mở đầu (Xác định vấn đề/nhiệm vụ học tập)", "Hình thành kiến thức mới", "Luyện tập", "Vận dụng"];
 const STEPS = ["Chuyển giao nhiệm vụ", "Thực hiện nhiệm vụ", "Báo cáo, thảo luận", "Kết luận, nhận định"] as const;
-export const LESSONS_KEY = "gv/giao-an";
-export const fetchLessons = get<LessonSummary[]>("/api/lessons");
 
 /** /giao-an — danh sách giáo án (bảng v2: tìm, lọc môn, sắp, trang trên URL) + AI soạn giáo án 5512 (?tao=1). */
 export function Lessons() {

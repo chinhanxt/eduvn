@@ -4,7 +4,7 @@ import { blobToDataUrl, printSvg, svgToPngBlob } from "../geometry3d/figure";
 import { FigureBuilder } from "../geometry3d/FigureBuilder";
 import { MathEditor } from "../math/MathEditor";
 import { MathText } from "../math/MathText";
-import { FilterBar, FormPane, get, post, SearchBox, statusOf, errorOf, useListView, useOpenParam, useRun, gradeVi, useKeyN } from "../portal/gv/kit";
+import { SUBJECT_DEFAULT, FilterBar, FormPane, get, post, SearchBox, statusOf, errorOf, useListView, useOpenParam, useRun, gradeVi, useKeyN } from "../portal/gv/kit";
 import { solutionStatus } from "../solution/api";
 import { STATUS_TEXT, type VerifyStatus } from "../solution/types";
 import { Icon } from "../ui/Icon";
@@ -21,7 +21,6 @@ import { PageHead } from "../ui/shell/PageHead";
 // P13: lời giải từng bước (tải lười trình xem + KaTeX khi mở)
 const SolutionDialog = lazy(() => import("../solution/SolutionDialog").then((m) => ({ default: m.SolutionDialog })));
 
-export const SUBJECT_DEFAULT = "Toán";
 const TYPE_LABEL: Record<Question["type"], string> = { mcq: "Trắc nghiệm", true_false: "Đúng/sai", short_answer: "Trả lời ngắn", essay: "Tự luận" };
 const TYPES = Object.keys(TYPE_LABEL) as Question["type"][];
 const LEVEL_VI = { NB: "Nhận biết", TH: "Thông hiểu", VD: "Vận dụng" } as const;

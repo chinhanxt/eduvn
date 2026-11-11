@@ -220,7 +220,12 @@ export async function openLink(path: string, body: unknown = {}) {
   return r;
 }
 
+export const SUBJECT_DEFAULT = "Toán";
+/** <option> lớp 1–12 + năm 1–4 đại học. */
+export const GRADE_OPTS = Array.from({ length: 16 }, (_, i) => <option key={i} value={i + 1}>{gradeVi(i + 1)}</option>);
 export const CLASSES_KEY = "gv/lop";
+export const LESSONS_KEY = "gv/giao-an";
+export const fetchLessons = get<import("../../api").LessonSummary[]>("/api/lessons");
 export const gradebookKey = (classId: string, term: string) => `gv/so-diem/${classId}/${term}`;
 
 const typing = (t: EventTarget | null) => {
