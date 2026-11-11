@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { dobVi, type ClassDetail, type ClassSummary, type Gradebook } from "../api";
 import { fetchGvToday, GV_TODAY_KEY } from "../portal/gv/data";
 import { pct } from "../portal/today";
-import { CodePill, del, openLink, FilterBar, FormPane, get, initialsOf, post, SearchBox, statusOf, errorOf, useListView, useOpenParam, useRun, vnNum } from "../portal/gv/kit";
+import { CLASSES_KEY, bandsOf, gradebookKey, useKeyN, CodePill, del, openLink, FilterBar, FormPane, get, initialsOf, post, SearchBox, statusOf, errorOf, useListView, useOpenParam, useRun, vnNum } from "../portal/gv/kit";
 import { Icon } from "../ui/Icon";
 import { GradeBar } from "../ui/charts/GradeBar";
 import { Button } from "../ui/components/Button";
@@ -29,35 +29,7 @@ const schoolYearNow = () => {
   const y = d.getMonth() >= 7 ? d.getFullYear() : d.getFullYear() - 1;
   return `${y}-${y + 1}`;
 };
-export const CLASSES_KEY = "gv/lop";
 export const classKey = (id: string) => `gv/lop/${id}`;
-export const gradebookKey = (id: string, term: string) => `gv/so-diem/${id}/${term}`;
-const typing = (t: EventTarget | null) => {
-  const el = t as HTMLElement | null;
-  return !!el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
-};
-/** Phím N (không đang gõ, không có hộp thoại) → mở khung tạo. */
-export function useKeyN(run: () => void) {
-  const f = useRef(run);
-  f.current = run;
-  useEffect(() => {
-    const k = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() !== "n" || e.ctrlKey || e.metaKey || e.altKey || typing(e.target) || document.querySelector(".cmdk, .dialog")) return;
-      e.preventDefault();
-      f.current();
-    };
-    window.addEventListener("keydown", k);
-    return () => window.removeEventListener("keydown", k);
-  }, []);
-}
-
-/** Học lực theo ĐTB: Giỏi ≥ 8 · Khá ≥ 6,5 · TB ≥ 5 · Yếu. */
-export function bandsOf(xs: readonly (number | null)[]): [number, number, number, number] {
-  const b: [number, number, number, number] = [0, 0, 0, 0];
-  for (const x of xs) if (x != null) b[x >= 8 ? 0 : x >= 6.5 ? 1 : x >= 5 ? 2 : 3]++;
-  return b;
-}
-
 /** /lop-hoc — danh sách lớp (bảng v2: tìm, lọc năm học, sắp, trang trên URL) + học lực từ dữ liệu Hôm nay. */
 export function Classes() {
   usePageMeta("Lớp học");

@@ -4,7 +4,7 @@ import { blobToDataUrl, printSvg, svgToPngBlob } from "../geometry3d/figure";
 import { FigureBuilder } from "../geometry3d/FigureBuilder";
 import { MathEditor } from "../math/MathEditor";
 import { MathText } from "../math/MathText";
-import { FilterBar, FormPane, get, post, SearchBox, statusOf, errorOf, useListView, useOpenParam, useRun, gradeVi } from "../portal/gv/kit";
+import { FilterBar, FormPane, get, post, SearchBox, statusOf, errorOf, useListView, useOpenParam, useRun, gradeVi, useKeyN } from "../portal/gv/kit";
 import { solutionStatus } from "../solution/api";
 import { STATUS_TEXT, type VerifyStatus } from "../solution/types";
 import { Icon } from "../ui/Icon";
@@ -17,7 +17,6 @@ import { invalidate, useQuery } from "../ui/data/query";
 import { useUrlState } from "../ui/data/urlState";
 import { usePageMeta } from "../ui/shell/AppShell";
 import { PageHead } from "../ui/shell/PageHead";
-import { useKeyN } from "./Classes";
 
 // P13: lời giải từng bước (tải lười trình xem + KaTeX khi mở)
 const SolutionDialog = lazy(() => import("../solution/SolutionDialog").then((m) => ({ default: m.SolutionDialog })));

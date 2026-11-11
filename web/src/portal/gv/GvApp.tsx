@@ -55,7 +55,7 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/cham-anh", page: P.photoGrade },
   { path: "/lop-hoc", page: P.classes },
   { path: "/lop-hoc/:id", page: P.classDetail },
-  { path: "/so-diem", page: P.gradebook, legacy: true },
+  { path: "/so-diem", page: P.gradebook },
   { path: "/giao-an", page: P.lessons, legacy: true },
   { path: "/giao-an/:id", page: P.lessonDetail, legacy: true },
   { path: "/de-cuong", page: P.deCuong, legacy: true },

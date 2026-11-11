@@ -257,3 +257,21 @@
 @media (max-width: 720px) { [data-portal="gv"] .matrix-t .select { min-width: 110px; } }
 [data-portal="gv"] .matrix-t td:nth-child(2) .select { min-width: 132px; } [data-portal="gv"] .matrix-t td:nth-child(3) .select { min-width: 150px; } [data-portal="gv"] .matrix-t td:first-child .input { min-width: 140px; }
 [data-portal="gv"] .page-head.bar .acts { display: flex; align-items: center; gap: 8px; }
+
+/* Sổ điểm */
+[data-portal="gv"] .sheet td, [data-portal="gv"] .sheet th { white-space: nowrap; }
+[data-portal="gv"] .sheet .sticky-c { position: sticky; left: 0; background: var(--bg); z-index: 1; box-shadow: inset -1px 0 0 var(--line); }
+[data-portal="gv"] .sheet thead .sticky-c { background: var(--bg-sunken); z-index: 2; }
+[data-portal="gv"] .sheet tbody tr:hover .sticky-c { background: var(--bg-hover); }
+[data-portal="gv"] .cell-in { width: 56px; height: 28px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); text-align: right; padding: 0 6px; font: inherit; font-variant-numeric: tabular-nums; color: var(--ink); transition: border-color var(--dur-1), background var(--dur-2), box-shadow var(--dur-1); }
+[data-portal="gv"] .cell-in:hover { border-color: var(--line-input); }
+[data-portal="gv"] .cell-in:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); background: var(--bg); }
+[data-portal="gv"] .cell-in.bad { border-color: var(--danger); background: var(--danger-bg); }
+[data-portal="gv"] .cell-in.saved { background: var(--ok-bg); }
+[data-portal="gv"] .cm-t td { vertical-align: top; }
+[data-portal="gv"] .cm-t .textarea.cm { width: 100%; min-height: 52px; padding: 6px 8px; resize: vertical; font-size: 13px; line-height: 19px; }
+[data-portal="gv"] .cm-t tr.ai-wait .textarea { background: linear-gradient(90deg, var(--bg-sunken), var(--bg-hover), var(--bg-sunken)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { [data-portal="gv"] .cm-t tr.ai-wait .textarea { animation: none; } }
+@media (min-width: 721px) { [data-portal="gv"] .page-head.bar .head-tabs { flex: 1; min-width: 0; } }
+@media (max-width: 720px) { [data-portal="gv"] .page-head.bar .acts { flex-wrap: wrap; } [data-portal="gv"] .cm-t th:nth-child(2), [data-portal="gv"] .cm-t td:nth-child(2) { min-width: 120px; } }

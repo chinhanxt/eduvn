@@ -219,3 +219,33 @@ export async function openLink(path: string, body: unknown = {}) {
   window.location.assign(r.url);
   return r;
 }
+
+export const CLASSES_KEY = "gv/lop";
+export const gradebookKey = (classId: string, term: string) => `gv/so-diem/${classId}/${term}`;
+
+const typing = (t: EventTarget | null) => {
+  const el = t as HTMLElement | null;
+  return !!el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
+};
+/** Phím N (không đang gõ, không có hộp thoại) → mở khung tạo. */
+export function useKeyN(run: () => void) {
+  const f = useRef(run);
+  f.current = run;
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== "n" || e.ctrlKey || e.metaKey || e.altKey || typing(e.target) || document.querySelector(".cmdk, .dialog")) return;
+      e.preventDefault();
+      f.current();
+    };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, []);
+}
+
+/** Học lực theo ĐTB: Giỏi ≥ 8 · Khá ≥ 6,5 · TB ≥ 5 · Yếu. */
+export function bandsOf(xs: readonly (number | null)[]): [number, number, number, number] {
+  const b: [number, number, number, number] = [0, 0, 0, 0];
+  for (const x of xs) if (x != null) b[x >= 8 ? 0 : x >= 6.5 ? 1 : x >= 5 ? 2 : 3]++;
+  return b;
+}
+

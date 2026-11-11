@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ApiError } from "../apiCore";
 import { aiSkill, type ExamSummary, type Links } from "../api";
-import { dateVi, EXAMS_KEY, fetchExams, errorOf, FilterBar, gradeVi, post, SearchBox, statusOf, useListView, useOpenParam, useRun } from "../portal/gv/kit";
+import { dateVi, EXAMS_KEY, fetchExams, errorOf, FilterBar, gradeVi, post, SearchBox, statusOf, useListView, useOpenParam, useRun, useKeyN } from "../portal/gv/kit";
 import { Icon } from "../ui/Icon";
 import { Button, IconButton } from "../ui/components/Button";
 import { Badge } from "../ui/components/Chip";
@@ -12,7 +12,6 @@ import { invalidate, useQuery } from "../ui/data/query";
 import { useUrlState } from "../ui/data/urlState";
 import { usePageMeta } from "../ui/shell/AppShell";
 import { PageHead } from "../ui/shell/PageHead";
-import { useKeyN } from "./Classes";
 
 type Cell = { topic: string; level: string; type: string; count: number; yccd?: string };
 type Shortage = { cell: Cell; need: number; have: number };
