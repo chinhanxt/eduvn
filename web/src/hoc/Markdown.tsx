@@ -14,8 +14,8 @@ function Inline({ src, cites, onCite }: { src: string; cites: Citation[]; onCite
         if (p.kind === "cite") {
           const c = cites.find((x) => x.n === p.n)!;
           return (
-            <button key={i} className="cite" title={`${c.doc}, trang ${c.page}`} onClick={() => onCite?.(c)} type="button">
-              {p.n}
+            <button key={i} className="cite" title={`${c.doc}, trang ${c.page}`} aria-label={`Nguồn ${p.n}: ${c.doc}, trang ${c.page}`} onClick={() => onCite?.(c)} type="button">
+              [{p.n}]
             </button>
           );
         }
@@ -51,7 +51,14 @@ export function Markdown({ text, cites = [], onCite }: { text: string; cites?: C
               </table>
             );
           case "math":
-            return <div key={i} className="md-math" dangerouslySetInnerHTML={{ __html: texMarkup(b.tex) }} />;
+            return b.after ? (
+              <div key={i} className="md-math">
+                <span dangerouslySetInnerHTML={{ __html: texMarkup(b.tex) }} />
+                <span className="md-math-cite"><Inline src={b.after} cites={cites} onCite={onCite} /></span>
+              </div>
+            ) : (
+              <div key={i} className="md-math" dangerouslySetInnerHTML={{ __html: texMarkup(b.tex) }} />
+            );
           default:
             return <p key={i}><Inline src={b.text} cites={cites} onCite={onCite} /></p>;
         }

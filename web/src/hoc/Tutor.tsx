@@ -41,7 +41,7 @@ export function Tutor() {
           <div className="list">
             {sessions.length === 0 && <div className="empty">Chưa có cuộc trò chuyện</div>}
             {sessions.map((s) => (
-              <button key={s.id} className={`sess${s.id === sid ? " on" : ""}`} onClick={() => { setSid(s.id); if (s.kbId) setKbId(s.kbId); }}>
+              <button key={s.id} className={`sess${s.id === sid ? " on" : ""}`} title={s.title} onClick={() => { setSid(s.id); if (s.kbId) setKbId(s.kbId); }}>
                 <span>{s.title}</span>
                 <i className="xbtn" role="button" aria-label="Xoá" onClick={(e) => { e.stopPropagation(); void del(s.id); }}><Icon name="trash" size={14} /></i>
               </button>

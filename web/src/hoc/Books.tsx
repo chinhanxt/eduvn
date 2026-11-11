@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { errText } from "../api";
 import { Icon } from "../Icon";
 import { MathText } from "../math/MathText";
@@ -6,6 +6,10 @@ import { useMe } from "../Shell";
 import { ChatPanel } from "./ChatPanel";
 import { type Citation, type Kb, tutorApi } from "./client";
 import { Markdown } from "./Markdown";
+import { calloutBody } from "./text";
+
+// bộ vẽ sơ đồ chỉ tải khi trang có khối figure
+const FigureDiagram = lazy(() => import("./FigureDiagram"));
 
 type BookRow = { id: string; title: string; description: string; kbId: string | null };
 type PageRow = { id: string; idx: number; title: string; summary: string; objectives: string[]; status: string };
@@ -20,14 +24,14 @@ function BlockView({ b }: { b: Block }) {
   const [flip, setFlip] = useState<Record<number, boolean>>({});
   switch (b.type) {
     case "callout":
-      return <div className="blk callout"><b>{CALLOUT_VI[b.title ?? ""] ?? "Ghi nhớ"}: </b><MathText value={b.markdown ?? ""} /></div>;
+      return <div className="blk callout"><b className="callout-label">{CALLOUT_VI[b.title ?? ""] ?? "Ghi nhớ"}</b><Markdown text={calloutBody(b.markdown ?? "")} cites={cites} /></div>;
     case "figure": {
       const mm = String(b.data?.mermaid ?? "");
       return (
         <div className="blk card">
           <b>{b.title}</b>
-          <div><Markdown text={b.markdown ?? ""} /></div>
-          {mm && <details><summary>Xem sơ đồ dạng mã</summary><pre className="md"><code>{mm}</code></pre></details>}
+          {mm && <Suspense fallback={<div className="fig-diagram sk" aria-hidden />}><FigureDiagram code={mm} title={b.title ?? "Sơ đồ"} /></Suspense>}
+          <div className="fig-caption"><Markdown text={b.markdown ?? ""} cites={cites} /></div>
         </div>
       );
     }
