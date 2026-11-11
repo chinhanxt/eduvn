@@ -1,3 +1,7 @@
+/* Font + token v2 gộp vào CSS của entry gốc (không dùng chung module CSS với cổng GV/Học để khỏi đổi cách chia chunk của hai cổng). */
+@import "../ui/styles/fonts.css";
+@import "../ui/styles/tokens.css";
+
 /* Đăng nhập (entry gốc) bằng token v2. styles.css cũ đặt lại --bg/--ink/--line ở :root → khai báo lại trong vùng này. */
 .lgv, .lgv-center { --bg: #ffffff; --ink: #121826; --line: #e7eaef; }
 :root[data-theme="dark"] .lgv, :root[data-theme="dark"] .lgv-center { --bg: #0e1117; --ink: #e9ecf3; --line: #232937; }

@@ -40,3 +40,4 @@ export function Mascot({ mood = "chao", size = 64, say, className }: { mood?: Mo
     </div>
   );
 }
+

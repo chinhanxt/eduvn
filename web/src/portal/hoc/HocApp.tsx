@@ -1,7 +1,7 @@
 import { type ComponentType, lazy, type ReactNode, Suspense, useEffect } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import { useAuth } from "../../auth";
-import { HOC_PATH, hocV2Path } from "../../student/paths";
+import { HOC_PATH } from "../../student/paths";
 import { ToastProvider } from "../../ui/components/Toast";
 import { prefetch } from "../../ui/data/query";
 import { request } from "../../ui/data/http";
@@ -19,13 +19,12 @@ const p6 = <M,>(load: () => Promise<M>, f: (m: M) => ComponentType): Page => pic
 const P = {
   homNay: pick(() => import("./HomNay"), (m) => m.HomNay),
   baiTap: pick(() => import("../../student/StudentApp"), (m) => m.BaiTap),
-  qr: pick(() => import("../../student/StudentLogin"), (m) => m.QrLogin),
   lamBai: pick(() => import("../../student/ExamRoom"), (m) => m.ExamRoom),
   ketQua: pick(() => import("./KetQua"), (m) => m.KetQua),
   ketQuaBai: pick(() => import("../../student/ResultPage"), (m) => m.ResultPage),
-  tutor: p6(() => import("../../hoc/Tutor"), (m) => m.Tutor),
   practice: pick(() => import("../../hoc/Practice"), (m) => m.Practice),
   paths: pick(() => import("../../hoc/Paths"), (m) => m.Paths),
+  tutor: p6(() => import("../../hoc/Tutor"), (m) => m.Tutor),
   books: p6(() => import("../../hoc/Books"), (m) => m.Books),
 };
 
@@ -65,13 +64,6 @@ function NeedLearner({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-/** Làm bài + kết quả: cần phiên mã lớp (tài khoản vào lớp bằng mã tham gia cũng nhận phiên này). */
-function NeedHs({ children }: { children: ReactNode }) {
-  const { session } = useLearner();
-  if (!session) return <Navigate to={HOC_PATH.baiTap} replace />;
-  return <>{children}</>;
-}
-
 /** Trang P6 cần Keycloak; chỉ có phiên mã lớp → khu Bài tập; chưa đăng nhập → đăng nhập. */
 function NeedUser({ children, legacy }: { children: ReactNode; legacy?: boolean }) {
   const { user, ready } = useAuth();
@@ -84,38 +76,28 @@ function NeedUser({ children, legacy }: { children: ReactNode; legacy?: boolean 
   return legacy ? <L>{children}</L> : <>{children}</>;
 }
 
-/** /hoc/hs/… (P9a, link cũ + thẻ QR cũ qua /hs/qr) → đường v2, giữ query + hash. */
-function OldHs() {
-  const { pathname, search, hash } = useLocation();
-  return <Navigate to={`${hocV2Path(pathname) ?? HOC_PATH.baiTap}${search}${hash}`} replace />;
-}
-
 const Legacy = lazy(() => import("./LegacyHoc").then((m) => ({ default: m.LegacyHoc })));
 
 /** Cổng học sinh /hoc: Hôm nay, Bài tập/Làm bài/Kết quả (phiên mã lớp), Luyện tập, Gia sư, Giáo trình, Lộ trình (tài khoản). */
 export function HocApp() {
   const H = P.homNay.Component;
   const BT = P.baiTap.Component;
-  const QR = P.qr.Component;
   const LB = P.lamBai.Component;
   const KQ = P.ketQua.Component;
   const KQB = P.ketQuaBai.Component;
-  const T = P.tutor.Component;
   const Pr = P.practice.Component;
   const Pa = P.paths.Component;
+  const T = P.tutor.Component;
   const B = P.books.Component;
   return (
     <ToastProvider>
       <Routes>
         <Route element={<HocShell />}>
           <Route path="/hoc" element={<NeedLearner><H /></NeedLearner>} />
-          <Route path={HOC_PATH.baiTap} element={<BT />} />
-          <Route path={HOC_PATH.qr} element={<QR />} />
-          <Route path="/hoc/lam-bai/:id" element={<NeedHs><LB /></NeedHs>} />
+          <Route path={`${HOC_PATH.baiTap}/*`} element={<BT />} />
+          <Route path="/hoc/lam-bai/:id" element={<LB />} />
           <Route path="/hoc/ket-qua" element={<NeedLearner><KQ /></NeedLearner>} />
-          <Route path="/hoc/ket-qua/:sid" element={<NeedHs><KQB /></NeedHs>} />
-          <Route path="/hoc/hs/*" element={<OldHs />} />
-          <Route path="/hoc/hs" element={<OldHs />} />
+          <Route path="/hoc/ket-qua/:sid" element={<KQB />} />
           <Route path="/hoc/gia-su" element={<NeedUser legacy><T /></NeedUser>} />
           <Route path="/hoc/luyen-tap" element={<NeedUser><Pr /></NeedUser>} />
           <Route path="/hoc/lo-trinh" element={<NeedUser><Pa /></NeedUser>} />

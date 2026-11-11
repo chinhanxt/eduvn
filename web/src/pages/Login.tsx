@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { AFTER_LOGIN_KEY, finishLogin, useAuth } from "../auth";
 import { Icon } from "../ui/Icon";
-import "../ui/styles/fonts.css";
-import "../ui/styles/tokens.css";
 import "./login.css";
 
 type Idp = "google" | "microsoft" | "email";

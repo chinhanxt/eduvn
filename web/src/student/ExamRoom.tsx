@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, Navigate, useNavigate, useParams } from "react-router";
 import { Button } from "../ui/components/Button";
 import { Dialog } from "../ui/components/Dialog";
 import { Skeleton } from "../ui/components/Skeleton";
@@ -19,6 +19,7 @@ import { QuestionCard } from "./QuestionCard";
 import { StudentApiError, errMsg, hsFetch, hsJson, retryAfterMs } from "./studentApi";
 import { AnswerSync, type Sender, type SyncStatus } from "./syncQueue";
 import type { AnswerValue, Answers, RoomPayload, SaveResult, StudentResult } from "./types";
+import { useHsSession } from "../portal/hoc/HocShell";
 import "./hs.css";
 
 const SAVE_TEXT: Record<SyncStatus, [string, string]> = {
@@ -55,7 +56,7 @@ function RoomSkeleton() {
 }
 
 /** Phòng làm bài (chế độ tập trung): lưu máy (Dexie) mỗi thay đổi + gửi máy chủ mỗi 3 giây; đồng hồ theo giờ máy chủ; bắt rời tab; câu đang xem trong URL (?cau=). */
-export function ExamRoom() {
+function ExamRoomInner() {
   const { id = "" } = useParams();
   const nav = useNavigate();
   const toast = useToast();
@@ -365,4 +366,9 @@ export function ExamRoom() {
       </Dialog>
     </div>
   );
+}
+
+/** Cần phiên mã lớp (tài khoản vào lớp bằng mã tham gia cũng có phiên này); chưa có → Bài tập. */
+export function ExamRoom() {
+  return useHsSession() ? <ExamRoomInner /> : <Navigate to={HOC_PATH.baiTap} replace />;
 }

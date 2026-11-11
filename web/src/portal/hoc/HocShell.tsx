@@ -10,7 +10,6 @@ import { AppShell, type MenuItem, type Notice } from "../../ui/shell/AppShell";
 import { PageSkeleton } from "../../ui/shell/PageSkeleton";
 import { GV_ROLES } from "../entries";
 import { fetchMe, ME_KEY } from "../meData";
-import { InShellCtx } from "../inShell";
 import { initialsOf, MeCtx } from "../me";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
 import { hocNav } from "./nav";
@@ -40,7 +39,7 @@ export function useLearner(): { ready: boolean; auth: "user" | "hs" | null; sess
 }
 
 /** Phòng làm bài + quét QR + màn đăng nhập: chế độ tập trung (không menu). */
-const BARE = [/^\/hoc\/lam-bai\/[^/]+/, /^\/hoc\/bai-tap\/qr$/, /^\/hoc\/hs(\/|$)/];
+const BARE = [/^\/hoc\/lam-bai\//, /^\/hoc\/bai-tap\/qr$/];
 
 /** Khung cổng Học (skin C): ≥ 1181 px thanh bên 248 px + nhóm Môn học + ô chuỗi ngày; 721–1180 px thanh bên icon; ≤ 720 px tab dưới 5 mục. */
 export function HocShell({ children }: { children?: ReactNode }) {
@@ -90,40 +89,38 @@ export function HocShell({ children }: { children?: ReactNode }) {
   const streak = d?.streak;
   return (
     <MeCtx value={me.data ?? null}>
-      <InShellCtx value>
-        <AppShell
-          portal="hoc"
-          base=""
-          tag="Học sinh"
-          nav={nav}
-          tabs={tabs}
-          sideExtra={
-            streak && (
-              <div className="streak-mini">
-                <Icon name="flame" />
-                <div>
-                  <b>{streak.current} ngày</b>
-                  <small>học liên tiếp · dài nhất {streak.longest}</small>
-                </div>
+      <AppShell
+        portal="hoc"
+        base=""
+        tag="Học sinh"
+        nav={nav}
+        tabs={tabs}
+        sideExtra={
+          streak && (
+            <div className="streak-mini">
+              <Icon name="flame" />
+              <div>
+                <b>{streak.current} ngày</b>
+                <small>học liên tiếp · dài nhất {streak.longest}</small>
               </div>
-            )
-          }
-          topExtra={
-            streak && (
-              <span className="streak show-sm" title="Chuỗi ngày học">
-                <Icon name="flame" size="sm" />
-                {streak.current}
-              </span>
-            )
-          }
-          user={{ initials: initialsOf(name), name, sub: cls ? `Lớp ${cls}` : "Học sinh" }}
-          menu={menu}
-          notices={notices}
-          commands={commands}
-        >
-          {content}
-        </AppShell>
-      </InShellCtx>
+            </div>
+          )
+        }
+        topExtra={
+          streak && (
+            <span className="streak show-sm" title="Chuỗi ngày học">
+              <Icon name="flame" size="sm" />
+              {streak.current}
+            </span>
+          )
+        }
+        user={{ initials: initialsOf(name), name, sub: cls ? `Lớp ${cls}` : "Học sinh" }}
+        menu={menu}
+        notices={notices}
+        commands={commands}
+      >
+        {content}
+      </AppShell>
     </MeCtx>
   );
 }

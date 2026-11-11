@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { givenName, mascotLine, moodForScore } from "../src/portal/hoc/mascot";
 import { asgAction, asgCounts, band, bySubject, ddmm, dueTone, filterAsg, notRight, scoredOf, sectionLabels, sectionScores, spent, subjectsOf, summary, verdictOf } from "../src/student/data";
-import { HOC_PATH, hocV2Path, isCardQr } from "../src/student/paths";
+import { isCardQr, hocV2Path } from "../src/student/oldPaths";
+import { HOC_PATH } from "../src/student/paths";
 import type { MyAssignment, ReviewItem } from "../src/student/types";
 
 const asg = (o: Partial<MyAssignment>): MyAssignment => ({

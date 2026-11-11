@@ -1,7 +1,6 @@
-import { lazy, Suspense } from "react";
+import { lazy, type ReactNode, Suspense } from "react";
 import { Link } from "react-router";
 import { StreakDays } from "../../ui/charts/Heatmap";
-import { RingBig } from "../../ui/components/Progress";
 import { Skeleton } from "../../ui/components/Skeleton";
 import { EmptyState, ErrorState } from "../../ui/components/States";
 import { Icon } from "../../ui/Icon";
@@ -12,12 +11,9 @@ import type { HocToday } from "../today";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
 import { useLearner } from "./HocShell";
 import { HOC_PATH } from "../../student/paths";
-import { givenName, mascotLine } from "./mascot";
 
 // Biểu đồ thành thạo nằm dưới thẻ việc tiếp theo: tải riêng (giữ JS lần đầu < 100 KB).
 const DotPlot = lazy(() => import("../../ui/charts/DotPlot").then((m) => ({ default: m.DotPlot })));
-// Linh vật Mầm ở thẻ chuỗi ngày: trang trí, tải sau (không nằm trong JS lần đầu).
-const Mascot = lazy(() => import("./Mascot").then((m) => ({ default: m.Mascot })));
 const MasterySkel = ({ n }: { n: number }) => (
   // cùng chiều cao DotPlot (18 + 30/hàng + 22) + dòng "Xem dạng bảng" → không xô lệch khi biểu đồ về
   <div aria-hidden="true" style={{ paddingTop: 18, minHeight: 18 + n * 30 + 22 + 28 }}>
@@ -31,6 +27,13 @@ const MasterySkel = ({ n }: { n: number }) => (
 );
 
 const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", hour12: false });
+
+/** Vòng lớn trên mảng màu (= RingBig của ui/components/Progress, viết tại chỗ để màn đầu không kéo thêm một chunk dùng chung — ngân sách JS lần đầu). */
+const Ring = ({ done, total, children }: { done: number; total: number; children: ReactNode }) => (
+  <div className="ringbig" style={{ ["--p" as string]: `${Math.round((100 * Math.min(done, total)) / Math.max(1, total))}%` }} role="img" aria-label={`Đã làm ${done} trên ${total} câu`}>
+    <div>{children}</div>
+  </div>
+);
 
 function Hero({ d }: { d: HocToday }) {
   const n = d.next;
@@ -52,10 +55,10 @@ function Hero({ d }: { d: HocToday }) {
         </p>
       </div>
       {n && (
-        <RingBig value={n.answered} max={Math.max(1, n.total)} label={`Đã làm ${n.answered} trên ${n.total} câu`}>
+        <Ring done={n.answered} total={n.total}>
           <b>{n.answered}/{n.total}</b>
           <span>câu đã làm</span>
-        </RingBig>
+        </Ring>
       )}
       {n && (
         <div className="meta">
@@ -254,13 +257,6 @@ export function HomNay() {
             <span className="caption">mục tiêu {d.streak.goal} câu/ngày</span>
           </div>
           <StreakDays days={d.days} goal={d.streak.goal} />
-          {d.streak.current >= 2 && (
-            <Suspense fallback={<div style={{ height: 48, marginTop: "var(--s-3)" }} />}>
-              <div style={{ marginTop: "var(--s-3)" }}>
-                <Mascot mood="chuoi" size={48} say={mascotLine("chuoi", { streak: d.streak.current, name: givenName(d.student.name) })} />
-              </div>
-            </Suspense>
-          )}
         </section>
       </aside>
     </div>

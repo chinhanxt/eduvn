@@ -5,8 +5,7 @@ import { Mascot } from "../portal/hoc/Mascot";
 import { Icon } from "../ui/Icon";
 import { Avatar, CountUp, confetti } from "./fx";
 import { LETTERS, type PlayerState, useLeftMs, useStream } from "./live";
-import "../ui/styles/fonts.css";
-import "../ui/styles/tokens.css";
+// font + token v2 đã có trong CSS entry gốc (pages/login.css)
 import "./play.css";
 
 type Info = { title: string; phase: string; players: number; roster: { id: string; name: string; taken: boolean }[] | null };

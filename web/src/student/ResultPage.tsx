@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, Navigate, useParams } from "react-router";
 import { vn } from "../api";
 import { ApiError } from "../apiCore";
 import { useAuth } from "../auth";
@@ -20,6 +20,7 @@ import { ASG_KEY, band, ddmm, fetchAssignments, fetchResult, notRight, resultKey
 import { HOC_PATH } from "./paths";
 import { loadSession } from "./session";
 import type { ReviewItem } from "./types";
+import { useHsSession } from "../portal/hoc/HocShell";
 import "./hs.css";
 
 // P13: lời giải từng bước có hình (chỉ khi GV cho hiện lời giải) — tải lười trình xem
@@ -50,7 +51,7 @@ function Skel() {
 }
 
 /** Kết quả một bài (mockup hoc/ket-qua): điểm + theo phần, từng câu (lọc "Chưa đúng" trong URL ?loc=), so với các bài trước. */
-export function ResultPage() {
+function ResultPageInner() {
   const { sid = "" } = useParams();
   const { user } = useAuth();
   const q = useQuery(sid ? resultKey(sid) : null, fetchResult(sid));
@@ -270,3 +271,8 @@ function Answer({ it }: { it: ReviewItem }) {
   return <div className="essayres read">{typeof it.response === "string" && it.response ? it.response : "Chưa trả lời"}</div>;
 }
 
+
+/** Cần phiên mã lớp (tài khoản vào lớp bằng mã tham gia cũng có phiên này); chưa có → Bài tập. */
+export function ResultPage() {
+  return useHsSession() ? <ResultPageInner /> : <Navigate to={HOC_PATH.baiTap} replace />;
+}

@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { vn } from "../api";
 import { ApiError } from "../apiCore";
+import { fetchHocToday, HOC_TODAY_KEY } from "../portal/hoc/data";
 import { Mascot } from "../portal/hoc/Mascot";
-import { givenName, mascotLine } from "../portal/hoc/mascot";
+import { givenName, mascotLine, type Mood } from "../portal/hoc/mascot";
 import { subjectColor } from "../portal/hocToday";
 import { Badge, Segmented } from "../ui/components/Chip";
 import { Meter } from "../ui/components/Progress";
@@ -132,6 +133,10 @@ export function MyAssignments() {
   const shown = rows ? filterAsg(rows, v, mon) : [];
   const name = givenName(loadSession()?.student.fullName);
   const left = rows ? asgCounts(rows)["can-lam"] : 0;
+  // chuỗi ngày học: dữ liệu Hôm nay khung đã tải (cùng khoá cache)
+  const streak = useQuery(`${HOC_TODAY_KEY}:hs`, fetchHocToday("hs")).data?.streak.current ?? 0;
+  const mood: Mood = rows && rows.length > 0 && left === 0 ? "khen" : streak >= 2 ? "chuoi" : "chao";
+  const say = mood === "chuoi" ? `${mascotLine("chuoi", { streak, name })} ${left > 0 ? `Còn ${left} bài.` : ""}`.trim() : mascotLine(mood, { name, left });
   return (
     <div className="ba">
       <div className="ba-head">
@@ -140,7 +145,7 @@ export function MyAssignments() {
           <p className="caption">{rows ? `${left > 0 ? `${left} bài cần làm` : "Không còn bài cần làm"} · ${rows.length} bài trong lớp` : " "}</p>
         </div>
         <span className="grow" />
-        {rows && <Mascot key={left} mood={left === 0 && rows.length > 0 ? "khen" : "chao"} size={52} say={mascotLine(left === 0 && rows.length > 0 ? "khen" : "chao", { name, left })} className="hide-sm" />}
+        {rows && <Mascot key={mood} mood={mood} size={52} say={say} className="hide-sm" />}
       </div>
       <div className="ba-bar">
         <Segmented label="Lọc bài" value={v} onChange={(x) => setView(x)} options={ASG_VIEWS.map((k) => ({ value: k, label: <>{VIEW_VI[k]}{counts && <span className="num muted"> {counts[k]}</span>}</> }))} />
