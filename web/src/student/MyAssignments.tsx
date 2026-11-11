@@ -15,7 +15,7 @@ import { useQuery } from "../ui/data/query";
 import { useUrlState } from "../ui/data/urlState";
 import { usePageMeta } from "../ui/shell/AppShell";
 import { formatCountdown } from "./clock";
-import { ASG_KEY, ASG_VIEWS, type AsgView, asgAction, asgCounts, dueTone, fetchAssignments, filterAsg, subjectsOf } from "./data";
+import { ASG_KEY, ASG_VIEWS, type AsgView, asgAction, asgCounts, ddmm, dueTone, fetchAssignments, filterAsg, subjectsOf } from "./data";
 import { HOC_PATH } from "./paths";
 import { clearSession, loadSession } from "./session";
 import type { MyAssignment } from "./types";
@@ -25,11 +25,12 @@ const VIEW_VI: Record<AsgView, string> = { "can-lam": "Cần làm", "da-nop": "�
 const STATE: Record<MyAssignment["state"], [tone: "neutral" | "ok" | "warn" | "danger" | "accent" | "outline", icon: string, label: string]> = {
   chua_mo: ["neutral", "lock", "Chưa mở"],
   chua_lam: ["outline", "exam", "Chưa làm"],
-  dang_lam: ["accent", "loader", "Đang làm"],
+  dang_lam: ["accent", "play", "Đang làm"],
   da_nop: ["ok", "check", "Đã nộp"],
   qua_han: ["danger", "alert", "Quá hạn"],
 };
-const at = (iso: string) => new Date(iso).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", hour12: false });
+/** "21:00 14/11" theo giờ Việt Nam (toLocaleString vi-VN ra "14-11" ở Chrome). */
+const at = (iso: string) => `${new Date(iso).toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", hour12: false })} ${ddmm(iso)}`;
 
 /** Đồng hồ cho hạn nộp: mỗi giây khi có bài sắp hết hạn trong 1 giờ, không thì mỗi 30 giây. */
 function useNow(fast: boolean): number {

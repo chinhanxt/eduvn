@@ -22,7 +22,7 @@ type PathView = { id: string; name: string; goal: string; subject: string; grade
 type Row = { id: string; name: string; progress: { percent: number; mastered: number; total: number } };
 type Graded = { results: { question: string; answer: string; expected: string; explanation: string; correct: boolean; feedback: string }[]; diagnoses: { question: string; errorType: string; why: string; remediation: string }[]; path: PathView };
 
-const STATUS = { new: ["Chưa học", "lock"], learning: ["Đang học", "loader"], mastered: ["Đã thành thạo", "check"] } as const;
+const STATUS = { new: ["Chưa học", "lock"], learning: ["Đang học", "target"], mastered: ["Đã thành thạo", "check"] } as const;
 const TYPE_VI: Record<string, string> = { memory: "ghi nhớ", concept: "khái niệm", procedure: "kĩ năng", design: "vận dụng" };
 const ERR_VI: Record<string, string> = { structural: "hổng kiến thức nền", deviation: "hiểu lệch", application: "chưa vận dụng được", metacognitive: "thiếu kiểm tra lại" };
 const LIST_KEY = "hoc/lo-trinh";

@@ -34,7 +34,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const [minW, setMinW] = useState<number | undefined>();
   const self = useRef<HTMLButtonElement | null>(null);
   const alive = useRef(true);
-  useEffect(() => () => void (alive.current = false), []);
+  // gắn lại true khi (tái) gắn kết: StrictMode chạy effect hai lần, cleanup lần đầu không được để nút kẹt "đang xử lý"
+  useEffect(() => {
+    alive.current = true;
+    return () => void (alive.current = false);
+  }, []);
   const isBusy = !!busy || pending;
   useEffect(() => {
     if (isBusy && self.current) setMinW(self.current.offsetWidth);
