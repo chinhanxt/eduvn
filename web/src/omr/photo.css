@@ -1,23 +1,10 @@
-/* Trang /cham-anh — skin GV "B · Công cụ chính xác" (docs/design/eduvn-design-system.md, web/mockup/v2/tokens.css + skin-gv.css).
-   Mọi luật gói trong .pg để không đụng khung/Shell đang dùng; token khai báo cục bộ theo tokens.css. */
+/* Chấm bài: quét phiếu, bài viết tay, in phiếu — skin GV "B · Công cụ chính xác". Mọi luật gói trong .pg; nút dùng Button v2 (.btn). */
 .pg {
-  --font-ui: "Inter", "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
-  --font-read: "Source Serif 4", "Noto Serif", Georgia, serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --bg: #ffffff; --bg-sunken: #f7f8fa; --bg-hover: #f0f2f5; --bg-active: #e8ebf0;
-  --ink: #121826; --ink-2: #4a5266; --ink-3: #646c80; --ink-disabled: #9aa1b1;
-  --line: #eceef2; --line-2: #dfe2e8; --line-input: #8c93a3;
-  --accent: #3346d1; --accent-hover: #2a3ab3; --accent-press: #22308f; --accent-bg: #eef0fd; --accent-line: #c7cdf7;
-  --ok: #137a43; --ok-bg: #e8f5ee; --warn: #9a5800; --warn-bg: #fdf3e3; --danger: #c0302e; --danger-bg: #fdeceb;
-  --r-xs: 4px; --r-sm: 5px; --r-md: 8px; --r-lg: 14px;
-  --shadow-2: 0 4px 12px rgb(16 24 40 / .08), 0 12px 32px rgb(16 24 40 / .12);
-  --dur-1: 90ms; --dur-2: 160ms; --dur-3: 240ms; --ease-out: cubic-bezier(.2, .8, .2, 1); --ease-in: cubic-bezier(.4, 0, 1, 1);
-  --stagger: 30ms;
+  /* token sáng/tối lấy từ cổng (tokens.css + skin-gv.css) — chế độ tối tự theo */
   font-family: var(--font-ui); font-size: 13px; line-height: 20px; color: var(--ink);
   font-feature-settings: "cv11", "ss01";
   max-width: 1440px;
 }
-@media (prefers-reduced-motion: reduce) { .pg { --dur-1: 1ms; --dur-2: 1ms; --dur-3: 1ms; --stagger: 0ms; } }
 .pg *, .pg *::before, .pg *::after { box-sizing: border-box; }
 .pg .num, .pg .mono { font-variant-numeric: tabular-nums; }
 .pg .mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: -.01em; }
@@ -36,24 +23,7 @@
 .pg-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .pg-sp { flex: 1; }
 
-/* Nút + ô nhập */
-.pg-btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: var(--r-sm); font: 500 13px/1 var(--font-ui); white-space: nowrap; border: 1px solid var(--line-2); background: var(--bg); color: var(--ink); transition: background var(--dur-1), border-color var(--dur-1), transform var(--dur-1); position: relative; }
-.pg-btn:hover { background: var(--bg-hover); }
-.pg-btn:active { transform: translateY(1px); }
-.pg-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.pg-btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
-.pg-btn.pri:hover { background: var(--accent-hover); }
-.pg-btn.pri:active { background: var(--accent-press); }
-.pg-btn.quiet { border-color: transparent; background: transparent; color: var(--ink-2); }
-.pg-btn.quiet:hover { background: var(--bg-hover); color: var(--ink); }
-.pg-btn.sm { height: 26px; padding: 0 8px; font-size: 12px; }
-.pg-btn.icon { width: 30px; padding: 0; }
-.pg-btn[disabled] { cursor: not-allowed; opacity: .5; transform: none; }
-.pg-btn[aria-busy="true"] { cursor: progress; opacity: 1; }
-.pg-btn[aria-busy="true"] > :not(.pg-spin) { visibility: hidden; }
-.pg-btn .pg-spin { position: absolute; inset: 0; margin: auto; }
-.pg-spin { width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: pg-rot .7s linear infinite; }
-@keyframes pg-rot { to { transform: rotate(360deg); } }
+/* Ô nhập */
 .pg-in { box-sizing: border-box; height: 30px; padding: 0 8px; border: 1px solid var(--line-input); border-radius: var(--r-sm); background: var(--bg); font: 13px var(--font-ui); color: var(--ink); min-width: 0; }
 .pg-in:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
 textarea.pg-in { height: auto; padding: 8px; line-height: 20px; resize: vertical; width: 100%; }
@@ -199,3 +169,4 @@ textarea.pg-in { height: auto; padding: 8px; line-height: 20px; resize: vertical
   .pg-toasts { right: 16px; bottom: 16px; }
 }
 @media print { .pg-head, .pg-tools, .pg-toasts { display: none !important; } .pg { max-width: none; } }
+.pg select.pg-in { appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23646c80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }

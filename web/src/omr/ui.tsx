@@ -3,7 +3,8 @@
 import { type ReactNode, useCallback, useRef, useState } from "react";
 import { useToast as useUiToast } from "../ui/components/Toast";
 import { errText } from "../api";
-import { Icon } from "../Icon";
+import { Icon } from "../ui/Icon";
+import { Button } from "../ui/components/Button";
 
 type ToastKind = "ok" | "err" | "info";
 type ToastFn = (kind: ToastKind, text: string) => void;
@@ -41,12 +42,20 @@ export function useLock() {
   return [run, busy] as const;
 }
 
-export function Btn({ busy, kind, children, ...p }: { busy?: boolean; kind?: "pri" | "quiet" | "sm" | string; children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+/** Nút của trang chấm = Button v2 (khoá khi đang xử lý, giữ bề rộng, vòng quay). kind: "pri" | "quiet" | "icon" (ghép bằng dấu cách; mọi nút cao 30 px như skin B). */
+export function Btn({ busy, kind = "", children, className, onClick, ...p }: { busy?: boolean; kind?: string; children: ReactNode; onClick?: (e: React.MouseEvent<HTMLButtonElement>) => unknown } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick">) {
+  const k = kind.split(/\s+/);
   return (
-    <button {...p} className={`pg-btn ${kind ?? ""} ${p.className ?? ""}`} aria-busy={busy || undefined} disabled={p.disabled || busy}>
-      {busy && <i className="pg-spin" aria-hidden="true" />}
+    <Button
+      {...p}
+      onClick={onClick}
+      busy={busy}
+      variant={k.includes("pri") ? "primary" : k.includes("quiet") ? "ghost" : "default"}
+      size="sm"
+      className={[k.includes("icon") && "icon", className].filter(Boolean).join(" ") || undefined}
+    >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -68,12 +77,12 @@ export function Dropzone({ title, hint, onFiles, compact, capture, testId }: { t
       <span className="ic"><Icon name="camera" /></span>
       <div><b>{title}</b><p>{hint}</p></div>
       <div className="acts">
-        <label className="pg-btn pri">
+        <label className="btn primary sm">
           <Icon name="upload" />Chọn ảnh
           <input type="file" accept="image/*" multiple hidden onChange={(e) => { pick(e.target.files); e.target.value = ""; }} data-testid={`${testId}-file`} />
         </label>
         {capture && (
-          <label className="pg-btn">
+          <label className="btn sm">
             <Icon name="camera" />Chụp
             <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { pick(e.target.files); e.target.value = ""; }} />
           </label>

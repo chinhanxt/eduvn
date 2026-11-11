@@ -1,7 +1,7 @@
 // web/src/omr/Saved.tsx — kết quả chấm từ ảnh đã lưu: bảng phân trang, xoá, ghi vào sổ điểm (thang 10).
 import { useCallback, useEffect, useState } from "react";
 import { type ClassSummary, api } from "../api";
-import { Icon } from "../Icon";
+import { Icon } from "../ui/Icon";
 import type { Roster } from "./seat";
 import { Btn, num, useLock, useToast } from "./ui";
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { type ExamSummary, type KeyEntry, api } from "../api";
-import { Icon } from "../Icon";
+import { Icon } from "../ui/Icon";
 import { sheetSvg } from "./sheetSvg";
 import { buildTemplate } from "./template";
 
@@ -35,7 +35,7 @@ export function PrintTab({ exams, examId }: { exams: ExamSummary[]; examId: stri
         </label>
         <span className="pg-tag"><Icon name="qr" />A4 · 4 mốc góc + QR mã đề · tô bằng bút chì 2B</span>
         <span className="pg-sp" />
-        <button className="pg-btn pri" onClick={() => window.print()} disabled={pages.length === 0} data-testid="p-print"><Icon name="printer" />In / lưu PDF ({pages.length} trang)</button>
+        <button className="btn primary sm" onClick={() => window.print()} disabled={pages.length === 0} data-testid="p-print"><Icon name="printer" />In / lưu PDF ({pages.length} trang)</button>
       </div>
       {keys.length === 0 && <div className="omr-page pg-sk" style={{ aspectRatio: "210 / 297" }} aria-busy="true" />}
       <div className="omr-print" data-testid="p-sheets">

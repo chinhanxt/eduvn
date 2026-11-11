@@ -1,170 +1,175 @@
-import { useEffect, useState } from "react";
-import { api, errText, vn } from "../../api";
-import { Icon } from "../../Icon";
+import { useMemo, useState } from "react";
+import { Link } from "react-router";
+import { vn } from "../../api";
 import { MathText } from "../../math/MathText";
-import type { ResultsPayload, SubmissionDetail } from "./types";
+import { Region, SkelRows, errorOf, get, initialsOf, put, useListView, useRun, vnNum } from "../../portal/gv/kit";
+import { binsOf, Histogram } from "../../ui/charts/Histogram";
+import { Difficulty } from "../../ui/charts/Difficulty";
+import { Button } from "../../ui/components/Button";
+import { Badge } from "../../ui/components/Chip";
+import { Dialog } from "../../ui/components/Dialog";
+import { Input } from "../../ui/components/Field";
+import { type Column, Table } from "../../ui/components/Table";
+import { invalidate, useQuery } from "../../ui/data/query";
+import { useUrlState } from "../../ui/data/urlState";
+import type { ItemStat, ResultRow, ResultsPayload, SubmissionDetail } from "./types";
 
-const band = (d: number): [string, string] => (d >= 0.4 ? ["g", "Tốt"] : d >= 0.3 ? ["b", "Khá"] : d >= 0.2 ? ["a", "Xem lại"] : ["r", "Kém"]);
-const ease = (p: number): [string, string] => (p >= 0.8 ? ["Dễ", "var(--green)"] : p >= 0.4 ? ["Vừa", "var(--brand)"] : ["Khó", "#d63a3a"]);
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 const LETTERS = "ABCD";
+const LV: Record<string, [string, string]> = { NB: ["l1", "NB"], TH: ["l2", "TH"], VD: ["l3", "VD"] };
+const band = (d: number): ["ok" | "accent" | "warn" | "danger", string] => (d >= 0.4 ? ["ok", "Tốt"] : d >= 0.3 ? ["accent", "Khá"] : d >= 0.2 ? ["warn", "Xem lại"] : ["danger", "Kém"]);
+const resKey = (id: string) => `gv/ket-qua/${id}`;
 
-/** Tab "Kết quả & thống kê": số liệu (màn 7 của mockup) + bảng điểm + xem/chấm từng bài. */
+/** Tab "Kết quả" (mockup gv/ket-qua.html): dải chỉ số · Hình 1 phổ điểm · Hình 2 độ khó · phân tích từng câu · HS cần quan tâm · bảng điểm + chấm tự luận. */
 export function ResultsTab({ assignmentId }: { assignmentId: string }) {
-  const [r, setR] = useState<ResultsPayload | null>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [open, setOpen] = useState<string | null>(null);
-  const load = () => {
-    api<ResultsPayload>(`/api/assignments/${assignmentId}/results`).then(setR).catch((e: unknown) => setErr(errText(e)));
-  };
-  useEffect(load, [assignmentId]);
-  if (!r) return err ? <div className="err">{err}</div> : null;
+  const q = useQuery(resKey(assignmentId), get<ResultsPayload>(`/api/assignments/${assignmentId}/results`));
+  const [all, setAll] = useUrlState<string>("cau", "");
+  const [open, setOpen] = useUrlState<string>("bai-lam", "", { mode: "push" });
+  const r = q.data;
+  const sorts = useMemo(() => ({ tt: (x: ResultRow) => x.seat, ten: (x: ResultRow) => x.fullName.split(/\s+/).pop() ?? "", diem: (x: ResultRow) => x.score10 }), []);
+  const v = useListView(r?.rows, { text: (x) => x.fullName, sorts, defSort: "tt", pageSize: 50, prefix: "bd" });
+  if (!r)
+    return (
+      <>
+        <section className="kpis" aria-hidden="true">{[0, 1, 2, 3, 4, 5].map((i) => <div key={i}><div className="k">&nbsp;</div><div className="v"><span className="skel" style={{ display: "block", width: 56, height: 22, margin: "3px 0" }} /></div></div>)}</section>
+        <Region className="pane mt" label="Kết quả" status={q.error ? "loi" : "dang-tai"} error={errorOf(q.error)} onRetry={q.refetch} skeletonRows={6} />
+      </>
+    );
   const s = r.stats;
+  const scored = s.distribution.reduce((a, b) => a + b, 0);
+  const pass = s.distribution.slice(5).reduce((a, b) => a + b, 0);
+  const items = [...s.items].sort((a, b) => (a.p ?? 2) - (b.p ?? 2));
+  const hard = items.filter((i) => i.p !== null && i.p < 0.4);
+  const shown = all === "tat-ca" ? items : items.slice(0, 5);
+  const wrongOf = (i: ItemStat) => i.choices.filter((c) => !c.correct).sort((a, b) => b.count - a.count)[0];
+  const itemCols: Column<ItemStat>[] = [
+    { key: "cau", header: "Câu", cell: (i) => <span className="row" style={{ gap: 6 }}><b>Câu {i.label}</b>{LV[i.level] && <span className={`lvl ${LV[i.level]![0]} hide-sm`}>{LV[i.level]![1]}</span>}</span> },
+    { key: "chu-de", header: "Chủ đề", hideSm: true, clip: true, cell: (i) => i.topic },
+    { key: "p", header: "% đúng", numeric: true, cell: (i) => (i.p === null ? "—" : <span className={i.p < 0.4 ? "hbar low" : "hbar"}><i style={{ ["--v" as string]: pct(i.p) }} />{pct(i.p)}</span>) },
+    { key: "sai", header: "Sai phổ biến nhất", hideSm: true, cell: (i) => { const w = wrongOf(i); return w && w.count ? <span>Chọn <b><MathText value={w.choice} /></b> ({pct(w.count / Math.max(1, i.n))})</span> : <span className="muted">—</span>; } },
+    { key: "d", header: "Phân biệt", numeric: true, hideSm: true, cell: (i) => (i.d === null ? <span className="muted" title="Cần ít nhất 10 bài">—</span> : <Badge tone={band(i.d)[0]} icon="">{vnNum(i.d)} · {band(i.d)[1]}</Badge>) },
+    { key: "co", header: "", numeric: true, cell: (i) => (i.flag ? <Badge tone="warn">{i.flag}</Badge> : null) },
+  ];
+  const atCols: Column<ResultsPayload["stats"]["atRisk"][number]>[] = [
+    { key: "ten", header: "Học sinh", cell: (a) => <div className="who"><span className="avatar sm hide-sm">{initialsOf(a.fullName)}</span><span>{a.fullName}<small>{a.seat ? `STT ${a.seat}` : ""}</small></span></div> },
+    { key: "diem", header: "Bài này", numeric: true, cell: (a) => <span className={a.score10 != null && a.score10 < 5 ? "low-score" : "muted"}>{vnNum(a.score10)}</span> },
+    { key: "ly-do", header: "Lý do", cell: (a) => <span className="row wrap" style={{ gap: 4 }}>{a.reasons.map((x) => <Badge key={x} tone={x.startsWith("Rời") ? "warn" : "danger"}>{x}</Badge>)}</span> },
+  ];
+  const rowCols: Column<ResultRow>[] = [
+    { key: "tt", header: "TT", numeric: true, sortable: true, width: 48, cell: (x) => x.seat ?? "—" },
+    { key: "ten", header: "Học sinh", sortable: true, cell: (x) => x.fullName },
+    { key: "tt-bai", header: "Trạng thái", cell: (x) => <span className="row wrap" style={{ gap: 4 }}>{x.status === null ? <span className="muted">Chưa vào</span> : x.status === "in_progress" ? <Badge tone="accent">Đang làm</Badge> : x.status === "auto_submitted" ? <Badge tone="warn">Tự nộp hết giờ</Badge> : <Badge tone="ok">Đã nộp</Badge>}{x.pending > 0 && <Badge tone="accent" icon="pen">{x.pending} câu chờ chấm</Badge>}</span> },
+    { key: "diem", header: "Điểm /10", numeric: true, sortable: true, cell: (x) => <span data-testid="lh-score" className={x.score10 != null && x.score10 < 5 ? "low-score" : undefined}>{vnNum(x.score10)}</span> },
+    { key: "luot", header: "Lượt", numeric: true, hideSm: true, cell: (x) => x.attempts },
+    { key: "xem", header: "", numeric: true, cell: (x) => (x.submissionId && x.status !== "in_progress" ? <Button size="sm" variant="ghost" onClick={() => setOpen(x.submissionId!)}>{x.pending > 0 ? "Chấm" : "Xem bài"}</Button> : null) },
+  ];
   return (
     <>
-      {err && <div className="err">{err}</div>}
-      <div className="lh-kpis">
-        <div className="card lh-kpi"><small>Tỉ lệ nộp</small><b data-testid="lh-kpi-submit">{s.submitted} / {s.rosterSize}</b><span>{pct(s.submitRate)}</span></div>
-        <div className="card lh-kpi"><small>Điểm trung bình</small><b>{s.mean === null ? "—" : vn(s.mean)}</b><span>Trung vị {s.median === null ? "—" : vn(s.median)}</span></div>
-        <div className="card lh-kpi"><small>Cao nhất</small><b>{s.best ? vn(s.best.score10) : "—"}</b><span>{s.best?.fullName ?? ""}</span></div>
-        <div className="card lh-kpi"><small>Thấp nhất</small><b>{s.worst ? vn(s.worst.score10) : "—"}</b><span>{s.worst?.fullName ?? ""}</span></div>
-      </div>
-      <div className="lh-grid2">
-        <div className="card"><h2>Phân bố điểm</h2><Histogram counts={s.distribution} mean={s.mean} /></div>
-        <div className="card">
-          <h2>Chủ đề yếu <small className="hint">· tỉ lệ đúng</small></h2>
-          <div className="lh-wk">
-            {s.topics.map((t) => (
-              <div key={t.topic} className="w"><span>{t.topic}</span><div className="lh-bar"><i style={{ width: pct(t.rate), background: t.rate < 0.5 ? "#d63a3a" : t.rate < 0.65 ? "#e08a00" : "var(--brand)" }} /></div><b>{pct(t.rate)}</b></div>
-            ))}
+      <section className="kpis" aria-label="Chỉ số">
+        <div><div className="k">Đã nộp</div><div className="v" data-testid="lh-kpi-submit">{s.submitted}/{s.rosterSize} <small className="mu">{pct(s.submitRate)}</small></div></div>
+        <div><div className="k">Điểm trung bình</div><div className="v">{vnNum(s.mean)}</div></div>
+        <div><div className="k">Trung vị</div><div className="v">{vnNum(s.median)}</div></div>
+        <div><div className="k">Đạt (≥ 5,0)</div><div className="v">{scored ? `${Math.round((pass / scored) * 100)}%` : "—"} <small className="mu">{pass}/{scored}</small></div></div>
+        <div><div className="k">Cao nhất</div><div className="v">{s.best ? vnNum(s.best.score10) : "—"} {s.best && <small className="mu ell" title={s.best.fullName}>{s.best.fullName}</small>}</div></div>
+        <div><div className="k">Thấp nhất</div><div className="v">{s.worst ? vnNum(s.worst.score10) : "—"} {s.worst && <small className="mu ell" title={s.worst.fullName}>{s.worst.fullName}</small>}</div></div>
+      </section>
+      <div className="figs">
+        <figure className="pane">
+          <div className="ghd"><span className="no">HÌNH 1</span> Phổ điểm <span className="grow" /><span className="n">{scored} bài đã chấm</span></div>
+          <div className="fig">
+            {scored ? <Histogram bins={binsOf(s.distribution)} median={s.median} height={220} /> : <p className="caption" style={{ padding: "40px 0", textAlign: "center" }}>Phổ điểm hiện khi có bài đã chấm.</p>}
+            <figcaption>Số HS theo khoảng 1 điểm; vạch: ngưỡng 5,0. {scored ? <b>{scored - pass} em dưới ngưỡng.</b> : null}</figcaption>
           </div>
-        </div>
+        </figure>
+        <figure className="pane">
+          <div className="ghd"><span className="no">HÌNH 2</span> Độ khó từng câu <span className="grow" /><span className="n">% làm đúng</span></div>
+          <div className="fig">
+            {items.some((i) => i.p !== null) ? <Difficulty rows={items.filter((i) => i.p !== null).slice(0, 12).map((i) => ({ label: `Câu ${i.label}`, p: Math.round((i.p ?? 0) * 100), topic: i.topic }))} flag={40} rowH={22} /> : <p className="caption" style={{ padding: "40px 0", textAlign: "center" }}>Chưa đủ bài nộp để tính.</p>}
+            <figcaption>Nền xám: dưới 40% — nên chữa lại. {hard.length ? <b>{hard.length} câu dưới 40%: {hard.slice(0, 4).map((i) => i.label).join(", ")}.</b> : "Không câu nào dưới 40%."}</figcaption>
+          </div>
+        </figure>
       </div>
-      <div className="card lh-block">
-        <h2>Từng câu hỏi</h2>
-        <div className="lh-scroll">
-          <table className="lh-tbl" data-testid="lh-items">
-            <thead><tr><th>Câu</th><th>Chủ đề</th><th>Độ khó p</th><th>Độ phân biệt D</th><th>Đáp án nhiễu hay chọn</th></tr></thead>
-            <tbody>
-              {s.items.map((i) => {
-                const wrong = i.choices.find((c) => !c.correct);
-                return (
-                  <tr key={i.questionId}>
-                    <td><b>Câu {i.label}</b>{i.flag && <span className="lh-chip c-amber">{i.flag}</span>}</td>
-                    <td>{i.topic}</td>
-                    <td>{i.p === null ? "—" : <div className="lh-pbar"><div className="lh-bar"><i style={{ width: pct(i.p), background: ease(i.p)[1] }} /></div><b>{vn(i.p)}</b><span className="lh-chip">{ease(i.p)[0]}</span></div>}</td>
-                    <td>{i.d === null ? <span className="hint">cần ≥ 10 bài</span> : <span className={`lh-bd ${band(i.d)[0]}`}>{vn(i.d)} <small>{band(i.d)[1]}</small></span>}</td>
-                    <td>{wrong ? <><MathText value={wrong.choice} /> · {pct(wrong.count / Math.max(1, i.n))}</> : "—"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="lh-legd"><b>Độ phân biệt D:</b><span className="lh-bd g">≥ 0,40 <small>Tốt</small></span><span className="lh-bd b">0,30–0,39 <small>Khá</small></span><span className="lh-bd a">0,20–0,29 <small>Xem lại</small></span><span className="lh-bd r">&lt; 0,20 <small>Kém</small></span></div>
-      </div>
-      <div className="card lh-block">
-        <h2>Học sinh cần quan tâm</h2>
-        {s.atRisk.length === 0 && <div className="empty">Không có</div>}
-        <div className="lh-att">
-          {s.atRisk.map((a) => (
-            <div key={a.studentId} className="a"><span className="avatar">{(a.fullName.trim().split(/\s+/).pop() ?? "").charAt(0)}</span><div className="g"><b>{a.fullName}</b><div className="why">{a.reasons.map((x) => <span key={x} className={`lh-chip ${x.startsWith("Rời") ? "c-amber" : "c-red"}`}>{x}</span>)}</div></div><span className="sc">{a.score10 === null ? "—" : vn(a.score10)}</span></div>
-          ))}
-        </div>
-      </div>
-      <div className="card lh-block">
-        <h2>Bảng điểm</h2>
-        <table className="lh-tbl" data-testid="lh-results">
-          <thead><tr><th>TT</th><th>Họ tên</th><th>Trạng thái</th><th className="num">Điểm (thang 10)</th><th className="num">Lượt</th><th /></tr></thead>
-          <tbody>
-            {r.rows.map((x) => (
-              <tr key={x.studentId} data-testid="lh-row">
-                <td className="hint">{x.seat ?? "—"}</td>
-                <td>{x.fullName}</td>
-                <td>{x.status === null ? "Chưa vào" : x.status === "in_progress" ? "Đang làm" : x.status === "auto_submitted" ? "Tự nộp hết giờ" : "Đã nộp"}{x.pending > 0 && <span className="lh-chip c-violet">{x.pending} câu chờ chấm</span>}</td>
-                <td className="num" data-testid="lh-score">{x.score10 === null ? "—" : vn(x.score10)}</td>
-                <td className="num">{x.attempts}</td>
-                <td>{x.submissionId && x.status !== "in_progress" && <button className="btn ghost sm" onClick={() => setOpen(x.submissionId)}>Xem bài</button>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {open && <SubmissionView assignmentId={assignmentId} submissionId={open} onClose={(changed) => { setOpen(null); if (changed) load(); }} />}
+      <section className="pane mt" aria-label="Phân tích từng câu">
+        <div className="ghd">Phân tích từng câu <span className="n">{items.length} câu · sắp theo % đúng tăng dần</span></div>
+        <div data-testid="lh-items"><Table label="Phân tích từng câu" dense columns={itemCols} rows={shown} rowKey={(i) => i.questionId} status={items.length ? "ok" : "trong"} empty={{ icon: "chart", title: "Chưa có số liệu câu hỏi" }} /></div>
+        {items.length > 5 && (
+          <div className="ghd" style={{ borderBottom: 0, borderRadius: "0 0 var(--r-md) var(--r-md)" }}>
+            <span className="n" style={{ fontWeight: 400 }}>Hiện {shown.length}/{items.length} câu · </span>
+            <button type="button" className="link" style={{ border: 0, background: "none", padding: 0, fontSize: 12 }} onClick={() => setAll(all ? "" : "tat-ca")}>{all ? "thu gọn" : `xem cả ${items.length}`}</button>
+            <span className="n" style={{ fontWeight: 400 }}>· Phân biệt &lt; 0,2: câu quá dễ hoặc lỗi đề</span>
+          </div>
+        )}
+      </section>
+      <section className="pane mt" aria-label="Học sinh cần quan tâm">
+        <div className="ghd">Học sinh cần quan tâm <span className="n">{s.atRisk.length} · dưới 5,0 · rời tab nhiều · chưa nộp</span></div>
+        <Table label="Học sinh cần quan tâm" dense columns={atCols} rows={s.atRisk} rowKey={(a) => a.studentId} status={s.atRisk.length ? "ok" : "trong"} empty={{ icon: "ok", title: "Không em nào cần quan tâm", text: "Tất cả đạt ngưỡng và không có dấu hiệu bất thường." }} />
+      </section>
+      <section className="pane mt" aria-label="Bảng điểm">
+        <div className="ghd">Bảng điểm <span className="n">{r.rows.length} học sinh</span><span className="grow" /><Link className="btn ghost sm" to={`/so-diem?lop=${r.assignment.classId}`}>Sổ điểm</Link></div>
+        <div data-testid="lh-results"><Table label="Bảng điểm" dense columns={rowCols} rows={v.rows} rowKey={(x) => x.studentId} sort={v.sort} onSort={v.setSort} page={v.pageProp} stale={q.stale} status={r.rows.length ? "ok" : "trong"} empty={{ icon: "users", title: "Lớp chưa có học sinh" }} /></div>
+      </section>
+      {open && <SubmissionView assignmentId={assignmentId} submissionId={open} onClose={() => setOpen("")} />}
     </>
   );
 }
 
-function Histogram({ counts, mean }: { counts: number[]; mean: number | null }) {
-  const W = 580, H = 250, L = 34, B = 34, T = 22, bw = 46, gap = 8.4;
-  const top = Math.max(2, ...counts);
-  const sc = (H - B - T) / top;
-  const ticks = Array.from({ length: 5 }, (_, i) => Math.round((top / 4) * i));
-  return (
-    <svg className="lh-hist" viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Biểu đồ phân bố điểm">
-      {ticks.map((g) => <g key={g}><line x1={L} x2={W - 6} y1={H - B - g * sc} y2={H - B - g * sc} stroke="#eceef4" /><text x={L - 8} y={H - B - g * sc + 4} textAnchor="end">{g}</text></g>)}
-      {counts.map((n, i) => {
-        const x = L + 8 + i * (bw + gap), h = n * sc, y = H - B - h;
-        return (
-          <g key={i}>
-            {n > 0 && <rect x={x} y={y} width={bw} height={h} rx={7} fill={i < 5 ? "#ef6a6a" : i < 7 ? "#6c83ee" : "#4f6bed"}><title>{`${i}–${i + 1} điểm: ${n} HS`}</title></rect>}
-            {n > 0 && <text className="cnt-t" x={x + bw / 2} y={y - 6} textAnchor="middle">{n}</text>}
-            <text x={x + bw / 2} y={H - 14} textAnchor="middle">{i}–{i + 1}</text>
-          </g>
-        );
-      })}
-      {mean !== null && (() => {
-        const mx = L + 8 + mean * (bw + gap) - gap / 2;
-        return <g><line x1={mx} x2={mx} y1={T - 6} y2={H - B} stroke="#1b2033" strokeDasharray="4 4" /><rect x={mx - 38} y={T - 22} width={76} height={20} rx={10} fill="#1b2033" /><text x={mx} y={T - 8} textAnchor="middle" style={{ fill: "#fff" }}>TB {vn(mean)}</text></g>;
-      })()}
-    </svg>
-  );
+function answerOf(it: SubmissionDetail["items"][number]) {
+  if (it.response === null || it.response === undefined) return <span className="muted">—</span>;
+  if (it.type === "mcq" && typeof it.response === "number") return LETTERS[it.response];
+  if (it.type === "true_false" && Array.isArray(it.response)) return it.response.map((b) => (b === null ? "_" : b ? "Đ" : "S")).join("");
+  if (it.type === "short_answer") return <MathText value={`$${String(it.response)}$`} />;
+  return String(it.response);
 }
 
-function SubmissionView({ assignmentId, submissionId, onClose }: { assignmentId: string; submissionId: string; onClose: (changed: boolean) => void }) {
-  const [d, setD] = useState<SubmissionDetail | null>(null);
+/** Hộp xem một bài làm (?bai-lam=); câu tự luận chấm điểm ngay trong hộp. */
+function SubmissionView({ assignmentId, submissionId, onClose }: { assignmentId: string; submissionId: string; onClose: () => void }) {
+  const q = useQuery(`gv/bai-lam/${submissionId}`, get<SubmissionDetail>(`/api/assignments/${assignmentId}/submissions/${submissionId}`));
+  const d = q.data;
   const [pts, setPts] = useState<Record<string, string>>({});
-  const [err, setErr] = useState<string | null>(null);
-  useEffect(() => {
-    api<SubmissionDetail>(`/api/assignments/${assignmentId}/submissions/${submissionId}`).then(setD).catch((e: unknown) => setErr(errText(e)));
-  }, [assignmentId, submissionId]);
-  const save = async () => {
-    const points = Object.fromEntries(Object.entries(pts).filter(([, v]) => v.trim() !== "").map(([k, v]) => [k, Number(v.replace(",", "."))]));
-    try {
-      await api(`/api/assignments/${assignmentId}/submissions/${submissionId}/grades`, { method: "PUT", body: { points } });
-      onClose(true);
-    } catch (e) {
-      setErr(errText(e));
-    }
-  };
+  const run = useRun();
+  const essays = d?.items.filter((x) => x.type === "essay") ?? [];
+  const save = () =>
+    run(async () => {
+      const points = Object.fromEntries(Object.entries(pts).filter(([, v]) => v.trim() !== "").map(([k, v]) => [k, Number(v.replace(",", "."))]));
+      await put(`/api/assignments/${assignmentId}/submissions/${submissionId}/grades`, { points });
+      invalidate(resKey(assignmentId));
+      invalidate(`gv/bai-lam/${submissionId}`);
+      onClose();
+    }, `Đã lưu điểm tự luận${d ? ` cho ${d.student.fullName}` : ""}`);
   return (
-    <div className="lh-modal" role="dialog">
-      <div className="lh-dlg">
-        <div className="lh-dhead"><b>{d ? `${d.student.fullName} · mã đề ${d.submission.variantCode}` : "…"}</b><button className="xbtn" onClick={() => onClose(false)} aria-label="Đóng"><Icon name="x" /></button></div>
-        {err && <div className="err">{err}</div>}
-        {d && (
+    <Dialog
+      open
+      onClose={onClose}
+      title={d ? `${d.student.fullName} · mã đề ${d.submission.variantCode}` : "Bài làm"}
+      footer={
+        <>
+          <Button onClick={onClose}>Đóng</Button>
+          {essays.length > 0 && <Button variant="primary" icon="check" onClick={save} data-testid="lh-grade-save">Lưu điểm tự luận</Button>}
+        </>
+      }
+    >
+      <div className="dialog-wide-body">
+        {!d ? (
+          q.error ? <p className="note err">Không tải được bài làm.</p> : <SkelRows rows={4} />
+        ) : (
           <>
-            <div className="hint" style={{ textAlign: "left" }}>Điểm {vn(d.submission.score)} / {vn(d.submission.maxScore)} · rời tab {d.submission.leaveCount} lần{d.events.length ? ` (${d.events.filter((e) => e.kind === "leave").map((e) => new Date(e.at).toLocaleTimeString("vi-VN")).join(", ")})` : ""}</div>
+            <p className="caption">Điểm <b className="num">{vn(d.submission.score)}</b> / {vn(d.submission.maxScore)} · rời tab {d.submission.leaveCount} lần{d.events.some((e) => e.kind === "leave") ? ` (${d.events.filter((e) => e.kind === "leave").map((e) => new Date(e.at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })).join(", ")})` : ""}</p>
             {d.items.map((it, i) => (
-              <div key={it.no} className="lh-ditem">
-                <div><b>Câu {i + 1}</b> <span className="hint">{vn(it.points)} / {vn(it.maxPoints)}</span></div>
-                <MathText value={it.stem} />
-                <div className="hint" style={{ textAlign: "left" }}>
-                  Trả lời: {it.response === null ? "—" : it.type === "mcq" && typeof it.response === "number" ? LETTERS[it.response] : it.type === "true_false" && Array.isArray(it.response) ? it.response.map((b) => (b === null ? "_" : b ? "Đ" : "S")).join("") : it.type === "short_answer" ? <MathText value={`$${String(it.response)}$`} /> : String(it.response)}
-                  {it.key && <> · Đáp án: <MathText value={it.key} /></>}
-                </div>
+              <div key={it.no} className="ditem">
+                <div className="row"><b>Câu {i + 1}</b><span className="caption">{vn(it.points) || "—"} / {vn(it.maxPoints)} điểm</span></div>
+                <div className="stem"><MathText value={it.stem} /></div>
+                <div className="caption">Trả lời: {answerOf(it)}{it.key && <> · Đáp án: <MathText value={it.key} /></>}</div>
                 {it.type === "essay" && (
-                  <div className="lh-essay">
-                    {it.rubric && <div className="warn"><MathText value={it.rubric} /></div>}
-                    <label className="lh-field">Điểm (tối đa {vn(it.maxPoints)})<input className="inp w-s" inputMode="decimal" defaultValue={it.points === null ? "" : vn(it.points)} onChange={(e) => setPts({ ...pts, [String(it.no)]: e.target.value })} data-testid={`lh-essay-${it.no}`} /></label>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    {it.rubric && <p className="note"><MathText value={it.rubric} /></p>}
+                    <label className="check-row">Điểm (tối đa {vn(it.maxPoints)})<Input style={{ width: 90 }} inputMode="decimal" defaultValue={it.points === null ? "" : vn(it.points)} onChange={(e) => setPts({ ...pts, [String(it.no)]: e.target.value })} data-testid={`lh-essay-${it.no}`} /></label>
                   </div>
                 )}
               </div>
             ))}
-            {d.items.some((x) => x.type === "essay") && <button className="btn" onClick={() => void save()} data-testid="lh-grade-save"><Icon name="check" size={18} />Lưu điểm tự luận</button>}
           </>
         )}
       </div>
-    </div>
+    </Dialog>
   );
 }

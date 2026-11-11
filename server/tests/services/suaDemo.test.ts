@@ -8,6 +8,7 @@ import { compileTimeline, oneLineExplain, plainText, quizVoiceLines, toSrt } fro
 import { framed, frameServer, settleInteractive } from "../../src/export/aiLessonVideo";
 import { interactiveDoc } from "../../src/export/interactiveHtml";
 import { hyperframesHtml } from "../../src/services/anim/hfHtml";
+import { addF, fracTex, mulF, toFrac } from "../../src/services/anim/studio";
 import { AnimSpec, fracMul } from "../../src/services/anim/spec";
 import type { StoredScene } from "../../src/services/aiLessons/types";
 
@@ -36,10 +37,14 @@ describe("số liệu nhất quán (hoạt hình)", () => {
     const b = (spec.params as { cacNhanh: { xs: number; xsNhan?: string }[] }).cacNhanh[0]!;
     expect(b).toMatchObject({ xs: 0.625, xsNhan: "5/8" });
     expect(fracMul("5/8", "4/7")).toBe("5/14");
+    // khuôn "Giấy học thuật" dựng phân số bằng KaTeX: kiểm phép nhân phân số tối giản + không còn số thập phân
+    expect(fracTex(mulF(toFrac(0.625), toFrac(4 / 7)))).toBe("\\dfrac{5}{14}");
+    expect(fracTex(addF([mulF(toFrac(0.375), toFrac(1)), mulF(toFrac(0.625), toFrac(3 / 7))]))).toBe("\\dfrac{9}{14}");
     const html = hyperframesHtml(spec as never);
-    expect(html).toContain(">5/8<");
-    expect(html).toContain("= 5/14");
+    const text = html.slice(html.indexOf("<body")).replace(/<script[\s\S]*?<\/script>/g, "").replace(/<[^>]+>/g, " ");
+    expect(text).toMatch(/Bốc bi/);
     expect(html).not.toContain("0,625");
+    expect(html).not.toContain("0,357");
     expect(AnimSpec.safeParse({ template: "cay_xac_suat", thoiLuong: 10, params: { cacNhanh: [{ ten: "A", xs: "9/8" }, { ten: "B", xs: "1/8" }] } }).success).toBe(false);
   });
   it("dữ kiện các cảnh slide trước đưa vào prompt cảnh sau", () => {

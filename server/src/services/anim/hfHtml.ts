@@ -1,6 +1,8 @@
 /** Mẫu HyperFrames CỐ ĐỊNH: spec đã kiểm → index.html (GSAP + KaTeX). Mọi chữ của AI đều được escape; không có mã nào của AI đi vào trang. */
 import katex from "katex";
 import { moreHtml } from "./hfHtmlMore";
+import { STUDIO_TEMPLATES, type StudioOpts, type StudioSpec, studioHtml } from "./hfStudio";
+import { DEFAULT_THEME, type ThemeName } from "./studio";
 import type { AnimSpec } from "./spec";
 
 export const HF_W = 1280;
@@ -67,7 +69,11 @@ tl.seek(0);
 /** Thời điểm hiện của phần tử thứ i trong n (chừa 0,4 s đầu và 0,5 s cuối). */
 export const at = (i: number, n: number, total: number) => Math.round((0.4 + (i * Math.max(total - 1.2, 0.5)) / n) * 100) / 100;
 
-export function hyperframesHtml(spec: HfSpec): string {
+/** Mẫu thế hệ studio (Đợt Thẩm mỹ) dựng ở khung 1920×1080 theo token video; các mẫu còn lại giữ khung 1280×720 cũ. */
+export const isStudio = (t: string) => (STUDIO_TEMPLATES as readonly string[]).includes(t);
+
+export function hyperframesHtml(spec: HfSpec, theme: ThemeName = DEFAULT_THEME, opts: StudioOpts = {}): string {
+  if (isStudio(spec.template)) return studioHtml(spec as StudioSpec, theme, opts);
   if (spec.template !== "dien_giai_tung_buoc" && spec.template !== "so_do_quy_trinh" && spec.template !== "so_sanh_bang") return moreHtml(spec);
   const T = spec.thoiLuong;
   const top = spec.tieuDe ? 100 : 40;
