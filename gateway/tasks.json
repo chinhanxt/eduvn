@@ -116,9 +116,8 @@
     },
     "giai_bai_tung_buoc": {
       "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
-      "json": true,
       "timeoutMs": 300000,
-      "description": "Lời giải từng bước có hình đồng bộ và phép kiểm đáp số (P13)",
+      "description": "Lời giải từng bước có hình đồng bộ và phép kiểm đáp số (P13). Không đặt json: lượt stream cần chữ hiện dần (cổng gom cả câu khi json); server tự bóc/kiểm JSON, lượt sửa gửi response_format json_object.",
       "system": "Bạn là giáo viên giỏi giải bài cho học sinh Việt Nam. Làm đúng hướng dẫn chi tiết trong tin nhắn hệ thống của người gọi; chỉ trả một đối tượng JSON, không markdown bao ngoài."
     }
   }

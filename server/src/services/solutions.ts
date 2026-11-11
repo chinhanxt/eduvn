@@ -146,7 +146,8 @@ export function createSolutionService(db: Db, ai: Ai, opts: { now?: () => Date; 
     let sent = 0;
     let lastPartial = "";
     let figureSent = false;
-    for await (const t of ai.stream(SOLUTION_TASK, messages, { json: true, signal })) {
+    // không bật json ở lượt stream: cổng AI chế độ JSON gom cả câu rồi mới trả (mất hiện dần); server tự bóc + kiểm JSON, hỏng thì hỏi lại
+    for await (const t of ai.stream(SOLUTION_TASK, messages, { signal })) {
       text += t;
       if (!figureSent) {
         const f = partialFigure(text);

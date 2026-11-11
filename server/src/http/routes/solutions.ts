@@ -28,7 +28,16 @@ async function pipeSse(req: FastifyRequest, reply: FastifyReply, start: (signal:
     if (!reply.raw.writableEnded) ac.abort();
   });
   const it = start(ac.signal);
-  const first = await it.next();
+  let first: IteratorResult<unknown, void>;
+  try {
+    first = await it.next();
+  } catch (e) {
+    // người dùng đóng trang trước sự kiện đầu: không còn ai nhận, không ghi lỗi
+    if (!ac.signal.aborted) throw e;
+    reply.hijack();
+    reply.raw.end();
+    return;
+  }
   reply.hijack();
   reply.raw.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-cache, no-transform", connection: "keep-alive", "x-accel-buffering": "no" });
   const send = (e: unknown) => reply.raw.write(`data: ${JSON.stringify(e)}\n\n`);
