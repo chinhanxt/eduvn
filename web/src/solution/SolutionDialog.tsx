@@ -120,6 +120,7 @@ export function SolutionDialog({ question, onClose, onStatus }: { question: { id
               onStop={solve.stop}
               corrected={solve.corrected}
               ask={staffHint}
+              eyebrow="Đề bài"
             />
             {solve.error && (
               <p className="sol-err">
@@ -130,7 +131,7 @@ export function SolutionDialog({ question, onClose, onStatus }: { question: { id
         ) : row === undefined ? (
           <div className="sol-empty" aria-busy="true"><span className="sol-skel-line w40" style={{ margin: "0 auto 12px" }} /><span className="sol-skel-line w80" style={{ margin: "0 auto" }} /></div>
         ) : row ? (
-          <SolutionViewer solution={row.solution} ask={staffHint} actions={actions} />
+          <SolutionViewer solution={row.solution} ask={staffHint} actions={actions} eyebrow="Đề bài" />
         ) : (
           <div className="sol-empty">
             <p>Câu này chưa có lời giải từng bước. AI sẽ chia 3–7 bước, dựng hình đồng bộ từng bước và tự đo lại đáp số.</p>
