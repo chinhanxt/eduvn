@@ -238,7 +238,7 @@ function wrap(p: Para, width: number, defSize: number, serif: boolean): Line[] {
 }
 
 export type TextBox = { x: number; y: number; w: number; h: number };
-export type TextOpts = { font: string; size: number; color: string; lineHeight?: number; vAlign?: "top" | "middle" | "bottom"; serif?: boolean; paraGap?: number; minScale?: number; id?: string };
+export type TextOpts = { font: string; size: number; color: string; lineHeight?: number; vAlign?: "top" | "middle" | "bottom"; serif?: boolean; paraGap?: number; minScale?: number; id?: string; /** Mọi đoạn trong MỘT <text> (một khung chữ — để thành placeholder của mẫu). */ single?: boolean };
 
 /** Dàn các đoạn vào khung: tự xuống dòng, tự co chữ (tối thiểu minScale) cho vừa chiều cao. Trả về chuỗi <text> và chiều cao dùng. */
 export function layoutText(paras: Para[], box: TextBox, o: TextOpts): { svg: string; height: number } {
@@ -259,6 +259,22 @@ export function layoutText(paras: Para[], box: TextBox, o: TextOpts): { svg: str
   }
   let y = box.y + (o.vAlign === "middle" ? Math.max(0, (box.h - total) / 2) : o.vAlign === "bottom" ? Math.max(0, box.h - total) : 0);
   const parts: string[] = [];
+  if (o.single && blocks.length) {
+    const first = blocks[0]!.lines[0]!;
+    const x = box.x;
+    const base = y + first.size * 0.92 + (first.hgt - first.size) * 0.6;
+    const tspans: string[] = [];
+    let prev: Line | null = null;
+    blocks.forEach((b, bi) => {
+      b.lines.forEach((l, li) => {
+        const lead = prev ? (l.size + (l.hgt - l.size) * 0.6 + (prev.hgt - prev.size) * 0.4) * lh + (li === 0 && bi > 0 ? l.size * gap : 0) : 0;
+        const brk = prev ? ` data-paragraph-soft-break="${li === 0 ? 0 : 1}"` : "";
+        tspans.push(`<tspan x="${n(x)}" dy="${n(lead)}"${brk}>${runsSvg(l.pieces, o)}</tspan>`);
+        prev = l;
+      });
+    });
+    return { svg: `<text${o.id ? ` id="${esc(o.id)}"` : ""} x="${n(x)}" y="${n(base)}" font-family="${esc(o.font)}" font-size="${n(first.size)}" fill="${esc(o.color)}">${tspans.join("")}</text>`, height: total };
+  }
   blocks.forEach((b, bi) => {
     if (bi) y += b.lines[0]!.size * gap;
     const anchor = b.p.align === "center" ? "middle" : b.p.align === "right" ? "end" : "start";
@@ -272,7 +288,7 @@ export function layoutText(paras: Para[], box: TextBox, o: TextOpts): { svg: str
     }
     b.lines.forEach((l, li) => {
       const dy = li === 0 ? 0 : (l.size + (l.hgt - l.size) * 0.6 + (b.lines[li - 1]!.hgt - b.lines[li - 1]!.size) * 0.4) * lh;
-      tspans.push(`<tspan x="${n(x)}" dy="${n(dy)}">${runsSvg(l.pieces, o)}</tspan>`);
+      tspans.push(`<tspan x="${n(x)}" dy="${n(dy)}"${li ? ' data-paragraph-soft-break="1"' : ""}>${runsSvg(l.pieces, o)}</tspan>`);
     });
     y += b.lines.reduce((a, l) => a + l.hgt * lh, 0);
     parts.push(`<text${o.id && bi === 0 ? ` id="${esc(o.id)}"` : ""} x="${n(x)}" y="${n(base)}" font-family="${esc(o.font)}" font-size="${n(first.size)}" fill="${esc(o.color)}" text-anchor="${anchor}">${tspans.join("")}</text>`);

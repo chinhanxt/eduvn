@@ -727,3 +727,4 @@ export const solutions = pgTable(
   },
   (t) => [index("solutions_org_idx").on(t.orgId), uniqueIndex("solutions_question_idx").on(t.questionId), index("solutions_public_idx").on(t.publishedAt)],
 );
+export * from "./schema/gx";

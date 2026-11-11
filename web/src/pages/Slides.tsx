@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, exportSlide, type DeckSummary, type LessonSummary } from "../api";
 import { Icon } from "../Icon";
+import { XuatBanButton } from "../xuat-ban/XuatBan";
 
 export function Slides() {
   const [rows, setRows] = useState<DeckSummary[] | null>(null);
@@ -73,6 +74,7 @@ export function Slides() {
                 {d.title}
                 <small>{d.slideCount} slide{d.subject ? ` · ${d.subject}${d.grade ? ` ${d.grade}` : ""}` : ""}{d.sourceLessonPlanId ? " · từ giáo án" : ""} · {new Date(d.updatedAt).toLocaleDateString("vi-VN")}</small>
               </div>
+              <XuatBanButton nguon={{ loai: "bo-slide", id: d.id }} nhan="PowerPoint gốc" />
               <button className="btn" onClick={() => void exportSlide(d.id)} data-testid="slide-download"><Icon name="down" size={18} />Tải .pptx</button>
               <button className="btn ghost sm" onClick={() => void remove(d.id)} aria-label="Xoá"><Icon name="trash" size={16} /></button>
             </div>

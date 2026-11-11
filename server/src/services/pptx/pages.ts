@@ -23,7 +23,16 @@ export type Page = {
   /** Tên hình chữ sẽ thành placeholder của mẫu. */
   ph?: { title?: string; subtitle?: string; body?: string };
 };
-export type BuildCtx = { canvas: Canvas; style: Style; images: Map<string, string>; qrUrl?: string; eyebrow?: string; template?: boolean };
+export type Box = { x: number; y: number; w: number; h: number };
+/** `area`: vùng tiêu đề + nội dung lấy từ layout của mẫu (px) — nội dung không đè lên logo/dải màu của master. */
+export type BuildCtx = { canvas: Canvas; style: Style; images: Map<string, string>; qrUrl?: string; eyebrow?: string; template?: boolean; area?: { title: Box; body: Box } };
+
+/** Lề trái/phải và đáy vùng nội dung. */
+function frame(c: BuildCtx): { L: number; R: number; B: number } {
+  const { W, H } = c.canvas;
+  if (c.area) return { L: c.area.body.x, R: c.area.body.x + c.area.body.w, B: c.area.body.y + c.area.body.h };
+  return { L: W * 0.0625, R: W - W * 0.0625, B: H * 0.86 };
+}
 
 const rect = (x: number, y: number, w: number, h: number, fill: string, extra = "") => `<rect x="${n(x)}" y="${n(y)}" width="${n(Math.max(w, 0.5))}" height="${n(Math.max(h, 0.5))}" fill="${esc(fill)}"${extra}/>`;
 const g = (id: string, b: [number, number, number, number], body: string) => `<g id="${esc(id)}" data-pptx-bounds="${b.map(n).join(" ")}">${body}</g>`;
@@ -64,12 +73,16 @@ function chrome(c: BuildCtx, index: number, total: number, label?: string): stri
 }
 
 /** Tiêu đề trang: chữ serif đậm, gạch nhấn ngắn màu chính. Trả về đáy tiêu đề. */
-function heading(c: BuildCtx, title: string, y: number, size: number): { svg: string; bottom: number } {
-  const { W } = c.canvas;
-  const mx = W * 0.0625;
+function heading(c: BuildCtx, title: string, y0: number, size0: number): { svg: string; bottom: number } {
   const s = c.style;
-  const plain = title.includes("$") ? title : title;
-  const t = layoutText(plainParas([plain], { size, color: s.ink, bold: true }), { x: mx, y, w: W - 2 * mx, h: size * 2.6 }, { font: s.head, size, color: s.ink, serif: true, lineHeight: 1.12, id: "tieu-de" });
+  const tb = c.area?.title;
+  const { L: mx, R } = frame(c);
+  const x = tb ? tb.x : mx;
+  const w = tb ? tb.w : R - mx;
+  const y = tb ? tb.y : y0;
+  const size = tb ? Math.min(size0, tb.h * 0.42) : size0;
+  const t = layoutText(plainParas([title], { size, color: s.ink, bold: true }), { x, y, w, h: tb ? tb.h : size * 2.6 }, { font: s.head, size, color: s.ink, serif: true, lineHeight: 1.12, id: "tieu-de" });
+  if (tb && c.area) return { svg: t.svg, bottom: c.area.body.y };
   const bottom = y + t.height;
   const rule = c.template ? "" : `<rect id="gach-tieu-de" data-pptx-role="decoration" x="${n(mx)}" y="${n(bottom + size * 0.35)}" width="${n(size * 1.6)}" height="${n(Math.max(3, size * 0.08))}" fill="${s.primary}"/>`;
   return { svg: t.svg + rule, bottom: bottom + size * 0.6 };
@@ -86,7 +99,7 @@ function bulletsGroup(c: BuildCtx, items: string[], box: [number, number, number
   const s = c.style;
   if (c.template) {
     // đổ vào mẫu: 1 khung chữ duy nhất → placeholder nội dung của mẫu (gạch đầu dòng theo mẫu)
-    const t = layoutText(plainParas(items, { size, color: color ?? s.ink }), { x: box[0], y: box[1], w: box[2], h: box[3] }, { font: s.body, size, color: color ?? s.ink, paraGap: 0.45, id: idBase });
+    const t = layoutText(plainParas(items, { size, color: color ?? s.ink }), { x: box[0], y: box[1], w: box[2], h: box[3] }, { font: s.body, size, color: color ?? s.ink, paraGap: 0.45, id: idBase, single: true });
     return t.svg;
   }
   const paras = plainParas(items, { size, color: color ?? s.ink, bullet: "•" }).map((p) => ({ ...p, runs: p.runs }));
@@ -130,19 +143,20 @@ function deckPage(deck: SlideDeck, sl: DeckSlide, i: number, total: number, c: B
     return { stem, layout: "section", ph: { title: "tieu-de", subtitle: sub ? "phu-de" : undefined }, notes, svg: page(c, `${deco}${head.svg}${sub}`) };
   }
   const h = heading(c, sl.title, H * 0.11, H * 0.058);
-  const top = h.bottom + H * 0.02;
-  const bh = H * 0.86 - top;
+  const fr = frame(c);
+  const top = h.bottom + (c.area ? 0 : H * 0.02);
+  const bh = fr.B - top;
   let body = "";
   if (sl.layout === "bullets") {
-    body = bulletsGroup(c, bullets, [mx, top, W - 2 * mx, bh], H * 0.04, "noi-dung", reveals);
+    body = bulletsGroup(c, bullets, [fr.L, top, fr.R - fr.L, bh], H * 0.04, "noi-dung", reveals);
   } else if (sl.layout === "two_column") {
     const gap = W * 0.03;
-    const cw = (W - 2 * mx - gap) / 2;
-    const cols: [string[], number, string][] = [[sl.left ?? [], mx, s.palette[0]!], [sl.right ?? [], mx + cw + gap, s.palette[1] ?? s.primary]];
+    const cw = (fr.R - fr.L - gap) / 2;
+    const cols: [string[], number, string][] = [[sl.left ?? [], fr.L, s.palette[0]!], [sl.right ?? [], fr.L + cw + gap, s.palette[1] ?? s.primary]];
     for (const [items, x, accent] of cols) {
-      const card = c.template ? "" : `${rect(x, top, cw, bh, s.surface, ' rx="10"')}${rect(x, top, 4, bh, accent)}`;
-      body += g(`cot-${x === mx ? "trai" : "phai"}`, [x, top, cw, bh], card + bulletsGroup({ ...c, template: false }, items, [x + 24, top + 22, cw - 44, bh - 44], H * 0.034, `cot-${x === mx ? "trai" : "phai"}-y`, []).replace(/<g id="[^"]+" data-pptx-bounds="[^"]+">|<\/g>/g, ""));
-      reveals.push({ group: `cot-${x === mx ? "trai" : "phai"}`, at: -1 });
+      const card = `${rect(x, top, cw, bh, s.surface, ' rx="10"')}${rect(x, top, 4, bh, accent)}`;
+      body += g(`cot-${x === fr.L ? "trai" : "phai"}`, [x, top, cw, bh], card + bulletsGroup({ ...c, template: false }, items, [x + 24, top + 22, cw - 44, bh - 44], H * 0.034, `cot-${x === fr.L ? "trai" : "phai"}-y`, []).replace(/<g id="[^"]+" data-pptx-bounds="[^"]+">|<\/g>/g, ""));
+      reveals.push({ group: `cot-${x === fr.L ? "trai" : "phai"}`, at: -1 });
     }
   } else {
     body = quizBody(c, sl.question ?? "", (sl.options ?? []).map((o) => o), ai, top, reveals, "cau-hoi");
@@ -152,9 +166,11 @@ function deckPage(deck: SlideDeck, sl: DeckSlide, i: number, total: number, c: B
 
 /** Câu hỏi + 2–6 phương án dạng thẻ, đáp án hiện sau cùng (tô xanh + nhãn). */
 function quizBody(c: BuildCtx, question: string, options: string[], answer: number | null, top: number, reveals: Reveal[], idBase: string): string {
-  const { W, H } = c.canvas;
+  const { H } = c.canvas;
   const s = c.style;
-  const mx = W * 0.0625;
+  const fr = frame(c);
+  const mx = fr.L;
+  const W = fr.R + fr.L;
   const qh = H * 0.16;
   const q = layoutText(plainParas([question], { size: H * 0.042, color: s.ink, bold: true }), { x: mx, y: top, w: W - 2 * mx, h: qh }, { font: s.body, size: H * 0.042, color: s.ink, vAlign: "middle" });
   let out = g(`${idBase}-de`, [mx, top, W - 2 * mx, qh], q.svg);
@@ -163,7 +179,7 @@ function quizBody(c: BuildCtx, question: string, options: string[], answer: numb
   const gap = H * 0.028;
   const ow = (W - 2 * mx - gap * (cols - 1)) / cols;
   const oy = top + qh + H * 0.03;
-  const oh = Math.min(H * 0.13, (H * (answer !== null ? 0.78 : 0.88) - oy - gap * (rows - 1)) / Math.max(1, rows));
+  const oh = Math.min(H * 0.13, (fr.B + H * 0.02 - (answer !== null ? H * 0.1 : 0) - oy - gap * (rows - 1)) / Math.max(1, rows));
   options.forEach((o, i) => {
     const x = mx + (i % cols) * (ow + gap);
     const y = oy + Math.floor(i / cols) * (oh + gap);
@@ -194,9 +210,10 @@ type AiCanvas = { elements: El[]; background?: { type?: string; color?: string; 
 /** Toạ độ canvas OpenMAIC (1000 × 562,5) → trang. */
 function mapper(c: BuildCtx) {
   const { W, H } = c.canvas;
-  const k = Math.min(W / 1000, H / 562.5);
-  const ox = (W - 1000 * k) / 2;
-  const oy = (H - 562.5 * k) / 2;
+  const a = c.area ? { x: Math.min(c.area.title.x, c.area.body.x), y: c.area.title.y, w: Math.max(c.area.title.x + c.area.title.w, c.area.body.x + c.area.body.w) - Math.min(c.area.title.x, c.area.body.x), h: c.area.body.y + c.area.body.h - c.area.title.y } : { x: 0, y: 0, w: W, h: H };
+  const k = Math.min(a.w / 1000, a.h / 562.5);
+  const ox = a.x + (a.w - 1000 * k) / 2;
+  const oy = a.y + (a.h - 562.5 * k) / 2;
   return { k, X: (x: number) => ox + x * k, Y: (y: number) => oy + y * k };
 }
 
@@ -303,7 +320,8 @@ export type AiLessonMeta = { title: string; subject?: string; grade?: number | n
 export function aiLessonPages(meta: AiLessonMeta, scenes: StoredScene[], c: BuildCtx): Page[] {
   const { W, H } = c.canvas;
   const s = c.style;
-  const mx = W * 0.0625;
+  const fr = frame(c);
+  const mx = fr.L;
   const pages: Page[] = [];
   const eyebrow = ["Bài giảng", meta.subject, meta.grade ? `Lớp ${meta.grade}` : ""].filter(Boolean).join(" · ");
   const ctx = { ...c, eyebrow };
@@ -355,9 +373,9 @@ export function aiLessonPages(meta: AiLessonMeta, scenes: StoredScene[], c: Buil
         let body = "";
         if (opts.length) body = quizBody(ctx, `Câu ${qi + 1}. ${q.question}`, opts, ans >= 0 && q.type !== "multiple" ? ans : null, h.bottom, reveals, `cau-${qi + 1}`);
         else {
-          const t = layoutText(plainParas([`Câu ${qi + 1}. ${q.question}`], { size: H * 0.042, color: s.ink, bold: true }), { x: mx, y: h.bottom, w: W - 2 * mx, h: H * 0.3 }, { font: s.body, size: H * 0.042, color: s.ink });
-          const a = layoutText(plainParas([`Đáp án: ${(q.answer ?? []).join(", ") || "—"}`, ...(q.analysis ? [q.analysis] : [])], { size: H * 0.034, color: s.good }), { x: mx + 20, y: h.bottom + H * 0.34, w: W - 2 * mx - 40, h: H * 0.3 }, { font: s.body, size: H * 0.034, color: s.good });
-          body = g(`cau-${qi + 1}-de`, [mx, h.bottom, W - 2 * mx, H * 0.3], t.svg) + g(`cau-${qi + 1}-dap-an`, [mx, h.bottom + H * 0.32, W - 2 * mx, H * 0.34], `${rect(mx, h.bottom + H * 0.32, W - 2 * mx, H * 0.32, "#EEF6F0", ' rx="10"')}${a.svg}`);
+          const t = layoutText(plainParas([`Câu ${qi + 1}. ${q.question}`], { size: H * 0.042, color: s.ink, bold: true }), { x: mx, y: h.bottom, w: (fr.R - fr.L), h: H * 0.3 }, { font: s.body, size: H * 0.042, color: s.ink });
+          const a = layoutText(plainParas([`Đáp án: ${(q.answer ?? []).join(", ") || "—"}`, ...(q.analysis ? [q.analysis] : [])], { size: H * 0.034, color: s.good }), { x: mx + 20, y: h.bottom + H * 0.34, w: (fr.R - fr.L) - 40, h: H * 0.3 }, { font: s.body, size: H * 0.034, color: s.good });
+          body = g(`cau-${qi + 1}-de`, [mx, h.bottom, (fr.R - fr.L), H * 0.3], t.svg) + g(`cau-${qi + 1}-dap-an`, [mx, h.bottom + H * 0.32, (fr.R - fr.L), H * 0.34], `${rect(mx, h.bottom + H * 0.32, (fr.R - fr.L), H * 0.32, "#EEF6F0", ' rx="10"')}${a.svg}`);
           reveals.push({ group: `cau-${qi + 1}-dap-an`, at: -1 });
         }
         const key = [`Câu ${qi + 1}: ${(q.answer ?? []).join(", ") || "—"}`, q.analysis ? latexToPlain(q.analysis) : ""].filter(Boolean).join(" — ");
@@ -375,10 +393,10 @@ export function aiLessonPages(meta: AiLessonMeta, scenes: StoredScene[], c: Buil
       const h = heading(ctx, sc.title, H * 0.11, H * 0.058);
       const c2 = sc.content as { widgetType?: string };
       const kind = c2.widgetType === "simulation" ? "mô phỏng" : c2.widgetType === "game" ? "trò chơi" : c2.widgetType === "diagram" ? "sơ đồ" : "hoạt động tương tác";
-      const cardW = W - 2 * mx - H * 0.36;
+      const cardW = (fr.R - fr.L) - H * 0.36;
       const msg = layoutText(plainParas([`Cảnh này là ${kind} chạy trong trình phát bài giảng EDUVN.`, "Quét mã QR (hoặc mở bài trên EDUVN) để học sinh thao tác trực tiếp; bản HTML ngoại tuyến cũng chạy được không cần mạng."], { size: H * 0.036, color: s.ink }), { x: mx + 30, y: h.bottom + 30, w: cardW - 60, h: H * 0.42 }, { font: s.body, size: H * 0.036, color: s.ink, paraGap: 0.6 });
       const card = g("tuong-tac", [mx, h.bottom, cardW, H * 0.5], `${rect(mx, h.bottom, cardW, H * 0.5, s.surface, ' rx="12"')}${rect(mx, h.bottom, 5, H * 0.5, s.palette[1] ?? s.primary)}${msg.svg}`);
-      const qr = c.qrUrl ? g("ma-qr", [W - mx - H * 0.3, h.bottom, H * 0.3, H * 0.36], `${qrPath(c.qrUrl, W - mx - H * 0.3, h.bottom, H * 0.3, s.ink)}<text x="${n(W - mx - H * 0.15)}" y="${n(h.bottom + H * 0.34)}" font-size="${n(H * 0.022)}" fill="${s.muted}" text-anchor="middle">Mở trên EDUVN</text>`) : "";
+      const qr = c.qrUrl ? g("ma-qr", [fr.R - H * 0.3, h.bottom, H * 0.3, H * 0.36], `${qrPath(c.qrUrl, fr.R - H * 0.3, h.bottom, H * 0.3, s.ink)}<text x="${n(fr.R - H * 0.15)}" y="${n(h.bottom + H * 0.34)}" font-size="${n(H * 0.022)}" fill="${s.muted}" text-anchor="middle">Mở trên EDUVN</text>`) : "";
       pages.push({ stem: `${stemBase}_tuong-tac`, svg: page(ctx, `${chrome(ctx, idx, total, eyebrow)}${h.svg}${card}${qr}`), notes, audio: speech.map((x) => ({ file: x.file, ms: x.ms })), layout: "titleOnly", ph: { title: "tieu-de" } });
     }
   });

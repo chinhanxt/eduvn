@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { aiSkill, api, errText, exportLesson, type LessonBody, type LessonDetail, type LessonSummary } from "../api";
 import { Icon } from "../Icon";
+import { XuatBanButton } from "../xuat-ban/XuatBan";
 
 const TITLES = ["Mở đầu (Xác định vấn đề/nhiệm vụ học tập)", "Hình thành kiến thức mới", "Luyện tập", "Vận dụng"];
 const STEPS = ["Chuyển giao nhiệm vụ", "Thực hiện nhiệm vụ", "Báo cáo, thảo luận", "Kết luận, nhận định"] as const;
@@ -115,6 +116,7 @@ export function LessonDetailPage() {
       <h1>{l.title} <small style={{ color: "var(--muted)", fontWeight: 400, fontSize: 14 }}>{l.subject} · {gradeLabel(l.grade)} · {l.periods} tiết</small></h1>
       <div className="bar">
         <span className="sp" />
+        <XuatBanButton nguon={{ loai: "giao-an", id: l.id }} nhan="Xuất slide" />
         <button className="btn" onClick={() => void exportLesson(l.id)} data-testid="export-lesson"><Icon name="down" size={18} />Tải Word</button>
       </div>
       <div className="card" data-testid="lesson-view">

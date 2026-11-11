@@ -321,8 +321,11 @@ def analyze(path: Path) -> dict:
             continue
         li = layout_info(z.read(part))
         for ph in li["placeholders"]:
-            if ph["box"] is None and ph["type"] in mph:
-                ph["box"] = mph[ph["type"]]
+            base = mph.get("title" if ph["type"] in ("title", "ctrTitle") else "body" if ph["type"] in ("body", "obj", "subTitle") else ph["type"])
+            if ph["box"] is None or ph["box"][2] <= 0 or ph["box"][3] <= 0:
+                # vị trí kế thừa (hoặc xfrm thiếu chiều) → lấy theo master
+                if base:
+                    ph["box"] = [ph["box"][i] if ph["box"] and ph["box"][i] > 0 and i in (0, 2) else base[i] for i in range(4)] if ph["box"] else base
         layouts.append({"part": part, **li})
     slides = sum(1 for r in prel if r["Type"] == T_SLIDE)
     bg = bg_color(mdata, th["colors"])
@@ -363,7 +366,7 @@ def to_placeholder(xml: str, shape_name: str, ph: dict | None) -> str:
     """Biến hình chữ tên `shape_name` thành placeholder của layout (kế thừa vị trí, phông, màu của mẫu)."""
     if ph is None:
         return xml
-    for m in _SP_RE.finditer(xml):
+    for m in list(_SP_RE.finditer(xml)):
         sp = m.group(0)
         if f'name="{shape_name}"' not in sp:
             continue
@@ -380,7 +383,7 @@ def to_placeholder(xml: str, shape_name: str, ph: dict | None) -> str:
         new = re.sub(r"<a:(latin|ea|cs) typeface=\"[^\"]*\"\s*/>", "", new)
         new = re.sub(r"<a:pPr[^>]*?(/?)>", lambda mm: "<a:pPr" + mm.group(1) + ">", new)
         new = re.sub(r"<a:buNone\s*/>", "", new)
-        return xml.replace(sp, new, 1)
+        xml = xml.replace(sp, new, 1)  # cả bản mc:Choice lẫn mc:Fallback
     return xml
 
 

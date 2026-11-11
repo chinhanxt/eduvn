@@ -5,6 +5,7 @@ import { Icon } from "../Icon";
 import { Editor } from "../ailesson/Editor";
 import { Player } from "../ailesson/Player";
 import { BASE, type LessonDetail, type Scene, type Status, type VideoStatus, downloadBlob } from "../ailesson/lib";
+import { XuatBanButton } from "../xuat-ban/XuatBan";
 
 type Tab = "play" | "edit";
 
@@ -193,6 +194,7 @@ export function AiLessonPage() {
         <div className="card" style={{ marginTop: 16 }} data-testid="ail-export">
           <b>Xuất bài giảng</b>
           <div className="bar" style={{ marginTop: 10, marginBottom: 0 }}>
+            <XuatBanButton nguon={{ loai: "bai-giang-ai", id }} khoa={scenes.some((s) => s.animation?.status === "dang_dung") ? "Đang dựng hoạt hình — đợi xong rồi xuất" : undefined} />
             <button className="btn" onClick={() => void downloadBlob(`${BASE}/${id}/pptx`, file("pptx")).catch((e: unknown) => setError(errText(e)))} data-testid="ail-pptx"><Icon name="down" size={18} />Tải .pptx</button>
             {video?.status === "done" ? (
               <>

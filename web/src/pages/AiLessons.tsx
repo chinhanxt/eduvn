@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { api, errText, type LessonSummary as PlanSummary } from "../api";
 import { Icon } from "../Icon";
 import { BASE, type LessonSummary } from "../ailesson/lib";
+import { NhapButton } from "../xuat-ban/Nhap";
 
 const statusText = (s: LessonSummary): string => (s.status === "done" ? `${s.sceneCount} cảnh` : s.status === "error" ? "Lỗi — mở để sinh tiếp" : `${s.progress.stage} (${s.progress.done}/${s.progress.total || "…"})`);
 
@@ -75,6 +76,7 @@ export function AiLessons() {
       <h1>Bài giảng AI</h1>
       <div className="bar">
         <span className="sp" />
+        <NhapButton onDone={(r) => nav(`/bai-giang-ai/${r.id}`)} />
         <button className="btn" onClick={() => setOpen((o) => !o)} data-testid="ail-new"><Icon name="spark" size={18} />Soạn bài bằng AI</button>
       </div>
       {error && <div className="err">{error}</div>}
