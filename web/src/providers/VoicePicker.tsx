@@ -6,6 +6,7 @@ import { useQuery } from "../ui/data/query";
 import { CAPS_KEY, VOICES_KEY, fetchCaps, fetchVoices } from "./api";
 import { genderVi, groupVoices, speedVi } from "./logic";
 import { useTts } from "./useTts";
+import "./providers.css";
 
 export const SAMPLE_LINE = "Xin chào các em. Hôm nay chúng ta cùng tìm hiểu định luật Ôm: cường độ dòng điện bằng hiệu điện thế chia cho điện trở.";
 
@@ -46,7 +47,7 @@ export function VoicePicker({ value, onChange, speed, onSpeed, label = "Giọng 
       </Field>
       <div className="vp-row">
         <label className="vp-speed" htmlFor={speedId}>
-          <span className="lbl-sm">Tốc độ <b className="num">{speedVi(speed)}</b></span>
+          <span className="vp-lbl">Tốc độ <b className="num">{speedVi(speed)}</b></span>
           <input id={speedId} type="range" min={0.5} max={2} step={0.05} value={speed} disabled={disabled} onChange={(e) => onSpeed(Number(e.target.value))} aria-valuetext={speedVi(speed)} data-testid="voice-speed" />
         </label>
         <Button size="sm" icon={tts.state === "loading" ? "loader" : playing ? "stop" : "play"} aria-busy={tts.state === "loading" || undefined} title={playing ? "Bấm để dừng" : undefined} onClick={() => void (playing ? tts.stop() : tts.speak(sample, { voiceId: value || undefined, speed }))} data-testid="voice-try">

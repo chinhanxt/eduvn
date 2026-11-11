@@ -15,7 +15,7 @@
 .pv-rows .g small { white-space: normal !important; }
 .pv-rows .lead { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--r-sm); background: var(--bg-sunken); color: var(--ink-2); flex: none; }
 .pv-av { border-radius: 50% !important; background: var(--accent-bg, var(--bg-sunken)) !important; color: var(--accent) !important; font-weight: 600; font-size: 13px; }
-.pv-tags { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 4px; font-size: 11px; color: var(--ink-3); }
+.pv-tags { display: flex; flex-wrap: wrap; gap: 2px 6px; margin-top: 4px; font-size: 11px; color: var(--ink-3); }
 .pv-tags span::before { content: "·"; margin-right: 6px; color: var(--line-input); }
 .pv-tags span:first-child::before { content: none; }
 .pv-health { display: grid; justify-items: end; gap: 2px; width: 200px; flex: none; text-align: right; }
@@ -65,3 +65,4 @@
   .pv-tab, .pv-add, .pv-res { animation: none; }
   .pv-dot { animation: none; }
 }
+.vp-lbl { font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--ink-2); }

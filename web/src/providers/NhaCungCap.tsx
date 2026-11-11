@@ -21,6 +21,7 @@ import { type Caps, type Health, KIND_ORDER, type ProviderInfo, type ProviderKin
 import { useAsr } from "./useAsr";
 import { useTts } from "./useTts";
 import { SAMPLE_LINE, VoicePicker } from "./VoicePicker";
+import "../portal/gv/gv.css";
 import "./providers.css";
 
 type Tab = "giong" | "nhan-dang" | "tai-lieu" | "khac";
@@ -58,7 +59,7 @@ function useRun() {
 }
 
 export function NhaCungCap() {
-  usePageMeta("Nhà cung cấp AI", [{ label: "Cài đặt" }, { label: "Nhà cung cấp AI" }]);
+  usePageMeta("Nhà cung cấp AI");
   const [tab, setTab] = useUrlState<string>("tab", "giong");
   const caps = useQuery(CAPS_KEY, fetchCaps);
   const config = useQuery(CONFIG_KEY, fetchConfig);
@@ -83,6 +84,14 @@ export function NhaCungCap() {
 }
 
 // ── Danh sách nhà cung cấp của một loại ─────────────────────────────────────
+
+const EMPTY_HINT: Partial<Record<ProviderKind, string>> = {
+  ocr: "Cần bật cổng AI của trường (GATEWAY_URL + GATEWAY_TOKEN) để AI đọc chữ và công thức trong ảnh.",
+  image: "Sắp có: vẽ ảnh qua cổng AI, kho ảnh mở Openverse/Wikimedia (ghi nguồn CC), ComfyUI tự chạy.",
+  search: "Sắp có: SearXNG tự chạy và DuckDuckGo, kèm lọc nguồn cho học sinh.",
+  fetch: "Sắp có: bộ đọc trang web tích hợp, chặn địa chỉ nội bộ.",
+  video: "Sắp có: video minh hoạ từ mẫu hoạt hình Manim/HyperFrames.",
+};
 
 function ProviderList({ kind, caps, canManage, title }: { kind: ProviderKind; caps: Caps | undefined; canManage: boolean; title?: string }) {
   const cap = caps?.kinds[kind];
@@ -109,7 +118,7 @@ function ProviderList({ kind, caps, canManage, title }: { kind: ProviderKind; ca
           <Skeleton w="50%" h={14} />
         </div>
       ) : ids.length === 0 ? (
-        <EmptyState icon="plug" title="Máy chủ chưa có nhà cung cấp loại này" text="Đợt sau sẽ thêm phương án tự chạy miễn phí." />
+        <EmptyState icon="plug" title="Máy chủ chưa có nhà cung cấp loại này" text={EMPTY_HINT[kind] ?? "Phương án tự chạy miễn phí sẽ được thêm ở đợt sau."} />
       ) : (
         <ul className="rows pv-rows">
           {ids.map((id) => {
@@ -145,7 +154,7 @@ function ProviderList({ kind, caps, canManage, title }: { kind: ProviderKind; ca
                 </span>
                 {canManage && (
                   <span className="t-acts">
-                    {!p?.clientOnly && !isDef && !off && (
+                    {!p?.clientOnly && !isDef && !off && kind !== "parse" && kind !== "preview" && (
                       <Button size="sm" variant="ghost" onClick={() => run(async () => apply(await saveConfig({ kind, providerId: id, isDefault: true })), `Đã đặt ${p?.label ?? id} làm mặc định`)} data-testid={`pv-default-${id}`}>
                         Đặt mặc định
                       </Button>
