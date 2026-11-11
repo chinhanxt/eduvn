@@ -14,6 +14,8 @@ const Env = z.object({
   AGY_SWITCH_BIN: z.string().min(1).default("agy-switch"),
   AGY_PROXY_PORT: z.coerce.number().int().min(1).max(65535).default(8900),
   AGY_MANAGE_PROXY: bool,
+  /** Chu kỳ kiểm proxy agy còn sống (ms); proxy do cổng quản mà tắt thì bật lại. */
+  PROXY_WATCH_MS: z.coerce.number().int().min(100).default(30000),
   AGY_PROCESSES: z.coerce.number().int().min(1).max(8).default(2),
   MAX_CONCURRENCY: z.coerce.number().int().min(1).max(32).default(6),
   SESSION_IDLE_MS: z.coerce.number().int().min(10000).default(900000),
