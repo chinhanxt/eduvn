@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { type ClassSummary, api } from "../api";
-import { Icon } from "../Icon";
+import { Icon } from "../ui/Icon";
 import { MathText } from "../math/MathText";
 import { fileToJpeg } from "./image";
 import { SavedList, useSaved } from "./Saved";
@@ -131,7 +131,7 @@ export function EssayTab({ examId }: { examId: string }) {
                   <figure key={i}>
                     <img src={s} alt={`Trang ${i + 1}`} />
                     <figcaption>Trang {i + 1}</figcaption>
-                    <Btn kind="icon sm" className="del" aria-label={`Bỏ trang ${i + 1}`} onClick={() => setImages((l) => l.filter((_, j) => j !== i))}><Icon name="x" size={14} /></Btn>
+                    <Btn kind="icon sm" className="del" aria-label={`Bỏ trang ${i + 1}`} onClick={() => setImages((l) => l.filter((_, j) => j !== i))}><Icon name="x" size="sm" /></Btn>
                   </figure>
                 ))}
                 {compressing && <div className="pg-sk" style={{ width: 68, height: 96 }} />}
