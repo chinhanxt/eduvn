@@ -356,11 +356,22 @@ table.data.dense td { height: var(--row-h-dense); padding-top: var(--s-1); paddi
 .avatar.sm { width: 24px; height: 24px; font-size: 10px; }
 
 /* ======================= Chuyển trang (View Transitions) ======================= */
+/* Đổi cổng / tải trang mới (MPA): trình duyệt tự mờ chéo. Trong app: React <ViewTransition default="vt-page"> bọc <main>,
+   nên chỉ vùng nội dung mờ-trượt; thanh bên + tab dưới có tên riêng nên đứng yên; thanh trên nằm trong root (chỉ mờ chéo).
+   Thời lượng 120–220 ms (trong khoảng 150–250 ms cảm nhận), giảm chuyển động → 1 ms (tokens.css). */
 @view-transition { navigation: auto; }
-::view-transition-old(root) { animation: vt-out var(--dur-2) var(--ease-in) both; }
-::view-transition-new(root) { animation: vt-in var(--dur-4) var(--ease-out) both; }
+::view-transition-group(root) { animation-duration: var(--dur-2); }
+::view-transition-old(root) { animation: vt-fade-out var(--dur-2) var(--ease-in) both; }
+::view-transition-new(root) { animation: vt-fade-in var(--dur-2) var(--ease-out) both; }
+::view-transition-group(.vt-page) { animation-duration: var(--dur-page); animation-timing-function: var(--ease-out); }
+::view-transition-old(.vt-page) { animation: vt-fade-out var(--dur-page-out) var(--ease-in) both; }
+::view-transition-new(.vt-page) { animation: vt-in var(--dur-page) var(--ease-out) both; }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-fade-in { from { opacity: 0; } }
 @keyframes vt-out { to { opacity: 0; } }
-@keyframes vt-in { from { opacity: 0; transform: translateY(4px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
+:root { --dur-page: 220ms; --dur-page-out: 120ms; }
+@media (prefers-reduced-motion: reduce) { :root { --dur-page: 1ms; --dur-page-out: 1ms; } }
 .side { view-transition-name: side; } .tabbar { view-transition-name: tabbar; }
 /* hiện danh sách lần đầu: hàng lần lượt hiện (tối đa 8 hàng có trễ) */
 .enter > * { animation: rise var(--dur-3) var(--ease-out) both; }
@@ -445,3 +456,37 @@ table.data.dense td { height: var(--row-h-dense); padding-top: var(--s-1); paddi
 /* StreamingText: nút Dừng + trạng thái đã dừng */
 .stream-wrap { display: flex; flex-direction: column; gap: var(--s-2); }
 .stream-wrap .stream-acts { display: flex; align-items: center; gap: var(--s-2); font-size: var(--fs-sm); color: var(--ink-3); }
+
+/* ======================= Khung code thật: menu bật, skeleton trang, chế độ tập trung ======================= */
+.pop-wrap { position: relative; display: inline-flex; }
+.avatar-btn { border: 0; padding: 0; cursor: pointer; }
+.avatar-btn:hover { box-shadow: 0 0 0 2px var(--accent-line); }
+.dot-badge { position: absolute; top: 6px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 2px var(--bg); }
+.menu-pop { position: absolute; right: 0; top: calc(100% + 6px); z-index: var(--z-popover); min-width: 220px; max-width: calc(100vw - 24px); padding: var(--s-1); background: var(--bg-raised); border: var(--bw) solid var(--line); border-radius: var(--r-md); box-shadow: var(--shadow-2); animation: pop var(--dur-2) var(--ease-out); transform-origin: top right; }
+.menu-pop.wide { width: 320px; }
+.menu-pop .hd { padding: var(--s-2) var(--s-3); font-size: var(--fs-xs); font-weight: var(--fw-semibold); color: var(--ink-3); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
+.menu-pop .none { padding: var(--s-3); color: var(--ink-3); font-size: var(--fs-sm); }
+.menu-pop .who { padding: var(--s-2) var(--s-3) var(--s-3); border-bottom: var(--bw) solid var(--line); margin-bottom: var(--s-1); }
+.menu-pop .who b { display: block; font-weight: var(--fw-semibold); }
+.menu-pop .who small { display: block; color: var(--ink-3); font-size: var(--fs-sm); }
+.menu-pop a, .menu-pop button { display: flex; align-items: center; gap: var(--s-2); width: 100%; min-height: 34px; padding: 0 var(--s-3); border: 0; background: none; border-radius: var(--r-sm); color: var(--ink-2); text-align: left; font-size: var(--fs-md); }
+.menu-pop a:hover, .menu-pop button:hover, .menu-pop a:focus-visible, .menu-pop button:focus-visible { background: var(--bg-hover); color: var(--ink); }
+.menu-pop .danger { color: var(--danger); }
+.menu-pop .sep { height: 1px; background: var(--line); margin: var(--s-1) 0; }
+.menu-pop .notice { align-items: flex-start; padding: var(--s-2) var(--s-3); }
+.menu-pop .notice b { display: block; font-weight: var(--fw-medium); color: var(--ink); }
+.menu-pop .notice small { display: block; font-size: var(--fs-sm); color: var(--ink-3); }
+.menu-pop .nd { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); flex: none; margin-top: 6px; }
+.menu-pop .nd.hot { background: var(--warn); }
+a.brand { color: inherit; }
+.page:focus { outline: none; }
+.page-skel .ph { display: flex; align-items: center; gap: var(--s-4); margin-bottom: var(--s-4); }
+.page-skel .blk { border: var(--bw) solid var(--line-2); border-radius: var(--r-md); background: var(--bg-raised); }
+.page-skel .row { display: flex; align-items: center; gap: var(--s-3); height: 44px; padding: 0 var(--s-4); border-bottom: var(--bw) solid var(--line); }
+.page-skel .row:last-child { border-bottom: 0; }
+.page-skel.full { position: fixed; inset: 0; padding: var(--s-6); background: var(--bg); }
+main.bare { min-height: 100dvh; }
+/* StreamingText có định dạng: con trỏ nháy sau khối chữ cuối */
+.caret-end > :last-child::after, .caret-end > :last-child > :last-child::after { content: ""; display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: var(--accent); animation: blink 1s steps(2) infinite; }
+.caret-end > :last-child:has(> :last-child)::after { content: none; }
+@media (prefers-reduced-motion: reduce) { .caret-end > :last-child::after, .caret-end > :last-child > :last-child::after { animation: none; } }
