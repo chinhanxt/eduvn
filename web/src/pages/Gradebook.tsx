@@ -1,16 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { LEVELS, aiSkill, vn, type AttStatus, type ClassSummary, type Gradebook as Gb } from "../api";
-import { CLASSES_KEY, bandsOf, errorOf, get, gradebookKey, msgOf, openLink, put, statusOf, useRun, vnNum } from "../portal/gv/kit";
+import { Region, CLASSES_KEY, bandsOf, errorOf, get, gradebookKey, msgOf, openLink, put, statusOf, useRun, vnNum } from "../portal/gv/kit";
 import { GradeBar } from "../ui/charts/GradeBar";
 import { Button } from "../ui/components/Button";
 import { Badge, Segmented } from "../ui/components/Chip";
 import { Input, Select } from "../ui/components/Field";
 import { Skeleton } from "../ui/components/Skeleton";
-import { Region } from "../ui/components/States";
 import { Tabs } from "../ui/components/Tabs";
 import { useToast } from "../ui/components/Toast";
-import { invalidate, setQueryData, useQuery } from "../ui/data/query";
+import { invalidate, useQuery } from "../ui/data/query";
 import { useUrlState } from "../ui/data/urlState";
 import { usePageMeta } from "../ui/shell/AppShell";
 
@@ -170,7 +169,7 @@ function Attendance({ gb }: { gb: Gb }) {
     run(async () => {
       const records = Object.fromEntries(gb.students.map((s) => [s.id, rec[s.id] ?? "present"]));
       await put(`/api/classes/${gb.class.id}/attendance`, { date, records });
-      setQueryData(`gv/diem-danh/${gb.class.id}/${date}`, records);
+      invalidate(`gv/diem-danh/${gb.class.id}/${date}`);
       invalidate(`gv/so-diem/${gb.class.id}`);
     }, { title: `Đã lưu điểm danh ${date.split("-").reverse().join("/")}`, msg: `${counts.present} có mặt · ${counts.excused} P · ${counts.unexcused} K` });
   return (

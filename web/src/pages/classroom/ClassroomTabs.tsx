@@ -1,8 +1,7 @@
 import { lazy, Suspense } from "react";
-import { errorOf, statusOf, whenVi } from "../../portal/gv/kit";
+import { Region, errorOf, statusOf, whenVi } from "../../portal/gv/kit";
 import { Button } from "../../ui/components/Button";
 import { Select } from "../../ui/components/Field";
-import { Region } from "../../ui/components/States";
 import { useQuery } from "../../ui/data/query";
 import { useUrlState } from "../../ui/data/urlState";
 import { asgKey, fetchAsg, useGoTab } from "./AssignTab";

@@ -1,14 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { aiSkill, type LessonBody, type LessonDetail, type LessonSummary } from "../api";
-import { LESSONS_KEY, fetchLessons, dateVi, del, errorOf, FilterBar, FormPane, get, gradeVi, openLink, post, SearchBox, statusOf, useKeyN, useListView, useOpenParam, useRun } from "../portal/gv/kit";
+import { Region, LESSONS_KEY, fetchLessons, dateVi, del, errorOf, FilterBar, FormPane, get, gradeVi, openLink, post, SearchBox, statusOf, useKeyN, useListView, useOpenParam, useRun } from "../portal/gv/kit";
 import { Icon } from "../ui/Icon";
 import { Button } from "../ui/components/Button";
 import { Chip } from "../ui/components/Chip";
 import { ConfirmDialog } from "../ui/components/Dialog";
 import { Field, Input, Select } from "../ui/components/Field";
 import { Skeleton } from "../ui/components/Skeleton";
-import { Region } from "../ui/components/States";
 import { type Column, Table } from "../ui/components/Table";
 import { invalidate, useQuery } from "../ui/data/query";
 import { useUrlState } from "../ui/data/urlState";

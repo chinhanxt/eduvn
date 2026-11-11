@@ -2,15 +2,13 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { vn } from "../../api";
 import { MathText } from "../../math/MathText";
-import { errorOf, get, initialsOf, put, useListView, useRun, vnNum } from "../../portal/gv/kit";
+import { Region, SkelRows, errorOf, get, initialsOf, put, useListView, useRun, vnNum } from "../../portal/gv/kit";
 import { binsOf, Histogram } from "../../ui/charts/Histogram";
 import { Difficulty } from "../../ui/charts/Difficulty";
 import { Button } from "../../ui/components/Button";
 import { Badge } from "../../ui/components/Chip";
 import { Dialog } from "../../ui/components/Dialog";
 import { Input } from "../../ui/components/Field";
-import { SkeletonRows } from "../../ui/components/Skeleton";
-import { Region } from "../../ui/components/States";
 import { type Column, Table } from "../../ui/components/Table";
 import { invalidate, useQuery } from "../../ui/data/query";
 import { useUrlState } from "../../ui/data/urlState";
@@ -152,7 +150,7 @@ function SubmissionView({ assignmentId, submissionId, onClose }: { assignmentId:
     >
       <div className="dialog-wide-body">
         {!d ? (
-          q.error ? <p className="note err">Không tải được bài làm.</p> : <SkeletonRows rows={4} />
+          q.error ? <p className="note err">Không tải được bài làm.</p> : <SkelRows rows={4} />
         ) : (
           <>
             <p className="caption">Điểm <b className="num">{vn(d.submission.score)}</b> / {vn(d.submission.maxScore)} · rời tab {d.submission.leaveCount} lần{d.events.some((e) => e.kind === "leave") ? ` (${d.events.filter((e) => e.kind === "leave").map((e) => new Date(e.at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })).join(", ")})` : ""}</p>

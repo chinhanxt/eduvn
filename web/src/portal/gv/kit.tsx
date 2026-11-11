@@ -6,9 +6,10 @@ import { ApiError } from "../../apiCore";
 import { Icon } from "../../ui/Icon";
 import { IconButton } from "../../ui/components/Button";
 import { fold } from "../../ui/components/focus";
-import type { RegionStatus } from "../../ui/components/States";
+import { EmptyState, ErrorState, type RegionStatus } from "../../ui/components/States";
+import { Skeleton } from "../../ui/components/Skeleton";
 import { type ToastInput, useToast } from "../../ui/components/Toast";
-import { isNetworkError, request } from "../../ui/data/http";
+import { request } from "../../ui/data/http";
 import { newIdempotencyKey } from "../../ui/data/action";
 import type { Fetcher, QueryState } from "../../ui/data/query";
 import { useUrlState, writeParam } from "../../ui/data/urlState";
@@ -34,7 +35,7 @@ export const del = <T,>(path: string) => request<T>(path, { method: "DELETE" });
 
 /** Câu lỗi cho toast/hộp lỗi: danh sách lỗi nhập liệu → nhiều dòng; mất mạng → nói rõ. */
 export function msgOf(e: unknown): string {
-  if (isNetworkError(e)) return "Mất kết nối — kiểm tra mạng rồi thử lại.";
+  if (e instanceof TypeError) return "Mất kết nối — kiểm tra mạng rồi thử lại.";
   if (e instanceof ApiError) {
     const issues = (e.body as { issues?: unknown[] } | null)?.issues;
     if (issues?.length && typeof issues[0] === "string") return issues.join("\n");
@@ -254,3 +255,36 @@ export function bandsOf(xs: readonly (number | null)[]): [number, number, number
   return b;
 }
 
+
+/**
+ * Vùng dữ liệu theo hợp đồng Region của hệ thiết kế (ok | dang-tai | trong | loi; stale → mờ 55%).
+ * Bản của cổng GV nằm trong chunk các màn để không kéo thêm mã vào JS lần đầu (Region gốc ở ui/components/States).
+ */
+export function Region({ status, stale, skeletonRows = 4, empty, error, onRetry, label, className, children }: { status: RegionStatus; stale?: boolean; skeletonRows?: number; empty?: { icon?: string; title: ReactNode; text?: ReactNode; action?: ReactNode }; error?: { status?: number; text?: ReactNode }; onRetry?: () => unknown; label: string; className?: string; children?: ReactNode }) {
+  const body = status === "dang-tai" ? <SkelRows rows={skeletonRows} /> : status === "trong" ? <EmptyState {...(empty ?? { title: "Chưa có dữ liệu" })} /> : status === "loi" ? <ErrorState status={error?.status} text={error?.text} onRetry={onRetry} /> : children;
+  return (
+    <section className={[className, stale && status === "ok" && "is-stale"].filter(Boolean).join(" ") || undefined} aria-label={label} aria-busy={status === "dang-tai" || stale || undefined} data-region={status}>
+      {body}
+    </section>
+  );
+}
+
+const W1 = [72, 54, 64, 46];
+const W2 = [38, 30, 44, 26];
+/** Hàng giữ chỗ (chấm + 2 dòng + giá trị) — cùng hình SkeletonRows của ui/, đặt ở chunk màn GV. */
+export function SkelRows({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="skel-list" aria-busy="true" aria-label="Đang tải" role="status">
+      {Array.from({ length: rows }, (_, i) => (
+        <div className="skel-row" key={i}>
+          <Skeleton circle w={28} h={28} />
+          <div style={{ flex: 1 }}>
+            <Skeleton className="line" w={`${W1[i % 4]}%`} />
+            <Skeleton className="line" w={`${W2[i % 4]}%`} h={8} />
+          </div>
+          <Skeleton className="line" w={56} />
+        </div>
+      ))}
+    </div>
+  );
+}

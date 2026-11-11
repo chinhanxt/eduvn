@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
-import { CodePill, errorOf, get, post, put, useListView, useRun, FilterBar, SearchBox } from "../../portal/gv/kit";
+import { Region, CodePill, errorOf, get, post, put, useListView, useRun, FilterBar, SearchBox } from "../../portal/gv/kit";
 import { Button } from "../../ui/components/Button";
 import { Badge } from "../../ui/components/Chip";
 import { ConfirmDialog } from "../../ui/components/Dialog";
-import { Region } from "../../ui/components/States";
 import { type Column, Table } from "../../ui/components/Table";
 import { invalidate, useQuery } from "../../ui/data/query";
 import { printBadges, seatLabel } from "./badgeSheet";

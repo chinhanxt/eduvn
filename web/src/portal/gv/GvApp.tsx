@@ -40,8 +40,7 @@ const P = {
   connect: pick(() => import("../../pages/Connect"), (m) => m.Connect),
   // trang P6 dùng hoc.css (trước đây nạp qua HocLayout)
   kho: pick(() => Promise.all([import("../../hoc/KhoTriThuc"), import("../../hoc/hoc.css")]), ([m]) => m.KhoTriThuc),
-  video: pick(() => import("./CongCu"), (m) => () => <m.SapCo name="Video bài giảng" icon="video" text="Dựng video bài giảng từ giáo án và bảng giảng. Trong lúc chờ, dùng Bài giảng AI để có bài giảng có lời thoại." />),
-  toChuc: pick(() => import("./CongCu"), (m) => () => <m.SapCo name="Tổ chức" icon="org" text="Quản lý trường, tổ chuyên môn và phân quyền giáo viên. Hiện tổ chức được tạo khi đăng nhập lần đầu." />),
+  sapCo: pick(() => import("./CongCu"), (m) => m.SapCo),
   books: pick(() => Promise.all([import("../../hoc/Books"), import("../../hoc/hoc.css")]), ([m]) => m.Books),
 };
 
@@ -49,8 +48,8 @@ const P = {
 /** legacy: trang chưa chuyển sang v2 (bọc .legacy giữ kiểu cũ). */
 const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/cong-cu", page: P.congCu },
-  { path: "/video", page: P.video },
-  { path: "/to-chuc", page: P.toChuc },
+  { path: "/video", page: P.sapCo },
+  { path: "/to-chuc", page: P.sapCo },
   { path: "/ngan-hang", page: P.bank },
   { path: "/de-thi", page: P.exams },
   { path: "/cham-bai", page: P.grade },

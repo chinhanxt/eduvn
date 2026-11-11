@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Icon } from "../../ui/Icon";
 import { EmptyState } from "../../ui/components/States";
 import { isItem } from "../../ui/shell/nav";
@@ -59,8 +59,14 @@ export function CongCu() {
   );
 }
 
+const SAP_CO: Record<string, { name: string; icon: string; text: string }> = {
+  "/video": { name: "Video bài giảng", icon: "video", text: "Dựng video bài giảng từ giáo án và bảng giảng. Trong lúc chờ, dùng Bài giảng AI để có bài giảng có lời thoại." },
+  "/to-chuc": { name: "Tổ chức", icon: "org", text: "Quản lý trường, tổ chuyên môn và phân quyền giáo viên. Hiện tổ chức được tạo khi đăng nhập lần đầu." },
+};
 /** Công cụ đang làm (/video, /to-chuc): một câu nói rõ + đường về. */
-export function SapCo({ name, icon, text }: { name: string; icon: string; text: string }) {
+export function SapCo() {
+  const { pathname } = useLocation();
+  const { name, icon, text } = SAP_CO[pathname] ?? SAP_CO["/video"]!;
   usePageMeta(name);
   return (
     <>

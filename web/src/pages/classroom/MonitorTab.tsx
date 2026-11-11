@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { vn } from "../../api";
-import { FilterBar, SearchBox, errorOf, get, initialsOf, useListView } from "../../portal/gv/kit";
+import { Region, FilterBar, SearchBox, errorOf, get, initialsOf, useListView } from "../../portal/gv/kit";
 import { Icon } from "../../ui/Icon";
 import { Badge } from "../../ui/components/Chip";
-import { Region } from "../../ui/components/States";
 import { type Column, Table } from "../../ui/components/Table";
 import { useQuery } from "../../ui/data/query";
 import { useUrlState } from "../../ui/data/urlState";
