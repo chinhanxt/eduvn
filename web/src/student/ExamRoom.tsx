@@ -1,26 +1,64 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { Icon } from "../Icon";
+import { Link, useNavigate, useParams } from "react-router";
+import { Button } from "../ui/components/Button";
+import { Dialog } from "../ui/components/Dialog";
+import { Skeleton } from "../ui/components/Skeleton";
+import { ErrorState } from "../ui/components/States";
+import { useToast } from "../ui/components/Toast";
+import { Icon } from "../ui/Icon";
+import { invalidate } from "../ui/data/query";
+import { useUrlState } from "../ui/data/urlState";
+import { usePageMeta } from "../ui/shell/AppShell";
 import { isAnswered, isPartial, unanswered } from "./answers";
 import { ServerClock, formatClock, timerTone } from "./clock";
+import { ASG_KEY, sectionLabels } from "./data";
 import { pickStore } from "./draftStore";
 import { EventOutbox, LeaveTracker, watchLeave } from "./leave";
+import { HOC_PATH } from "./paths";
 import { QuestionCard } from "./QuestionCard";
 import { StudentApiError, errMsg, hsFetch, hsJson, retryAfterMs } from "./studentApi";
 import { AnswerSync, type Sender, type SyncStatus } from "./syncQueue";
 import type { AnswerValue, Answers, RoomPayload, SaveResult, StudentResult } from "./types";
+import "./hs.css";
 
 const SAVE_TEXT: Record<SyncStatus, [string, string]> = {
   saved: ["checkc", "Đã lưu"],
   saving: ["loader", "Đang lưu…"],
-  offline: ["wifioff", "Mất mạng – vẫn lưu trên máy"],
+  offline: ["wifioff", "Lưu trên máy"],
   closed: ["checkc", "Đã nộp"],
 };
+const hhmm = (d = new Date()) => d.toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", hour12: false });
+const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || !!t.closest("math-field"));
 
-/** Phòng làm bài: lưu máy (Dexie) mỗi thay đổi + gửi máy chủ mỗi 3 giây; đồng hồ theo giờ máy chủ; bắt rời tab. */
+function RoomSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Đang mở bài">
+      <header className="exam-top">
+        <Skeleton w={36} h={36} style={{ borderRadius: 10 }} />
+        <div className="ttl"><Skeleton w="40%" h={16} /><Skeleton w="24%" h={12} style={{ marginTop: 6 }} /></div>
+        <Skeleton w={96} h={40} style={{ borderRadius: 999 }} />
+      </header>
+      <main className="room">
+        <nav className="card navq">
+          <Skeleton w={120} h={12} />
+          <div className="grid10">{Array.from({ length: 10 }, (_, i) => <Skeleton key={i} h={42} style={{ borderRadius: 12 }} />)}</div>
+        </nav>
+        <article className="card qc">
+          <Skeleton w={160} h={12} />
+          <Skeleton w="92%" h={22} style={{ marginTop: 16 }} />
+          <Skeleton w="70%" h={22} style={{ marginTop: 10 }} />
+          {[0, 1, 2, 3].map((i) => <Skeleton key={i} h={56} style={{ marginTop: 12, borderRadius: 14 }} />)}
+        </article>
+      </main>
+    </div>
+  );
+}
+
+/** Phòng làm bài (chế độ tập trung): lưu máy (Dexie) mỗi thay đổi + gửi máy chủ mỗi 3 giây; đồng hồ theo giờ máy chủ; bắt rời tab; câu đang xem trong URL (?cau=). */
 export function ExamRoom() {
   const { id = "" } = useParams();
   const nav = useNavigate();
+  const toast = useToast();
   const clock = useRef(new ServerClock());
   const outbox = useRef(new EventOutbox());
   const submitted = useRef(false);
@@ -30,17 +68,22 @@ export function ExamRoom() {
   const [answers, setAnswers] = useState<Answers>({});
   const [flags, setFlags] = useState<number[]>([]);
   const [status, setStatus] = useState<SyncStatus>("saved");
+  const [savedAt, setSavedAt] = useState<string | null>(null);
   const [deadline, setDeadline] = useState("");
   const [left, setLeft] = useState(Number.POSITIVE_INFINITY);
-  const [cur, setCur] = useState(0);
+  const [cauRaw, setCau] = useUrlState<number>("cau", 1);
   const [ask, setAsk] = useState(false);
   const [timeUp, setTimeUp] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [fatal, setFatal] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  usePageMeta(room ? `Câu ${cauRaw} · ${room.assignment.title}` : "Làm bài");
 
   // 1) Vào phòng: bắt đầu/tiếp tục lượt, nạp bản nháp mới nhất (máy hoặc máy chủ)
   useEffect(() => {
     let alive = true;
+    setFatal(null);
     (async () => {
       const sentAt = performance.now();
       const r = await hsJson<RoomPayload>(`/api/student/assignments/${id}/start`, { method: "POST", body: {} });
@@ -67,6 +110,7 @@ export function ExamRoom() {
         setStatus(st);
         setAnswers(d.answers);
         setFlags(d.flags);
+        if (st === "saved" || st === "offline") setSavedAt(hhmm());
       });
       if (!alive) return;
       setRoom(r);
@@ -75,32 +119,37 @@ export function ExamRoom() {
       setFlags(s.flags);
       setStatus(s.status);
       setDeadline(r.submission.deadlineAt);
-    })().catch((e: unknown) => setErr(e instanceof StudentApiError && e.status === 409 ? e.message : errMsg(e)));
+    })().catch((e: unknown) => alive && setFatal(e instanceof StudentApiError && e.status === 409 ? e.message : errMsg(e)));
     return () => {
       alive = false;
     };
-  }, [id]);
+  }, [id, attempt]);
 
   const doSubmit = useCallback(
     async (auto: boolean) => {
       if (!sync || !room || submitted.current) return;
       submitted.current = true;
       setBusy(true);
-      setAsk(false);
       try {
         const body = await sync.forSubmit();
         await hsJson<StudentResult>(`/api/student/submissions/${room.submission.id}/submit`, { method: "POST", body });
         sync.markClosed();
+        invalidate(ASG_KEY);
+        setAsk(false);
         if (auto) setTimeUp(true);
-        else nav(`/hs/ket-qua/${room.submission.id}`, { replace: true });
+        else {
+          toast({ title: `Đã nộp bài lúc ${hhmm()}`, msg: room.assignment.title });
+          nav(HOC_PATH.ketQua(room.submission.id), { replace: true });
+        }
       } catch (e) {
         submitted.current = false;
         setErr(`${errMsg(e)}. Bài vẫn lưu trên máy, em bấm Nộp lại nhé.`);
+        toast({ kind: "err", title: "Chưa nộp được", msg: "Bài vẫn lưu trên máy" });
       } finally {
         setBusy(false);
       }
     },
-    [sync, room, nav],
+    [sync, room, nav, toast],
   );
 
   // 2) Gửi mỗi 3 giây, khi rời trang, khi có mạng lại; ghi rời tab
@@ -153,97 +202,167 @@ export function ExamRoom() {
     if (status === "closed" && !submitted.current) setTimeUp(true);
   }, [status]);
 
-  if (err && !room) return <div className="hs-main"><div className="hs-err">{err}</div><a className="hs-btn" href="/hs">Về bài của em</a></div>;
-  if (!room) return <div className="hs-main hs-muted">Đang mở bài…</div>;
+  const qs = room?.questions ?? [];
+  const cur = Math.min(Math.max(1, Math.round(cauRaw)), Math.max(1, qs.length)) - 1;
+  const go = useCallback((i: number) => setCau(i + 1), [setCau]);
+  const answer = useCallback(
+    (no: number, v: AnswerValue) => {
+      setAnswers((a) => ({ ...a, [String(no)]: v }));
+      void sync?.set(no, v);
+    },
+    [sync],
+  );
 
-  const qs = room.questions;
+  // Phím: ← → đổi câu, 1–4 chọn phương án (khi không gõ trong ô)
+  useEffect(() => {
+    if (!room) return;
+    const key = (e: KeyboardEvent) => {
+      if (ask || timeUp || e.altKey || e.ctrlKey || e.metaKey || typing(e.target)) return;
+      const q = qs[cur];
+      if (e.key === "ArrowRight" && cur < qs.length - 1) go(cur + 1);
+      else if (e.key === "ArrowLeft" && cur > 0) go(cur - 1);
+      else if (q?.type === "mcq" && /^[1-4]$/.test(e.key) && Number(e.key) <= q.options.length) answer(q.no, Number(e.key) - 1);
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [room, qs, cur, ask, timeUp, go, answer]);
+
+  if (fatal && !room)
+    return (
+      <main className="room-msg">
+        <ErrorState title="Chưa mở được bài" text={fatal} onRetry={() => setAttempt((x) => x + 1)} />
+        <Link className="btn" to={HOC_PATH.baiTap}><Icon name="arrowl" size="sm" /><span>Về Bài tập</span></Link>
+      </main>
+    );
+  if (!room) return <RoomSkeleton />;
+
   const nos = qs.map((q) => q.no);
-  const answer = (no: number, v: AnswerValue) => {
-    setAnswers((a) => ({ ...a, [String(no)]: v }));
-    void sync?.set(no, v);
-  };
-  const go = (i: number) => {
-    setCur(i);
-    if (window.innerWidth > 720) document.getElementById(`hs-q-${i}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
   const missing = unanswered(answers, nos);
   const done = nos.length - missing.length;
   const [ic, text] = SAVE_TEXT[status];
   const tone = timerTone(left);
+  const q = qs[cur];
+  const labels = sectionLabels(qs);
+  const missText = missing.map((no) => nos.indexOf(no) + 1).join(", ");
 
   return (
-    <>
-      <div className="hs-extop">
-        <div className="hs-in">
-          <span className="ic blue"><Icon name="exam" /></span>
-          <div className="ttl"><b>{room.assignment.title}</b><small data-testid="hs-variant">{room.assignment.subject} · mã đề {room.submission.variantCode}</small></div>
-          <span className={`hs-save ${status}`} data-testid="hs-save"><Icon name={ic} /><span className="tx2">{text}</span></span>
-          {Number.isFinite(left) && <span className={`hs-timer ${tone}`} title="Giờ theo máy chủ" data-testid="hs-timer"><Icon name="timer" />{formatClock(left)}</span>}
-          <button className="hs-btn primary top-submit" onClick={() => setAsk(true)} disabled={busy} data-testid="hs-submit-top"><Icon name="send" />Nộp</button>
+    <div className="exam" data-focus>
+      <header className="exam-top">
+        <Link className="btn ghost icon" to={HOC_PATH.baiTap} aria-label="Rời phòng (bài vẫn được lưu)" title="Rời phòng — bài vẫn được lưu"><Icon name="x" /></Link>
+        <div className="ttl">
+          <b>{room.assignment.title}</b>
+          <small data-testid="hs-variant">{room.assignment.subject} · {qs.length} câu · mã đề {room.submission.variantCode}{room.assignment.attemptsAllowed === 1 ? " · nộp 1 lần" : ""}</small>
         </div>
-      </div>
-      {err && <div className="hs-main"><div className="hs-err">{err}</div></div>}
-      <div className="hs-exbody">
-        <div className="hs-qs">
-          {qs.map((q, i) => (
-            <QuestionCard key={q.no} q={q} index={i} value={answers[String(q.no)]} flagged={flags.includes(q.no)} current={i === cur} onAnswer={(v) => answer(q.no, v)} onFlag={() => void sync?.toggleFlag(q.no)} onFocus={() => setCur(i)} />
-          ))}
-        </div>
-        <div className="hs-side">
-          <div className="hs-card">
-            <h2>Câu hỏi</h2>
-            <div className="hs-pal">
-              {qs.map((q, i) => {
-                const v = answers[String(q.no)];
-                const cls = [isAnswered(v) ? "ans" : isPartial(v) ? "part" : "", flags.includes(q.no) ? "flag" : "", i === cur ? "cur" : ""].join(" ");
-                return (
-                  <button key={q.no} className={cls} onClick={() => go(i)} aria-label={`Câu ${i + 1}`} data-testid={`hs-pal-${i}`}>
-                    {i + 1}<span className="fl"><Icon name="flag" /></span>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="hs-legend"><span><i className="a" />Đã làm</span><span><i className="p" />Làm dở</span><span><i className="f" />Đánh dấu xem lại</span></div>
-          </div>
-          <div className="hs-card">
-            <div className="sumline"><span className="hs-muted">Đã làm</span><span data-testid="hs-done">{done} / {nos.length}</span></div>
-            <button className="hs-btn primary lg block" onClick={() => setAsk(true)} disabled={busy} data-testid="hs-submit"><Icon name="send" />Nộp bài</button>
-          </div>
-        </div>
-      </div>
-      <div className="hs-bottombar">
-        <button className="hs-btn sq" onClick={() => go(Math.max(0, cur - 1))} disabled={cur === 0} aria-label="Câu trước"><Icon name="chevl" /></button>
-        <button className={`hs-btn${flags.includes(qs[cur]?.no ?? -1) ? " flagged" : ""}`} onClick={() => qs[cur] && void sync?.toggleFlag(qs[cur].no)}><Icon name="flag" />Xem lại</button>
-        {cur === qs.length - 1 ? (
-          <button className="hs-btn primary" onClick={() => setAsk(true)}><Icon name="send" />Nộp bài</button>
-        ) : (
-          <button className="hs-btn primary" onClick={() => go(cur + 1)}>Câu sau<Icon name="chevr" /></button>
+        <span className={`saved ${status}`} aria-live="polite" data-testid="hs-save">
+          <Icon name={ic} size="sm" />
+          <span>{text}{savedAt && status !== "saving" && status !== "closed" ? ` · ${savedAt}` : ""}</span>
+        </span>
+        {Number.isFinite(left) && (
+          <span className={`timer ${tone}`} role="timer" aria-label={`Còn ${formatClock(left)}`} title="Giờ theo máy chủ" data-testid="hs-timer">
+            <Icon name="timer" size="sm" />
+            {formatClock(left)}
+          </span>
         )}
-      </div>
-      {ask && (
-        <div className="hs-modal" role="dialog">
-          <div className="hs-dlg">
-            <div className={`ic ${missing.length ? "amber" : "green"}`}><Icon name={missing.length ? "alert" : "checkc"} /></div>
-            <h3>{missing.length ? `Còn ${missing.length} câu chưa trả lời` : "Em đã trả lời hết rồi"}</h3>
-            <div className="hs-muted">{missing.length ? "Nộp xong sẽ không sửa được nữa." : `Còn ${flags.length} câu đánh dấu xem lại. Nộp xong sẽ không sửa được nữa.`}</div>
-            <div className="hs-nums">{missing.map((no) => <b key={no} className={flags.includes(no) ? "f" : ""}>{nos.indexOf(no) + 1}</b>)}</div>
-            <div className="row">
-              <button className="hs-btn" onClick={() => setAsk(false)}>Làm tiếp</button>
-              <button className="hs-btn primary" onClick={() => void doSubmit(false)} disabled={busy} data-testid="hs-confirm">Nộp bài</button>
-            </div>
-          </div>
+        <Button variant="primary" className="hide-sm" onClick={() => setAsk(true)} disabled={busy} data-testid="hs-submit-top">Nộp bài</Button>
+      </header>
+      {status === "offline" && (
+        <div className="banner" role="status">
+          <Icon name="offline" size="sm" />
+          <span><b>Mất kết nối.</b> Bài làm vẫn lưu trên máy và tự gửi khi có mạng — em cứ làm tiếp.</span>
         </div>
       )}
-      {timeUp && (
-        <div className="hs-modal" role="dialog">
-          <div className="hs-dlg">
-            <div className="ic red"><Icon name="timer" /></div>
-            <h3>Hết giờ rồi!</h3>
-            <div className="hs-muted">Bài của em đã được tự nộp với các câu đã lưu.</div>
-            <div className="row"><button className="hs-btn primary" onClick={() => nav(`/hs/ket-qua/${room.submission.id}`, { replace: true })}>Xem kết quả</button></div>
-          </div>
+      {err && (
+        <div className="banner err" role="alert">
+          <Icon name="alert" size="sm" />
+          <span>{err}</span>
         </div>
       )}
-    </>
+
+      <main className="room" id="main">
+        <nav className="card navq" aria-label="Danh sách câu">
+          <div className="caption"><b data-testid="hs-done">{done} / {nos.length}</b> câu đã làm</div>
+          <div className="grid10">
+            {qs.map((x, i) => {
+              const v = answers[String(x.no)];
+              const cls = [isAnswered(v) ? "done" : isPartial(v) ? "part" : "", flags.includes(x.no) ? "flag" : ""].filter(Boolean).join(" ");
+              return (
+                <button type="button" key={x.no} className={cls || undefined} aria-current={i === cur ? "step" : undefined} onClick={() => go(i)} aria-label={`Câu ${i + 1}${isAnswered(v) ? ", đã làm" : ""}${flags.includes(x.no) ? ", xem lại sau" : ""}`} data-testid={`hs-pal-${i}`}>
+                  {i + 1}
+                </button>
+              );
+            })}
+          </div>
+          <div className="key">
+            <span><i className="k-done" />Đã làm</span>
+            <span><i className="k-part" />Làm dở</span>
+            <span><i className="k-flag" />Xem lại sau</span>
+            <span><i className="k-cur" />Đang xem</span>
+          </div>
+          <p className="caption kbd-hint hide-sm">Phím <kbd>←</kbd> <kbd>→</kbd> đổi câu · <kbd>1</kbd>–<kbd>4</kbd> chọn</p>
+        </nav>
+
+        {q && (
+          <QuestionCard
+            key={q.no}
+            q={q}
+            index={cur}
+            part={labels[cur] ?? ""}
+            value={answers[String(q.no)]}
+            flagged={flags.includes(q.no)}
+            onAnswer={(v) => answer(q.no, v)}
+            onFlag={() => void sync?.toggleFlag(q.no)}
+            foot={
+              <>
+                <div className="foot">
+                  <Button size="lg" icon="chevl" onClick={() => go(cur - 1)} disabled={cur === 0} aria-label="Câu trước">{cur > 0 ? `Câu ${cur}` : "Câu trước"}</Button>
+                  <span className="grow" />
+                  {cur < qs.length - 1 ? (
+                    <Button size="lg" iconEnd="chevr" onClick={() => go(cur + 1)}>{`Câu ${cur + 2}`}</Button>
+                  ) : (
+                    <Button size="lg" variant="primary" icon="send" onClick={() => setAsk(true)} disabled={busy} className="hide-sm">Nộp bài</Button>
+                  )}
+                </div>
+                <Button variant="primary" size="lg" className="show-sm block" onClick={() => setAsk(true)} disabled={busy} data-testid="hs-submit">Nộp bài</Button>
+              </>
+            }
+          />
+        )}
+
+        <aside className="card sub-card" aria-label="Tình trạng bài">
+          <div className="caption">Còn chưa làm</div>
+          <div className="big">{missing.length} câu</div>
+          <p className="caption">{missing.length ? `Câu ${missText}.` : "Em đã trả lời hết."} {flags.length ? `${flags.length} câu đánh dấu xem lại.` : ""} {Number.isFinite(left) ? "Hết giờ bài tự nộp." : ""}</p>
+          <Button variant="primary" className="block" icon="send" onClick={() => setAsk(true)} disabled={busy}>Nộp bài</Button>
+        </aside>
+      </main>
+
+      <Dialog
+        open={ask}
+        title="Nộp bài?"
+        onClose={() => !busy && setAsk(false)}
+        footer={
+          <>
+            <Button onClick={() => setAsk(false)} disabled={busy} data-autofocus>Làm tiếp</Button>
+            <Button variant="primary" onClick={() => doSubmit(false)} busy={busy} data-testid="hs-confirm">Nộp</Button>
+          </>
+        }
+      >
+        {missing.length ? (
+          <p>Còn <b>{missing.length} câu chưa làm</b> ({missText}). Sau khi nộp không sửa được.</p>
+        ) : (
+          <p>Em đã trả lời hết {nos.length} câu{flags.length ? `, còn ${flags.length} câu đánh dấu xem lại` : ""}. Sau khi nộp không sửa được.</p>
+        )}
+      </Dialog>
+      <Dialog
+        open={timeUp}
+        title="Hết giờ rồi!"
+        onClose={() => nav(HOC_PATH.ketQua(room.submission.id), { replace: true })}
+        footer={<Button variant="primary" onClick={() => nav(HOC_PATH.ketQua(room.submission.id), { replace: true })} data-autofocus>Xem kết quả</Button>}
+      >
+        <p>Bài của em đã được tự nộp với các câu đã lưu.</p>
+      </Dialog>
+    </div>
   );
 }
