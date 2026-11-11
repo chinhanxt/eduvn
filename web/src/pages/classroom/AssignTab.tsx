@@ -1,75 +1,100 @@
 import { useEffect, useMemo, useState } from "react";
-import { type BankQuestion, type ExamSummary, api, errText, gradeLabel } from "../../api";
-import { Icon } from "../../Icon";
+import { useSearchParams } from "react-router";
+import { type BankQuestion, gradeLabel } from "../../api";
 import { MathText } from "../../math/MathText";
+import { EXAMS_KEY, fetchExams, FormPane, get, patch, post, statusOf, errorOf, useOpenParam, useRun, whenVi } from "../../portal/gv/kit";
+import { Icon } from "../../ui/Icon";
+import { Badge, ChipGroup, Segmented } from "../../ui/components/Chip";
+import { Button } from "../../ui/components/Button";
+import { Field, Input } from "../../ui/components/Field";
+import { Region } from "../../ui/components/States";
+import { invalidate, useQuery } from "../../ui/data/query";
 import type { AssignmentListItem } from "./types";
 
-const STATUS_VI = { draft: ["", "Nháp"], published: ["c-green", "Đang giao"], closed: ["", "Đã đóng"] } as const;
+const STATUS_VI = { draft: ["neutral", "Nháp"], published: ["ok", "Đang giao"], closed: ["outline", "Đã đóng"] } as const;
 const SOL_VI = { after_submit: ["Sau khi nộp", "Em xem ngay khi nộp xong"], after_due: ["Sau hạn nộp", "Chờ cả lớp nộp xong"], never: ["Không hiện", "Chỉ hiện điểm"] } as const;
 const LEVEL_VI = { NB: "Nhận biết", TH: "Thông hiểu", VD: "Vận dụng" } as const;
 const pad = (n: number) => String(n).padStart(2, "0");
 /** Date → giá trị cho <input type="datetime-local"> theo giờ máy. */
 export const toLocalInput = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-export const fmtWhen = (iso: string) => {
-  const d = new Date(iso);
-  return `${d.getDate()}/${d.getMonth() + 1}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
+export const fmtWhen = whenVi;
+export const asgKey = (classId: string) => `gv/lop/${classId}/bai`;
+export const fetchAsg = (classId: string) => get<AssignmentListItem[]>(`/api/classes/${classId}/assignments`);
 
-/** Tab "Giao bài": danh sách bài đã giao + form giao bài mới (màn 5 của mockup). */
-export function AssignTab({ classId, subject, className, rosterSize, onOpen }: { classId: string; subject: string | null; className: string; rosterSize: number; onOpen: (assignmentId: string, tab: "theo-doi" | "ket-qua") => void }) {
-  const [rows, setRows] = useState<AssignmentListItem[] | null>(null);
-  const [form, setForm] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const load = () => {
-    api<AssignmentListItem[]>(`/api/classes/${classId}/assignments`).then(setRows).catch((e: unknown) => setErr(errText(e)));
-  };
-  useEffect(load, [classId]);
-  const patch = async (id: string, body: Record<string, unknown>) => {
-    try {
-      await api(`/api/assignments/${id}`, { method: "PATCH", body });
-      load();
-    } catch (e) {
-      setErr(errText(e));
-    }
-  };
-  if (form) return <AssignForm classId={classId} subject={subject} className={className} rosterSize={rosterSize} onDone={(id) => { setForm(false); load(); if (id) onOpen(id, "theo-doi"); }} />;
+/** Đổi tab lớp kèm bài đang xem (một bước lịch sử). */
+export function useGoTab() {
+  const [, setSp] = useSearchParams();
+  return (tab: string, bai?: string | null) => setSp(() => new URLSearchParams({ tab, ...(bai ? { bai } : {}) }));
+}
+
+/** Tab "Bài tập": danh sách bài đã giao + khung giao bài mới (?tao=1). */
+export function AssignTab({ classId, subject, className, rosterSize }: { classId: string; subject: string | null; className: string; rosterSize: number }) {
+  const q = useQuery(asgKey(classId), fetchAsg(classId));
+  const [form, setForm] = useOpenParam();
+  const go = useGoTab();
+  const run = useRun();
+  const setStatus = (a: AssignmentListItem, status: "published" | "closed") =>
+    run(async () => {
+      await patch(`/api/assignments/${a.id}`, { status });
+      invalidate(asgKey(classId));
+    }, status === "published" ? `Đã giao “${a.title}”` : `Đã đóng “${a.title}”`);
+  const rows = q.data ?? [];
   return (
     <>
-      <div className="bar">
-        <span className="sp" />
-        <button className="btn" onClick={() => setForm(true)} data-testid="lh-new"><Icon name="plus" size={18} />Giao bài mới</button>
-      </div>
-      {err && <div className="err">{err}</div>}
-      {rows?.length === 0 && <div className="card"><div className="empty">Chưa giao bài nào</div></div>}
-      <div className="lh-list">
-        {rows?.map((a) => (
-          <div key={a.id} className="card lh-arow" data-testid="lh-asg">
-            <span className={`ic ${a.kind === "test" ? "blue" : "violet"}`}><Icon name={a.kind === "test" ? "exam" : "repeat"} /></span>
-            <div className="g">
-              <b>{a.title}</b>
-              <small>{fmtWhen(a.opensAt)} → {fmtWhen(a.dueAt)} · {a.questionCount} câu · {a.durationMinutes ? `${a.durationMinutes} phút` : "không giới hạn giờ"} · {a.variantCodes.length} mã đề</small>
-            </div>
-            <span className={`lh-chip ${STATUS_VI[a.status][0]}`}>{STATUS_VI[a.status][1]}</span>
-            <span className="lh-cnt" title="Đã nộp / sĩ số"><Icon name="check" size={16} />{a.submitted}/{a.rosterSize}</span>
-            {a.status === "draft" && <button className="btn sm" onClick={() => void patch(a.id, { status: "published" })}><Icon name="send" size={16} />Giao</button>}
-            {a.status === "published" && <button className="btn ghost sm" onClick={() => void patch(a.id, { status: "closed" })}>Đóng</button>}
-            <button className="btn ghost sm" onClick={() => onOpen(a.id, "theo-doi")} data-testid="lh-open-monitor"><Icon name="eye" size={16} />Theo dõi</button>
-            <button className="btn ghost sm" onClick={() => onOpen(a.id, "ket-qua")}><Icon name="chart" size={16} />Kết quả</button>
-          </div>
-        ))}
-      </div>
+      {form && <AssignForm classId={classId} subject={subject} className={className} rosterSize={rosterSize} onClose={() => setForm(false)} onDone={(id) => (id ? go("theo-doi", id) : setForm(false))} />}
+      <Region
+        className="pane"
+        label="Bài đã giao"
+        status={statusOf(q, (d) => d.length === 0)}
+        stale={q.stale}
+        onRetry={q.refetch}
+        error={errorOf(q.error)}
+        empty={{ icon: "send", title: "Chưa giao bài nào", text: `Giao đề đã tạo hoặc nhóm câu từ ngân hàng cho ${className}.`, action: <Button size="sm" variant="primary" icon="plus" onClick={() => setForm(true)}>Giao bài mới</Button> }}
+      >
+        <div className="ghd">
+          Bài đã giao <span className="n">{rows.length}</span>
+          <span className="grow" />
+          {!form && <Button size="sm" variant="ghost" icon="plus" onClick={() => setForm(true)} data-testid="lh-new">Giao bài mới</Button>}
+        </div>
+        <ul className="rows enter">
+          {rows.map((a) => {
+            const pct = a.rosterSize ? Math.round((a.submitted / a.rosterSize) * 100) : 0;
+            return (
+              <li key={a.id} data-testid="lh-asg">
+                <span className={a.kind === "test" ? "lead acc" : "lead"}><Icon name={a.kind === "test" ? "exam" : "repeat"} size="sm" /></span>
+                <div className="g">
+                  <b>{a.title}</b>
+                  <small>{whenVi(a.opensAt)} → {whenVi(a.dueAt)} · {a.questionCount} câu · {a.durationMinutes ? `${a.durationMinutes} phút` : "không giới hạn giờ"}{a.variantCodes.length > 1 ? ` · ${a.variantCodes.length} mã đề` : ""}</small>
+                </div>
+                <Badge tone={STATUS_VI[a.status][0]}>{STATUS_VI[a.status][1]}</Badge>
+                <span className="meter-n" title="Đã nộp / sĩ số">
+                  <span className="meter"><i style={{ ["--v" as string]: `${pct}%` }} /></span>
+                  {a.submitted}/{a.rosterSize}
+                </span>
+                <span className="t-acts">
+                  {a.status === "draft" && <Button size="sm" icon="send" onClick={() => setStatus(a, "published")}>Giao</Button>}
+                  {a.status === "published" && <Button size="sm" variant="ghost" onClick={() => setStatus(a, "closed")}>Đóng</Button>}
+                  <Button size="sm" variant="ghost" icon="eye" onClick={() => go("theo-doi", a.id)} data-testid="lh-open-monitor">Theo dõi</Button>
+                  <Button size="sm" variant="ghost" icon="chart" onClick={() => go("ket-qua", a.id)}>Kết quả</Button>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </Region>
     </>
   );
 }
 
-function AssignForm({ classId, subject, className, rosterSize, onDone }: { classId: string; subject: string | null; className: string; rosterSize: number; onDone: (id: string | null) => void }) {
+function AssignForm({ classId, subject, className, rosterSize, onClose, onDone }: { classId: string; subject: string | null; className: string; rosterSize: number; onClose: () => void; onDone: (id: string | null) => void }) {
   const now = new Date();
+  const run = useRun();
   const [title, setTitle] = useState("");
   const [src, setSrc] = useState<"exam" | "bank">("exam");
-  const [exams, setExams] = useState<ExamSummary[]>([]);
+  const exams = useQuery(EXAMS_KEY, fetchExams);
   const [examId, setExamId] = useState("");
   const [grade, setGrade] = useState(() => Number.parseInt(className, 10) || 10);
-  const [bank, setBank] = useState<BankQuestion[]>([]);
+  const bank = useQuery(src === "bank" && subject ? `gv/ngan-hang/${subject}/${grade}/500` : null, get<BankQuestion[]>(`/api/questions?subject=${encodeURIComponent(subject ?? "")}&grade=${grade}&limit=500`));
   const [topics, setTopics] = useState<string[]>([]);
   const [levels, setLevels] = useState<string[]>(["NB", "TH", "VD"]);
   const [picked, setPicked] = useState<string[]>([]);
@@ -81,35 +106,24 @@ function AssignForm({ classId, subject, className, rosterSize, onDone }: { class
   const [attempts, setAttempts] = useState(1);
   const [sol, setSol] = useState<"after_submit" | "after_due" | "never">("after_due");
   const [shuffle, setShuffle] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
+  const examList = exams.data ?? [];
   useEffect(() => {
-    api<ExamSummary[]>("/api/exams").then((xs) => {
-      setExams(xs);
-      if (xs[0]) setExamId((id) => id || xs[0]!.id);
-    }).catch((e: unknown) => setErr(errText(e)));
-  }, []);
-  useEffect(() => {
-    if (src !== "bank" || !subject) return;
-    api<BankQuestion[]>(`/api/questions?subject=${encodeURIComponent(subject)}&grade=${grade}&limit=500`).then(setBank).catch((e: unknown) => setErr(errText(e)));
-  }, [src, subject, grade]);
-  const allTopics = useMemo(() => [...new Set(bank.map((q) => q.topic))], [bank]);
-  const shownBank = bank.filter((q) => (topics.length === 0 || topics.includes(q.topic)) && levels.includes(q.level));
-  const exam = exams.find((e) => e.id === examId);
+    if (!examId && examList[0]) setExamId(examList[0].id);
+  }, [examList, examId]);
+  const allTopics = useMemo(() => [...new Set((bank.data ?? []).map((q) => q.topic))], [bank.data]);
+  const shownBank = (bank.data ?? []).filter((q) => (topics.length === 0 || topics.includes(q.topic)) && levels.includes(q.level));
+  const exam = examList.find((e) => e.id === examId);
   const setKindDefaults = (k: "test" | "practice") => {
     setKind(k);
     setAttempts(k === "test" ? 1 : 3);
     setSol(k === "test" ? "after_due" : "after_submit");
   };
   const toggle = (xs: string[], x: string) => (xs.includes(x) ? xs.filter((y) => y !== x) : [...xs, x]);
-
-  const save = async (publish: boolean) => {
-    setErr(null);
-    setBusy(true);
-    try {
+  const bad = new Date(dueAt) <= new Date(opensAt);
+  const save = (publish: boolean) =>
+    run(async () => {
       const body = {
-        title: title || exam?.title || "Bài tập",
+        title: title.trim() || exam?.title || "Bài tập",
         kind,
         source: src === "exam" ? { examId } : { questionIds: picked },
         opensAt: new Date(opensAt).toISOString(),
@@ -120,112 +134,95 @@ function AssignForm({ classId, subject, className, rosterSize, onDone }: { class
         shuffle,
         publish,
       };
-      const r = await api<{ id: string }>(`/api/classes/${classId}/assignments`, { method: "POST", body });
+      const r = await post<{ id: string }>(`/api/classes/${classId}/assignments`, body);
+      invalidate(asgKey(classId));
       onDone(publish ? r.id : null);
-    } catch (e) {
-      setErr(errText(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-
+      return r;
+    }, publish ? { title: `Đã giao bài cho ${className}`, msg: `${rosterSize} học sinh nhận được ngay` } : "Đã lưu nháp");
+  const ready = src === "exam" ? !!examId : picked.length > 0;
   return (
-    <div className="lh-gb">
-      <div className="card lh-form">
-        {err && <div className="err">{err}</div>}
-        <div className="lh-sec">
-          <div className="lh-sh"><span className="ic blue"><Icon name="exam" /></span>Nội dung</div>
-          <label className="lh-field">Tên bài<input className="inp w-l" value={title} placeholder={exam?.title ?? "Kiểm tra 15 phút"} onChange={(e) => setTitle(e.target.value)} data-testid="lh-title" /></label>
-          <div className="lh-seg">
-            <button className={src === "exam" ? "on" : ""} onClick={() => setSrc("exam")}>Từ đề đã tạo</button>
-            <button className={src === "bank" ? "on" : ""} onClick={() => setSrc("bank")}>Nhóm câu từ ngân hàng</button>
-          </div>
-          {src === "exam" ? (
-            <div className="lh-pick" data-testid="lh-exams">
-              {exams.length === 0 && <div className="empty">Chưa có đề — tạo đề ở mục Đề thi</div>}
-              {exams.map((e) => (
-                <label key={e.id} className="p">
-                  <input type="radio" name="lh-exam" checked={examId === e.id} onChange={() => setExamId(e.id)} />
-                  <span className="g"><b>{e.title}</b><small>{e.subject} · {gradeLabel(e.grade)} · {e.codes.length} mã đề</small></span>
-                </label>
-              ))}
-            </div>
-          ) : (
-            <div className="lh-sec">
-              {!subject && <div className="warn">Lớp chưa có môn — đặt môn cho lớp để lọc ngân hàng câu hỏi.</div>}
-              <label className="lh-field">Khối<input className="inp w-s" type="number" min={1} max={16} value={grade} onChange={(e) => setGrade(Number(e.target.value) || 10)} /></label>
-              <div className="lh-chips">{allTopics.map((t) => <button key={t} className={topics.includes(t) ? "on" : ""} onClick={() => setTopics(toggle(topics, t))}>{t}</button>)}</div>
-              <div className="lh-chips">{(["NB", "TH", "VD"] as const).map((l) => <button key={l} className={levels.includes(l) ? "on" : ""} onClick={() => setLevels(toggle(levels, l))}>{LEVEL_VI[l]}</button>)}</div>
-              <div className="lh-bq-list">
-                {shownBank.map((q) => (
-                  <label key={q.id} className="lh-bq">
-                    <input type="checkbox" checked={picked.includes(q.id)} onChange={() => setPicked(toggle(picked, q.id))} />
-                    <span className="t"><MathText value={q.stem} /></span>
-                    <span className="lh-chip">{LEVEL_VI[q.level]}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="hint" style={{ textAlign: "left" }}>Đã chọn {picked.length} câu</div>
-            </div>
-          )}
+    <div className="work wide-l" style={{ marginBottom: "var(--s-4)" }}>
+      <FormPane
+        title="Giao bài mới"
+        sub={className}
+        onClose={onClose}
+        className="lh-form"
+        footer={
+          <>
+            {bad && <span className="caption" style={{ color: "var(--danger)" }}>Hạn nộp phải sau giờ mở</span>}
+            <Button onClick={onClose}>Huỷ</Button>
+            <Button disabled={!ready || bad} onClick={() => save(false)}>Lưu nháp</Button>
+            <Button variant="primary" icon="send" disabled={!ready || bad} onClick={() => save(true)} data-testid="lh-publish">Giao bài</Button>
+          </>
+        }
+      >
+        <Field label="Tên bài"><Input value={title} placeholder={exam?.title ?? "Kiểm tra 15 phút"} onChange={(e) => setTitle(e.target.value)} data-testid="lh-title" /></Field>
+        <div>
+          <span className="lbl-sm">Nội dung</span>
+          <Segmented label="Nguồn câu hỏi" value={src} onChange={setSrc} options={[{ value: "exam", label: "Từ đề đã tạo" }, { value: "bank", label: "Nhóm câu từ ngân hàng" }]} />
         </div>
-        <div className="lh-sec">
-          <div className="lh-sh"><span className="ic violet"><Icon name="shield" /></span>Loại bài</div>
-          <div className="lh-seg">
-            <button className={kind === "practice" ? "on" : ""} onClick={() => setKindDefaults("practice")}>Luyện tập</button>
-            <button className={kind === "test" ? "on" : ""} onClick={() => setKindDefaults("test")}>Kiểm tra</button>
-          </div>
-        </div>
-        <div className="lh-sec">
-          <div className="lh-sh"><span className="ic amber"><Icon name="cal" /></span>Thời gian</div>
-          <div className="lh-g2">
-            <label className="lh-field">Mở lúc<input className="inp" type="datetime-local" value={opensAt} onChange={(e) => setOpensAt(e.target.value)} /></label>
-            <label className="lh-field">Hạn nộp<input className="inp" type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)} data-testid="lh-due" /></label>
-          </div>
-          <div className="lh-g2">
-            <div className="lh-field">Thời gian làm (phút)
-              <Stepper value={dur} min={1} max={300} step={5} onChange={setDur} disabled={noLimit} />
-              <label className="lh-tgl"><input type="checkbox" checked={noLimit} onChange={(e) => setNoLimit(e.target.checked)} />Không giới hạn trong cửa sổ mở</label>
-            </div>
-            <div className="lh-field">Số lượt làm
-              <Stepper value={attempts} min={1} max={10} step={1} onChange={setAttempts} />
-              <small className="hint" style={{ textAlign: "left" }}>Mặc định {kind === "test" ? "1 lượt cho kiểm tra" : "3 lượt cho luyện tập"}</small>
-            </div>
-          </div>
-        </div>
-        <div className="lh-sec">
-          <div className="lh-sh"><span className="ic green"><Icon name="eye" /></span>Hiện lời giải</div>
-          <div className="lh-pick">
-            {(Object.keys(SOL_VI) as (keyof typeof SOL_VI)[]).map((k) => (
-              <label key={k} className="p"><input type="radio" name="lh-sol" checked={sol === k} onChange={() => setSol(k)} /><span className="g"><b>{SOL_VI[k][0]}</b><small>{SOL_VI[k][1]}</small></span></label>
+        {src === "exam" ? (
+          <div className="pick-list" data-testid="lh-exams" role="radiogroup" aria-label="Chọn đề">
+            {exams.data === undefined && <Region status="dang-tai" label="Đang tải đề" skeletonRows={3} />}
+            {exams.data?.length === 0 && <p className="note">Chưa có đề — tạo đề ở mục Đề thi rồi quay lại.</p>}
+            {examList.map((e) => (
+              <label key={e.id} className="pick">
+                <input type="radio" name="lh-exam" checked={examId === e.id} onChange={() => setExamId(e.id)} />
+                <span className="g"><b>{e.title}</b><small>{e.subject} · {gradeLabel(e.grade)} · {e.codes.length} mã đề</small></span>
+              </label>
             ))}
           </div>
-          <label className="lh-tgl"><input type="checkbox" checked={shuffle} onChange={(e) => setShuffle(e.target.checked)} /><span><b>Đảo thứ tự câu</b><small>Giữ nguyên thứ tự các phần theo CV 7991</small></span><Icon name="shuffle" /></label>
+        ) : (
+          <div style={{ display: "grid", gap: 10 }}>
+            {!subject && <p className="note warn">Lớp chưa có môn — đặt môn cho lớp để lọc ngân hàng câu hỏi.</p>}
+            <div className="fgrid"><Field label="Khối"><Input type="number" min={1} max={16} value={grade} onChange={(e) => setGrade(Number(e.target.value) || 10)} /></Field></div>
+            {allTopics.length > 0 && <ChipGroup multiple label="Chủ đề" value={topics} onChange={setTopics} options={allTopics.map((t) => ({ value: t, label: t }))} />}
+            <ChipGroup multiple label="Mức độ" value={levels} onChange={setLevels} options={(["NB", "TH", "VD"] as const).map((l) => ({ value: l, label: LEVEL_VI[l] }))} />
+            <div className="pick-list scroll">
+              {bank.loading && <Region status="dang-tai" label="Đang tải câu hỏi" skeletonRows={3} />}
+              {shownBank.map((q) => (
+                <label key={q.id} className="pick">
+                  <input type="checkbox" checked={picked.includes(q.id)} onChange={() => setPicked(toggle(picked, q.id))} />
+                  <span className="g"><MathText value={q.stem} /></span>
+                  <span className={`lvl l${q.level === "NB" ? 1 : q.level === "TH" ? 2 : 3}`}>{q.level}</span>
+                </label>
+              ))}
+              {bank.data && shownBank.length === 0 && <p className="note">Không có câu nào khớp chủ đề/mức đã chọn.</p>}
+            </div>
+            <span className="caption">Đã chọn <b className="num">{picked.length}</b> câu</span>
+          </div>
+        )}
+        <div>
+          <span className="lbl-sm">Loại bài</span>
+          <Segmented label="Loại bài" value={kind} onChange={setKindDefaults} options={[{ value: "practice", label: "Luyện tập" }, { value: "test", label: "Kiểm tra" }]} />
         </div>
-        <div className="lh-actions">
-          <button className="btn ghost" onClick={() => onDone(null)}>Huỷ</button>
-          <button className="btn ghost" disabled={busy} onClick={() => void save(false)}>Lưu nháp</button>
-          <button className="btn" disabled={busy || (src === "exam" ? !examId : picked.length === 0)} onClick={() => void save(true)} data-testid="lh-publish"><Icon name="send" size={18} />Giao bài</button>
+        <div className="fgrid">
+          <Field label="Mở lúc"><Input type="datetime-local" value={opensAt} onChange={(e) => setOpensAt(e.target.value)} /></Field>
+          <Field label="Hạn nộp" error={bad ? "Hạn nộp phải sau giờ mở" : undefined}><Input type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)} data-testid="lh-due" /></Field>
+          <Field label="Thời gian làm (phút)"><Input type="number" min={1} max={300} step={5} disabled={noLimit} value={dur} onChange={(e) => setDur(Math.max(1, Math.min(300, Number(e.target.value) || 1)))} /></Field>
+          <Field label="Số lượt làm" hint={`Mặc định ${kind === "test" ? "1 lượt cho kiểm tra" : "3 lượt cho luyện tập"}`}><Input type="number" min={1} max={10} value={attempts} onChange={(e) => setAttempts(Math.max(1, Math.min(10, Number(e.target.value) || 1)))} /></Field>
         </div>
-      </div>
-      <div className="card lh-sum">
-        <h2>Tóm tắt</h2>
-        <div className="li"><span className="ic blue"><Icon name="users" /></span><div><b>Lớp {className}</b><small>{rosterSize} học sinh · {src === "exam" ? `${exam?.codes.length ?? 0} mã đề` : "1 mã đề"}</small></div></div>
-        <div className="li"><span className="ic amber"><Icon name="cal" /></span><div><b>{fmtWhen(new Date(opensAt).toISOString())} → {fmtWhen(new Date(dueAt).toISOString())}</b><small>Mở lúc → hạn nộp</small></div></div>
-        <div className="li"><span className="ic violet"><Icon name="timer" /></span><div><b>{noLimit ? "Không giới hạn giờ" : `${dur} phút`} · {attempts} lượt</b><small>{kind === "test" ? "Kiểm tra" : "Luyện tập"}</small></div></div>
-        <div className="li"><span className="ic green"><Icon name="eye" /></span><div><b>{sol === "never" ? "Không hiện lời giải" : `Lời giải ${SOL_VI[sol][0].toLowerCase()}`}</b><small>{shuffle ? "Đảo thứ tự câu" : "Giữ thứ tự câu"}</small></div></div>
-      </div>
-    </div>
-  );
-}
-
-function Stepper({ value, min, max, step, onChange, disabled }: { value: number; min: number; max: number; step: number; onChange: (n: number) => void; disabled?: boolean }) {
-  const clamp = (n: number) => Math.max(min, Math.min(max, n));
-  return (
-    <div className={`lh-step${disabled ? " off" : ""}`}>
-      <button type="button" disabled={disabled} onClick={() => onChange(clamp(value - step))} aria-label="Giảm">−</button>
-      <input inputMode="numeric" disabled={disabled} value={value} onChange={(e) => onChange(clamp(Number(e.target.value) || min))} />
-      <button type="button" disabled={disabled} onClick={() => onChange(clamp(value + step))} aria-label="Tăng">+</button>
+        <label className="check-row"><input type="checkbox" checked={noLimit} onChange={(e) => setNoLimit(e.target.checked)} />Không giới hạn giờ trong cửa sổ mở</label>
+        <div>
+          <span className="lbl-sm">Hiện lời giải</span>
+          <Segmented label="Hiện lời giải" value={sol} onChange={setSol} options={(Object.keys(SOL_VI) as (keyof typeof SOL_VI)[]).map((k) => ({ value: k, label: SOL_VI[k][0] }))} />
+          <span className="caption" style={{ display: "block", marginTop: 4 }}>{SOL_VI[sol][1]}</span>
+        </div>
+        <label className="check-row"><input type="checkbox" checked={shuffle} onChange={(e) => setShuffle(e.target.checked)} /><span>Đảo thứ tự câu<small>Giữ nguyên thứ tự các phần theo CV 7991</small></span></label>
+      </FormPane>
+      <aside>
+        <section className="pane" aria-label="Tóm tắt">
+          <div className="ghd">Tóm tắt</div>
+          <dl className="props" style={{ margin: 0, borderBottom: 0 }}>
+            <dt>Lớp</dt><dd>{className} · {rosterSize} HS</dd>
+            <dt>Nội dung</dt><dd>{src === "exam" ? (exam ? `${exam.title} · ${exam.codes.length} mã đề` : "—") : `${picked.length} câu từ ngân hàng`}</dd>
+            <dt>Thời gian</dt><dd>{whenVi(new Date(opensAt).toISOString())} → {whenVi(new Date(dueAt).toISOString())}</dd>
+            <dt>Làm bài</dt><dd>{noLimit ? "Không giới hạn giờ" : `${dur} phút`} · {attempts} lượt</dd>
+            <dt>Loại</dt><dd>{kind === "test" ? "Kiểm tra" : "Luyện tập"}</dd>
+            <dt>Lời giải</dt><dd>{sol === "never" ? "Không hiện" : SOL_VI[sol][0]}{shuffle ? " · đảo câu" : ""}</dd>
+          </dl>
+        </section>
+      </aside>
     </div>
   );
 }

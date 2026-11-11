@@ -1,91 +1,94 @@
-import { useEffect, useState } from "react";
-import { api, errText, vn } from "../../api";
-import { Icon } from "../../Icon";
-import { fmtWhen } from "./AssignTab";
-import type { MonitorPayload, MonitorState } from "./types";
+import { useEffect, useMemo, useState } from "react";
+import { vn } from "../../api";
+import { FilterBar, SearchBox, errorOf, get, initialsOf, useListView } from "../../portal/gv/kit";
+import { Icon } from "../../ui/Icon";
+import { Badge } from "../../ui/components/Chip";
+import { Region } from "../../ui/components/States";
+import { type Column, Table } from "../../ui/components/Table";
+import { useQuery } from "../../ui/data/query";
+import { useUrlState } from "../../ui/data/urlState";
+import type { MonitorPayload, MonitorRow, MonitorState } from "./types";
 
 const POLL_MS = 5000;
-const STATE_VI: Record<MonitorState, [string, string]> = { chua_vao: ["", "Chưa vào"], dang_lam: ["c-blue", "Đang làm"], da_nop: ["c-green", "Đã nộp"], tu_nop: ["c-amber", "Tự nộp hết giờ"] };
-type Filter = "all" | "chua_vao" | "dang_lam" | "done";
+const STATE_VI: Record<MonitorState, ["neutral" | "accent" | "ok" | "warn", string]> = { chua_vao: ["neutral", "Chưa vào"], dang_lam: ["accent", "Đang làm"], da_nop: ["ok", "Đã nộp"], tu_nop: ["warn", "Tự nộp hết giờ"] };
+type Filter = "tat-ca" | "chua-vao" | "dang-lam" | "da-nop";
+const MATCH: Record<Filter, (r: MonitorRow) => boolean> = {
+  "tat-ca": () => true,
+  "chua-vao": (r) => r.state === "chua_vao",
+  "dang-lam": (r) => r.state === "dang_lam",
+  "da-nop": (r) => r.state === "da_nop" || r.state === "tu_nop",
+};
 
-/** Tab "Theo dõi": hỏi lại mỗi 5 giây (máy chủ cache 2 giây) — ai đang làm, đã nộp, rời tab mấy lần. */
+/** Tab "Theo dõi": hỏi lại mỗi 5 giây (máy chủ cache 2 giây) — ai đang làm, đã nộp, rời tab mấy lần. Lọc trên URL (?trang-thai=). */
 export function MonitorTab({ assignmentId }: { assignmentId: string }) {
-  const [m, setM] = useState<MonitorPayload | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+  const q = useQuery(`gv/theo-doi/${assignmentId}`, get<MonitorPayload>(`/api/assignments/${assignmentId}/monitor`), { staleMs: 2000 });
+  const { refetch } = q;
   const [since, setSince] = useState(0);
-  const [filter, setFilter] = useState<Filter>("all");
-  const [q, setQ] = useState("");
-  const [round, setRound] = useState(0);
+  useEffect(() => setSince(0), [q.updatedAt]);
   useEffect(() => {
-    let alive = true;
-    const load = () =>
-      api<MonitorPayload>(`/api/assignments/${assignmentId}/monitor`)
-        .then((x) => {
-          if (!alive) return;
-          setM(x);
-          setErr(null);
-          setSince(0);
-          setRound((r) => r + 1);
-        })
-        .catch((e: unknown) => alive && setErr(errText(e)));
-    void load();
-    const poll = window.setInterval(() => void load(), POLL_MS);
+    const poll = window.setInterval(() => document.visibilityState === "visible" && void refetch(), POLL_MS);
     const sec = window.setInterval(() => setSince((s) => s + 1), 1000);
-    return () => {
-      alive = false;
-      window.clearInterval(poll);
-      window.clearInterval(sec);
-    };
-  }, [assignmentId]);
-  if (!m) return err ? <div className="err">{err}</div> : null;
+    return () => (window.clearInterval(poll), window.clearInterval(sec));
+  }, [refetch]);
+  const m = q.data;
+  const [f, setF] = useUrlState<string>("trang-thai", "tat-ca");
+  const filter = (f in MATCH ? f : "tat-ca") as Filter;
+  const sorts = useMemo(() => ({ tt: (r: MonitorRow) => r.seat, ten: (r: MonitorRow) => r.fullName.split(/\s+/).pop() ?? "", roi: (r: MonitorRow) => r.leaveCount, tien: (r: MonitorRow) => (r.state === "chua_vao" ? -1 : r.answered / Math.max(1, r.total)) }), []);
+  const v = useListView(m?.rows, { text: (r) => r.fullName, sorts, defSort: "tt", filter: MATCH[filter], pageSize: 50 });
+  if (!m) return <Region className="pane" label="Theo dõi" status={q.error ? "loi" : "dang-tai"} error={errorOf(q.error)} onRetry={q.refetch} skeletonRows={8} />;
   const done = m.counts.da_nop + m.counts.tu_nop;
-  const cards: [Filter, string, string, string, number][] = [
-    ["all", "users", "violet", "Cả lớp", m.rows.length],
-    ["chua_vao", "ban", "amber", "Chưa vào", m.counts.chua_vao],
-    ["dang_lam", "loader", "blue", "Đang làm", m.counts.dang_lam],
-    ["done", "check", "green", "Đã nộp", done],
-  ];
-  const rows = m.rows.filter((r) => (filter === "all" || (filter === "done" ? r.state === "da_nop" || r.state === "tu_nop" : r.state === filter)) && r.fullName.toLowerCase().includes(q.trim().toLowerCase()));
   const ago = (iso: string | null) => (iso ? Math.max(0, Math.round((Date.parse(m.serverNow) - Date.parse(iso)) / 1000)) + since : null);
+  const cards: [Filter, string, number, string][] = [
+    ["tat-ca", "Cả lớp", m.rows.length, "học sinh"],
+    ["chua-vao", "Chưa vào", m.counts.chua_vao, m.rows.length ? `${Math.round((m.counts.chua_vao / m.rows.length) * 100)}%` : ""],
+    ["dang-lam", "Đang làm", m.counts.dang_lam, "trực tiếp"],
+    ["da-nop", "Đã nộp", done, m.counts.tu_nop ? `${m.counts.tu_nop} tự nộp` : ""],
+  ];
+  const cols: Column<MonitorRow>[] = [
+    { key: "tt", header: "TT", numeric: true, sortable: true, width: 48, cell: (r) => r.seat ?? "—" },
+    { key: "ten", header: "Học sinh", sortable: true, cell: (r) => <div className="who"><span className="avatar sm hide-sm">{initialsOf(r.fullName)}</span><span>{r.fullName}</span></div> },
+    { key: "tt-lam", header: "Trạng thái", cell: (r) => <Badge tone={STATE_VI[r.state][0]}>{r.state === "dang_lam" ? `Đang làm · ${r.answered}/${r.total}` : r.state === "chua_vao" ? "Chưa vào" : `${STATE_VI[r.state][1]} · ${vn(r.score10)}`}</Badge> },
+    {
+      key: "tien",
+      header: "Tiến độ",
+      sortable: true,
+      hideSm: true,
+      width: 180,
+      cell: (r) => {
+        const pg = r.state === "chua_vao" ? 0 : r.state === "dang_lam" ? r.answered : r.total;
+        return (
+          <span className="meter-n" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
+            <span className="meter" style={{ flex: 1, height: 4, background: "var(--line)" }}><i style={{ ["--v" as string]: `${(pg / Math.max(1, r.total)) * 100}%`, background: r.state === "dang_lam" ? undefined : "var(--ok)" }} /></span>
+            <span className="num muted">{pg}/{r.total}</span>
+          </span>
+        );
+      },
+    },
+    { key: "roi", header: "Rời tab", numeric: true, sortable: true, cell: (r) => <span className={r.leaveCount >= 5 ? "low-score" : r.leaveCount >= 2 ? "warn-t" : "muted"} title="Số lần thoát khỏi trang làm bài"><Icon name="eyeoff" size="sm" style={{ verticalAlign: "-3px", marginRight: 4 }} />{r.leaveCount}</span> },
+    { key: "cn", header: "Cập nhật", numeric: true, hideSm: true, cell: (r) => <span className="muted">{r.state === "chua_vao" ? "—" : r.state === "dang_lam" ? `${ago(r.updatedAt)} giây trước` : "đã nộp"}</span> },
+  ];
   return (
     <>
-      <div className="lh-mhead">
-        <div className="g"><h2>{m.assignment.title}</h2><span className="hint">Mở {fmtWhen(m.assignment.opensAt)} · hạn {fmtWhen(m.assignment.dueAt)} · {m.assignment.questionCount} câu</span></div>
-        <div className="lh-live"><span className="dotl" />Trực tiếp<svg className="lh-ring" viewBox="0 0 26 26"><circle className="bg" cx="13" cy="13" r="11" /><circle key={round} className="fg run" cx="13" cy="13" r="11" /></svg><span className="hint">{since ? `cập nhật ${since} giây trước` : "vừa cập nhật"}</span></div>
-      </div>
-      {err && <div className="err">{err}</div>}
-      <div className="lh-counters">
-        {cards.map(([k, ic, color, label, n]) => (
-          <button key={k} className={`card lh-cntc${filter === k ? " on" : ""}`} onClick={() => setFilter(k)} data-testid={`lh-count-${k}`}>
-            <span className={`ic ${color}`}><Icon name={ic} /></span><div><b>{n}</b><small>{label}</small></div>
+      <section className="kpis pick k4" aria-label="Lọc theo trạng thái">
+        {cards.map(([k, label, n, sub]) => (
+          <button key={k} type="button" aria-pressed={filter === k} onClick={() => setF(k)} data-testid={`lh-count-${k}`}>
+            <div className="k">{label}</div>
+            <div className="v">{n} {sub && <small className="mu">{sub}</small>}</div>
           </button>
         ))}
-      </div>
-      <div className="card lh-tablecard">
-        <div className="lh-tools"><input className="inp" placeholder="Tìm học sinh…" value={q} onChange={(e) => setQ(e.target.value)} /><span className="lh-chip c-amber"><Icon name="eyeoff" size={14} />Rời tab: số lần HS thoát khỏi trang</span></div>
-        <div className="lh-scroll">
-          <table className="lh-tbl" data-testid="lh-monitor">
-            <thead><tr><th>TT</th><th>Họ tên</th><th>Trạng thái</th><th className="lh-hide-sm">Tiến độ</th><th>Rời tab</th><th className="lh-hide-sm num">Cập nhật</th></tr></thead>
-            <tbody>
-              {rows.map((r) => {
-                const label = r.state === "dang_lam" ? `Đang làm – ${r.answered}/${r.total} câu` : r.state === "chua_vao" ? "Chưa vào" : `${STATE_VI[r.state][1]} – ${vn(r.score10)}`;
-                const pg = r.state === "chua_vao" ? 0 : r.state === "dang_lam" ? r.answered : r.total;
-                const a = ago(r.updatedAt);
-                return (
-                  <tr key={r.studentId} data-testid="lh-mrow">
-                    <td className="hint">{r.seat ?? "—"}</td>
-                    <td><div className="lh-nm"><span className="avatar">{(r.fullName.trim().split(/\s+/).pop() ?? "").charAt(0)}</span>{r.fullName}</div></td>
-                    <td><span className={`lh-chip ${STATE_VI[r.state][0]}`}>{label}</span></td>
-                    <td className="lh-hide-sm"><div className="lh-pg"><div className="lh-bar"><i style={{ width: `${(pg / Math.max(1, r.total)) * 100}%`, background: r.state === "dang_lam" ? undefined : "var(--green)" }} /></div><small>{pg}/{r.total}</small></div></td>
-                    <td><span className={`lh-leave ${r.leaveCount >= 5 ? "h" : r.leaveCount >= 2 ? "m" : ""}`}><Icon name="eyeoff" size={13} />{r.leaveCount}</span></td>
-                    <td className="lh-hide-sm num hint">{r.state === "chua_vao" ? "—" : r.state === "dang_lam" ? `${a} giây trước` : "đã nộp"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      </section>
+      <section className="pane mt" aria-label="Học sinh làm bài">
+        <FilterBar>
+          <SearchBox value={v.q} onChange={v.setQ} placeholder="Tìm học sinh  /" label="Tìm học sinh" />
+          <span className="grow" />
+          <span className="live-dot" aria-live="polite">
+            <i />Trực tiếp · <span className="num">{since ? `cập nhật ${since} giây trước` : "vừa cập nhật"}</span>
+          </span>
+        </FilterBar>
+        <div data-testid="lh-monitor">
+          <Table label="Theo dõi làm bài" dense columns={cols} rows={v.rows} rowKey={(r) => r.studentId} sort={v.sort} onSort={v.setSort} page={v.pageProp} stale={false} status={v.total ? "ok" : "trong"} empty={{ icon: "users", title: "Không em nào ở trạng thái này", text: "Chọn ô khác ở dải trên để xem." }} />
         </div>
-      </div>
+      </section>
     </>
   );
 }

@@ -46,30 +46,31 @@ const P = {
 };
 
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
-const SHELL_ROUTES: { path: string; page: Page; full?: boolean }[] = [
-  { path: "/cong-cu", page: P.home },
+/** legacy: trang chưa chuyển sang v2 (bọc .legacy giữ kiểu cũ). */
+const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
+  { path: "/cong-cu", page: P.home, legacy: true },
   { path: "/ngan-hang", page: P.bank },
   { path: "/de-thi", page: P.exams },
   { path: "/cham-bai", page: P.grade },
   { path: "/cham-anh", page: P.photoGrade },
   { path: "/lop-hoc", page: P.classes },
   { path: "/lop-hoc/:id", page: P.classDetail },
-  { path: "/so-diem", page: P.gradebook },
-  { path: "/giao-an", page: P.lessons },
-  { path: "/giao-an/:id", page: P.lessonDetail },
-  { path: "/de-cuong", page: P.deCuong },
-  { path: "/slide", page: P.slides },
-  { path: "/bai-giang-ai", page: P.aiLessons },
-  { path: "/bai-giang-ai/:id", page: P.aiLesson },
-  { path: "/bang-giang", page: P.boards },
-  { path: "/so-do", page: P.diagrams },
-  { path: "/tro-choi", page: P.games },
-  { path: "/dau-truong", page: P.arena },
-  { path: "/dau-truong/phien/:id", page: P.session },
-  { path: "/van-ban", page: P.vanBan },
-  { path: "/ket-noi", page: P.connect },
-  { path: "/kho-tri-thuc", page: P.kho },
-  { path: "/giao-trinh", page: P.books },
+  { path: "/so-diem", page: P.gradebook, legacy: true },
+  { path: "/giao-an", page: P.lessons, legacy: true },
+  { path: "/giao-an/:id", page: P.lessonDetail, legacy: true },
+  { path: "/de-cuong", page: P.deCuong, legacy: true },
+  { path: "/slide", page: P.slides, legacy: true },
+  { path: "/bai-giang-ai", page: P.aiLessons, legacy: true },
+  { path: "/bai-giang-ai/:id", page: P.aiLesson, legacy: true },
+  { path: "/bang-giang", page: P.boards, legacy: true },
+  { path: "/so-do", page: P.diagrams, legacy: true },
+  { path: "/tro-choi", page: P.games, legacy: true },
+  { path: "/dau-truong", page: P.arena, legacy: true },
+  { path: "/dau-truong/phien/:id", page: P.session, legacy: true },
+  { path: "/van-ban", page: P.vanBan, legacy: true },
+  { path: "/ket-noi", page: P.connect, legacy: true },
+  { path: "/kho-tri-thuc", page: P.kho, legacy: true },
+  { path: "/giao-trinh", page: P.books, legacy: true },
 ];
 /** Màn toàn màn hình (không khung): bảng giảng, sơ đồ, màn chiếu đấu trường. */
 const FULL_ROUTES: { path: string; page: Page }[] = [
@@ -129,8 +130,8 @@ export function GvApp() {
         ))}
         <Route element={<GvShell />}>
           <Route index element={<Home />} />
-          {SHELL_ROUTES.map(({ path, page: { Component: C } }) => (
-            <Route key={path} path={path} element={<Legacy><C /></Legacy>} />
+          {SHELL_ROUTES.map(({ path, legacy, page: { Component: C } }) => (
+            <Route key={path} path={path} element={legacy ? <Legacy><C /></Legacy> : <C />} />
           ))}
           {/* công cụ chưa xong (trước đây sinh từ TOOLS có nhãn "Thử") */}
           <Route path="/video" element={<Legacy><Ph tool={{ to: "/video", name: "Video bài giảng", icon: "video", color: "violet", pill: "Thử" }} /></Legacy>} />
