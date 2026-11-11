@@ -11,6 +11,7 @@ import { heroAction, heroTitle, longDay, metricText, subjectColor, subjectIcon }
 import type { HocToday } from "../today";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
 import { useLearner } from "./HocShell";
+import { HOC_PATH } from "../../student/paths";
 
 // Biểu đồ thành thạo nằm dưới thẻ việc tiếp theo: tải riêng (giữ JS lần đầu < 100 KB).
 const DotPlot = lazy(() => import("../../ui/charts/DotPlot").then((m) => ({ default: m.DotPlot })));
@@ -62,7 +63,7 @@ function Hero({ d }: { d: HocToday }) {
       )}
       <div className="acts">
         {n ? (
-          <Link className="btn lg primary on-field" to={`/hoc/hs/bai/${n.assignmentId}`}>
+          <Link className="btn lg primary on-field" to={HOC_PATH.lamBai(n.assignmentId)}>
             <span>{heroAction(n)}</span>
             <Icon name="right" size="sm" />
           </Link>
@@ -74,7 +75,7 @@ function Hero({ d }: { d: HocToday }) {
                 <Icon name="right" size="sm" />
               </Link>
             )}
-            <Link className="btn lg ghost-field" to="/hoc/hs">
+            <Link className="btn lg ghost-field" to={HOC_PATH.ketQua()}>
               <span>Xem bài đã làm</span>
             </Link>
           </>
@@ -139,7 +140,7 @@ export function HomNay() {
   if (!d && q.error) return <ErrorState title="Không tải được trang Hôm nay" onRetry={() => q.refetch()} />;
   if (!d) return <Skel />;
   const account = auth === "user";
-  const subjLink = account ? "/hoc/giao-trinh" : "/hoc/hs";
+  const subjLink = account ? "/hoc/giao-trinh" : HOC_PATH.baiTap;
   return (
     <div className={q.stale ? "today-hoc is-stale" : "today-hoc"}>
       <div style={{ minWidth: 0 }}>
@@ -222,7 +223,7 @@ export function HomNay() {
                     </span>
                   </>
                 );
-                return <li key={u.assignmentId}>{u.canStart ? <Link to={`/hoc/hs/bai/${u.assignmentId}`}>{inner}</Link> : <div>{inner}</div>}</li>;
+                return <li key={u.assignmentId}>{u.canStart ? <Link to={HOC_PATH.lamBai(u.assignmentId)}>{inner}</Link> : <div>{inner}</div>}</li>;
               })}
             </ul>
           )}

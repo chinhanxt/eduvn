@@ -52,15 +52,18 @@ describe("điều hướng khung cổng", () => {
     expect(n.find((x) => x.to === "/cham-bai")?.count).toBe(23);
     expect(n.find((x) => x.to === "/lop-hoc")?.count).toBe(4);
   });
-  it("cổng Học: tài khoản có 5 tab + nhóm Môn học; phiên mã lớp chỉ Hôm nay/Bài tập/Đấu trường", () => {
+  it("cổng Học: tài khoản có 5 tab + nhóm Môn học; phiên mã lớp Hôm nay/Bài tập/Kết quả/Đấu trường", () => {
     const d = { upcoming: [{ canStart: true }, { canStart: false }], review: { due: 12, minutes: 5 }, subjects: [{ subject: "Toán" }, { subject: "Ngữ văn" }] } as unknown as HocToday;
     const acc = hocNav(true, d);
     expect(acc.tabs.map((t) => t.label)).toEqual(["Hôm nay", "Bài tập", "Luyện tập", "Gia sư", "Giáo trình"]);
     expect(acc.nav.filter(isItem).filter((n) => n.dot).map((n) => n.label)).toEqual(["Toán", "Ngữ văn"]);
     expect(acc.nav.filter(isItem).find((n) => n.label === "Bài tập")?.count).toBe(1);
     const hs = hocNav(false, d);
-    expect(hs.tabs.map((t) => t.label)).toEqual(["Hôm nay", "Bài tập", "Đấu trường"]);
-    expect(hs.tabs[2]?.href).toBe("/choi");
+    expect(hs.tabs.map((t) => t.label)).toEqual(["Hôm nay", "Bài tập", "Kết quả", "Đấu trường"]);
+    expect(hs.tabs[1]?.to).toBe("/hoc/bai-tap");
+    expect(hs.tabs[3]?.href).toBe("/choi");
+    expect(hs.nav.filter(isItem).find((n) => n.label === "Toán")?.to).toBe("/hoc/bai-tap?mon=To%C3%A1n");
+    expect(acc.nav.filter(isItem).map((n) => n.label)).toContain("Kết quả");
   });
 });
 

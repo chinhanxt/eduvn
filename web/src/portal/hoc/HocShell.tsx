@@ -1,6 +1,7 @@
 import { type ReactNode, Suspense, useMemo, useSyncExternalStore } from "react";
 import { Outlet, useLocation } from "react-router";
 import { useAuth } from "../../auth";
+import { HOC_PATH } from "../../student/paths";
 import { clearSession, loadSession, SESSION_EVENT, type StoredSession } from "../../student/session";
 import type { Command } from "../../ui/components/CommandPalette";
 import { Icon } from "../../ui/Icon";
@@ -39,7 +40,7 @@ export function useLearner(): { ready: boolean; auth: "user" | "hs" | null; sess
 }
 
 /** Phòng làm bài + quét QR + màn đăng nhập: chế độ tập trung (không menu). */
-const BARE = [/^\/hoc\/hs\/bai\/[^/]+/, /^\/hoc\/hs\/qr$/];
+const BARE = [/^\/hoc\/lam-bai\/[^/]+/, /^\/hoc\/bai-tap\/qr$/, /^\/hoc\/hs(\/|$)/];
 
 /** Khung cổng Học (skin C): ≥ 1181 px thanh bên 248 px + nhóm Môn học + ô chuỗi ngày; 721–1180 px thanh bên icon; ≤ 720 px tab dưới 5 mục. */
 export function HocShell({ children }: { children?: ReactNode }) {
@@ -51,12 +52,12 @@ export function HocShell({ children }: { children?: ReactNode }) {
   const d = today.data;
   const { nav, tabs } = useMemo(() => hocNav(auth === "user", d), [auth, d]);
   const notices = useMemo<Notice[]>(
-    () => (d?.upcoming ?? []).filter((u) => u.canStart).slice(0, 5).map((u) => ({ title: u.title, sub: `${u.subject} · ${u.day} ${u.dayNum}`, to: `/hoc/hs/bai/${u.assignmentId}`, hot: u.hot })),
+    () => (d?.upcoming ?? []).filter((u) => u.canStart).slice(0, 5).map((u) => ({ title: u.title, sub: `${u.subject} · ${u.day} ${u.dayNum}`, to: HOC_PATH.lamBai(u.assignmentId), hot: u.hot })),
     [d],
   );
   const commands = useMemo<Command[]>(
     () => [
-      ...(d?.next?.canStart ? [{ group: "Thao tác", title: `Làm tiếp ${d.next.title}`, icon: "play", href: `/hoc/hs/bai/${d.next.assignmentId}` }] : []),
+      ...(d?.next?.canStart ? [{ group: "Thao tác", title: `Làm tiếp ${d.next.title}`, icon: "play", href: HOC_PATH.lamBai(d.next.assignmentId) }] : []),
       ...(auth === "user" ? [{ group: "Thao tác", title: "Hỏi gia sư", icon: "chat", href: "/hoc/gia-su" }, { group: "Thao tác", title: "Ôn thẻ đến hạn", icon: "layers", href: "/hoc/luyen-tap" }] : []),
       ...(me.data && GV_ROLES.has(me.data.role) ? [{ group: "Thao tác", title: "Sang cổng Giáo viên", icon: "users", href: "/gv" }] : []),
     ],
@@ -80,7 +81,7 @@ export function HocShell({ children }: { children?: ReactNode }) {
   const out = () => {
     clearSession();
     if (user) logout();
-    else window.location.assign("/hoc/hs");
+    else window.location.assign(HOC_PATH.baiTap);
   };
   const menu: MenuItem[] = [
     ...(me.data && GV_ROLES.has(me.data.role) ? [{ label: "Sang cổng Giáo viên", icon: "users", href: "/gv" }, { sep: true } as const] : []),
