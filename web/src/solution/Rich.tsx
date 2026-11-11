@@ -5,6 +5,7 @@ import "katex/dist/katex.min.css";
 import { memo } from "react";
 import { parseBlocks, parseInline } from "../hoc/text";
 import { isSafeLatex, splitMath } from "../math/segments";
+import { fixEscapes } from "./context";
 
 const cache = new Map<string, string>();
 /** LaTeX → HTML KaTeX (có cache); lệnh nguy hiểm hoặc lỗi cú pháp → chữ thường. */
@@ -55,7 +56,7 @@ function Inline({ src }: { src: string }) {
 export const Rich = memo(function Rich({ text, className }: { text: string; className?: string }) {
   return (
     <div className={className ?? "sol-rich"}>
-      {parseBlocks(text).map((b, i) => {
+      {parseBlocks(fixEscapes(text)).map((b, i) => {
         switch (b.kind) {
           case "h":
             return <p key={i} className="sol-rich-h"><Inline src={b.text} /></p>;

@@ -43,9 +43,18 @@ function fit(boxes: Box[], pad = 16): [number, number, number, number] {
 }
 
 // ——— hình không gian ———
+/** AI hay vừa đặt dấu góc ("marks" type angle) vừa đặt số đo góc tại cùng đỉnh → hai nhãn "45°" chồng nhau; giữ số đo, bỏ dấu trùng. */
+export function dedupeAngleMarks(spec: Extract<Figure, { kind: "solid3d" }>["spec"]): Extract<Figure, { kind: "solid3d" }>["spec"] {
+  const ms = (spec.measures ?? []) as { type: string; line?: string[]; lines?: string[][] }[];
+  const verts = new Set(ms.filter((m) => m.type.startsWith("angle")).flatMap((m) => [...(m.line ?? []), ...(m.lines ?? []).flat()]));
+  if (!verts.size || !spec.marks?.length) return spec;
+  return { ...spec, marks: spec.marks.filter((m) => !(m.type === "angle" && verts.has(m.at))) };
+}
+
 function solidModel(f: Extract<Figure, { kind: "solid3d" }>): FigureModel {
-  const solved = solve(f.spec);
-  const scene = buildScene(solved, SGK_VIEW[f.spec.view ?? defaultMode(f.spec)], { cx: 0, cy: 0, size: 150, font: 17 });
+  const spec = dedupeAngleMarks(f.spec);
+  const solved = solve(spec);
+  const scene = buildScene(solved, SGK_VIEW[spec.view ?? defaultMode(spec)], { cx: 0, cy: 0, size: 150, font: 17 });
   const [x0, y0, x1, y1] = scene.bbox;
   const ids = new Set<string>(scene.points.keys());
   const labels = scene.labels.map((l) => ({ x: l.x - l.w / 2, y: l.y - l.h / 2, w: l.w, h: l.h }));
@@ -115,7 +124,8 @@ function graphModel(f: Extract<Figure, { kind: "graph" }>): FigureModel {
   let d = "";
   let pen = false;
   for (const [x, y] of samples) {
-    if (!Number.isFinite(y) || y < lo - (hi - lo) || y > hi + (hi - lo)) {
+    // ngoài khung vẽ (phần nổ/tiệm cận) thì nhấc bút: đường cong không tràn khỏi hình
+    if (!Number.isFinite(y) || y < lo || y > hi) {
       pen = false;
       continue;
     }
@@ -127,7 +137,9 @@ function graphModel(f: Extract<Figure, { kind: "graph" }>): FigureModel {
   for (const p of pts) {
     const cx = X(p.x), cy = Y(p.y);
     els.push({ t: "line", ids: [p.id], x1: cx, y1: cy, x2: cx, y2: Y(0), dash: true }, { t: "circle", ids: [p.id], cx, cy, r: 4, fill: true });
-    const text = `${p.label ? `${strip(p.label)} ` : ""}(${fmt(p.x)}; ${fmt(p.y)})`;
+    // nhãn AI đã ghi toạ độ ("Cực đại (−1; 3)") thì không ghép thêm
+    const lbl = p.label ? strip(p.label).replace(/-/g, "−") : "";
+    const text = lbl.includes("(") ? lbl : `${lbl ? `${lbl} ` : ""}(${fmt(p.x)}; ${fmt(p.y)})`;
     const w = textW(text, 13), h = 16;
     let best: Box | null = null, bestS = Infinity;
     for (const [dx, dy] of [[8, -22], [8, 6], [-8 - w, -22], [-8 - w, 6], [-w / 2, -30], [-w / 2, 12]] as const) {

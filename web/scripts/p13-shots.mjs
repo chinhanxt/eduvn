@@ -30,7 +30,7 @@ const PROBLEMS = [
 async function solve(questionId) {
   const t0 = Date.now();
   const r = await fetch(`${API}/api/solutions/solve`, { method: "POST", headers: { authorization: `Bearer ${TOKEN}`, "content-type": "application/json" }, body: JSON.stringify({ questionId }) });
-  if (!r.ok) throw new Error(`solve ${r.status} ${await r.text()}`);
+  if (!r.ok) return { error: `HTTP ${r.status} ${await r.text()}` };
   const dec = new TextDecoder();
   let buf = "";
   const out = { firstFigure: null, firstStep: null, done: null, steps: 0, partials: 0, status: [], error: null };
@@ -57,13 +57,21 @@ async function solve(questionId) {
 let run;
 if (ONLY === "shots") run = JSON.parse(readFileSync("/tmp/p13-run.json", "utf8"));
 else {
-  run = { items: [] };
+  // chạy tiếp được: bài đã giải xong trong /tmp/p13-run.json thì bỏ qua (cổng AI dùng chung có lúc 503)
+  try {
+    run = JSON.parse(readFileSync("/tmp/p13-run.json", "utf8"));
+  } catch {
+    run = { items: [] };
+  }
   for (const p of PROBLEMS) {
+    if (run.items.some((i) => i.key === p.key && i.id)) continue;
+    run.items = run.items.filter((i) => i.key !== p.key);
     const q = await call("POST", "/api/questions", { type: "short_answer", subject: "Toán", grade: 12, topic: p.topic, level: "VD", tags: [], stem: p.stem, answer: p.answer });
     process.stdout.write(`giải ${p.key}… `);
     let r = await solve(q.id);
-    if (r.error && !r.solution) {
-      process.stdout.write(`lỗi (${r.error}), thử lại… `);
+    for (let k = 0; k < 3 && r.error && !r.solution; k++) {
+      process.stdout.write(`lỗi (${r.error}), thử lại sau 20 s… `);
+      await new Promise((ok) => setTimeout(ok, 20_000));
       r = await solve(q.id);
     }
     const s = r.solution;

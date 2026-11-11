@@ -86,15 +86,16 @@
 .sol-nofig .sol-grid { grid-template-columns: minmax(0, 72ch); }
 .sol-fig { position: sticky; top: 24px; margin: 0; }
 .sol-fig-box {
-  position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3.2; padding: 20px; border: 1px solid var(--sol-line); border-radius: 10px;
-  background: var(--sol-bg); overflow: hidden;
+  position: relative; aspect-ratio: 4 / 3.4; border: 1px solid var(--sol-line); border-radius: 10px; background: var(--sol-bg); overflow: hidden;
 }
+/* hình luôn vừa khung, giữ tỉ lệ (viewBox meet) — không bị cắt dù hình cao hay rộng */
+.sol-fig-box > .sol-svg, .sol-fig-box > .sol-fig-skel { position: absolute; inset: 20px; width: calc(100% - 40px); height: calc(100% - 40px); }
 .sol-fig figcaption { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 10px 2px 0; font: 13px/20px var(--sol-ui); color: var(--sol-ink-2); }
 .sol-fig figcaption b { color: var(--sol-ink); font-weight: 600; }
 .sol-refs { display: block; color: var(--fig-hl); font-variant-numeric: tabular-nums; }
 
 /* hình: phần tử tô sáng mượt bằng CSS */
-.sol-svg { width: 100%; height: 100%; max-height: 520px; overflow: visible; }
+.sol-svg { display: block; overflow: visible; }
 .sol-solid { transition: opacity var(--sol-d4) var(--sol-ease); }
 .sol-solid.is-dim { opacity: .32; }
 .sol-el { transition: stroke var(--sol-d3) var(--sol-ease), fill var(--sol-d3) var(--sol-ease), opacity var(--sol-d3) var(--sol-ease), stroke-width var(--sol-d3) var(--sol-ease); }
@@ -186,7 +187,8 @@ h3 .sol-skel-line { display: inline-block; width: 40%; margin: 0; vertical-align
 @media (max-width: 900px) {
   .sol-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .sol-fig { top: 0; z-index: 12; background: var(--sol-bg); padding-top: 4px; margin: 0 -4px; }
-  .sol-fig-box { aspect-ratio: auto; height: min(38vh, 300px); padding: 10px; }
+  .sol-fig-box { aspect-ratio: auto; height: min(38vh, 300px); }
+  .sol-fig-box > .sol-svg, .sol-fig-box > .sol-fig-skel { inset: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
   .sol-fig figcaption { padding: 6px 2px 6px; border-bottom: 1px solid var(--sol-line); }
   .sol-nums { position: static; }
   .sol-kbd { display: none; }

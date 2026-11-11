@@ -1,5 +1,6 @@
 // server/src/domain/solution.ts — mô hình lời giải từng bước (P13): bước có refs tới phần tử hình, hình kèm theo, phép kiểm đáp số.
 import { z } from "zod";
+import { fixEscapes } from "../../../web/src/solution/context";
 import { ConstructionSpecSchema, unwrapSpec } from "./geometry3d";
 
 export const MAX_STEPS = 9;
@@ -151,8 +152,8 @@ export function parseSolution(raw: unknown): { ok: true; solution: Solution } | 
   const r = SolutionSchema.safeParse(unwrapSolution(raw));
   if (!r.success) return { ok: false, issues: r.error.issues.slice(0, 8).map((i) => `${i.path.join(".") || "gốc"}: ${i.message}`) };
   const kind = r.data.figure?.kind;
-  const steps = r.data.steps.map((s) => ({ ...s, refs: [...new Set(s.refs.map((x) => normalizeRef(x, kind)))] }));
-  return { ok: true, solution: { ...r.data, steps } };
+  const steps = r.data.steps.map((s) => ({ ...s, title: fixEscapes(s.title), body: fixEscapes(s.body), refs: [...new Set(s.refs.map((x) => normalizeRef(x, kind)))] }));
+  return { ok: true, solution: { ...r.data, answer: fixEscapes(r.data.answer), steps } };
 }
 
 /** Id các phần tử hình có thể tô sáng (để lọc refs AI bịa). */

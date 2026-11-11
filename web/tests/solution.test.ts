@@ -2,9 +2,9 @@
 // (kiểm như test P10: khung chữ không chạm nhau và không đè nút), lời nhắn "Chưa hiểu bước này" đủ ngữ cảnh.
 import { describe, expect, it } from "vitest";
 import fixtures from "../../server/tests/fixtures/dung-hinh.json";
-import { stuckMessage } from "../src/solution/context";
+import { fixEscapes, stuckMessage } from "../src/solution/context";
 import { compilePlain, plainNumber } from "../src/solution/expr";
-import { type Box, type FigureModel, boxesHit, buildFigureModel, figureSvg, highlightOf, knownRefs, solidOverlay } from "../src/solution/figure";
+import { type Box, type FigureModel, boxesHit, buildFigureModel, dedupeAngleMarks, figureSvg, highlightOf, knownRefs, solidOverlay } from "../src/solution/figure";
 import type { Figure } from "../src/solution/types";
 
 const tree = (): Figure => ({
@@ -170,5 +170,34 @@ describe("biểu thức đồ thị + ngữ cảnh gia sư", () => {
     expect(m).not.toContain("Bayes");
     expect(m).toContain("gợi ý từng chút");
     expect(stuckMessage({ problem: "Đề", steps }, 0)).not.toContain("Các bước trước");
+  });
+});
+
+describe("sửa lỗi hay gặp ở lời giải AI thật (chạy thật 2026-11-11)", () => {
+  it('"\\n" hai ký tự → xuống dòng, trừ lệnh LaTeX \\neq, \\notin, \\nabla', () => {
+    expect(fixEscapes("Giải $y'=0$:\\n$$3x^2-3=0$$")).toBe("Giải $y'=0$:\n$$3x^2-3=0$$");
+    expect(fixEscapes("Ta có:\\n- Đạo hàm\\ny' = 3x^2")).toBe("Ta có:\n- Đạo hàm\ny' = 3x^2");
+    expect(fixEscapes("$x \\neq 1$, $a \\notin B$, $\\nabla f$, $x\\ne 0$")).toBe("$x \\neq 1$, $a \\notin B$, $\\nabla f$, $x\\ne 0$");
+    expect(fixEscapes("a\\\\n")).toBe("a\\\\n");
+  });
+  it("đồ thị: nhãn AI đã có toạ độ thì không ghép thêm toạ độ lần hai", () => {
+    const m = buildFigureModel({ kind: "graph", spec: { expr: "x^3-3x+1", xRange: [-3, 3], points: [{ id: "CD", x: "-1", y: "3", label: "Cực đại (-1; 3)" }] } });
+    const t = m.els.find((e) => e.t === "text" && e.ids.includes("CD"));
+    expect(t && t.t === "text" && t.text).toBe("Cực đại (−1; 3)");
+  });
+  it("đồ thị: đường cong không vượt khung vẽ", () => {
+    const m = buildFigureModel(graph());
+    const path = m.els.find((e) => e.t === "path");
+    const ys = [...(path && path.t === "path" ? path.d : "").matchAll(/[ML][-\d.]+ ([-\d.]+)/g)].map((x) => Number(x[1]));
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...ys)).toBeLessThanOrEqual(300);
+  });
+  it("hình không gian: dấu góc trùng số đo góc tại cùng đỉnh bị bỏ (không hai nhãn 45°)", () => {
+    const spec = { ...(fixtures[0]!.spec as object), marks: [{ type: "right", at: "A", a: "S", b: "C" }, { type: "angle", at: "C", a: "S", b: "A" }], measures: [{ type: "angle_line_plane", line: ["S", "C"], plane: ["A", "B", "C"] }] } as never;
+    const out = dedupeAngleMarks(spec) as { marks: { type: string }[] };
+    expect(out.marks.map((m) => m.type)).toEqual(["right"]);
+    const m = buildFigureModel({ kind: "solid3d", spec });
+    expect(m.solid!.scene.labels.filter((l) => l.kind === "angle")).toHaveLength(1);
+    expectNoOverlap(m.labels, "chóp có góc");
   });
 });
