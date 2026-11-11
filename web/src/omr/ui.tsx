@@ -60,7 +60,7 @@ export function useLock() {
 
 export function Btn({ busy, kind, children, ...p }: { busy?: boolean; kind?: "pri" | "quiet" | "sm" | string; children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button {...p} className={`pg-btn ${kind ?? ""} ${p.className ?? ""}`} aria-busy={busy || undefined} disabled={p.disabled}>
+    <button {...p} className={`pg-btn ${kind ?? ""} ${p.className ?? ""}`} aria-busy={busy || undefined} disabled={p.disabled || busy}>
       {busy && <i className="pg-spin" aria-hidden="true" />}
       {children}
     </button>

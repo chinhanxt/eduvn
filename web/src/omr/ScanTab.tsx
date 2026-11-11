@@ -25,6 +25,7 @@ type Sheet = {
   ms: number;
   saved: { id: string; total: number; max: number } | null;
 };
+type SaveResult = { id: string; total: number; max: number; student: { fullName: string; seat: number | null } | null };
 type Grade = { total: number; autoMax: number; items: { no: number; points: number | null; maxPoints?: number }[] };
 
 function groupName(g: Group): string {
@@ -85,6 +86,10 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
   ctx.current = { examId, code, exams };
   const keyCache = useRef(new Map<string, Promise<{ code: string; entries: KeyEntry[] }[]>>());
   const codes = exams.find((e) => e.id === examId)?.codes ?? [];
+  // Trạng thái mới nhất + phiếu đang/đã gửi: chặn lưu trùng khi bấm dồn trước lúc React vẽ lại.
+  const latest = useRef(sheets);
+  latest.current = sheets;
+  const sent = useRef(new Set<string>());
 
   useEffect(() => setCode(codes[0] ?? ""), [examId]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => void api<ClassSummary[]>("/api/classes").then(setClasses).catch(() => setClasses([])), []);
@@ -155,9 +160,19 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
     void pump();
   };
 
-  async function saveSheet(s: Sheet) {
+  async function saveSheet(s: Sheet): Promise<SaveResult | null> {
+    if (sent.current.has(s.key)) return null;
+    sent.current.add(s.key);
+    try {
+      return await postSheet(s);
+    } catch (e) {
+      sent.current.delete(s.key);
+      throw e;
+    }
+  }
+  async function postSheet(s: Sheet): Promise<SaveResult> {
     const d = derive(s, roster);
-    const r = await api<{ id: string; total: number; max: number; student: { fullName: string; seat: number | null } | null }>("/api/photo/omr", {
+    const r = await api<SaveResult>("/api/photo/omr", {
       method: "POST",
       body: { examId: s.examId, code: s.code, student: d.sbd, classId: roster?.id, studentId: d.studentId ?? undefined, responses: d.asm.responses, doubts: d.doubts.length, edited: Object.keys(s.overrides).length },
     });
@@ -202,12 +217,13 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
             <Btn kind="quiet" onClick={() => setSheets((l) => l.filter((s) => !s.saved && s.status !== "error"))} disabled={scanning}>Dọn phiếu đã lưu / lỗi</Btn>
             <Btn kind="pri" busy={savingAll} disabled={stats.savable === 0 || scanning} data-testid="s-save-all"
               onClick={() => void saveAll(async () => {
-                const todo = sheets.filter((s) => s.status === "ready" && !s.saved && !derive(s, roster).blocker);
-                for (const s of todo) await saveSheet(s);
-                toast("ok", `Đã lưu ${todo.length} phiếu`);
+                const todo = latest.current.filter((s) => s.status === "ready" && !s.saved && !derive(s, roster).blocker);
+                let n = 0;
+                for (const s of todo) if (await saveSheet(s)) n++;
+                if (n) toast("ok", `Đã lưu ${n} phiếu`);
                 saved.reload();
               })}>
-              <Icon name="check" />Lưu {stats.savable} phiếu sẵn sàng
+              <Icon name="check" />{stats.savable ? `Lưu ${stats.savable} phiếu sẵn sàng` : "Lưu tất cả"}
             </Btn>
           </>
         )}
@@ -218,8 +234,8 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
       {sheets.length > 0 && (
         <div className="pg-kpis" data-testid="s-kpis">
           <div><div className="k">Phiếu đã quét</div><div className="v">{ready.length}<small>/ {sheets.length}</small></div></div>
-          <div><div className="k">Ô nghi vấn còn lại</div><div className={`v${stats.open ? " warn" : ""}`} data-testid="s-open">{stats.open}</div></div>
-          <div><div className="k">Chưa khớp học sinh</div><div className={`v${stats.unmatched ? " warn" : ""}`}>{roster ? stats.unmatched : "—"}</div></div>
+          <div><div className="k">Ô nghi vấn còn lại</div><div className={`v${stats.open ? " is-warn" : ""}`} data-testid="s-open">{stats.open}</div></div>
+          <div><div className="k">Chưa khớp học sinh</div><div className={`v${stats.unmatched ? " is-warn" : ""}`}>{roster ? stats.unmatched : "—"}</div></div>
           <div><div className="k">Đã lưu</div><div className="v">{sheets.filter((s) => s.saved).length}</div></div>
           <div><div className="k">Thời gian quét</div><div className="v" data-testid="s-ms">{stats.msPerPage ? num(Math.round(stats.msPerPage)) : "—"}<small>ms/trang</small></div></div>
         </div>
@@ -234,11 +250,11 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
       <div className="pg-list">
         {sheets.map((s, i) =>
           s.status === "ready" ? (
-            <SheetCard key={s.key} i={i} sheet={s} roster={roster} onChange={(f) => patch(s.key, f)} onRemove={() => setSheets((l) => l.filter((x) => x.key !== s.key))} onSave={() => saveSheet(s)} onSaved={saved.reload} />
+            <SheetCard key={s.key} i={i} sheet={s} roster={roster} onChange={(f) => patch(s.key, f)} onRemove={() => setSheets((l) => l.filter((x) => x.key !== s.key))} onSave={() => saveSheet(latest.current.find((x) => x.key === s.key) ?? s)} onSaved={saved.reload} />
           ) : s.status === "error" ? (
             <div key={s.key} className="pg-card err" data-testid="s-error">
               <div className="pg-chd" style={{ gridTemplateColumns: "auto minmax(0,1fr) auto" }}>
-                <span className="pg-tag danger"><Icon name="alert" />Lỗi</span>
+                <span className="pg-tag is-danger"><Icon name="alert" />Lỗi</span>
                 <div className="pg-meta"><span className="t">{s.name}</span><span className="mu">{s.error} — chụp lại thẳng hơn, đủ sáng, thấy đủ 4 mốc góc.</span></div>
                 <Btn kind="quiet icon" aria-label="Bỏ ảnh" onClick={() => setSheets((l) => l.filter((x) => x.key !== s.key))}><Icon name="x" /></Btn>
               </div>
@@ -260,7 +276,7 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
   );
 }
 
-function SheetCard({ i, sheet, roster, onChange, onRemove, onSave, onSaved }: { i: number; sheet: Sheet; roster: Roster | null; onChange: (f: (s: Sheet) => Sheet) => void; onRemove: () => void; onSave: () => Promise<{ total: number; max: number; student: { fullName: string } | null }>; onSaved: () => void }) {
+function SheetCard({ i, sheet, roster, onChange, onRemove, onSave, onSaved }: { i: number; sheet: Sheet; roster: Roster | null; onChange: (f: (s: Sheet) => Sheet) => void; onRemove: () => void; onSave: () => Promise<SaveResult | null>; onSaved: () => void }) {
   const toast = useToast();
   const [grade, setGrade] = useState<Grade | null>(null);
   const [open, setOpen] = useState(false);
@@ -286,13 +302,13 @@ function SheetCard({ i, sheet, roster, onChange, onRemove, onSave, onSaved }: { 
         <div className="pg-meta">
           <span className="t" title={sheet.name}>{sheet.name}</span>
           <div className="row">
-            <span className="pg-tag acc">Mã đề {sheet.code}</span>
-            {sheet.qrOk ? <span className="pg-tag ok"><Icon name="qr" />QR</span> : <span className="pg-tag warn"><Icon name="alert" />Không đọc được QR</span>}
-            {d.missing > 0 && <span className="pg-tag warn"><Icon name="alert" />Thiếu {d.missing} trang</span>}
+            <span className="pg-tag is-acc">Mã đề {sheet.code}</span>
+            {sheet.qrOk ? <span className="pg-tag is-ok"><Icon name="qr" />QR</span> : <span className="pg-tag is-warn"><Icon name="alert" />Không đọc được QR</span>}
+            {d.missing > 0 && <span className="pg-tag is-warn"><Icon name="alert" />Thiếu {d.missing} trang</span>}
             {d.doubts.length > 0 ? (
-              <span className={`pg-tag ${d.open ? "warn" : "ok"}`} data-testid="s-doubts"><Icon name={d.open ? "alert" : "check"} />{d.open ? `${d.open}/${d.doubts.length} ô nghi vấn` : `Đã sửa ${d.doubts.length} ô`}</span>
+              <span className={`pg-tag ${d.open ? "is-warn" : "is-ok"}`} data-testid="s-doubts"><Icon name={d.open ? "alert" : "check"} />{d.open ? `${d.open}/${d.doubts.length} ô nghi vấn` : `Đã sửa ${d.doubts.length} ô`}</span>
             ) : (
-              <span className="pg-tag ok"><Icon name="check" />Không ô nghi vấn</span>
+              <span className="pg-tag is-ok"><Icon name="check" />Không ô nghi vấn</span>
             )}
             <span className="mu num">{num(Math.round(sheet.ms))} ms</span>
           </div>
@@ -304,7 +320,7 @@ function SheetCard({ i, sheet, roster, onChange, onRemove, onSave, onSaved }: { 
           </label>
           {roster && (
             d.match?.status === "ok" && !sheet.studentId ? (
-              <button className="pg-tag ok" style={{ border: 0, cursor: locked ? "default" : "pointer" }} disabled={locked} title="Bấm để chọn học sinh khác" onClick={() => d.match?.status === "ok" && onChange((s) => ({ ...s, studentId: d.match?.status === "ok" ? d.match.student.id : null }))} data-testid="s-match">
+              <button className="pg-tag is-ok" style={{ border: 0, cursor: locked ? "default" : "pointer" }} disabled={locked} title="Bấm để chọn học sinh khác" onClick={() => d.match?.status === "ok" && onChange((s) => ({ ...s, studentId: d.match?.status === "ok" ? d.match.student.id : null }))} data-testid="s-match">
                 <Icon name="user" />{seatLabel(d.match)}
               </button>
             ) : (
@@ -321,18 +337,19 @@ function SheetCard({ i, sheet, roster, onChange, onRemove, onSave, onSaved }: { 
         </div>
         <div className="pg-cacts">
           {locked ? (
-            <span className="pg-tag ok"><Icon name="checkc" />Đã lưu {num(sheet.saved!.total)} / {num(sheet.saved!.max)}</span>
+            <span className="pg-tag is-ok"><Icon name="checkc" />Đã lưu {num(sheet.saved!.total)} / {num(sheet.saved!.max)}</span>
           ) : (
             <Btn kind="pri sm" busy={saving} disabled={!!d.blocker} data-testid="s-save"
               onClick={() => void save(async () => {
                 const r = await onSave();
+                if (!r) return;
                 toast("ok", `Đã lưu ${num(r.total)}/${num(r.max)}${r.student ? ` — ${r.student.fullName}` : ""}`);
                 onSaved();
               })}>
               <Icon name="check" />Lưu điểm
             </Btn>
           )}
-          {d.blocker && !locked && <span className="note warn">{d.blocker}</span>}
+          {d.blocker && !locked && <span className="note is-warn">{d.blocker}</span>}
           <span className="pg-sp" />
           <Btn kind="quiet sm" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "Ẩn" : "Xem"} đáp án đã đọc</Btn>
           <Btn kind="quiet icon sm" onClick={onRemove} aria-label="Bỏ phiếu"><Icon name="trash" /></Btn>
@@ -350,7 +367,7 @@ function SheetCard({ i, sheet, roster, onChange, onRemove, onSave, onSaved }: { 
                 <div className="h">
                   <Icon name={fixed ? "check" : "alert"} size={14} />{groupName(g)}
                   <span className="pg-sp" />
-                  <span className={`pg-tag ${fixed ? "" : "warn"}`}>{fixed ? "đã sửa" : read.reason}</span>
+                  <span className={`pg-tag ${fixed ? "" : "is-warn"}`}>{fixed ? "đã sửa" : read.reason}</span>
                 </div>
                 <Crop warped={part.warped} g={g} />
                 <div className="pg-opts" role="group" aria-label={`Chọn đáp án ${groupName(g)}`}>

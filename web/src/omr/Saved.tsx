@@ -96,7 +96,7 @@ function GradebookPanel({ row }: { row: SavedRow }) {
   return (
     <div className="pg-gb" data-testid="gb-panel">
       {linked ? (
-        <span className="pg-tag ok"><Icon name="user" />{who ? `${who.seat ?? "—"} · ${who.fullName}` : row.student}{roster ? ` · ${roster.name}` : ""}</span>
+        <span className="pg-tag is-ok"><Icon name="user" />{who ? `${who.seat ?? "—"} · ${who.fullName}` : row.student}{roster ? ` · ${roster.name}` : ""}</span>
       ) : (
         <>
           <select className="pg-in" value={classId} onChange={(e) => { setClassId(e.target.value); setStudentId(""); }} aria-label="Lớp"><option value="">Chọn lớp…</option>{classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>

@@ -26,6 +26,8 @@ export function PhotoGrade() {
     n.set(k, v);
     setQ(n, { replace: !push });
   };
+  const [seen, setSeen] = useState(() => new Set<Tab>([tab]));
+  useEffect(() => setSeen((x) => (x.has(tab) ? x : new Set([...x, tab]))), [tab]);
   useEffect(() => {
     api<ExamSummary[]>("/api/exams").then(setExams).catch(() => setExams([]));
   }, []);
@@ -60,12 +62,13 @@ export function PhotoGrade() {
           <div className="pg-pane" style={{ padding: 16, display: "grid", gap: 10 }} aria-busy="true">
             <div className="pg-sk l" style={{ width: "40%" }} /><div className="pg-sk" style={{ height: 64 }} /><div className="pg-sk l" style={{ width: "70%" }} />
           </div>
-        ) : tab === "in" ? (
-          <PrintTab exams={exams} examId={examId} />
-        ) : tab === "quet" ? (
-          <ScanTab exams={exams} examId={examId} classId={q.get("lop") ?? ""} setClassId={(v) => set("lop", v)} />
         ) : (
-          <EssayTab examId={examId} />
+          // Giữ các chế độ đã mở (phiếu đang quét/bài đang chấm không mất khi đổi tab).
+          <>
+            {seen.has("quet") && <div hidden={tab !== "quet"}><ScanTab exams={exams} examId={examId} classId={q.get("lop") ?? ""} setClassId={(v) => set("lop", v)} /></div>}
+            {seen.has("viet-tay") && <div hidden={tab !== "viet-tay"}><EssayTab examId={examId} /></div>}
+            {tab === "in" && <PrintTab exams={exams} examId={examId} />}
+          </>
         )}
       </div>
     </ToastHost>

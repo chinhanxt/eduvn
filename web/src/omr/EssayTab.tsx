@@ -200,7 +200,7 @@ export function EssayTab({ examId }: { examId: string }) {
                   <div className="pg-total"><span className="v" data-testid="e-total">{num(total)}</span><span className="mu">/ {num(maxPoints)} điểm</span></div>
                   <span className="pg-sp" />
                   {savedId ? (
-                    <span className="pg-tag ok"><Icon name="checkc" />Đã duyệt và lưu</span>
+                    <span className="pg-tag is-ok"><Icon name="checkc" />Đã duyệt và lưu</span>
                   ) : (
                     <Btn kind="pri" busy={saving} disabled={!!roster && !studentId} data-testid="e-save"
                       onClick={() => void save(async () => {

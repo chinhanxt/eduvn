@@ -30,7 +30,7 @@
 .pg-crumb { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-3); text-decoration: none; font-size: 12px; }
 .pg-crumb:hover { color: var(--accent); }
 .pg-seg { display: inline-flex; padding: 2px; background: var(--bg-sunken); border: 1px solid var(--line-2); border-radius: var(--r-sm); }
-.pg-seg button { all: unset; cursor: pointer; height: 26px; padding: 0 12px; border-radius: 4px; font-size: 13px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; transition: background var(--dur-1), color var(--dur-1); }
+.pg-seg button { all: unset; white-space: nowrap; cursor: pointer; height: 26px; padding: 0 12px; border-radius: 4px; font-size: 13px; color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; transition: background var(--dur-1), color var(--dur-1); }
 .pg-seg button:hover { color: var(--ink); }
 .pg-seg button[aria-pressed="true"] { background: var(--bg); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgb(16 24 40 / .08), 0 0 0 1px var(--line-2); }
 .pg-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -64,10 +64,10 @@ textarea.pg-in { height: auto; padding: 8px; line-height: 20px; resize: vertical
 /* Nhãn trạng thái: luôn icon + chữ */
 .pg-tag { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px; border-radius: var(--r-xs); font-size: 12px; font-weight: 500; background: var(--bg-sunken); color: var(--ink-2); white-space: nowrap; }
 .pg-tag svg.i { width: 12px; height: 12px; }
-.pg-tag.ok { background: var(--ok-bg); color: var(--ok); }
-.pg-tag.warn { background: var(--warn-bg); color: var(--warn); }
-.pg-tag.danger { background: var(--danger-bg); color: var(--danger); }
-.pg-tag.acc { background: var(--accent-bg); color: var(--accent); }
+.pg-tag.is-ok { background: var(--ok-bg); color: var(--ok); }
+.pg-tag.is-warn { background: var(--warn-bg); color: var(--warn); }
+.pg-tag.is-danger { background: var(--danger-bg); color: var(--danger); }
+.pg-tag.is-acc { background: var(--accent-bg); color: var(--accent); }
 
 /* Khung (pane) + đầu nhóm */
 .pg-pane { border: 1px solid var(--line-2); border-radius: var(--r-md); background: var(--bg); min-width: 0; }
@@ -81,7 +81,7 @@ textarea.pg-in { height: auto; padding: 8px; line-height: 20px; resize: vertical
 .pg-kpis .k { font-size: 11px; line-height: 16px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pg-kpis .v { font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .pg-kpis .v small { font-size: 11px; font-weight: 500; letter-spacing: 0; color: var(--ink-3); margin-left: 4px; }
-.pg-kpis .v.warn { color: var(--warn); }
+.pg-kpis .v.is-warn { color: var(--warn); }
 .pg-meter { height: 3px; background: var(--line); overflow: hidden; }
 .pg-meter > i { display: block; height: 100%; background: var(--accent); transition: width var(--dur-3) var(--ease-out); }
 
@@ -108,13 +108,13 @@ textarea.pg-in { height: auto; padding: 8px; line-height: 20px; resize: vertical
 .pg-meta .row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .pg-who { display: grid; gap: 4px; justify-items: start; }
 .pg-who .sbd { width: 84px; font-family: var(--font-mono); letter-spacing: .08em; }
-.pg-who select.need { border-color: var(--warn); background: var(--warn-bg); }
+.pg-in.need { border-color: var(--warn); background: var(--warn-bg); }
 .pg-score { text-align: right; display: grid; gap: 2px; min-width: 96px; }
 .pg-score .v { font-size: 22px; line-height: 28px; font-weight: 600; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .pg-score .v small { font-size: 12px; color: var(--ink-3); font-weight: 500; letter-spacing: 0; }
 .pg-cacts { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--line); margin: 0 -12px -10px; padding: 8px 12px; }
 .pg-cacts .note { font-size: 12px; color: var(--ink-3); }
-.pg-cacts .note.warn { color: var(--warn); font-weight: 500; }
+.pg-cacts .note.is-warn { color: var(--warn); font-weight: 500; }
 
 /* Ô nghi vấn — tô nổi, sửa bằng một lần bấm */
 .pg-doubts { border-top: 1px solid var(--line); padding: 10px 12px 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
@@ -185,6 +185,12 @@ textarea.pg-in { height: auto; padding: 8px; line-height: 20px; resize: vertical
   .pg-kpis > div:nth-child(4) { border-left: 0; } .pg-kpis > div:nth-child(n+4) { border-top: 1px solid var(--line); }
 }
 @media (max-width: 720px) {
+  .pg-head { gap: 10px; }
+  .pg-head > div:first-child, .pg-head .pg-field, .pg-tools .pg-field { flex: 1 1 100%; min-width: 0 !important; }
+  .pg-head .pg-sp { display: none; }
+  .pg-seg { width: 100%; } .pg-seg button { flex: 1; justify-content: center; }
+  .pg-drop .acts { width: 100%; } .pg-drop .acts > * { flex: 1; }
+  .pg-table th:nth-child(2), .pg-table td:nth-child(2), .pg-table th:nth-child(4), .pg-table td:nth-child(4) { display: none; }
   .pg-chd { grid-template-columns: 56px minmax(0, 1fr); }
   .pg-who, .pg-score { grid-column: 2; justify-items: start; text-align: left; }
   .pg-drop { flex-wrap: wrap; } .pg-drop .acts { margin-left: 0; }
