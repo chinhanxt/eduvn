@@ -8,7 +8,6 @@ import { EmptyState, ErrorState } from "../ui/components/States";
 import { type StreamState, StreamingText } from "../ui/components/StreamingText";
 import { useToast } from "../ui/components/Toast";
 import { Icon } from "../ui/Icon";
-import { useAction } from "../ui/data/action";
 import { request } from "../ui/data/http";
 import { invalidate, setQueryData, useQuery } from "../ui/data/query";
 import { useUrlState } from "../ui/data/urlState";
@@ -59,16 +58,26 @@ function PathList({ onOpen }: { onOpen: (id: string) => void }) {
   const [form, setForm] = useState({ name: "", goal: "", subject: "", grade: 0, kbId: "" });
   const k0 = kbs.data?.[0];
   const f = { ...form, subject: form.subject || k0?.subject || "Toán", grade: form.grade || k0?.grade || 10, kbId: form.kbId };
-  const create = useAction((ctx) => request<PathView>("/api/tutor/paths", { method: "POST", body: { ...f, kbId: f.kbId || undefined }, idempotencyKey: ctx.idempotencyKey }));
+  // Tạo mới: một Idempotency-Key cho mỗi lần dựng, giữ nguyên khi thử lại sau lỗi mạng (máy chủ trả kết quả lần đầu).
+  // Không dùng useAction ở đây: module data/action dùng chung với cổng GV sẽ tách chunk riêng, tăng JS lần đầu cổng GV.
+  const idem = useRef<string | null>(null);
+  const [creating, setCreating] = useState(false);
   const go = async () => {
+    if (creating) return;
+    idem.current ??= globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    setCreating(true);
     try {
-      const p = await create.run();
+      const p = await request<PathView>("/api/tutor/paths", { method: "POST", body: { ...f, kbId: f.kbId || undefined }, idempotencyKey: idem.current });
+      idem.current = null;
       setQueryData(`hoc/lo-trinh/${p.id}`, p);
       invalidate(LIST_KEY);
       toast({ title: "Đã dựng lộ trình", msg: p.name });
       onOpen(p.id);
     } catch (e) {
+      if (!(e instanceof TypeError)) idem.current = null; // lỗi mạng: lần sau gửi lại cùng khoá
       toast({ kind: "err", title: "Chưa dựng được lộ trình", msg: msg(e) });
+    } finally {
+      setCreating(false);
     }
   };
   return (
@@ -103,7 +112,7 @@ function PathList({ onOpen }: { onOpen: (id: string) => void }) {
           <label className="field wide"><span className="lbl">Kho tài liệu</span>
             <select className="select" value={f.kbId} onChange={(e) => setForm({ ...form, kbId: e.target.value })}><option value="">Không dùng tài liệu</option>{kbs.data?.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}</select>
           </label>
-          <div className="acts"><Button type="submit" variant="primary" icon="spark" busy={create.pending} disabled={!form.name.trim() || !form.goal.trim()} data-testid="path-create">{create.pending ? "AI đang dựng lộ trình…" : "Dựng lộ trình"}</Button></div>
+          <div className="acts"><Button type="submit" variant="primary" icon="spark" busy={creating} disabled={!form.name.trim() || !form.goal.trim()} data-testid="path-create">{creating ? "AI đang dựng lộ trình…" : "Dựng lộ trình"}</Button></div>
         </form>
       </section>
     </div>

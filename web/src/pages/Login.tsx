@@ -1,9 +1,21 @@
 import { useEffect, useState } from "react";
 import { AFTER_LOGIN_KEY, finishLogin, useAuth } from "../auth";
-import { Icon } from "../ui/Icon";
+import spriteUrl from "../ui/icons.svg?url";
 import "./login.css";
 
 type Idp = "google" | "microsoft" | "email";
+
+/**
+ * Icon v2 (cùng sprite ui/icons.svg) cho trang gốc: không import ui/Icon.tsx — module dùng chung cả 3 entry sẽ bị đẩy
+ * vào chunk chung của cổng GV/Học và làm tăng JS lần đầu của hai cổng. Đấu trường (/choi) dùng lại từ đây.
+ */
+export function Icon({ name, size }: { name: string; size?: "sm" }) {
+  return (
+    <svg className={size ? "i sm" : "i"} aria-hidden="true" focusable="false">
+      <use href={`${spriteUrl}#i-${name}`} />
+    </svg>
+  );
+}
 
 /** Đăng nhập (trang gốc, token v2): GV/SV bằng tài khoản; HS vào lớp bằng mã; đấu trường bằng PIN. */
 export function Login() {

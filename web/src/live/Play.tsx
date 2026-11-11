@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { useSearchParams } from "react-router";
 import { MathText } from "../math/MathText";
 import { Mascot } from "../portal/hoc/Mascot";
-import { Icon } from "../ui/Icon";
+import { Icon } from "../pages/Login";
 import { Avatar, CountUp, confetti } from "./fx";
 import { LETTERS, type PlayerState, useLeftMs, useStream } from "./live";
 // font + token v2 đã có trong CSS entry gốc (pages/login.css)
