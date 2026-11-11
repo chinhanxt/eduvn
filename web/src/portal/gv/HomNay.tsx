@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Skeleton } from "../../ui/components/Skeleton";
 import { EmptyState, ErrorState } from "../../ui/components/States";
@@ -80,13 +80,15 @@ function SkelRows({ n }: { n: number }) {
   );
 }
 
-function DetailSkel() {
+function DetailSkel({ body }: { body?: boolean }) {
   return (
     <div aria-hidden="true">
-      <div className="dhd">
-        <Skeleton w={96} h={10} />
-        <Skeleton w="80%" h={16} style={{ marginTop: 8 }} />
-      </div>
+      {!body && (
+        <div className="dhd">
+          <Skeleton w={96} h={10} />
+          <Skeleton w="80%" h={16} style={{ marginTop: 8 }} />
+        </div>
+      )}
       <div className="props">
         {[0, 1, 2, 3, 4].map((i) => (
           <span key={i} style={{ display: "contents" }}>
@@ -144,6 +146,10 @@ export function HomNay() {
   const d = q.data;
   const [view, setView] = useUrlState<string>("xem", "tat-ca", { mode: "push" });
   const v: GvView = (GV_VIEWS as readonly string[]).includes(view) ? (view as GvView) : "tat-ca";
+  // Tab đổi ngay (phản hồi bấm), danh sách vẽ lại trong transition → INP thấp kể cả máy chậm.
+  const [tabNow, setTabNow] = useState<GvView | null>(null);
+  useEffect(() => setTabNow(null), [v]);
+  const shownTab = tabNow ?? v;
   const counts = d ? viewCounts(d) : null;
   const list = useMemo(() => (d ? filterTasks(d.tasks, v) : []), [d, v]);
   const [sel, setSel] = useState(0);
@@ -193,10 +199,11 @@ export function HomNay() {
         <a
           key={x}
           href={`?xem=${x}`}
-          aria-current={x === v ? "page" : undefined}
+          aria-current={x === shownTab ? "page" : undefined}
           onClick={(e) => {
             e.preventDefault();
-            setView(x);
+            setTabNow(x);
+            startTransition(() => setView(x));
           }}
         >
           {VIEW_LABEL[x]} {counts && <span className="count">{counts[x]}</span>}
@@ -295,9 +302,19 @@ export function HomNay() {
             v === "hoc-sinh" ? (
               <EmptyState icon="users" title="Học sinh cần quan tâm" text="Bấm tên em để mở lớp, xem bài làm và nhắn phụ huynh." />
             ) : (
-              <Suspense fallback={<DetailSkel />}>
-                <Detail t={cur} now={d.now} />
-              </Suspense>
+              cur ? (
+                <>
+                  <div className="dhd">
+                    <span className="mono">{cur.id}</span>
+                    <h2>{cur.title}</h2>
+                  </div>
+                  <Suspense fallback={<DetailSkel body />}>
+                    <Detail t={cur} now={d.now} />
+                  </Suspense>
+                </>
+              ) : (
+                <EmptyState icon="check" title="Chọn một việc" text="Chi tiết, phổ điểm và câu sai nhiều sẽ hiện ở đây." />
+              )
             )
           ) : err ? null : (
             <DetailSkel />

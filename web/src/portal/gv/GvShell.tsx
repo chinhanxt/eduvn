@@ -16,7 +16,8 @@ import { GV_FOOT, gvNav } from "./nav";
 export function GvShell() {
   const { logout } = useAuth();
   const me = useQuery(ME_KEY, fetchMe, { staleMs: 5 * 60_000 });
-  const today = useQuery(me.data ? GV_TODAY_KEY : null, fetchGvToday);
+  // Không chờ /api/me: dữ liệu Hôm nay (đã tải trước lúc mở trang) và nội dung trang vẽ song song.
+  const today = useQuery(GV_TODAY_KEY, fetchGvToday);
   const status = me.error instanceof ApiError ? me.error.status : 0;
   useEffect(() => {
     if (status === 401) goLogin();
@@ -81,13 +82,9 @@ export function GvShell() {
         notices={notices}
         commands={commands}
       >
-        {m ? (
-          <Suspense fallback={<PageSkeleton />}>
-            <Outlet />
-          </Suspense>
-        ) : (
-          <PageSkeleton />
-        )}
+        <Suspense fallback={<PageSkeleton />}>
+          <Outlet />
+        </Suspense>
       </AppShell>
     </MeCtx>
   );

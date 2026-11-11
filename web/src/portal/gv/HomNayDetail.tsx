@@ -2,7 +2,6 @@ import { Link } from "react-router";
 import { Difficulty } from "../../ui/charts/Difficulty";
 import { Histogram, binsOf } from "../../ui/charts/Histogram";
 import { Button } from "../../ui/components/Button";
-import { EmptyState } from "../../ui/components/States";
 import { useToast } from "../../ui/components/Toast";
 import { Icon } from "../../ui/Icon";
 import { dueText, type GvAssignmentDetail, type GvLessonDetail, type GvTask, taskKey, vn1 } from "../today";
@@ -95,16 +94,8 @@ function LessonDetail({ t, d }: { t: GvTask; d: GvLessonDetail }) {
   );
 }
 
-export function Detail({ t, now }: { t: GvTask | null; now: string }) {
-  if (!t) return <EmptyState icon="check" title="Chọn một việc" text="Chi tiết, phổ điểm và câu sai nhiều sẽ hiện ở đây." />;
-  return (
-    <>
-      <div className="dhd">
-        <span className="mono">{t.id}</span>
-        <h2>{t.title}</h2>
-      </div>
-      {t.detail.type === "assignment" ? <AssignmentDetail t={t} d={t.detail} now={now} /> : <LessonDetail t={t} d={t.detail} />}
-    </>
-  );
+/** Thân khung chi tiết (đầu khung — mã + tiêu đề — vẽ sẵn ở HomNay.tsx để hiện cùng danh sách). */
+export function Detail({ t, now }: { t: GvTask; now: string }) {
+  return t.detail.type === "assignment" ? <AssignmentDetail t={t} d={t.detail} now={now} /> : <LessonDetail t={t} d={t.detail} />;
 }
 

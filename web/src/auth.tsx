@@ -34,7 +34,27 @@ export const hasStoredUser = (): boolean => {
     return false;
   }
 };
-if (typeof window !== "undefined" && hasStoredUser()) void getUserManager();
+
+/**
+ * Phiên Keycloak đã lưu, đọc đồng bộ (JSON của oidc-client-ts) — để vẽ khung + gọi API ngay khi trang mở,
+ * không chờ tải thư viện oidc. Thư viện tải xong sẽ thay bằng đối tượng User thật (gia hạn ngầm, sự kiện).
+ */
+export function readStoredUser(): User | null {
+  try {
+    const k = Object.keys(window.localStorage).find((x) => x.startsWith("oidc.user:"));
+    if (!k) return null;
+    const u = JSON.parse(window.localStorage.getItem(k) ?? "null") as (Partial<User> & { expires_at?: number }) | null;
+    if (!u?.access_token || !u.expires_at || u.expires_at * 1000 <= Date.now() + 30_000) return null;
+    return { ...u, expired: false, expires_in: u.expires_at - Math.floor(Date.now() / 1000) } as unknown as User;
+  } catch {
+    return null;
+  }
+}
+/** Tải oidc: phiên đã lưu còn hạn → lúc trình duyệt rảnh (không tranh CPU với lần vẽ đầu); hết hạn → ngay để gia hạn. */
+if (typeof window !== "undefined" && hasStoredUser()) {
+  if (readStoredUser() && window.requestIdleCallback) window.requestIdleCallback(() => void getUserManager(), { timeout: 1500 });
+  else void getUserManager();
+}
 
 /** Lớp mỏng giữ API cũ (userManager.getUser() …) cho mã hiện có. */
 export const userManager = {
@@ -56,8 +76,9 @@ export function finishLogin(): Promise<User | undefined> {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [ready, setReady] = useState(false);
+  // Có phiên đã lưu còn hạn → sẵn sàng ngay (vẽ khung, gọi API); thư viện oidc tải song song rồi thay bằng User thật.
+  const [user, setUser] = useState<User | null>(() => (window.location.pathname === "/callback" ? null : readStoredUser()));
+  const [ready, setReady] = useState(() => user !== null);
 
   useEffect(() => {
     const onLoaded = (u: User) => setUser(u);
@@ -68,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Chưa từng đăng nhập: không chờ tải oidc.
     if (isCallback || !hasStoredUser()) setReady(true);
     if (!isCallback && !hasStoredUser()) return;
-    void getUserManager().then((m) => {
+    const attach = () => void getUserManager().then((m) => {
       if (!live) return;
       um = m;
       m.events.addUserLoaded(onLoaded);
@@ -76,11 +97,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       m.events.addAccessTokenExpired(onGone);
       if (!isCallback)
         m.getUser()
-          .then((u) => live && setUser(u && !u.expired ? u : null))
+          // cùng token với bản đọc nhanh → giữ đối tượng cũ, khỏi vẽ lại cả cây
+          .then((u) => live && setUser((prev) => (u && !u.expired ? (prev && prev.access_token === u.access_token ? prev : u) : null)))
           .finally(() => live && setReady(true));
     });
+    // Đã sẵn sàng nhờ phiên đọc nhanh → gắn oidc lúc rảnh; còn lại (callback, phiên hết hạn) → ngay.
+    let idle = 0;
+    if (!isCallback && readStoredUser() && window.requestIdleCallback) idle = window.requestIdleCallback(attach, { timeout: 1500 });
+    else attach();
     return () => {
       live = false;
+      if (idle) window.cancelIdleCallback(idle);
       um?.events.removeUserLoaded(onLoaded);
       um?.events.removeUserUnloaded(onGone);
       um?.events.removeAccessTokenExpired(onGone);
