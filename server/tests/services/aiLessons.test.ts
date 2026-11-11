@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -589,6 +589,16 @@ describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () =
     expect(r.totalMs).toBeGreaterThan(1500 + 2 * (3000 + 3200));
     const dur = Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", r.video]).toString()) * 1000;
     expect(Math.abs(dur - r.totalMs)).toBeLessThan(400);
+    // bài mở đầu bằng cảnh hoạt hình rồi tới slide: ghép đoạn không được vỡ luồng H.264 (demo 11/11: "non-existing PPS")
+    const animDir = path.join(dir, "anim");
+    execFileSync("mkdir", ["-p", animDir]);
+    const hash = "a".repeat(24);
+    execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc=size=1280x720:rate=30:duration=2", "-pix_fmt", "yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "20", path.join(animDir, `${hash}.mp4`)]);
+    const withAnim = [{ ...sc[0], id: "z", animation: { status: "xong", hash, spec: {} } }, sc[0]] as unknown as StoredScene[];
+    const r2 = await renderLessonVideo("Thử", withAnim, audio, { chromePath: CHROME, outDir: path.join(dir, "out2"), animDir });
+    const dec = spawnSync("ffmpeg", ["-v", "error", "-i", r2.video, "-f", "null", "-"], { encoding: "utf8" });
+    expect(dec.status).toBe(0);
+    expect(dec.stderr.trim()).toBe("");
   });
 });
 

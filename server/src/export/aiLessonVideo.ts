@@ -124,6 +124,18 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
       await page.goto(`${fs.origin}/frame`, { waitUntil: "load" });
       for (const f of page.frames()) await f.evaluate(() => document.fonts.ready).catch(() => undefined);
     };
+    // Chrome thỉnh thoảng trả "Unable to capture screenshot" khi máy nặng (demo 11/11): chờ rồi chụp lại, tối đa 2 lần
+    const snap = async (o: { path: string; omitBackground?: boolean }) => {
+      for (let k = 0; ; k++) {
+        try {
+          await page.screenshot(o);
+          return;
+        } catch (e) {
+          if (k >= 2) throw e;
+          await page.waitForTimeout(700 * (k + 1));
+        }
+      }
+    };
     const setSub = (t: string) => page.evaluate((x) => { const el = document.getElementById("s"); if (el) el.textContent = x; }, t);
 
     const clips: string[] = [];
@@ -143,7 +155,7 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
           if (!cue.text) continue;
           await setSub(cue.text);
           const png = path.join(work, `s${String(frameN++).padStart(5, "0")}.png`);
-          await page.screenshot({ path: png, omitBackground: true });
+          await snap({ path: png, omitBackground: true });
           subs.push({ png, startMs: cue.startMs, endMs: cue.startMs + cue.durationMs });
         }
         const dur = (seg.durationMs / 1000).toFixed(3);
@@ -175,7 +187,7 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
           interactiveReady = true;
         }
         if (seg.kind === "interactive") await setSub(sub);
-        await page.screenshot({ path: png });
+        await snap({ path: png });
         shots.push({ png, durationMs: cue.durationMs });
         opts.onProgress?.(frameN, total);
       }
@@ -192,7 +204,9 @@ async function doRender(title: string, scenes: StoredScene[], audioDir: string, 
     const all = path.join(work, "all.txt");
     await writeFile(all, clips.map((c) => `file '${c}'`).join("\n"));
     const video = path.join(opts.outDir, "bai-giang.mp4");
-    await run("ffmpeg", ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", all, "-c", "copy", "-movflags", "+faststart", video], { timeout: 300_000 });
+    // Ghép: các đoạn x264 khác tham số (đoạn hoạt hình dựng qua filter_complex, đoạn slide từ ảnh PNG) → ghép -c copy làm vỡ
+    // luồng H.264 ("non-existing PPS", demo 11/11 khi bài mở đầu bằng hoạt hình). Hình mã hoá lại một lượt, tiếng giữ nguyên.
+    await run("ffmpeg", ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", all, "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", video], { timeout: 600_000 });
     const srt = path.join(opts.outDir, "phu-de.srt");
     await writeFile(srt, toSrt(tl));
     return { video, srt, totalMs: tl.totalMs, frames: frameN, diagnostics: tl.diagnostics };
