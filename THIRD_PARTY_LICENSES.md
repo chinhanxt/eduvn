@@ -230,3 +230,34 @@ authors nor the names of their institutions may be used to endorse or promote pr
 this software without specific prior written permission. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT
 WARRANTY OF ANY KIND; see the full license text at the URL above.
 ```
+
+## ppt-master (hugohe3/ppt-master, commit 3c6ffd0) — MIT — gói "Xuất bản & Nhập" (P14/GX)
+
+Lõi dựng PowerPoint gốc: `skills/ppt-master` dùng nguyên bản, cài ngoài repo (`services/pptmaster/setup.sh`), máy chủ gọi qua `services/pptmaster/eduvn_pptx.py`.
+Dùng: `svg_to_pptx` (hình gốc DrawingML, biểu đồ/bảng gốc, chuyển trang, hiệu ứng, giọng đọc nhúng, ghi chú), `svg_to_pptx/native_objects/formula_*` (LaTeX → Office Math OMML), `svg_quality_checker.py`, `pptx_to_svg/prstgeom_to_svg.py` (hình preset khi nhập .pptx), `source_to_md/_omml_latex.py` (OMML → LaTeX khi nhập). Không dùng `mathml2omml` (LGPL).
+Tham khảo ý tưởng (không chép mã): luonghaianh1208/2anh-studio (bản Việt hoá ppt-master), THU-MAIC/OpenMAIC `packages/@openmaic/importer`, `lib/export` (PPTX + QR, HTML ngoại tuyến, `.maic.zip`).
+Mã QR: `qrcode` 1.5.4 (MIT).
+
+```
+MIT License
+
+Copyright (c) 2025-2026 Hugo He
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
