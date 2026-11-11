@@ -25,5 +25,8 @@ export function gvNav(counts: { classes?: number; grading?: number } = {}): NavE
     { to: "/cong-cu", label: "Tất cả công cụ", icon: "more" },
   ];
 }
-export const GV_FOOT: NavItem[] = [{ to: "/ket-noi", label: "Kết nối AI", icon: "plug" }];
+export const GV_FOOT: NavItem[] = [
+  { to: "/ket-noi", label: "Kết nối AI", icon: "plug" },
+  { to: "/cai-dat/nha-cung-cap", label: "Nhà cung cấp AI", icon: "sliders" },
+];
 

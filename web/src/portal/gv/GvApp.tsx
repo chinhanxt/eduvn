@@ -42,6 +42,7 @@ const P = {
   kho: pick(() => Promise.all([import("../../hoc/KhoTriThuc"), import("../../hoc/hoc.css")]), ([m]) => m.KhoTriThuc),
   sapCo: pick(() => import("./CongCu"), (m) => m.SapCo),
   books: pick(() => Promise.all([import("../../hoc/Books"), import("../../hoc/hoc.css")]), ([m]) => m.Books),
+  nhaCungCap: pick(() => import("../../providers/NhaCungCap"), (m) => m.NhaCungCap),
 };
 
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
@@ -72,6 +73,7 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/ket-noi", page: P.connect },
   { path: "/kho-tri-thuc", page: P.kho, legacy: true },
   { path: "/giao-trinh", page: P.books, legacy: true },
+  { path: "/cai-dat/nha-cung-cap", page: P.nhaCungCap },
 ];
 /** Màn toàn màn hình (không khung): bảng giảng, sơ đồ, màn chiếu đấu trường. */
 const FULL_ROUTES: { path: string; page: Page }[] = [
