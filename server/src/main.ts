@@ -5,6 +5,7 @@ import { buildApp } from "./http/app";
 import { createAi } from "./services/ai";
 import { createAnimService } from "./services/anim";
 import { createVieneuTts, disabledTts } from "./services/aiLessons/tts";
+import { createProviders } from "./providers";
 
 const cfg = loadConfig();
 const db = await connectDb(cfg.DATABASE_URL);
@@ -18,6 +19,7 @@ const app = buildApp({
   pressure: { maxEventLoopDelay: 1000 },
   sweepMs: 60_000,
   ai: createAi({ url: cfg.GATEWAY_URL, token: cfg.GATEWAY_TOKEN }),
+  providers: createProviders({ ai: createAi({ url: cfg.GATEWAY_URL, token: cfg.GATEWAY_TOKEN }) }),
   aiLessons: {
     dataDir: cfg.DATA_DIR,
     anim: createAnimService({ dataDir: cfg.DATA_DIR, wrap: cfg.HEAVY_BIN ? [cfg.HEAVY_BIN, "run", "eduvn-anim", "--"] : undefined, manimHome: cfg.MANIM_HOME, tinytexBin: cfg.TINYTEX_BIN }),

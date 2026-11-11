@@ -52,6 +52,9 @@ import { createTodayService } from "../services/today";
 import { registerPhotoGradingRoutes } from "./routes/photoGrading";
 import { createPhotoGradingService } from "../services/photoGrading";
 import { registerSolutionRoutes } from "./routes/solutions";
+import { registerProviderRoutes } from "./routes/providers";
+import { createProviders, type ProviderRegistry } from "../providers";
+import { createProviderService } from "../providers/service";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -72,6 +75,8 @@ export type AppDeps = {
   studentRateLimit?: { max: number; timeWindow: number };
   /** Chu kỳ quét chốt bài quá hạn (ms); 0/không có = tắt. */
   sweepMs?: number;
+  /** G1: registry nhà cung cấp phụ (test truyền fakeRegistry); không có → dựng từ biến môi trường. */
+  providers?: ProviderRegistry;
 };
 
 const GradeBody = z.object({ code: z.string().min(1), responses: z.record(z.string(), ResponseValue) });
@@ -425,6 +430,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerTodayRoutes(app, { db: deps.db, today: createTodayService(deps.db, { now }), authenticate, studentAuth });
   registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, geoAi, classes), authenticate });
   registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate, tutor, student: (req) => studentAuth.verifySession(bearer(req)).catch(() => Promise.reject(new UnauthorizedError("Phiên đã hết, em đăng nhập lại nhé"))) });
+
+  registerProviderRoutes(app, { providers: createProviderService(deps.db, deps.providers ?? createProviders({ ai: deps.ai }), { dataDir: deps.aiLessons?.dataDir ?? process.env.DATA_DIR ?? "./data" }), authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

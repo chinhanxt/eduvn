@@ -28,6 +28,7 @@ export const ACTIONS = [
   "assignment:manage",
   "assignment:read",
   "student:credentials",
+  "provider:manage",
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
