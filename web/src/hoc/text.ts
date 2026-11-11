@@ -155,9 +155,11 @@ export function parseInline(src: string, validCites: readonly number[]): Inline[
 
 /** Nội dung hộp nhấn: bỏ nhãn AI tự thêm ở đầu ("**Lỗi thường gặp:**", "Lưu ý:") vì hộp đã có nhãn riêng. */
 export function calloutBody(md: string): string {
-  return md
-    .trim()
+  const src = md.trim();
+  const out = src
     .replace(/^\*\*[^*\n]{1,40}?:\*\*\s*|^\*\*[^*\n]{1,40}?\*\*\s*:\s*/, "")
     .replace(/^(?:Lỗi (?:hay|thường) gặp|Lưu ý|Mẹo|Ý chính|Ghi nhớ|Liên hệ|Hiểu sâu hơn|Cảnh báo)\s*:\s*/iu, "")
     .trim();
+  // bỏ nhãn thì câu còn lại viết hoa chữ đầu
+  return out !== src ? out.replace(/^\p{Ll}/u, (c) => c.toUpperCase()) : out;
 }

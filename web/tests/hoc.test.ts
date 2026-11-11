@@ -61,8 +61,8 @@ describe("sửa demo 11/11 — Markdown + toán", () => {
     expect(p.some((x) => x.kind === "cite" && x.n === 2)).toBe(true);
   });
   it("hộp nhấn: bỏ nhãn AI tự thêm ở đầu, giữ **đậm** trong nội dung", () => {
-    expect(calloutBody("**Lỗi thường gặp:** khi lấy **không hoàn lại** …")).toBe("khi lấy **không hoàn lại** …");
-    expect(calloutBody("Lưu ý: dùng $\\frac47$")).toBe("dùng $\\frac47$");
+    expect(calloutBody("**Lỗi thường gặp:** khi lấy **không hoàn lại** …")).toBe("Khi lấy **không hoàn lại** …");
+    expect(calloutBody("Lưu ý: dùng $\\frac47$")).toBe("Dùng $\\frac47$");
     expect(calloutBody("**Công thức nhân** là định nghĩa viết lại")).toBe("**Công thức nhân** là định nghĩa viết lại");
   });
 });
