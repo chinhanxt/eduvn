@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="vi" data-portal="hoc">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230b7466%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gia sư · EDUVN Học sinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="../skin-hoc.css">
+<style>
+  main.page { padding: 0; }
+  .tutor { display: grid; grid-template-columns: 250px minmax(0, 1fr) 290px; min-height: calc(100dvh - var(--top-h)); }
+  .threads { padding: var(--s-4) var(--s-3); border-right: 1px solid var(--line); }
+  .threads .new { width: 100%; justify-content: flex-start; margin-bottom: var(--s-3); }
+  .threads .eyebrow { margin: var(--s-4) var(--s-2) var(--s-1); }
+  .th { display: block; padding: 8px 10px; border-radius: 10px; font-size: 13px; line-height: 18px; color: var(--ink-2); }
+  .th:hover { background: var(--bg-hover); }
+  .th[aria-current] { background: var(--bg-raised); color: var(--ink); box-shadow: var(--shadow-card); font-weight: 600; }
+  .th small { display: flex; align-items: center; gap: 6px; font-weight: 400; color: var(--ink-3); font-size: 11px; margin-top: 2px; }
+  .th small i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+  .conv { display: flex; flex-direction: column; min-width: 0; }
+  .conv-hd { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; padding: var(--s-4) var(--s-6); }
+  .conv-hd h1 { font-size: 20px; line-height: 26px; font-weight: 800; letter-spacing: -.01em; }
+  .msgs { flex: 1; width: 100%; max-width: 780px; margin: 0 auto; padding: var(--s-2) var(--s-6) var(--s-6); display: flex; flex-direction: column; gap: var(--s-5); }
+  .me { align-self: flex-end; max-width: 78%; background: var(--accent); color: #fff; padding: 12px 16px; border-radius: 20px 20px 6px 20px; font-size: 15px; line-height: 22px; }
+  .me .att { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; color: #dcf3ef; }
+  .me .thumb { width: 56px; height: 40px; border-radius: 8px; background: rgb(255 255 255 / .16); display: grid; place-items: center; }
+  .ai { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: var(--s-3); }
+  .ai .av { width: 36px; height: 36px; border-radius: 12px; background: var(--accent-bg); color: var(--accent); display: grid; place-items: center; }
+  .ai .bubble { background: var(--bg-raised); border-radius: 6px 20px 20px 20px; box-shadow: var(--shadow-card); padding: 14px 18px; }
+  .ai .read { font-size: 17px; line-height: 28px; max-width: none; }
+  .ai .read p + p { margin-top: 10px; }
+  .ai .eq { display: block; text-align: center; margin: 8px 0; font-family: var(--font-read); font-style: italic; }
+  .cite { font: 700 11px/18px var(--font-ui); padding: 0 6px; border-radius: 6px; background: var(--accent-bg); color: var(--accent); vertical-align: 2px; margin-left: 2px; }
+  .hint { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: #fff7e6; color: #7a4a00; font-size: 14px; }
+  .tools { display: flex; gap: 2px; margin-top: 8px; }
+  .follow { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 0 48px; }
+  .follow button { height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--accent-line); background: var(--bg-raised); color: var(--accent); font-weight: 600; font-size: 13px; }
+  .follow button:hover { background: var(--accent-bg); }
+  .composer { position: sticky; bottom: 0; padding: var(--s-3) var(--s-6) var(--s-5); background: linear-gradient(transparent, var(--bg) 35%); }
+  .box { max-width: 780px; margin: 0 auto; background: var(--bg-raised); border-radius: 20px; box-shadow: var(--shadow-card), 0 0 0 1px var(--line-2); }
+  .box:focus-within { box-shadow: var(--shadow-card), 0 0 0 2px var(--accent); }
+  .box textarea { width: 100%; border: 0; outline: 0; resize: none; background: none; padding: 14px 18px 0; min-height: 52px; font-size: 16px; line-height: 24px; }
+  .box .row { padding: 8px 10px; }
+  .sources { padding: var(--s-5) var(--s-4); border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: var(--s-3); }
+  .src { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 12px; border-radius: 14px; background: var(--bg-raised); box-shadow: var(--shadow-card); font-size: 13px; line-height: 19px; }
+  .src .pg { height: 56px; border-radius: 6px; background: color-mix(in srgb, var(--c1) 12%, #fff); display: grid; place-items: center; font: 800 12px/1 var(--font-ui); color: var(--ink-2); position: relative; }
+  .src .pg::after { content: attr(data-n); position: absolute; top: -6px; left: -6px; width: 20px; height: 20px; border-radius: 6px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 11px; }
+  .src b { display: block; } .src q { display: block; margin-top: 4px; color: var(--ink-2); font-family: var(--font-read); font-size: 14px; line-height: 21px; }
+  @media (max-width: 1180px) { .tutor { grid-template-columns: 220px minmax(0, 1fr); } .sources { display: none; } }
+  @media (max-width: 720px) { .tutor { grid-template-columns: minmax(0, 1fr); } .threads { display: none; } .conv-hd { padding: var(--s-3) var(--s-4); } .msgs { padding: var(--s-2) var(--s-4) var(--s-4); } .me { max-width: 90%; } .ai { grid-template-columns: minmax(0, 1fr); } .ai .av { display: none; } .follow { margin-left: 0; } .composer { padding: var(--s-2) var(--s-3) calc(var(--tab-h) + var(--s-2)); } .ai .read { font-size: 16px; line-height: 26px; } }
+</style>
+</head>
+<body data-nav="gia-su" data-crumb="Gia sư|Dấu tam thức bậc hai">
+<script src="../icons.js"></script>
+<main id="main">
+  <div class="tutor">
+    <nav class="threads" aria-label="Cuộc trò chuyện" data-region data-skel-rows="5" data-empty-icon="chat" data-empty-title="Chưa hỏi gì" data-empty-text="Chụp ảnh bài tập hoặc gõ câu hỏi.">
+      <a class="btn new" href="#"><svg class="i sm"><use href="#i-plus"/></svg><span>Hỏi điều mới</span></a>
+      <div class="eyebrow">Hôm nay</div>
+      <a class="th" href="#" aria-current="page">Dấu tam thức bậc hai<small><i style="--c:var(--c1)"></i>Toán · 4 tin</small></a>
+      <a class="th" href="#">Thì hiện tại hoàn thành<small><i style="--c:var(--c3)"></i>Tiếng Anh · 6 tin</small></a>
+      <div class="eyebrow">Tuần này</div>
+      <a class="th" href="#">Tích vô hướng hai vectơ<small><i style="--c:var(--c1)"></i>Toán · 9 tin</small></a>
+      <a class="th" href="#">Phân tích “Tràng giang”<small><i style="--c:var(--c2)"></i>Ngữ văn · 12 tin</small></a>
+    </nav>
+
+    <section class="conv" aria-label="Hội thoại">
+      <div class="conv-hd page-head" style="margin:0">
+        <h1>Dấu tam thức bậc hai</h1><span class="chipc">SGK Toán 10 · KNTT</span><span class="grow"></span>
+        <div class="seg" role="group" aria-label="Cách trả lời"><button aria-pressed="true">Gợi ý từng bước</button><button aria-pressed="false">Lời giải đầy đủ</button></div>
+      </div>
+      <div class="msgs" aria-live="polite">
+        <div class="me"><div class="att"><span class="thumb"><svg class="i sm"><use href="#i-image"/></svg></span>bai-tap-trang-24.jpg</div>Bài 6.12: tìm m để x² − 2mx + m + 2 &gt; 0 với mọi x. Em không biết bắt đầu từ đâu ạ.</div>
+        <div class="ai"><span class="av"><svg class="i"><use href="#i-bot"/></svg></span><div><div class="bubble"><div class="read"><p>Mình làm từng bước nhé. Tam thức f(x) = ax² + bx + c luôn dương với mọi x khi và chỉ khi<span class="cite">1</span></p><span class="eq">a &gt; 0 và Δ &lt; 0.</span><p>Ở đây a = 1 &gt; 0 rồi. Em thử tính <b>Δ′</b> của x² − 2mx + m + 2 xem?</p></div></div><div class="tools"><button class="btn ghost sm icon" aria-label="Chép"><svg class="i sm"><use href="#i-copy"/></svg></button><button class="btn ghost sm icon" aria-label="Lưu thành thẻ ôn"><svg class="i sm"><use href="#i-bookmark"/></svg></button><button class="btn ghost sm icon" aria-label="Đọc to"><svg class="i sm"><use href="#i-play"/></svg></button></div></div></div>
+        <div class="me">Δ′ = m² − m − 2 ạ.</div>
+        <div class="ai"><span class="av"><svg class="i"><use href="#i-bot"/></svg></span><div><div class="bubble"><div class="read"><p>Chính xác! Giờ cần Δ′ &lt; 0, tức là</p><span class="eq">m² − m − 2 &lt; 0.</span><p id="stream" class="caret">Tam thức này có hai nghiệm m = −1 và m = 2. Theo quy tắc “trong trái, ngoài cùng”<span class="cite">2</span>, nó âm khi m nằm giữa hai nghiệm, nên</p></div><div class="row" style="margin-top:10px;gap:10px"><div class="stream-bar" style="width:120px"></div><span class="caption">Gia sư đang viết…</span></div></div></div></div>
+        <div class="follow" aria-label="Hỏi tiếp"><button>Vì sao không lấy dấu “=”?</button><button>Cho em 1 bài tương tự</button><button>Vẽ đồ thị giúp em</button></div>
+      </div>
+      <div class="composer"><div class="box"><textarea rows="1" placeholder="Hỏi tiếp, hoặc gửi ảnh bài tập…" aria-label="Câu hỏi"></textarea><div class="row"><button class="btn ghost icon sm" aria-label="Gửi ảnh"><svg class="i sm"><use href="#i-image"/></svg></button><button class="btn ghost icon sm" aria-label="Nói"><svg class="i sm"><use href="#i-mic"/></svg></button><span class="caption grow hide-sm">Chỉ trả lời theo tài liệu lớp · <kbd>Enter</kbd> gửi</span><span class="grow show-sm"></span><button class="btn sm" id="btn-stop"><svg class="i sm"><use href="#i-stop"/></svg><span>Dừng</span></button></div></div></div>
+    </section>
+
+    <aside class="sources" aria-label="Nguồn">
+      <div class="eyebrow">Nguồn trong câu trả lời</div>
+      <div class="src"><span class="pg" data-n="1">tr. 22</span><div><b>SGK Toán 10 tập 1</b><span class="caption">Định lí dấu tam thức bậc hai</span><q>Nếu Δ &lt; 0 thì f(x) cùng dấu với a với mọi x ∈ ℝ.</q></div></div>
+      <div class="src"><span class="pg" data-n="2" style="--c1:var(--c3)">03/11</span><div><b>Vở ghi lớp 10A1</b><span class="caption">Cô Lan Anh tải lên</span><q>Trong trái, ngoài cùng: giữa hai nghiệm f(x) trái dấu a.</q></div></div>
+      <a class="btn" href="luyen-tap.html" style="margin-top:auto"><svg class="i sm"><use href="#i-layers"/></svg><span>Luyện 5 câu tương tự</span></a>
+    </aside>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell2.js"></script>
+<script>
+  const el = document.getElementById("stream");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches && !location.search.includes("shot")) {
+    setTimeout(() => { const t = document.createElement("span"); el.append(t); UI.stream(t, " −1 < m < 2. Em thử thay m = 0 xem x² + 2 có luôn dương không?", { cps: 45, onDone: () => { el.classList.remove("caret"); document.querySelector(".stream-bar").parentElement.remove(); } }); }, 400);
+  }
+  UI.states();
+</script>
+</body>
+</html>

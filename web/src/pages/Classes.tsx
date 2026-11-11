@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import { api, dobVi, errText, exportClass, type ClassDetail, type ClassSummary } from "../api";
 import { Icon } from "../Icon";
+import { AssignTab } from "./classroom/AssignTab";
+import { BadgesTab } from "./classroom/BadgesTab";
+import { AssignmentScoped, ClassTabs, type ClassTab } from "./classroom/ClassroomTabs";
 
 const schoolYearNow = () => {
   const d = new Date();
@@ -85,6 +88,10 @@ export function ClassDetailPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const file = useRef<HTMLInputElement>(null);
+  const [sp, setSp] = useSearchParams();
+  const tab = (sp.get("tab") ?? "hoc-vien") as ClassTab;
+  const picked = sp.get("bai");
+  const goTab = (t: ClassTab, bai: string | null = picked) => setSp(t === "hoc-vien" ? {} : { tab: t, ...(bai ? { bai } : {}) });
 
   const load = useCallback(() => {
     api<ClassDetail>(`/api/classes/${id}`).then(setC).catch((e: unknown) => setError(errText(e)));
@@ -135,6 +142,11 @@ export function ClassDetailPage() {
     <>
       <Link to="/lop-hoc" className="back"><Icon name="back" size={18} />Lớp học</Link>
       <h1>{c.name} <small style={{ color: "var(--muted)", fontWeight: 400, fontSize: 14 }}>{c.schoolYear}{c.subject ? ` · ${c.subject}` : ""} · {c.scale}</small></h1>
+      <ClassTabs tab={tab} onTab={(t) => goTab(t)} />
+      {tab === "giao-bai" && <AssignTab classId={c.id} subject={c.subject} className={c.name} rosterSize={c.students.length} onOpen={(aid, t) => goTab(t, aid)} />}
+      {(tab === "theo-doi" || tab === "ket-qua") && <AssignmentScoped classId={c.id} tab={tab} assignmentId={picked} onPick={(aid) => goTab(tab, aid)} />}
+      {tab === "the-lop" && <BadgesTab classId={c.id} />}
+      {tab === "hoc-vien" && <>
       <div className="bar">
         <button className="btn ghost" onClick={() => setPaste((p) => !p)} data-testid="paste-toggle"><Icon name="clip" size={18} />Dán danh sách</button>
         <button className="btn ghost" onClick={() => file.current?.click()} data-testid="upload-btn"><Icon name="upload" size={18} />Tải Excel</button>
@@ -169,6 +181,7 @@ export function ClassDetailPage() {
           </table>
         )}
       </div>
+    </>}
     </>
   );
 }

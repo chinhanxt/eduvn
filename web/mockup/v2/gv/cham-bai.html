@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chấm KT 15′ 10A3 · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="../skin-gv.css">
+<style>
+  .grade { display: grid; grid-template-columns: 220px minmax(0, 1fr) 300px; gap: var(--s-4); align-items: start; }
+  .qnav a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .qnav a:last-child { border-bottom: 0; }
+  .qnav a:hover { background: var(--bg-hover); }
+  .qnav a[aria-current] { background: var(--accent-bg); box-shadow: inset 2px 0 0 var(--accent); }
+  .qnav b { font-weight: 600; } .qnav small { grid-column: 1 / -1; color: var(--ink-3); font-size: 11px; }
+  .qnav .n { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .qnav .meter { grid-column: 1 / -1; height: 4px; background: var(--line); }
+  .qnav .done .meter > i { background: var(--ok); }
+  .qcard { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .qcard .stem { font-family: var(--font-read); font-size: 16px; line-height: 25px; margin-top: 4px; }
+  .qcard .key { display: inline-flex; gap: 6px; align-items: center; margin-top: 8px; font-size: 12px; color: var(--ok); font-weight: 600; }
+  .cl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); align-items: center; }
+  .cl:last-child { border-bottom: 0; }
+  .cl[aria-current] { background: var(--accent-bg); box-shadow: inset 2px 0 0 var(--accent); }
+  .cl .ans { font-family: var(--font-read); font-size: 17px; line-height: 24px; }
+  .cl .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; font-size: 12px; color: var(--ink-3); }
+  .cl .names { grid-column: 1 / -1; font-size: 12px; color: var(--ink-2); }
+  .cl .pts { display: flex; align-items: center; gap: 8px; }
+  .cl .seg button { min-width: 44px; font-variant-numeric: tabular-nums; }
+  .conf { font: 600 11px/1 var(--font-mono); }
+  .rub { font-size: 12px; line-height: 18px; color: var(--ink-2); padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .rub ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+  .rub b { color: var(--ink); }
+  .bulk { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg-sunken); border-radius: 0 0 var(--r-md) var(--r-md); }
+  @media (max-width: 1180px) { .grade { grid-template-columns: 200px minmax(0, 1fr); } .grade > .side-info { grid-column: 1 / -1; } }
+  @media (max-width: 720px) { .grade { grid-template-columns: minmax(0, 1fr); } .qnav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .qnav a { border-right: 1px solid var(--line); } .cl { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body data-nav="cham-bai" data-crumb="Chấm bài|KT 15′ · 10A3">
+<script src="../icons.js"></script>
+<main id="main">
+  <div class="page-head bar">
+    <h1>Chấm KT 15′ · 10A3</h1>
+    <div class="seg" role="group" aria-label="Cách chấm"><button aria-pressed="true">Theo câu</button><button aria-pressed="false">Theo bài</button></div>
+    <span class="caption hide-sm"><b class="num">18</b>/41 bài xong · hạn 17:00</span>
+    <span class="grow"></span>
+    <div class="acts"><button class="btn sm" disabled title="Còn 23 câu chưa chấm"><svg class="i sm"><use href="#i-send"/></svg><span>Công bố điểm</span></button></div>
+  </div>
+
+  <div class="grade">
+    <nav class="pane qnav" aria-label="Câu cần chấm">
+      <div class="ghd">Trả lời ngắn <span class="n">4 câu</span></div>
+      <a href="?cau=7" class="done"><b>Câu 7</b><span class="n">40/40</span><span class="meter"><i style="--v:100%"></i></span><small>BPT tích · xong</small></a>
+      <a href="?cau=8"><b>Câu 8</b><span class="n">18/40</span><span class="meter"><i style="--v:45%"></i></span><small>Tìm m, có nghiệm</small></a>
+      <a href="?cau=9" aria-current="page"><b>Câu 9</b><span class="n">0/40</span><span class="meter"><i style="--v:0%"></i></span><small>Tìm m, ∀x · 5 nhóm</small></a>
+      <a href="?cau=10"><b>Câu 10</b><span class="n">0/40</span><span class="meter"><i style="--v:0%"></i></span><small>Tìm m, vô nghiệm</small></a>
+    </nav>
+
+    <section class="pane" aria-label="Câu 9">
+      <div class="qcard">
+        <div class="row"><span class="mono" style="color:var(--ink-3)">Q-1041</span><span class="badge">0,5 điểm</span><span class="grow"></span><span class="caption">40 bài · gộp thành <b>5 nhóm</b> đáp án giống nhau</span></div>
+        <p class="stem"><b>Câu 9.</b> Tìm tất cả giá trị của m để x² − 2mx + m + 2 &gt; 0 với mọi x ∈ ℝ.</p>
+        <span class="key"><svg class="i sm"><use href="#i-ok"/></svg>Đáp án: −1 &lt; m &lt; 2</span>
+      </div>
+      <div data-region data-skel-rows="5" data-empty-icon="check" data-empty-title="Đã chấm xong câu 9" data-empty-text="Chuyển sang câu 10 hoặc công bố điểm." data-empty-act="Câu 10">
+        <div class="cl"><div><div class="ans">−1 &lt; m &lt; 2</div><div class="meta"><span class="badge ok"><svg class="i"><use href="#i-ok"/></svg>AI: Đúng</span><span class="conf">99%</span><span>· gồm cả “m ∈ (−1; 2)”</span></div></div><div class="pts"><b class="num">13 em</b><div class="seg"><button aria-pressed="false">0</button><button aria-pressed="false">0,25</button><button aria-pressed="true">0,5</button></div></div></div>
+        <div class="cl"><div><div class="ans">−1 ≤ m ≤ 2</div><div class="meta"><span class="badge danger"><svg class="i"><use href="#i-err"/></svg>AI: Sai</span><span class="conf">97%</span><span>· lấy cả dấu “=”: tại m = −1 có x làm f(x) = 0</span></div></div><div class="pts"><b class="num">17 em</b><div class="seg"><button aria-pressed="true">0</button><button aria-pressed="false">0,25</button><button aria-pressed="false">0,5</button></div></div></div>
+        <div class="cl"><div><div class="ans">m &lt; −1 hoặc m &gt; 2</div><div class="meta"><span class="badge danger"><svg class="i"><use href="#i-err"/></svg>AI: Sai</span><span class="conf">98%</span><span>· lấy ngoài khoảng nghiệm</span></div></div><div class="pts"><b class="num">6 em</b><div class="seg"><button aria-pressed="true">0</button><button aria-pressed="false">0,25</button><button aria-pressed="false">0,5</button></div></div></div>
+        <div class="cl" aria-current="true"><div><div class="ans">m &gt; −1</div><div class="meta"><span class="badge warn"><svg class="i"><use href="#i-alert"/></svg>Cần cô xem</span><span class="conf">61%</span><span>· thiếu vế m &lt; 2 — có thể cho 0,25 theo hướng chấm</span></div></div><div class="pts"><b class="num">2 em</b><div class="seg"><button aria-pressed="false">0</button><button aria-pressed="false">0,25</button><button aria-pressed="false">0,5</button></div></div><div class="names">Võ Thành Nam · Lý Gia Hân <a class="link" href="#">xem bài làm</a></div></div>
+        <div class="cl"><div><div class="ans" style="color:var(--ink-3);font-style:italic">(bỏ trống)</div><div class="meta"><span class="badge">Không làm</span></div></div><div class="pts"><b class="num">2 em</b><div class="seg"><button aria-pressed="true">0</button><button aria-pressed="false">0,25</button><button aria-pressed="false">0,5</button></div></div></div>
+      </div>
+      <div class="bulk"><span class="caption grow">4/5 nhóm đã có điểm gợi ý · nhóm còn lại cần cô chọn</span><button class="btn primary sm" data-busy="900" data-done="Đã lưu" data-toast="Đã lưu điểm câu 9 cho 38 em" data-toast-msg="còn 2 em ở nhóm “m > −1”" data-undo="1"><svg class="i sm"><use href="#i-check"/></svg><span>Duyệt 4 nhóm</span><kbd class="k">A</kbd></button></div>
+    </section>
+
+    <aside class="side-info stack" style="gap:var(--s-4)">
+      <section class="pane">
+        <div class="ghd">Hướng chấm câu 9</div>
+        <div class="rub">Tối đa <b>0,5 điểm</b>.<ol><li><b>0,5</b>: −1 &lt; m &lt; 2 hoặc cách viết tương đương.</li><li><b>0,25</b>: đúng một vế, hoặc chỉ sai dấu ở một đầu mút.</li><li><b>0</b>: lấy dấu “=” cả hai đầu, sai khoảng, bỏ trống.</li></ol></div>
+        <dl class="props" style="margin:0;border-bottom:0"><dt>Sai phổ biến</dt><dd>“−1 ≤ m ≤ 2” · 17 em (43%)</dd><dt>Gợi ý</dt><dd>Chữa lại 5 phút đầu tiết sau</dd></dl>
+      </section>
+      <div class="keys" style="margin-top:0"><span><kbd>J</kbd> <kbd>K</kbd> nhóm</span><span><kbd>0</kbd> <kbd>1</kbd> <kbd>2</kbd> chọn điểm</span><span><kbd>A</kbd> duyệt gợi ý</span><span><kbd>]</kbd> câu sau</span></div>
+    </aside>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell2.js"></script>
+<script src="../charts.js"></script>
+<script>
+  document.querySelectorAll(".cl .seg").forEach((g) => g.addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; g.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b)); }));
+  UI.states();
+</script>
+</body>
+</html>

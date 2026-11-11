@@ -1,16 +1,26 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import rateLimit from "@fastify/rate-limit";
+import underPressure from "@fastify/under-pressure";
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
 import { ZodError, z } from "zod";
 import { resolveActor } from "../auth/actor";
 import { type DownloadClaims, createDownloadSigner } from "../auth/download";
+import { createStudentAuth } from "../auth/student";
 import type { Identity, VerifyToken } from "../auth/verify";
 import type { Db } from "../db/client";
 import { ForbiddenError } from "../domain/authz";
 import { ResponseValue } from "../domain/scoring";
 import { answerKey } from "../domain/variants";
-import { AiUnavailableError, NotFoundError, UnauthorizedError, ValidationError } from "../errors";
+import { AiUnavailableError, ConflictError, NotFoundError, TooManyRequestsError, UnauthorizedError, ValidationError } from "../errors";
+import { createAssignmentService } from "../services/assignments";
+import { createCredentialService } from "../services/credentials";
+import { createSubmissionService } from "../services/submissions";
+import { registerClassroomRoutes } from "./classroom";
+import { registerStudentRoutes } from "./student";
 import { type Ai, disabledAi } from "../services/ai";
 import { createDiagramService } from "../services/diagrams";
+import { buildFigure } from "../services/geometry";
+import { parseOverrides, withTaskOverrides } from "../tutor/tasks";
 import { renderAnswerKeyDocx, renderExamDocx } from "../export/docx";
 import { renderLessonDocx } from "../export/lesson";
 import { renderMatrixDocx } from "../export/matrix";
@@ -26,17 +36,39 @@ import { createGameService } from "../services/games";
 import { createSlideService } from "../services/slides";
 import type { AiLessonsCfg } from "../services/aiLessons/service";
 import { registerAiLessonRoutes } from "./routes/aiLessons";
+import { registerAiSkillRoutes } from "./routes/aiSkills";
+import { registerLiveRoutes } from "./routes/liveGame";
+import { createLiveService } from "../services/live";
 import { renderClassListXlsx, renderGradebookXlsx } from "../export/xlsx";
 import { buildMcpServer } from "../mcp/server";
 import { createClassService } from "../services/classes";
 import { StudentItem } from "../domain/roster";
 import { createTutor } from "../tutor";
+import { registerInkRoutes } from "./routes/ink";
 import { registerTutorRoutes } from "./routes/tutor";
 import { registerPhotoGradingRoutes } from "./routes/photoGrading";
 import { createPhotoGradingService } from "../services/photoGrading";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
-export type AppDeps = { db: Db; verify: VerifyToken; issuer: string; publicUrl: string; downloadSecret: string; ai?: Ai; aiLessons?: AiLessonsCfg };
+export type AppDeps = {
+  db: Db;
+  verify: VerifyToken;
+  issuer: string;
+  publicUrl: string;
+  downloadSecret: string;
+  /** Khoá ký phiên HS + thẻ QR (HS256, ≥ 32 ký tự). */
+  studentSecret: string;
+  ai?: Ai;
+  aiLessons?: AiLessonsCfg;
+  /** Đồng hồ (test truyền đồng hồ giả). */
+  now?: () => Date;
+  /** Bật @fastify/under-pressure: quá tải trả 503 + Retry-After. Test không bật. */
+  pressure?: { maxEventLoopDelay: number };
+  /** Giới hạn mỗi bài làm trên route ghi của HS; mặc định 60 lần/phút. */
+  studentRateLimit?: { max: number; timeWindow: number };
+  /** Chu kỳ quét chốt bài quá hạn (ms); 0/không có = tắt. */
+  sweepMs?: number;
+};
 
 const GradeBody = z.object({ code: z.string().min(1), responses: z.record(z.string(), ResponseValue) });
 const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -53,11 +85,19 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const slides = createSlideService(deps.db);
   const games = createGameService(deps.db);
   const boardsSvc = createBoardService(deps.db);
+  const now = deps.now ?? (() => new Date());
+  const studentAuth = createStudentAuth(deps.studentSecret);
+  const credentials = createCredentialService(deps.db, studentAuth, { now });
+  const submissionsSvc = createSubmissionService(deps.db, { now });
+  const assignmentsSvc = createAssignmentService(deps.db, { now, finalize: (id) => submissionsSvc.finalizeExpired({ assignmentId: id }) });
   const diagramsSvc = createDiagramService(deps.db, deps.ai ?? disabledAi);
   const signer = createDownloadSigner(deps.downloadSecret, `${LINK_TTL_MINUTES}m`);
   const metadataUrl = `${deps.publicUrl}/.well-known/oauth-protected-resource`;
 
-  app.setErrorHandler((err, _req, reply) => {
+  if (deps.pressure) app.register(underPressure, { maxEventLoopDelay: deps.pressure.maxEventLoopDelay, retryAfter: 2, exposeStatusRoute: false });
+  app.register(rateLimit, { global: false, errorResponseBuilder: (_req, ctx) => ({ statusCode: 429, message: `Gửi quá nhanh, thử lại sau ${Math.ceil(ctx.ttl / 1000)} giây` }) });
+
+  app.setErrorHandler((err, req, reply) => {
     if (err instanceof UnauthorizedError) {
       return reply.code(401).header("www-authenticate", `Bearer resource_metadata="${metadataUrl}"`).send({ error: err.message });
     }
@@ -66,7 +106,12 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     if (err instanceof AiUnavailableError) return reply.code(503).header("retry-after", "5").send({ error: err.message });
     if (err instanceof ValidationError) return reply.code(400).send({ error: err.message, issues: err.issues });
     if (err instanceof ZodError) return reply.code(400).send({ error: "Dữ liệu không hợp lệ", issues: err.issues });
-    if ((err as { code?: string }).code === "FST_ERR_CTP_BODY_TOO_LARGE") return reply.code(413).send({ error: "Bài giảng quá lớn (tối đa 4 MB) — xoá bớt nét vẽ hoặc tách trang." });
+    if (err instanceof TooManyRequestsError) return reply.code(429).header("retry-after", String(err.retryAfterSec)).send({ error: err.message });
+    if (err instanceof ConflictError) return reply.code(409).send({ error: err.message, ...err.extra });
+    const code = (err as { code?: string }).code;
+    if (code === "FST_UNDER_PRESSURE") return reply.code(503).send({ error: "Máy chủ đang bận, thử lại sau giây lát" });
+    if (code === "FST_ERR_CTP_BODY_TOO_LARGE")
+      return reply.code(413).send({ error: req.url.startsWith("/api/boards") || req.url.startsWith("/api/diagrams") ? "Bài giảng quá lớn (tối đa 4 MB) — xoá bớt nét vẽ hoặc tách trang." : "Dữ liệu gửi lên quá lớn" });
     const status = (err as { statusCode?: number }).statusCode;
     if (status !== undefined && status >= 400 && status < 500) return reply.code(status).send({ error: (err as Error).message });
     console.error(err);
@@ -134,6 +179,20 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const slug = (s: string, fallback: string) => s.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/gi, "d").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase().slice(0, 50) || fallback;
 
   app.get("/health", async () => ({ ok: true }));
+
+  registerStudentRoutes(app, { auth: studentAuth, verify: deps.verify, credentials, submissions: submissionsSvc, rateLimit: deps.studentRateLimit ?? { max: 60, timeWindow: 60_000 } });
+  registerClassroomRoutes(app, { authenticate, credentials, assignments: assignmentsSvc });
+
+  if (deps.sweepMs) {
+    let timer: NodeJS.Timeout | undefined;
+    app.addHook("onReady", async () => {
+      timer = setInterval(() => {
+        submissionsSvc.finalizeExpired().catch((e: unknown) => console.error("sweep", e));
+      }, deps.sweepMs);
+      timer.unref();
+    });
+    app.addHook("onClose", async () => clearInterval(timer));
+  }
 
   app.get("/.well-known/oauth-protected-resource", async () => ({
     resource: `${deps.publicUrl}/mcp`,
@@ -229,6 +288,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     await boardsSvc.remove(await authenticate(req), Cid(req));
     return reply.code(204).send();
   });
+
+  const geoAi = withTaskOverrides(deps.ai ?? disabledAi, parseOverrides(process.env.AI_TASK_OVERRIDES));
+  app.post("/api/geometry/ai", async (req) => buildFigure(geoAi, await authenticate(req), req.body));
 
   app.get("/api/diagrams", async (req) => diagramsSvc.list(await authenticate(req)));
   app.post("/api/diagrams/ai", async (req) => diagramsSvc.draw(await authenticate(req), req.body));
@@ -348,12 +410,17 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   });
 
   registerAiLessonRoutes(app, { db: deps.db, ai: deps.ai, cfg: deps.aiLessons ?? { dataDir: "./data" }, service, authenticate });
+  registerAiSkillRoutes(app, { ai: deps.ai, lessons, classes, authenticate });
+  registerInkRoutes(app, { ai: deps.ai, authenticate });
+  const live = createLiveService({ db: deps.db, ai: deps.ai ?? disabledAi, classes, games, secret: deps.downloadSecret });
+  app.addHook("onClose", async () => live.dispose());
+  registerLiveRoutes(app, { live, authenticate });
   registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
   registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, deps.ai ?? disabledAi, classes), authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
-    const server = buildMcpServer({ service, actor, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind, term) => makeClassLink(actor, ref, kind, term), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), vanBan, makeVanBanLink: (id) => makeVanBanLink(actor, id), slides, games, makeSlideLink: (id) => makeSlideLink(actor, id), makeGameLink: (id) => makeGameLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
+    const server = buildMcpServer({ service, actor, assignments: assignmentsSvc, makeLinks: (examId) => makeLinks(actor, examId), classes, makeClassLink: (ref, kind, term) => makeClassLink(actor, ref, kind, term), lessons, makeLessonLink: (id) => makeLessonLink(actor, id), vanBan, makeVanBanLink: (id) => makeVanBanLink(actor, id), slides, games, makeSlideLink: (id) => makeSlideLink(actor, id), makeGameLink: (id) => makeGameLink(actor, id), makeMatrixLink: (id) => makeMatrixLink(actor, id) });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     reply.raw.on("close", () => {
       server.close().catch((err) => console.error("mcp close", err));

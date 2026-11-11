@@ -1,5 +1,5 @@
 // web/src/board/ShapeView.tsx — hình phẳng và ô chữ/công thức trên bảng
-import { type PointerEvent, useRef, useState } from "react";
+import { type PointerEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Icon } from "../Icon";
 import { MathText } from "../math/MathText";
 import type { Tool, ToBoard } from "./BoardPage";
@@ -53,11 +53,31 @@ export function ShapeView({ obj, tool, selected, onSelect, b, toBoard }: Props<S
 export function TextView({ obj, tool, selected, onSelect, onEdit, b, toBoard }: Props<TextObj> & { onEdit: () => void }) {
   const h = useDrag(obj, tool, onSelect, b, toBoard);
   const { w, h: bh } = textBox(obj);
+  const inner = useRef<HTMLDivElement>(null);
+  // Đo kích thước thật của ô sau khi MathLive dựng xong (đơn vị bảng = px CSS bên trong foreignObject) rồi lưu vào đối tượng.
+  const bRef = useRef(b);
+  bRef.current = b;
+  const measure = () => {
+    const el = inner.current;
+    if (!el) return;
+    const w2 = Math.ceil(el.scrollWidth) + 2, h2 = Math.ceil(el.scrollHeight) + 2;
+    if (w2 > 1 && h2 > 1 && (Math.abs(w2 - (obj.w ?? 0)) >= 1 || Math.abs(h2 - (obj.h ?? 0)) >= 1)) bRef.current.updateObj(obj.id, { w: w2, h: h2 }, true);
+  };
+  useLayoutEffect(measure, [obj.text, obj.size, obj.w, obj.h]);
+  useEffect(() => {
+    const el = inner.current;
+    if (!el) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    void document.fonts?.ready.then(measure);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [obj.text, obj.size]);
   return (
     <g className="bd-obj" data-testid="bd-text" {...h} onLostPointerCapture={h.onPointerUp} onDoubleClick={onEdit}>
       <rect x={obj.x} y={obj.y} width={w} height={bh} fill="transparent" stroke={selected ? "#8fa2ff" : "none"} strokeDasharray="6 4" rx={6} />
-      <foreignObject x={obj.x} y={obj.y} width={w} height={bh} pointerEvents="none" data-plain={obj.text} data-color={obj.color} data-size={obj.size}>
-        <div className="bd-text" style={{ color: obj.color, fontSize: obj.size }}>
+      <foreignObject x={obj.x} y={obj.y} width={w} height={bh} style={{ overflow: "visible" }} pointerEvents="none" data-plain={obj.text} data-color={obj.color} data-size={obj.size}>
+        <div ref={inner} className="bd-text" data-testid="bd-text-inner" style={{ color: obj.color, fontSize: obj.size, width: "max-content" }}>
           {obj.text.split("\n").map((l, i) => (
             <div key={i}><MathText value={l} /></div>
           ))}

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router";
 import { api, errText, exportGame, type ExamSummary, type GameSummary } from "../api";
 import { Icon } from "../Icon";
 
@@ -37,7 +38,8 @@ export function Games() {
                 {g.title}
                 <small>{KIND[g.kind]} · {g.questionCount} câu{g.timerSeconds ? ` · ${g.timerSeconds} giây/câu` : ""} · {g.source}</small>
               </div>
-              <button className="btn" onClick={() => void exportGame(g.id, true)} data-testid="game-open"><Icon name="check" size={18} />Mở</button>
+              <Link className="btn" to={`/dau-truong?game=${g.id}`} data-testid="game-live"><Icon name="game" size={18} />Chơi trực tiếp</Link>
+              <button className="btn ghost" onClick={() => void exportGame(g.id, true)} data-testid="game-open"><Icon name="check" size={18} />Mở</button>
               <button className="btn ghost" onClick={() => void exportGame(g.id)} data-testid="game-download"><Icon name="down" size={18} />Tải .html</button>
               <button className="btn ghost sm" onClick={() => void remove(g.id)} aria-label="Xoá"><Icon name="trash" size={16} /></button>
             </div>

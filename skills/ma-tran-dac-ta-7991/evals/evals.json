@@ -1,0 +1,16 @@
+{
+  "skill": "ma-tran-dac-ta-7991",
+  "task": "ma_tran_7991",
+  "common": [
+    "Đầu ra là JSON hợp lệ đúng cấu trúc trong SKILL.md (không chữ thừa ngoài JSON).",
+    "Mọi level thuộc NB/TH/VD và type thuộc mcq/true_false/short_answer/essay.",
+    "Tổng điểm tính theo luật điểm (0,25/câu nhiều lựa chọn; đúng/sai tối đa 1,0; trả lời ngắn 0,25 hoặc 0,5 với Toán; tự luận 1 điểm/câu) đúng bằng 10."
+  ],
+  "cases": [
+    {"id": "toan10-giuaki", "input": "Lập ma trận và bản đặc tả đề kiểm tra giữa kì 1 môn Toán lớp 10, 45 phút, các chủ đề: Mệnh đề và tập hợp; Bất phương trình bậc nhất hai ẩn; Hệ thức lượng trong tam giác. Tỉ lệ NB 40%, TH 30%, VD 30%.", "criteria": ["Có đủ 3 chủ đề được nêu.", "Tỉ lệ điểm NB/TH/VD lệch không quá 5 điểm phần trăm so với 40/30/30.", "Mỗi ô có yccd bắt đầu bằng động từ đúng mức (NB: nêu/nhận biết…, TH: giải thích/so sánh…, VD: tính/giải/vận dụng…)."]},
+    {"id": "ly11-cuoiki", "input": "Ma trận đề cuối kì 1 Vật lí 11, 45 phút, chủ đề: Dao động điều hoà; Sóng cơ; Giao thoa sóng. GV muốn chỉ có trắc nghiệm nhiều lựa chọn, đúng/sai và trả lời ngắn, không tự luận.", "criteria": ["Không có ô nào type essay.", "Có cả ba dạng mcq, true_false, short_answer.", "yccd bám đúng nội dung vật lí của từng chủ đề (không lạc đề)."]},
+    {"id": "van9-tuluan", "input": "Đề kiểm tra giữa kì Ngữ văn 9, 90 phút, gồm đọc hiểu (trắc nghiệm nhiều lựa chọn) và phần viết tự luận. Chủ đề: Truyện trung đại; Thơ hiện đại; Nghị luận xã hội.", "criteria": ["Có ô essay cho phần viết.", "Chủ đề đặt tên nhất quán, không lặp tên khác nhau cho cùng chủ đề.", "durationMinutes bằng 90."]},
+    {"id": "hoa12-vdc", "input": "Ma trận đề 45 phút Hoá học 12, chủ đề Este – lipit; Cacbohiđrat; Amin – aminoaxit. GV muốn khoảng 10% là vận dụng cao.", "criteria": ["Các ô vận dụng cao ghi level VD và yccd mở đầu bằng '(Vận dụng cao)'.", "Phần vận dụng cao chiếm khoảng 10% điểm (chấp nhận 5–15%).", "Tổng điểm bằng 10."]},
+    {"id": "sinh10-khongnoi-chude", "input": "Lập ma trận đề 15 phút môn Sinh học lớp 10 (kiểm tra thường xuyên), GV không nêu chủ đề.", "criteria": ["Tự chọn chủ đề đúng chương trình Sinh học 10 (GDPT 2018).", "Đề 15 phút nên tổng số câu nhỏ, hợp lí (khoảng 10–15 câu trắc nghiệm hoặc quy đổi tương đương) và tổng điểm vẫn bằng 10.", "durationMinutes bằng 15."]}
+  ]
+}

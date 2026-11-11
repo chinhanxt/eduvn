@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ApiError, api, getLinks, type ExamSummary, type Links } from "../api";
+import { ApiError, aiSkill, api, errText, getLinks, type ExamSummary, type Links } from "../api";
 import { Icon } from "../Icon";
 
 type Cell = { topic: string; level: string; type: string; count: number; yccd?: string };
@@ -71,6 +71,28 @@ function Create({ onCreated }: { onCreated: () => void }) {
   const [links, setLinks] = useState<Links | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [aiText, setAiText] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiNote, setAiNote] = useState<string | null>(null);
+
+  const askAi = async () => {
+    setAiBusy(true);
+    setError(null);
+    setAiNote(null);
+    try {
+      const r = await aiSkill<{ title: string; durationMinutes: number; matrix: { subject: string; grade: number; cells: Cell[] }; report: { totalPoints: number; warnings: string[]; levelRatio: Record<string, { percent: number }> } }>("ma-tran", { description: aiText, subject: subject.trim() || undefined });
+      setTitle(r.title);
+      setSubject(r.matrix.subject);
+      setGrade(r.matrix.grade);
+      setDuration(r.durationMinutes);
+      setCells(r.matrix.cells);
+      setAiNote(`AI đã điền ma trận: ${r.matrix.cells.length} ô, tổng ${String(r.report.totalPoints).replace(".", ",")} điểm; NB ${r.report.levelRatio.NB?.percent ?? 0}% – TH ${r.report.levelRatio.TH?.percent ?? 0}% – VD ${r.report.levelRatio.VD?.percent ?? 0}%. ${r.report.warnings.join(" ")} Hãy kiểm tra, sửa rồi bấm Tạo.`);
+    } catch (e) {
+      setError(errText(e));
+    } finally {
+      setAiBusy(false);
+    }
+  };
 
   const setCell = (i: number, patch: Partial<Cell>) => setCells(cells.map((c, j) => (j === i ? { ...c, ...patch } : c)));
 
@@ -96,6 +118,13 @@ function Create({ onCreated }: { onCreated: () => void }) {
   return (
     <div className="card" style={{ marginBottom: 16 }}>
       {error && <div className="err">{error}</div>}
+      <div className="formrow" data-testid="ai-matrix">
+        <label className="lbl" style={{ flex: 1 }}>AI lập ma trận + đặc tả (CV 7991) từ mô tả đề
+          <input className="inp" style={{ width: "100%" }} placeholder="vd: Giữa kì 1 Toán 10, 45 phút, chủ đề Mệnh đề, Tập hợp, tỉ lệ NB 40% TH 30% VD 30%" value={aiText} onChange={(e) => setAiText(e.target.value)} data-testid="ai-matrix-text" />
+        </label>
+        <button className="btn" disabled={aiBusy || aiText.trim().length < 5} onClick={() => void askAi()} data-testid="ai-matrix-run"><Icon name="spark" size={18} />{aiBusy ? "Đang lập…" : "AI lập ma trận"}</button>
+      </div>
+      {aiNote && <div className="warn" data-testid="ai-matrix-note">{aiNote}</div>}
       <div className="formrow">
         <label className="lbl">Tên đề<input className="inp w-m" style={{ width: 220 }} value={title} onChange={(e) => setTitle(e.target.value)} data-testid="e-title" /></label>
         <label className="lbl">Môn<input className="inp w-m" value={subject} onChange={(e) => setSubject(e.target.value)} /></label>

@@ -9,6 +9,22 @@ describe("parseQuestion", () => {
     }
   });
 
+  it("short_answer: từ chối đáp án mơ hồ 3.141 / 2.000, cho phép 1.250.000", () => {
+    const r = (answer: string) => parseQuestion(short({ answer }));
+    let msg = "";
+    try {
+      r("3.141");
+    } catch (e) {
+      msg = (e as { issues: { message: string }[] }).issues[0]?.message ?? "";
+    }
+    expect(msg).toBe('Đáp án "3.141" dễ hiểu nhầm: viết "3,141" nếu là số thập phân, hoặc "3141" nếu là số nguyên.');
+    expect(() => r("1,5|2.000")).toThrow(/2\.000/);
+    expect(() => r("-1.000")).toThrow();
+    expect(r("1.250.000").type).toBe("short_answer");
+    expect(r("0.250").type).toBe("short_answer");
+    expect(r("2,5|2.5").type).toBe("short_answer");
+  });
+
   it("tags mặc định là []", () => {
     const { tags: _t, ...noTags } = mcq();
     expect(parseQuestion(noTags).tags).toEqual([]);

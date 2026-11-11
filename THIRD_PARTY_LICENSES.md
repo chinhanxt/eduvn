@@ -37,9 +37,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Edge TTS (`msedge-tts`, MIT)
+## VieNeu-TTS (Apache License 2.0)
 
-Giọng đọc lời giảng (vi-VN-HoaiMyNeural / vi-VN-NamMinhNeural) qua dịch vụ đọc của Microsoft Edge.
+Giọng đọc lời giảng: CLI `vieneu-say` dùng chung của máy (gói `vieneu` 3.8.3, `~/Apps/vieneu-tts`), nhân giọng từ mẫu "Giọng dạy". EDUVN chỉ gọi qua dòng lệnh, không chép mã.
+
+## Manim Community (MIT)
+
+Hoạt hình toán (`do_thi_ham_so`, `bien_doi_cong_thuc`, `hinh_hoc_dien_tich`, `truc_so`): các mẫu cố định viết sẵn trong `server/src/services/manim/`, chạy bằng Manim Community (venv ngoài repo `~/Apps/manim`) và TinyTeX (LaTeX Project Public License / các gói TeX Live). Không chạy mã do AI viết.
+
+## HyperFrames (Apache License 2.0)
+
+Hoạt hình HTML (`dien_giai_tung_buoc`, `so_do_quy_trinh`, `so_sanh_bang`): mẫu cố định dựng HTML + GSAP, render bằng `npx hyperframes render`. GSAP chạy theo giấy phép của chính nó (gói kèm HyperFrames); KaTeX (MIT) cho công thức.
 
 ## DeepTutor v1.7.2 (HKUDS/DeepTutor, commit 60fb3bd) — Apache License 2.0
 
@@ -180,3 +188,45 @@ Không vendor mã nguồn nguyên repo; thuật toán và UX tham khảo, mã t�
 - **node-qrcode** (`qrcode`, soldair/node-qrcode) — MIT. Sinh QR in trên phiếu.
 
 Phần chấm bài viết tay lấy ý tưởng tách hai bước (phiên âm → giáo viên sửa → chấm theo rubric) từ nghiên cứu về chấm bài viết tay bằng LLM; không sao chép mã.
+
+## Bộ skill sư phạm `skills/` (P8) — nguồn tái chế
+
+Các skill được EDUVN tự viết bằng tiếng Việt; chỉ mượn **khung cấu trúc và ý tưởng quy trình** từ các dự án sau (không chép nguyên văn):
+
+- **anthropics/k12-teacher-skills** — Apache License 2.0. Khung `SKILL.md` (frontmatter, quy trình từng bước), cách dùng tiêu chí chấm dạng LLM-judge cho `evals/`. Theo điều 4 của Apache-2.0 giữ nguyên NOTICE dưới đây (cũng có ở `skills/NOTICE`):
+
+  ```
+  Agent Skills for K-12 Teachers
+  Copyright 2026 Anthropic, PBC
+  Copyright 2026 Learning Commons
+  Portions of this product were co-developed by Anthropic, PBC
+  and Learning Commons under a collaboration agreement.
+  ```
+
+  Toàn văn: https://www.apache.org/licenses/LICENSE-2.0. Thay đổi: dịch và viết lại theo CV 5512, 7991, TT22, TT27; không dùng nội dung tiêu chuẩn Mỹ.
+- **DaRL-GenAI/instructional_agents** — MIT. Luồng ADDIE và phân vai (giảng viên, nhà thiết kế, trợ giảng, điều phối) cho `de-cuong-hoc-phan`.
+- **oaknational/oak-ai-lesson-assistant** và **oak-ai-autoeval-tools** — MIT. Ý tưởng sinh giáo án theo từng mục có schema và chấm tự động bằng LLM-judge (`scripts/eval-skills.mjs`).
+- **duongtrung/BloomLLM**, **nicyscaria/AEQG_Blooms_Evaluation_LLMs** — MIT. Ý tưởng bảng động từ Bloom và tiêu chí đánh giá câu hỏi.
+- **Khalidsyfullah/Vision-Language-Models-for-Outcome-Based-Assessment** — Apache-2.0. Ý tưởng chấm theo từng tiêu chí (`rubric-tu-luan`).
+- **GarethManning/education-agent-skills** — CC BY-SA 4.0. Chỉ tham khảo ý tưởng cấp cao (thiết kế ngược, nhận xét theo thang, rubric theo tiêu chí); **không sao chép văn bản** nên không phát sinh nghĩa vụ ShareAlike.
+
+Văn bản pháp quy (CV 5512, CV 7991, TT22/2021, TT27/2020, CT GDPT 2018) được tóm lược lại bằng lời của EDUVN trong `references/`.
+
+## $P Point-Cloud Recognizer (và họ $-family, $Q) — BSD-3-Clause
+
+Nhận dạng nét tay → hình trên bảng giảng (P12) port phần lõi của bộ nhận dạng **$P** (resample 32 điểm, chuẩn hoá, khớp đám điểm tham lam) sang TypeScript tại `web/src/board/dollarP.ts`. $Q là bản tối ưu tốc độ cùng họ (không port; chỉ dùng phần $P). Dùng làm phương án dự phòng sau bước nhận dạng hình học trực tiếp (`web/src/board/recognize.ts`, viết mới).
+
+Nguồn: Vatavu, R.-D., Anthony, L., Wobbrock, J. O. "Gestures as Point Clouds: A $P Recognizer for User Interface Prototypes", ICMI 2012; Vatavu, Anthony, Wobbrock, "$Q: A Super-Quick, Articulation-Invariant Stroke-Gesture Recognizer…", MobileHCI 2018. https://depts.washington.edu/acelab/proj/dollar/
+
+```
+BSD 3-Clause License
+Copyright (c) 2012, Radu-Daniel Vatavu, Lisa Anthony, and Jacob O. Wobbrock. All rights reserved.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided
+that the following conditions are met: (1) redistributions of source code retain the above copyright
+notice, this list of conditions and the following disclaimer; (2) redistributions in binary form
+reproduce the above copyright notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution; (3) neither the names of the
+authors nor the names of their institutions may be used to endorse or promote products derived from
+this software without specific prior written permission. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT
+WARRANTY OF ANY KIND; see the full license text at the URL above.
+```

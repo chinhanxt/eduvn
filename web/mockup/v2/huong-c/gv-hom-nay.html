@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C · Hôm nay · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="c.css">
+<style>
+  .page-head.field { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: var(--s-6) var(--s-10); margin-bottom: var(--s-6); align-items: start; background: linear-gradient(135deg, #2a3ab3 0%, #3346d1 60%, #4457e0 100%); }
+  .field .acts { display: flex; gap: var(--s-2); margin-top: var(--s-6); flex-wrap: wrap; }
+  .nums { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgb(255 255 255 / .18); border-radius: 14px; overflow: hidden; }
+  .nums > div { background: #2f41c4; padding: var(--s-4); }
+  .nums .k { font-size: 12px; color: #d7dcff; }
+  .nums .v { font-size: 30px; line-height: 36px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; }
+  .nums .d { font-size: 12px; color: #d7dcff; } .nums .d b { color: #fff; }
+  .day { grid-column: 1 / -1; position: relative; z-index: 1; border-top: 1px solid rgb(255 255 255 / .18); padding-top: var(--s-3); --_dl-bg: #3346d1; }
+  .day .eyebrow { margin-bottom: 2px; }
+  .classes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-4); }
+  .ccard { padding: 0; overflow: hidden; }
+  .ccard .band { padding: var(--s-4) var(--s-5); display: flex; align-items: baseline; gap: var(--s-2); }
+  .ccard .band b { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+  .ccard .band span { color: var(--ink-2); font-size: 13px; }
+  .ccard .body { padding: var(--s-4) var(--s-5) var(--s-5); }
+  .ccard .row1 { display: flex; align-items: baseline; gap: var(--s-2); }
+  .ccard .row1 .lbl { font-size: 12px; color: var(--ink-3); margin-right: auto; }
+  .ccard .gb { margin-top: var(--s-3); }
+  .ccard .foot { display: flex; gap: 6px; flex-wrap: wrap; margin-top: var(--s-3); }
+  .two { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--s-4); margin-top: var(--s-4); align-items: start; }
+  .gq { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px var(--s-4); align-items: center; padding: var(--s-4) 0; border-top: 1px solid var(--line); }
+  .gq:first-of-type { border-top: 0; padding-top: 0; }
+  .gq .t { font-weight: 700; } .gq .t small { display: block; font-weight: 400; color: var(--ink-3); font-size: 13px; }
+  .gq .bar { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--s-3); }
+  .gq .bar .meter { flex: 1; height: 10px; background: var(--bg-sunken); }
+  .gq .bar span { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 56px; text-align: right; }
+  .kid { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 4px var(--s-3); align-items: center; padding: var(--s-3) 0; border-top: 1px solid var(--line); }
+  .kid:first-of-type { border-top: 0; padding-top: 0; }
+  .kid .nm { font-weight: 700; } .kid .nm small { display: block; font-weight: 400; color: var(--ink-3); font-size: 12px; }
+  @media (max-width: 1180px) { .page-head.field { grid-template-columns: minmax(0, 1fr); } .classes { grid-template-columns: repeat(2, minmax(0, 1fr)); } .two { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 720px) { .classes { grid-template-columns: minmax(0, 1fr); } .nums .v { font-size: 26px; line-height: 30px; } .kid { grid-template-columns: minmax(0, 1fr) 128px; } }
+</style>
+</head>
+<body data-shell="gv" data-nav="trang-chu" data-crumb="Hôm nay">
+<script src="../icons.js"></script>
+<main id="main">
+  <section class="page-head field" aria-label="Hôm nay">
+    <div style="position:relative;z-index:1">
+      <div class="eyebrow">Thứ Hai · 10/11 · Tuần 10</div>
+      <h1>Chào cô Lan Anh!</h1>
+      <p class="sub">4 việc hôm nay. Gấp nhất: chấm Kiểm tra 15′ của 10A3 trước 17:00 — còn 23 câu trả lời ngắn, khoảng 25 phút.</p>
+      <div class="acts">
+        <a class="btn lg primary on-field" href="#"><svg class="i sm"><use href="#i-grade"/></svg><span>Chấm 10A3</span></a>
+        <a class="btn lg ghost-field" href="../gv-soan-de.html"><svg class="i sm"><use href="#i-spark"/></svg><span>Tạo đề</span></a>
+      </div>
+    </div>
+    <div class="nums" aria-label="Số liệu">
+      <div><div class="k">Chờ chấm</div><div class="v">23</div><div class="d"><b>+8</b> từ sáng</div></div>
+      <div><div class="k">Nộp đúng hạn</div><div class="v">91%</div><div class="d"><b>+3</b> điểm % / 4 tuần</div></div>
+      <div><div class="k">Điểm TB tuần</div><div class="v">6,9</div><div class="d"><b>+0,3</b> so với tuần trước</div></div>
+      <div><div class="k">Cần quan tâm</div><div class="v">7</div><div class="d">học sinh · 3 lớp</div></div>
+    </div>
+    <div class="day"><div class="eyebrow">Lịch hôm nay · 7h–22h</div><div id="day"></div></div>
+  </section>
+
+  <section aria-label="Lớp của tôi">
+    <div class="classes">
+      <article class="card ccard"><div class="band tint" style="--h:var(--c1)"><b>10A1</b><span>Toán 10 · 32 HS</span></div><div class="body"><div class="row1"><span class="lbl">Điểm TB</span><span class="big">7,0</span><b class="up">+0,4</b></div><div class="gb" data-c="9,14,7,2"></div><div class="foot"><span class="chipc warn">2 cần quan tâm</span><span class="chipc">Tiết 2 hôm nay</span></div></div></article>
+      <article class="card ccard"><div class="band tint" style="--h:var(--c2)"><b>10A3</b><span>Toán 10 · 41 HS</span></div><div class="body"><div class="row1"><span class="lbl">Điểm TB</span><span class="big">6,1</span><b class="dn">−0,4</b></div><div class="gb" data-c="5,16,17,3"></div><div class="foot"><span class="chipc warn">3 cần quan tâm</span><span class="chipc">23 câu chờ chấm</span></div></div></article>
+      <article class="card ccard"><div class="band tint" style="--h:var(--c3)"><b>11B2</b><span>Toán 11 · 40 HS</span></div><div class="body"><div class="row1"><span class="lbl">Điểm TB</span><span class="big">7,5</span><b class="up">+0,1</b></div><div class="gb" data-c="12,18,8,2"></div><div class="foot"><span class="chipc warn">2 cần quan tâm</span><span class="chipc">12 em chưa nộp</span></div></div></article>
+      <article class="card ccard"><div class="band tint" style="--h:var(--c7)"><b>K68</b><span>Giải tích 1 · 86 SV</span></div><div class="body"><div class="row1"><span class="lbl">Điểm TB</span><span class="big">7,2</span><b class="up">+0,2</b></div><div class="gb" data-c="21,38,22,5"></div><div class="foot"><span class="chipc ok">Đúng tiến độ</span><span class="chipc">78 bài luận chờ</span></div></div></article>
+    </div>
+    <div id="lg" style="margin-top:var(--s-3)"></div>
+  </section>
+
+  <div class="two">
+    <section class="card" aria-label="Bài chờ chấm">
+      <div class="hd"><h2>Bài chờ chấm</h2><span class="grow"></span><a class="btn sm" href="#">Mở hàng chấm</a></div>
+      <div class="gq"><span class="t">Kiểm tra 15′ · Bất phương trình<small>10A3 · hạn hôm nay 17:00</small></span><span class="chipc warn">Hôm nay</span><div class="bar"><div class="meter"><i style="--v:44%"></i></div><span>18/41</span></div></div>
+      <div class="gq"><span class="t">Bài tập về nhà · Tích vô hướng<small>10A1 · hạn 12/11</small></span><span class="chipc">2 ngày</span><div class="bar"><div class="meter"><i style="--v:84%"></i></div><span>27/32</span></div></div>
+      <div class="gq"><span class="t">Bài luận ngắn · Ứng dụng đạo hàm<small>K68 CNTT · hạn 15/11 · AI đã gợi ý điểm</small></span><span class="chipc">5 ngày</span><div class="bar"><div class="meter"><i style="--v:9%"></i></div><span>8/86</span></div></div>
+    </section>
+    <section class="card" aria-label="Cần quan tâm">
+      <div class="hd"><h2>Cần quan tâm</h2><span class="grow"></span><a class="btn sm" href="../gv-ket-qua.html">Xem 7 em</a></div>
+      <div class="kid"><span class="nm">Phạm Gia Bảo<small>10A1 · giảm 3,0 qua 3 bài</small></span><div class="tr" data-v="5.5,5,4.25,3.5,2.5"></div></div>
+      <div class="kid"><span class="nm">Lê Thảo Vy<small>10A1 · giảm 2,25 ở bài cuối</small></span><div class="tr" data-v="6,6.5,5.75,6,3.75"></div></div>
+      <div class="kid"><span class="nm">Trần Đăng Khoa<small>10A3 · 5/5 bài dưới 5,0</small></span><div class="tr" data-v="4.5,4,4.75,4.5,4.25"></div></div>
+      <p class="caption" style="margin-top:var(--s-3)">5 bài gần nhất, thang 0–10; vạch là 5,0; chấm đậm là bài mới nhất.</p>
+    </section>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell.js"></script>
+<script src="../charts.js"></script>
+<script>
+  Charts.dayline(document.getElementById("day"), { from: 7, to: 22, now: 7.2, events: [{ t: "07:30", l: "Lên lớp 10A1", s: "Lên lớp 10A1" }, { t: "17:00", l: "Hạn chấm KT 15′ 10A3", s: "Hạn chấm 10A3" }, { t: "21:00", l: "Hạn nộp luyện tập 11B2", s: "Hạn nộp 11B2" }], ink: "#ffffff", sub: "#d7dcff", line: "rgba(255,255,255,.35)", height: 52 });
+  document.querySelectorAll(".gb").forEach((el) => Charts.gradeBar(el, el.dataset.c.split(",").map(Number), { height: 22 }));
+  document.getElementById("lg").innerHTML = Charts.gradeLegend().replace("legend", "legend caption") + "";
+  const lb = ["BT 10/10", "KT 17/10", "BT 24/10", "BT 31/10", "KT 07/11"];
+  document.querySelectorAll(".tr").forEach((el) => Charts.track(el, { vals: el.dataset.v.split(",").map(Number), labels: lb, threshold: 5, height: 36 }));
+</script>
+</body>
+</html>

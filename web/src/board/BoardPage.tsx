@@ -1,7 +1,7 @@
 // web/src/board/BoardPage.tsx
 import { type PointerEvent, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
-import { type BankQuestion, gradeLabel } from "../api";
+import { type BankQuestion, errText, gradeLabel } from "../api";
 import { Icon } from "../Icon";
 import "./board.css";
 import { download } from "../diagram/export";
@@ -10,12 +10,14 @@ import { boardPng } from "./exportPng";
 import { ShapeView, TextDialog, TextView } from "./ShapeView";
 import { GraphDialog, GraphView } from "./GraphView";
 import { hitStroke, strokePath } from "./ink";
+import { inkToLatex, strokesBox } from "./inkImage";
+import { recognizeStroke } from "./recognize";
 import { Projector } from "./Projector";
 import { SolidPicker, SolidView } from "./SolidView";
 import { SuggestPanel } from "./SuggestPanel";
 import { useBoard } from "./useBoard";
 
-export type Tool = "pointer" | "pen" | "eraser" | ShapeKind | "text";
+export type Tool = "pointer" | "pen" | "eraser" | ShapeKind | "text" | "formula";
 const isShapeTool = (t: Tool): t is ShapeKind => (SHAPE_KINDS as readonly string[]).includes(t);
 const SHAPE_TITLE: Record<ShapeKind, string> = { line: "Đoạn thẳng (L)", arrow: "Mũi tên (A)", rect: "Hình chữ nhật (R)", triangle: "Tam giác", circle: "Đường tròn (O)", polygon: "Đa giác (bấm từng đỉnh, Enter để đóng)" };
 const SHAPE_ICON: Record<ShapeKind, string> = { line: "M5 19L19 5", arrow: "M5 19L19 5M10 5H19V14", rect: "M4 6H20V18H4Z", triangle: "M12 5L20 19H4Z", circle: "M12 4A8 8 0 1 0 12.01 4Z", polygon: "M6 7L17 5L20 14L11 19L4 13Z" };
@@ -44,6 +46,9 @@ export function BoardPage() {
   const [textDlg, setTextDlg] = useState<{ edit?: TextObj; x: number; y: number } | null>(null);
   const [suggest, setSuggest] = useState(false);
   const [projected, setProjected] = useState<BankQuestion | null>(null);
+  const [beautify, setBeautify] = useState(() => localStorage.getItem("bd-beautify") === "1");
+  const [frame, setFrame] = useState<[number, number, number, number] | null>(null);
+  const [reading, setReading] = useState(false);
   const erasing = useRef<{ snapped: boolean } | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -128,6 +133,9 @@ export function BoardPage() {
     } else if (isShapeTool(tool)) {
       svgRef.current?.setPointerCapture(e.pointerId);
       setShapeDraft(mkShape(tool, [x, y, x, y]));
+    } else if (tool === "formula") {
+      svgRef.current?.setPointerCapture(e.pointerId);
+      setFrame([x, y, x, y]);
     } else if (tool === "text") setTextDlg({ x: Math.round(x), y: Math.round(y) });
     else setSelected(null);
   };
@@ -137,6 +145,7 @@ export function BoardPage() {
       const lx = draft[draft.length - 2]!, ly = draft[draft.length - 1]!;
       if (draft.length < 4000 && Math.hypot(x - lx, y - ly) > 1.5) setDraft([...draft, Math.round(x * 10) / 10, Math.round(y * 10) / 10]);
     } else if (erasing.current) erase(x, y);
+    else if (frame) setFrame([frame[0], frame[1], x, y]);
     else if (shapeDraft) setShapeDraft({ ...shapeDraft, pts: [shapeDraft.pts[0]!, shapeDraft.pts[1]!, x, y] });
     else if (poly) setHover([x, y]);
   };
@@ -144,8 +153,19 @@ export function BoardPage() {
     if (!e.isPrimary) return;
     if (draft) {
       const pts = draft.length >= 4 ? draft : [draft[0]!, draft[1]!, draft[0]! + 0.5, draft[1]!];
-      b.addObj({ type: "stroke", id: newId(), color, width: 4.5, pts });
+      const raw: Stroke = { type: "stroke", id: newId(), color, width: 4.5, pts };
+      const rec = beautify ? recognizeStroke(pts) : null;
+      if (rec) {
+        const shape: ShapeObj = { type: "shape", id: newId(), kind: rec.kind, color, width: 3.5, fill: false, pts: rec.pts };
+        b.addWithRaw(raw, shape);
+        setSelected(shape.id);
+      } else b.addObj(raw);
       setDraft(null);
+    }
+    if (frame) {
+      const f = frame;
+      setFrame(null);
+      void readFormula(f);
     }
     if (shapeDraft) {
       const [x1, y1, x2, y2] = shapeDraft.pts as [number, number, number, number];
@@ -158,6 +178,31 @@ export function BoardPage() {
     }
     erasing.current = null;
   };
+
+  async function readFormula(f: [number, number, number, number]) {
+    const [x1, x2] = [Math.min(f[0], f[2]), Math.max(f[0], f[2])];
+    const [y1, y2] = [Math.min(f[1], f[3]), Math.max(f[1], f[3])];
+    const picked = objs.filter((o): o is Stroke => {
+      if (o.type !== "stroke") return false;
+      const bx = strokesBox([o]);
+      const cx = (bx.x1 + bx.x2) / 2, cy = (bx.y1 + bx.y2) / 2;
+      return cx >= x1 && cx <= x2 && cy >= y1 && cy <= y2;
+    });
+    if (!picked.length) return b.setError("Khung chưa bao nét viết tay nào. Kéo khung quanh phần công thức đã viết.");
+    setReading(true);
+    try {
+      const latex = await inkToLatex(picked);
+      if (!latex) return b.setError("AI chưa đọc được công thức này, thầy cô viết rõ hơn hoặc chọn lại vùng.");
+      const bx = strokesBox(picked);
+      const o: TextObj = { type: "text", id: newId(), x: Math.round(bx.x1), y: Math.round(bx.y1), size: Math.max(28, Math.min(56, Math.round((bx.y2 - bx.y1) * 0.7))), color: picked[0]!.color, text: `$${latex}$` };
+      b.replaceObjs(picked.map((p) => p.id), o);
+      setSelected(o.id);
+    } catch (e) {
+      b.setError(errText(e));
+    } finally {
+      setReading(false);
+    }
+  }
 
   const rail = (icon: string, title: string, on: boolean, onClick: () => void, testId?: string) => (
     <button className={on ? "bd-rb on" : "bd-rb"} title={title} onClick={onClick} data-testid={testId}><Icon name={icon} /></button>
@@ -190,6 +235,8 @@ export function BoardPage() {
           </button>
         ))}
         <button className={fill ? "bd-rb sh on" : "bd-rb sh"} title="Tô nền hình" onClick={() => setFill((f) => !f)} data-testid="t-fill"><svg viewBox="0 0 24 24"><path d="M4 6H20V18H4Z" fill="currentColor" fillOpacity=".35" /></svg></button>
+        <button className={beautify ? "bd-rb tx on" : "bd-rb tx"} title="Làm đẹp nét: tự đổi nét tay thành hình sạch (đường thẳng, mũi tên, tam giác, chữ nhật, tròn, đa giác)" onClick={() => setBeautify((v) => { localStorage.setItem("bd-beautify", v ? "0" : "1"); return !v; })} data-testid="t-beautify">✨</button>
+        <button className={tool === "formula" ? "bd-rb tx on" : "bd-rb tx"} title="Viết tay → công thức: kéo khung quanh phần đã viết, AI đổi thành công thức" onClick={() => setTool("formula")} data-testid="t-formula">∑</button>
         <button className={tool === "text" ? "bd-rb tx on" : "bd-rb tx"} title="Ô chữ / công thức (T)" onClick={() => setTool("text")} data-testid="t-text">Aa</button>
         <div className="bd-sep" />
         {rail("spark", "Gợi ý bài liên quan", suggest, () => setSuggest((s) => !s), "t-suggest")}
@@ -221,6 +268,7 @@ export function BoardPage() {
               {objs.map((o) => renderObject(o))}
               {objs.map((o) => (o.type === "stroke" ? <path key={o.id} className="bd-ink" d={strokePath(o.pts, o.width)} fill={o.color} /> : null))}
               {draft && <path d={strokePath(draft, 4.5)} fill={color} />}
+              {frame && <rect x={Math.min(frame[0], frame[2])} y={Math.min(frame[1], frame[3])} width={Math.abs(frame[2] - frame[0])} height={Math.abs(frame[3] - frame[1])} fill="rgba(143,162,255,.12)" stroke="#8fa2ff" strokeWidth={2} strokeDasharray="8 5" pointerEvents="none" />}
               {shapeDraft && <ShapeView obj={shapeDraft} tool="pen" selected={false} onSelect={() => {}} b={b} toBoard={toBoard} />}
               {poly && (
                 <g pointerEvents="none">
@@ -229,6 +277,7 @@ export function BoardPage() {
                 </g>
               )}
             </svg>
+            {reading && <div className="bd-err" style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)" }} data-testid="bd-reading">AI đang đọc công thức viết tay…</div>}
             {projected && <Projector key={projected.id} q={projected} onClose={() => setProjected(null)} />}
           </div>
         </div>
@@ -276,8 +325,8 @@ export function BoardPage() {
       {picker && (
         <SolidPicker
           onClose={() => setPicker(false)}
-          onPick={(k) => {
-            const s = newSolid(k);
+          onPick={(k, spec, view) => {
+            const s = newSolid(k, spec, view);
             b.addObj(s);
             setSelected(s.id);
             setTool("pointer");

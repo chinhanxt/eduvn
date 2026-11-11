@@ -1,16 +1,17 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import JSZip from "jszip";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { renderAiLessonPptx } from "../../src/export/aiLessonPptx";
-import { compileTimeline, splitCues, toSrt } from "../../src/export/aiLessonTimeline";
+import { compileTimeline, shortExplain, splitCues, toSrt } from "../../src/export/aiLessonTimeline";
 import { renderLessonVideo } from "../../src/export/aiLessonVideo";
-import { slideHtml } from "../../src/export/slideHtml";
+import { mathInline, quizQuestionHtml, slideHtml } from "../../src/export/slideHtml";
 import type { Ai } from "../../src/services/ai";
+import { type AnimService, createAnimService } from "../../src/services/anim";
 import { extractMaterialText } from "../../src/services/aiLessons/material";
-import { speakable } from "../../src/services/aiLessons/tts";
+import { createVieneuTts, speakable } from "../../src/services/aiLessons/tts";
 import type { Tts } from "../../src/services/aiLessons/tts";
 import type { StoredScene } from "../../src/services/aiLessons/types";
 import { testApp } from "../helpers/app";
@@ -40,7 +41,7 @@ const QUIZ = [
 const HTML = `<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>Mô phỏng</title></head><body><h1>Kéo a và b</h1><input id="a" type="range" min="1" max="10" value="3"><div id="out">9</div><script>document.getElementById('a').addEventListener('input',function(e){document.getElementById('out').textContent=String(e.target.value*e.target.value)});</script></body></html>`;
 const ACTIONS = (id: string) => [{ type: "action", name: "spotlight", params: { elementId: id } }, { type: "text", content: "Chúng ta cùng xem công thức bình phương của một tổng." }, { type: "text", content: "Hãy ghi nhớ: a cộng b, tất cả bình phương." }];
 
-function fakeAi(opts: { failInteractive?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
+function fakeAi(opts: { failInteractive?: boolean; noAnim?: boolean; badAnim?: boolean; lowConf?: boolean } = {}): Ai & { calls: string[]; opts: typeof opts } {
   const calls: string[] = [];
   const ai = {
     calls,
@@ -55,6 +56,12 @@ function fakeAi(opts: { failInteractive?: boolean } = {}): Ai & { calls: string[
       }
       if (task === "slide_noi_dung") return user.includes("Luyện tập nhanh") ? JSON.stringify(QUIZ) : JSON.stringify(SLIDE);
       if (task === "loi_giang") return JSON.stringify(ACTIONS("t1"));
+      if (task === "hoat_hinh_toan") {
+        if (ai.opts.noAnim) return JSON.stringify({ template: null });
+        if (ai.opts.badAnim) return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "\\input{x}" }, { latex: "y" }] }, reason: "x", confidence: 0.9 });
+        if (ai.opts.lowConf) return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "x" }, { latex: "y" }] }, reason: "không chắc", confidence: 0.3 });
+        return JSON.stringify({ template: "bien_doi_cong_thuc", thoiLuong: 99, params: { cacBuoc: [{ latex: "(a+b)^2" }, { latex: "a^2+2ab+b^2", ghiChu: "Khai triển" }], toMau: ["2ab"] }, reason: "Cảnh khai triển bình phương một tổng", confidence: 0.92 });
+      }
       throw new Error(`task lạ ${task}`);
     },
     // biome-ignore lint: không dùng
@@ -64,13 +71,34 @@ function fakeAi(opts: { failInteractive?: boolean } = {}): Ai & { calls: string[
 }
 
 const fakeTts: Tts = {
-  async synth(_t, dir, name) {
-    const f = path.join(dir, `${name}.mp3`);
+  async synthMany(items, dir) {
     execFileSync("mkdir", ["-p", dir]);
-    writeFileSync(f, Buffer.from("ID3-fake-audio"));
-    return { file: `${name}.mp3`, durationMs: 2000 };
+    return items.map((it) => {
+      writeFileSync(path.join(dir, `${it.name}.mp3`), Buffer.from("ID3-fake-audio"));
+      return { file: `${it.name}.mp3`, durationMs: 2000 };
+    });
   },
 };
+const tmpDirs: string[] = [];
+const mkTmp = (p: string) => {
+  const d = mkdtempSync(path.join(tmpdir(), p));
+  tmpDirs.push(d);
+  return d;
+};
+
+/** Dựng giả: ffmpeg tạo clip 1 giây thay cho Manim/HyperFrames (việc dựng thật có test riêng ở anim.test.ts). */
+function fakeAnim(): AnimService {
+  const real = createAnimService({ dataDir, manimHome: "/khong/co", tinytexBin: "/khong/co" });
+  return {
+    ...real,
+    render: async (input: unknown) => {
+      const { hash } = real.prepare(input);
+      execFileSync("mkdir", ["-p", real.dir]);
+      execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "lavfi", "-i", "testsrc=size=320x180:rate=10:duration=1", "-pix_fmt", "yuv420p", real.fileOf(hash)]);
+      return { hash, file: real.fileOf(hash), durationMs: 1000 };
+    },
+  };
+}
 
 let ttsImpl: Tts = fakeTts;
 let dataDir: string;
@@ -79,9 +107,9 @@ let ai: ReturnType<typeof fakeAi>;
 let auth: Record<string, string>;
 
 async function boot() {
-  dataDir = mkdtempSync(path.join(tmpdir(), "eduvn-ail-"));
+  dataDir = mkTmp("eduvn-ail-");
   ai = fakeAi();
-  const app = await testApp({ ai, aiLessons: { dataDir, tts: { synth: (a, b, c) => ttsImpl.synth(a, b, c) }, sceneConcurrency: 3, chromePath: CHROME } });
+  const app = await testApp({ ai, aiLessons: { dataDir, tts: { synthMany: (a, b) => ttsImpl.synthMany(a, b) }, anim: fakeAnim(), sceneConcurrency: 3, chromePath: CHROME } });
   return { app };
 }
 
@@ -93,6 +121,7 @@ beforeEach(async () => {
 });
 afterEach(async () => {
   await t.app.close();
+  for (const d of tmpDirs.splice(0)) rmSync(d, { recursive: true, force: true });
 });
 
 const call = (method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload?: unknown) => t.app.inject({ method, url, headers: auth, payload: payload as object });
@@ -146,7 +175,7 @@ describe("sinh bài giảng AI", () => {
   });
 
   it("giọng đọc lỗi tạm thời: bài vẫn xong, 'sinh tiếp' bù lại các câu còn thiếu tiếng", async () => {
-    ttsImpl = { synth: async () => null };
+    ttsImpl = { synthMany: async (items) => items.map(() => null) };
     const { id } = await makeLesson();
     const speechOf = async () => ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[]).flatMap((s) => (s.actions ?? []).filter((a) => a.type === "speech"));
     expect((await speechOf()).every((a) => !(a as { audioFile?: string }).audioFile)).toBe(true);
@@ -190,6 +219,57 @@ describe("sinh bài giảng AI", () => {
     expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/luu-ngan-hang`, {})).statusCode).toBe(404);
   });
 
+  it("danh mục mẫu hoạt hình cho thư viện chọn", async () => {
+    const r = await call("GET", "/api/ai-lessons/mau-hoat-hinh");
+    expect(r.statusCode).toBe(200);
+    const list = r.json() as { id: string; viDu: unknown; tuKhoa?: unknown }[];
+    expect(list.length).toBeGreaterThanOrEqual(28);
+    expect(list.every((e) => e.tuKhoa === undefined && e.viDu !== undefined)).toBe(true);
+  });
+
+  it("hoạt hình toán: AI chọn mẫu → kiểm zod → dựng nền → gắn vào cảnh; spec xấu bị chặn; bỏ hoạt hình", async () => {
+    const { id } = await makeLesson();
+    const scenes = (await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[];
+    const slide = scenes[0] as StoredScene;
+    const quiz = scenes[1] as StoredScene;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${quiz.id}/hoat-hinh`, {})).statusCode).toBe(400);
+    ai.opts.noAnim = true;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).json().error).toContain("không cần hoạt hình");
+    ai.opts.noAnim = false;
+    ai.opts.badAnim = true;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).statusCode).toBe(400);
+    ai.opts.badAnim = false;
+    ai.opts.lowConf = true;
+    const low = await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {});
+    expect(low.statusCode).toBe(400);
+    expect(ai.calls.filter((c) => c === "hoat_hinh_toan").length).toBeGreaterThanOrEqual(5); // 1 + 2 (sai zod) + 2 (tin cậy thấp), mỗi lần thử lại 1 lượt
+    ai.opts.lowConf = false;
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, { spec: { template: "bien_doi_cong_thuc", thoiLuong: 5, params: { cacBuoc: [{ latex: "\\input{/etc/passwd}" }, { latex: "x" }] } } })).statusCode).toBe(400);
+    const r = await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {});
+    expect(r.statusCode).toBe(202);
+    for (let i = 0; i < 200; i++) {
+      const sc0 = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0];
+      if (sc0?.animation?.status !== "dang_dung") break;
+      await new Promise((r) => setTimeout(r, 25));
+    }
+    const got = ((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0] as StoredScene;
+    expect(got.animation).toMatchObject({ status: "xong", durationMs: 1000, confidence: 0.92 });
+    expect((got.animation?.spec as { thoiLuong: number }).thoiLuong).toBe(4); // = tổng lời giảng 2 × 2 s, không theo số AI đưa ra (99)
+    const hash = got.animation?.hash as string;
+    const clip = await call("GET", `/api/ai-lessons/${id}/hoat-hinh/${hash}`);
+    expect(clip.statusCode).toBe(200);
+    expect(clip.headers["content-type"]).toBe("video/mp4");
+    expect((await call("GET", `/api/ai-lessons/${id}/hoat-hinh/${"0".repeat(24)}`)).statusCode).toBe(404);
+    // sửa nhanh không làm mất / đè hoạt hình do máy chủ quản
+    const body = { scenes: scenes.map((s) => ({ ...s, animation: { status: "dang_dung", spec: {} } })) };
+    await call("PUT", `/api/ai-lessons/${id}`, body);
+    expect(((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0]?.animation?.status).toBe("xong");
+    const tl = compileTimeline("Bài", [got]);
+    expect(tl.segments.map((s) => s.anim)).toEqual([{ hash, offsetMs: 0 }, { hash, offsetMs: 2000 }]);
+    expect((await call("DELETE", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`)).statusCode).toBe(200);
+    expect(((await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[])[0]?.animation).toBeUndefined();
+  });
+
   it("xuất PPTX: 3 trang, lời giảng trong ghi chú, đáp án quiz trong ghi chú", async () => {
     const { id } = await makeLesson();
     const res = await call("GET", `/api/ai-lessons/${id}/pptx`);
@@ -226,6 +306,45 @@ describe("sinh bài giảng AI", () => {
     expect(r.statusCode).toBe(503);
     expect((await call("POST", "/api/ai-lessons", { requirement: "" })).statusCode).toBe(400);
     await t2.app.close();
+  });
+});
+
+describe("giọng VieNeu (lệnh giả)", () => {
+  // lệnh giả: mỗi dòng trong -f thành 1 giây âm 330 Hz + 0,25 s lặng, ghi seg.json như vieneu-say thật
+  function fakeCmd(): string {
+    const dir = mkTmp("eduvn-fakesay-");
+    const f = path.join(dir, "vieneu-say");
+    writeFileSync(f, `#!/usr/bin/env bash
+while [ $# -gt 0 ]; do case "$1" in -f) F="$2"; shift 2;; -o) O="$2"; shift 2;; --segments) S="$2"; shift 2;; --ref) echo "$2" > "$(dirname "$O")/ref.txt"; shift 2;; *) shift;; esac; done
+N=$(grep -c . "$F")
+ffmpeg -y -loglevel error -f lavfi -i "sine=frequency=330:duration=$((N * 125 / 100 + 1))" "$O"
+python3 - "$F" "$S" <<'PY'
+import json,sys
+lines=[l.strip() for l in open(sys.argv[1],encoding="utf-8") if l.strip()]
+pos=0.0;segs=[]
+for l in lines:
+    segs.append({"text":l,"start":pos,"end":pos+1.0});pos+=1.25
+json.dump(segs,open(sys.argv[2],"w"))
+PY
+`);
+    chmodSync(f, 0o755);
+    return f;
+  }
+
+  it("đọc cả loạt một lần, cắt từng câu đúng mốc (+0,2 s đệm cuối), bỏ câu rỗng", async () => {
+    const out = mkTmp("eduvn-ttsout-");
+    const tts = createVieneuTts({ cmd: fakeCmd(), ref: "/x/mau.wav" });
+    const r = await tts.synthMany([{ text: "Câu một", name: "a" }, { text: "**", name: "rong" }, { text: "Câu **hai**", name: "b" }], out);
+    expect(r[1]).toBeNull();
+    expect(r[0]?.file).toBe("a.mp3");
+    expect(Math.abs((r[0]?.durationMs ?? 0) - 1200)).toBeLessThan(120);
+    expect(Math.abs((r[1 + 1]?.durationMs ?? 0) - 1200)).toBeLessThan(120);
+    expect(existsSync(path.join(out, "b.mp3"))).toBe(true);
+  });
+
+  it("lệnh lỗi → null, không ném", async () => {
+    const tts = createVieneuTts({ cmd: "/khong/co/lenh" });
+    expect(await tts.synthMany([{ text: "Xin chào", name: "a" }], mkTmp("eduvn-ttsout-"))).toEqual([null]);
   });
 });
 
@@ -284,6 +403,46 @@ describe("dòng thời gian video (IR) và phụ đề", () => {
     expect(srt).toMatch(/^1\n00:00:00,000 --> 00:00:0\d,\d{3}\n/);
   });
 
+  it("quiz: mỗi câu hai đoạn (câu hỏi rồi đáp án), lời giải ngắn nằm ở phụ đề; lời giảng đầu hiện câu 1", () => {
+    const quiz = { id: "q", outlineId: "s2", type: "quiz", title: "Luyện tập", order: 1, stageId: "x", content: { type: "quiz", questions: QUIZ }, actions: [{ id: "1", type: "speech", text: "Làm thử nhé.", durationMs: 3000 }] } as unknown as StoredScene;
+    const tl = compileTimeline("Bài", [quiz]);
+    expect(tl.segments.map((x) => [x.quizIndex, x.reveal ?? false, x.durationMs])).toEqual([[0, false, 3000], [0, true, 4000], [1, false, 6200], [1, true, 4000]]);
+    const cue = tl.segments[1]?.cues[0]?.text ?? "";
+    expect(cue.startsWith("Đáp án B.")).toBe(true);
+    expect(cue.length).toBeLessThanOrEqual(150);
+    expect(tl.segments[1]?.cues[0]?.text).not.toContain("$");
+    const q2 = { ...QUIZ[0], analysis: "Ta có (x+1)^2 = x^2 + 2x + 1 nên chọn B." };
+    expect(shortExplain(q2 as never)).toBe("Đáp án B. Ta có (x+1)² = x² + 2x + 1 nên chọn B.");
+  });
+
+  it("phụ đề: câu dài chia nhỏ ≤ ~140 ký tự mà tổng thời lượng không đổi", () => {
+    const long = `${"Chúng ta khai triển từng số hạng, rồi gộp các số hạng đồng dạng lại với nhau, ".repeat(4)}và thu gọn.`;
+    const cues = splitCues(long, 20000);
+    expect(cues.length).toBeGreaterThan(2);
+    expect(Math.max(...cues.map((c) => c.text.length))).toBeLessThanOrEqual(150);
+    expect(cues.reduce((n, c) => n + c.durationMs, 0)).toBe(20000);
+  });
+
+  it("công thức viết thuần (^) trong quiz được dựng KaTeX; chữ thường giữ nguyên, $…$ vẫn dùng được", () => {
+    const L = (t: string) => `<i>${t}</i>`;
+    expect(mathInline("Khai triển biểu thức (2x - 3y)^2 ta được kết quả là:", L)).toBe("Khai triển biểu thức <i>(2x - 3y)^2</i> ta được kết quả là:");
+    expect(mathInline("4x^2 - 12xy + 9y^2", L)).toBe("<i>4x^2 - 12xy + 9y^2</i>");
+    expect(mathInline("102^2 - 4 = (102 - 2)(102 + 2) = 100 * 104", L)).toBe("<i>102^2 - 4 = (102 - 2)(102 + 2) = 100 \\cdot 104</i>");
+    expect(mathInline("Hôm nay học hằng đẳng thức", L)).toBe("Hôm nay học hằng đẳng thức");
+    expect(mathInline("Ta có $x^2$ và <b>", L)).toBe("Ta có <i>x^2</i> và &lt;b&gt;");
+  });
+
+  it("khung câu hỏi: phương án đúng tô xanh có dấu ✓, phương án sai mờ đi khi hiện đáp án", () => {
+    const L = (t: string) => `<i>${t}</i>`;
+    const q = QUIZ[0] as never;
+    const before = quizQuestionHtml("Luyện tập", q, 0, 2, { latex: L });
+    const after = quizQuestionHtml("Luyện tập", q, 0, 2, { latex: L, reveal: true });
+    expect(before).toContain("CÂU HỎI 1/2");
+    expect(before).not.toContain("✓");
+    expect(after).toContain("✓");
+    expect(after.match(/opacity:0\.4/g)).toHaveLength(3);
+  });
+
   it("speakable bỏ LaTeX để giọng đọc không đọc ký hiệu", () => {
     expect(speakable("Ta có $(a+b)^2$ và **đậm**")).not.toMatch(/[$*\\]/);
     expect(speakable("$\\frac{1}{2}$")).toContain("1 phần 2");
@@ -306,7 +465,7 @@ describe("HTML slide dùng chung", () => {
 
 describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () => {
   it("dựng video ngắn có tiếng, tệp mp4 + srt hợp lệ", { timeout: 120_000 }, async () => {
-    const dir = mkdtempSync(path.join(tmpdir(), "eduvn-vid-"));
+    const dir = mkTmp("eduvn-vid-");
     const audio = path.join(dir, "audio");
     execFileSync("mkdir", ["-p", audio]);
     execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "lavfi", "-i", "sine=frequency=330:duration=1.5", path.join(audio, "s1.mp3")]);
@@ -319,7 +478,7 @@ describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () =
     expect(probe).toContain("video,1280,720");
     expect(probe).toContain("audio");
     expect(readFileSync(r.srt, "utf8")).toContain("Công thức bình phương");
-    expect(r.totalMs).toBe(9500);
+    expect(r.totalMs).toBe(23100); // 1500 + (7400 + 4000) + (6200 + 4000): mỗi câu quiz một đoạn câu hỏi + một đoạn đáp án
   });
 });
 

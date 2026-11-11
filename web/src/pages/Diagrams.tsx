@@ -16,6 +16,25 @@ export function Diagrams() {
   const [form, setForm] = useState({ title: "", subject: SUBJECT_DEFAULT, grade: "10", topic: "", kind: "mind" as DiagramKind, sample: false });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [formula, setFormula] = useState<string | null>(null);
+
+  /** Sơ đồ công thức: tạo sơ đồ trống rồi mở trình soạn, AI vẽ ngay theo chủ đề. */
+  const createFormula = async (e: FormEvent) => {
+    e.preventDefault();
+    const topic = formula?.trim();
+    if (!topic) return setError("Nhập chủ đề, ví dụ: Công thức lượng giác lớp 10");
+    setBusy(true);
+    setError(null);
+    try {
+      const grade = Number(/lớp\s*(\d{1,2})/i.exec(topic)?.[1] ?? form.grade) || 10;
+      const r = await api<DiagramSummary>("/api/diagrams", { method: "POST", body: { title: topic.slice(0, 120), subject: form.subject, topic: topic.slice(0, 120), grade: Math.min(16, Math.max(1, grade)), doc: blank("mind") } });
+      nav(`/so-do/${r.id}?cong-thuc=${encodeURIComponent(topic)}`);
+    } catch (err) {
+      setError(errText(err));
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const load = useCallback(() => {
     api<DiagramSummary[]>("/api/diagrams").then(setRows).catch((e: unknown) => setError(errText(e)));
@@ -54,8 +73,18 @@ export function Diagrams() {
       <h1>Sơ đồ</h1>
       <div className="bar">
         <span className="sp" />
+        <button className="btn ghost" onClick={() => setFormula((f) => (f === null ? "" : null))} data-testid="sd-formula"><Icon name="graph" size={18} />Sơ đồ công thức</button>
         <button className="btn" onClick={() => setAdding((a) => !a)} data-testid="sd-new"><Icon name="plus" size={18} />Tạo</button>
       </div>
+      {formula !== null && (
+        <form className="card" style={{ marginBottom: 16 }} onSubmit={(e) => void createFormula(e)}>
+          <div className="formrow">
+            <label className="lbl">Chủ đề công thức<input className="inp" style={{ width: 360 }} autoFocus placeholder="Ví dụ: Công thức lượng giác lớp 10, Đạo hàm" value={formula} onChange={(e) => setFormula(e.target.value)} data-testid="sd-formula-topic" /></label>
+            <label className="lbl">Môn<input className="inp w-m" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} /></label>
+            <button className="btn" disabled={busy} data-testid="sd-formula-go"><Icon name="spark" size={18} />AI vẽ sơ đồ công thức</button>
+          </div>
+        </form>
+      )}
       {error && <div className="err">{error}</div>}
       {adding && (
         <form className="card" style={{ marginBottom: 16 }} onSubmit={(e) => void create(e)}>

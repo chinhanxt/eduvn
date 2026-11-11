@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Icon } from "../Icon";
 import { elementHtml, esc } from "../../../server/src/export/slideHtml";
+import { AnimGallery } from "./AnimGallery";
 import { type El, type Scene, latex } from "./lib";
 
 const plainOf = (html: string) => html.replace(/<\/p>|<br\s*\/?>|<\/li>/gi, "\n").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/\n+$/, "");
@@ -25,10 +26,11 @@ const blankScene = (n: number): Scene => ({
 });
 
 /** Sửa nhanh sau khi sinh: sửa chữ phần tử, kéo vị trí, xoá/thêm cảnh, đổi thứ tự, sinh lại 1 cảnh. */
-export function Editor({ scenes, onChange, onRegenerate, busy }: { scenes: Scene[]; onChange: (s: Scene[]) => void; onRegenerate: (id: string, directive: string) => void; busy: boolean }) {
+export function Editor({ scenes, onChange, onRegenerate, onAnimate, onRemoveAnim, busy }: { scenes: Scene[]; onChange: (s: Scene[]) => void; onRegenerate: (id: string, directive: string) => void; onAnimate: (id: string, spec?: Record<string, unknown>) => void; onRemoveAnim: (id: string) => void; busy: boolean }) {
   const [idx, setIdx] = useState(0);
   const [sel, setSel] = useState<string | null>(null);
   const [directive, setDirective] = useState("");
+  const [gallery, setGallery] = useState(false);
   const stage = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: string; x: number; y: number; l: number; t: number } | null>(null);
   const scene = scenes[Math.min(idx, scenes.length - 1)];
@@ -137,13 +139,30 @@ export function Editor({ scenes, onChange, onRegenerate, busy }: { scenes: Scene
           ) : (
             <div className="card"><div className="empty">Cảnh {scene.type === "quiz" ? "quiz" : "tương tác"} — dùng "Sinh lại cảnh" để đổi nội dung, hoặc xoá/đổi chỗ ở danh sách bên trái.</div></div>
           )}
+          {scene.type === "slide" && (
+            <div className="card" style={{ marginTop: 12 }} data-testid="ail-anim-card">
+              <b>Hoạt hình toán</b>
+              <div style={{ margin: "6px 0", color: "var(--muted)", fontSize: 14 }}>
+                {!scene.animation && "AI chọn một mẫu hoạt hình có sẵn (đồ thị, biến đổi công thức, hình học diện tích, trục số, diễn giải từng bước, sơ đồ, bảng so sánh) khớp với lời giảng; clip thay hình slide của cảnh này khi trình chiếu và xuất video."}
+                {scene.animation?.status === "dang_dung" && "Đang dựng hoạt hình… (vài phút, tuỳ máy đang bận)"}
+                {scene.animation?.status === "xong" && `Đã có hoạt hình “${scene.animation.spec?.tieuDe ?? scene.animation.spec?.template ?? ""}” (${Math.round((scene.animation.durationMs ?? 0) / 1000)} giây).${scene.animation.reason ? ` AI chọn vì: ${scene.animation.reason}` : ""}`}
+                {scene.animation?.status === "loi" && <span className="err">Dựng lỗi: {scene.animation.error}</span>}
+              </div>
+              <div className="bar" style={{ marginBottom: 0 }}>
+                <button className="btn" disabled={busy || scene.animation?.status === "dang_dung"} onClick={() => onAnimate(scene.id)} data-testid="ail-anim-make"><Icon name="video" size={18} />{scene.animation ? "AI chọn lại hoạt hình" : "AI chọn hoạt hình"}</button>
+                <button className="btn ghost" disabled={busy || scene.animation?.status === "dang_dung"} onClick={() => setGallery(true)} data-testid="ail-anim-gallery"><Icon name="plus" size={18} />Chọn hoạt hình</button>
+                {scene.animation && <button className="btn ghost" disabled={busy} onClick={() => onRemoveAnim(scene.id)} data-testid="ail-anim-del"><Icon name="trash" size={18} />Bỏ hoạt hình</button>}
+              </div>
+              {gallery && <div style={{ marginTop: 10 }}><AnimGallery busy={busy} onClose={() => setGallery(false)} onPick={(sp) => { setGallery(false); onAnimate(scene.id, sp); }} /></div>}
+            </div>
+          )}
           {speeches.length > 0 && (
             <div className="card" style={{ marginTop: 12 }}>
               <b>Lời giảng</b>
               {speeches.map((a) => (
                 <textarea key={a.id} className="inp" rows={2} style={{ marginTop: 8 }} value={a.text ?? ""} onChange={(e) => setScene({ ...scene, actions: (scene.actions ?? []).map((x) => (x.id === a.id ? { ...x, text: e.target.value, audioFile: undefined, durationMs: undefined } : x)) })} data-testid="ail-speech" />
               ))}
-              <small style={{ color: "var(--muted)" }}>Sửa lời giảng thì giọng đọc cũ bị bỏ; trình phát tự đọc ước lượng thời gian.</small>
+              <small style={{ color: "var(--muted)" }}>Sửa lời giảng thì giọng đọc cũ bị bỏ; lưu rồi bấm "Sinh tiếp" để đọc lại bằng giọng VieNeu (trước đó trình phát ước lượng thời gian).</small>
             </div>
           )}
         </div>

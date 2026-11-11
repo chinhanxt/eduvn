@@ -1,4 +1,5 @@
-import { boolean, index, integer, jsonb, pgTable, primaryKey, real, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, primaryKey, real, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import type { Answers, AssignmentKind, AssignmentSource, AssignmentStatus, ShowSolution, SubmissionStatus } from "../domain/assignment";
 import { ROLES } from "../domain/authz";
 import type { Scale } from "../domain/comments";
 import type { GradeColumn } from "../domain/gradebook";
@@ -9,7 +10,8 @@ import type { BoardDoc } from "../domain/board";
 import type { DiagramDoc } from "../domain/diagram";
 import type { SlideDeck } from "../domain/slides";
 import type { ExamMatrix } from "../domain/matrix";
-import type { QuestionInput } from "../domain/question";
+import type { QuestionInput, QuestionType } from "../domain/question";
+import type { PointRules } from "../domain/scoring";
 import type { Variant } from "../domain/variants";
 
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -92,6 +94,11 @@ export const classes = pgTable(
     subject: text("subject"),
     scale: text("scale").$type<Scale>().notNull().default("TT22"),
     columns: jsonb("columns").$type<GradeColumn[]>().notNull(),
+    /** Mã lớp in trên thẻ (đăng nhập bằng số thứ tự + PIN). */
+    code: text("code").unique(),
+    /** Mã tham gia cho tài khoản Keycloak (SV, HS lớn); chỉ dùng được khi joinOpen. */
+    joinCode: text("join_code").unique(),
+    joinOpen: boolean("join_open").notNull().default(false),
     createdAt: createdAt(),
   },
   (t) => [index("classes_org_idx").on(t.orgId)],
@@ -110,9 +117,17 @@ export const students = pgTable(
     gender: text("gender"),
     note: text("note").notNull().default(""),
     position: integer("position").notNull().default(0),
+    /** Số thứ tự trên thẻ lớp: cấp khi "Cấp mã", không đổi khi thêm HS sau. */
+    seat: integer("seat"),
+    pinHash: text("pin_hash"),
+    /** Tăng khi cấp lại thẻ: thẻ QR và phiên cũ hết dùng. */
+    badgeVersion: integer("badge_version").notNull().default(0),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    /** HS tự tham gia trùng họ tên + ngày sinh: chờ GV xác nhận. */
+    linkPending: boolean("link_pending").notNull().default(false),
     createdAt: createdAt(),
   },
-  (t) => [index("students_class_idx").on(t.classId)],
+  (t) => [index("students_class_idx").on(t.classId), uniqueIndex("students_seat_uq").on(t.classId, t.seat), uniqueIndex("students_user_uq").on(t.classId, t.userId)],
 );
 
 export const scores = pgTable(
@@ -520,6 +535,147 @@ export const tutorBookPages = pgTable(
     updatedAt: updatedAt(),
   },
   (t) => [index("tutor_book_pages_idx").on(t.bookId, t.idx)],
+);
+
+export const assignments = pgTable(
+  "assignments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    classId: uuid("class_id")
+      .notNull()
+      .references(() => classes.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    title: text("title").notNull(),
+    kind: text("kind").$type<AssignmentKind>().notNull(),
+    subject: text("subject").notNull(),
+    source: jsonb("source").$type<AssignmentSource>().notNull(),
+    /** Bản chụp mã đề lúc giao: sửa ngân hàng/đề sau đó không ảnh hưởng. */
+    variants: jsonb("variants").$type<Variant[]>().notNull(),
+    rules: jsonb("rules").$type<PointRules>().notNull(),
+    opensAt: timestamp("opens_at", { withTimezone: true }).notNull(),
+    dueAt: timestamp("due_at", { withTimezone: true }).notNull(),
+    durationMinutes: integer("duration_minutes"),
+    attemptsAllowed: integer("attempts_allowed").notNull(),
+    showSolution: text("show_solution").$type<ShowSolution>().notNull(),
+    shuffle: boolean("shuffle").notNull().default(false),
+    status: text("status").$type<AssignmentStatus>().notNull().default("draft"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("assignments_class_idx").on(t.classId)],
+);
+
+export const submissions = pgTable(
+  "submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    assignmentId: uuid("assignment_id")
+      .notNull()
+      .references(() => assignments.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => students.id, { onDelete: "cascade" }),
+    attempt: integer("attempt").notNull(),
+    variantCode: text("variant_code").notNull(),
+    seed: integer("seed").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    /** Máy chủ tính: min(started_at + thời lượng, due_at). */
+    deadlineAt: timestamp("deadline_at", { withTimezone: true }).notNull(),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    status: text("status").$type<SubmissionStatus>().notNull().default("in_progress"),
+    answers: jsonb("answers").$type<Answers>().notNull().default({}),
+    /** Số thứ tự lần lưu (do máy khách tăng dần): chỉ ghi khi seq mới lớn hơn. */
+    seq: integer("seq").notNull().default(0),
+    score: real("score"),
+    maxScore: real("max_score"),
+    /** Số câu tự luận chờ GV chấm. */
+    pending: integer("pending").notNull().default(0),
+    leaveCount: integer("leave_count").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("submissions_attempt_uq").on(t.assignmentId, t.studentId, t.attempt), index("submissions_open_idx").on(t.status, t.deadlineAt)],
+);
+
+export const submissionEvents = pgTable(
+  "submission_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    submissionId: uuid("submission_id")
+      .notNull()
+      .references(() => submissions.id, { onDelete: "cascade" }),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+    kind: text("kind").notNull(),
+  },
+  (t) => [index("submission_events_sub_idx").on(t.submissionId)],
+);
+
+/** Bảng phẳng: một dòng cho mỗi câu của mỗi bài đã chốt (thống kê CTT). */
+export const answerItems = pgTable(
+  "answer_items",
+  {
+    submissionId: uuid("submission_id")
+      .notNull()
+      .references(() => submissions.id, { onDelete: "cascade" }),
+    assignmentId: uuid("assignment_id")
+      .notNull()
+      .references(() => assignments.id, { onDelete: "cascade" }),
+    no: integer("no").notNull(),
+    questionId: text("question_id").notNull(),
+    topic: text("topic").notNull(),
+    level: text("level").notNull(),
+    type: text("type").$type<QuestionType>().notNull(),
+    /** null = tự luận chờ chấm. */
+    points: real("points"),
+    maxPoints: real("max_points").notNull(),
+    correct: boolean("correct"),
+    choice: text("choice"),
+  },
+  (t) => [primaryKey({ columns: [t.submissionId, t.no] }), index("answer_items_assignment_idx").on(t.assignmentId, t.questionId)],
+);
+
+/** Phiên chơi trực tiếp (P11): lưu một lần lúc kết thúc. `qstats` = thống kê từng câu. */
+export type LiveQStat = { i: number; q: string; kind: "choice" | "text"; answered: number; correct: number; counts: number[] };
+export type LiveAnswer = { i: number; ok: boolean; pts: number; ms: number };
+
+export const liveSessions = pgTable(
+  "live_sessions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    classId: uuid("class_id").references(() => classes.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    questionCount: integer("question_count").notNull(),
+    qstats: jsonb("qstats").$type<LiveQStat[]>().notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    endedAt: timestamp("ended_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("live_sessions_org_idx").on(t.orgId)],
+);
+
+export const liveResults = pgTable(
+  "live_results",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => liveSessions.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id").references(() => students.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    rank: integer("rank").notNull(),
+    score: integer("score").notNull(),
+    correctCount: integer("correct_count").notNull(),
+    answers: jsonb("answers").$type<LiveAnswer[]>().notNull(),
+  },
+  (t) => [index("live_results_session_idx").on(t.sessionId)],
 );
 
 /** Kết quả chấm từ ảnh (P7): kind "omr" = phiếu trắc nghiệm quét; "essay" = bài viết tay đã duyệt. */

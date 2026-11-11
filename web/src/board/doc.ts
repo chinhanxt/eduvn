@@ -1,16 +1,20 @@
 // web/src/board/doc.ts
 import { autoView, compileExpr, type View2 } from "./graph";
-import { type PointRef, SOLIDS, type SolidKind } from "./solids";
+import { PRESET_MAP } from "../geometry3d/presets";
+import type { ConstructionSpec, ViewMode } from "../geometry3d/spec";
 
 /** Phải khớp server/src/domain/board.ts (BoardDocSchema). */
 export type Stroke = { type: "stroke"; id: string; color: string; width: number; pts: number[] };
 export type GraphObj = { type: "graph"; id: string; x: number; y: number; w: number; h: number; exprs: { latex: string; color: string }[]; params: Record<string, number>; view: View2 };
-export type SolidObj = { type: "solid"; id: string; kind: SolidKind; cx: number; cy: number; size: number; th: number; ph: number; points: PointRef[]; section: [string, string, string] | null; angle: [string, string, string] | null };
+export type PointRef = { name: string; a: number; b: number; t: number };
+/** Hình không gian. Từ P10b: `spec` (mô hình dựng hình) là nguồn chính, th/ph là góc xoay/độ nghiêng của phép chiếu SGK.
+ *  Hình lưu trước đó (không có spec) dựng lại từ kind + points/section/angle. `kind`: mã hình mẫu, "ai" hoặc loại cũ. */
+export type SolidObj = { type: "solid"; id: string; kind: string; cx: number; cy: number; size: number; th: number; ph: number; points: PointRef[]; section: [string, string, string] | null; angle: [string, string, string] | null; spec?: ConstructionSpec; mode?: ViewMode; print?: boolean };
 export const SHAPE_KINDS = ["line", "arrow", "rect", "triangle", "circle", "polygon"] as const;
 export type ShapeKind = (typeof SHAPE_KINDS)[number];
 /** line/arrow/rect/triangle/circle: pts = [x1,y1,x2,y2] (khung bao / hai đầu); polygon: danh sách đỉnh. */
 export type ShapeObj = { type: "shape"; id: string; kind: ShapeKind; color: string; width: number; fill: boolean; pts: number[] };
-export type TextObj = { type: "text"; id: string; x: number; y: number; size: number; color: string; text: string };
+export type TextObj = { type: "text"; id: string; x: number; y: number; size: number; color: string; text: string; w?: number; h?: number };
 export type BoardObj = Stroke | GraphObj | SolidObj | ShapeObj | TextObj;
 export type BoardPageDoc = { id: string; objects: BoardObj[] };
 export type BoardDoc = { version: 1; pages: BoardPageDoc[] };
@@ -38,7 +42,10 @@ export function graphFromExprs(exprs: string[], xRange: [number, number], old?: 
   };
 }
 
-export const newSolid = (kind: SolidKind): SolidObj => ({ type: "solid", id: newId(), kind, cx: 380, cy: 330, size: 200, th: 0.62, ph: 0.42, points: [], section: null, angle: null });
+export function newSolid(kind: string, spec: ConstructionSpec, view: { mode: ViewMode; th: number; ph: number }): SolidObj {
+  return { type: "solid", id: newId(), kind, cx: 400, cy: 330, size: 170, th: view.th, ph: view.ph, mode: view.mode, points: [], section: null, angle: null, spec };
+}
+const LEGACY_TITLE: Record<string, string> = { cube: "hình lập phương", cuboid: "hình hộp chữ nhật", pyramid4: "hình chóp tứ giác đều", pyramid3: "hình chóp tam giác đều", prism3: "hình lăng trụ tam giác đều" };
 
 const EXPR_HINTS: [RegExp, string][] = [
   [/\\(sin|cos|tan|cot)/, "lượng giác"],
@@ -55,9 +62,10 @@ export function boardKeywords(page: BoardPageDoc): string {
   const out = new Set<string>();
   for (const o of page.objects) {
     if (o.type === "solid") {
-      out.add(SOLIDS[o.kind].title);
-      if (o.section) out.add("thiết diện mặt phẳng cắt");
-      if (o.angle) out.add("góc");
+      out.add(o.spec?.title ?? PRESET_MAP.get(o.kind)?.title.toLowerCase() ?? LEGACY_TITLE[o.kind] ?? "hình không gian");
+      if (o.section || o.spec?.sections?.length) out.add("thiết diện mặt phẳng cắt");
+      if (o.angle || o.spec?.marks?.some((m) => m.type === "angle")) out.add("góc");
+      for (const m of o.spec?.measures ?? []) out.add(m.type.startsWith("angle") ? "góc" : "khoảng cách");
     }
     if (o.type === "graph") {
       out.add("đồ thị hàm số");
@@ -97,6 +105,7 @@ export function arrowHead(o: ShapeObj): string {
   return `M${p(0.45)}L${x2} ${y2}L${p(-0.45)}`;
 }
 export const textBox = (o: TextObj): { w: number; h: number } => {
+  if (o.w && o.h) return { w: o.w, h: o.h }; // kích thước đo thật (TextView đo sau khi hiển thị)
   const lines = o.text.split("\n");
   const w = Math.max(...lines.map((l) => l.replace(/\\[a-zA-Z]+/g, "x").replace(/[${}\\^_]/g, "").length)) * o.size * 0.6 + 24;
   const h = lines.reduce((a, l) => a + (/\\d?frac|\\sqrt/.test(l) ? o.size * 2.2 : o.size * 1.5), 0) + 8;

@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soạn đề · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+<style>
+  .work { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: var(--gutter); align-items: start; }
+  .sticky { position: sticky; top: calc(var(--top-h) + var(--s-6)); }
+  .matrix { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+  .matrix th { font-size: var(--fs-xs); color: var(--ink-3); font-weight: var(--fw-semibold); text-align: center; padding: 0 0 6px; }
+  .matrix th:first-child { text-align: left; }
+  .matrix td { padding: 3px 0; border-top: var(--bw) solid var(--line); }
+  .matrix td:first-child { color: var(--ink-2); padding-right: 6px; }
+  .matrix input { width: 40px; height: 28px; text-align: center; border: var(--bw) solid var(--line-2); border-radius: var(--r-xs); background: var(--bg); font-variant-numeric: tabular-nums; display: block; margin: 0 auto; }
+  .matrix input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+  .matrix tfoot td { font-weight: var(--fw-semibold); text-align: center; font-variant-numeric: tabular-nums; padding-top: 6px; }
+  .matrix tfoot td:first-child { text-align: left; }
+  .paper { max-width: calc(var(--measure) + 160px); margin: 0 auto; padding: var(--s-10) 80px var(--s-12); font-family: var(--font-read); font-size: var(--fs-read); line-height: var(--lh-read); color: var(--ink); }
+  .paper .hdr { display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: var(--s-4); font-family: var(--font-ui); font-size: var(--fs-sm); line-height: var(--lh-sm); color: var(--ink-2); padding-bottom: var(--s-5); border-bottom: var(--bw) solid var(--line-2); }
+  .paper .hdr .c { text-align: center; } .paper .hdr .rt { text-align: right; }
+  .paper .hdr b { color: var(--ink); display: block; }
+  .paper h2 { font-family: var(--font-read); font-size: 22px; line-height: 30px; text-align: center; margin: var(--s-6) 0 var(--s-1); }
+  .paper .part { font-family: var(--font-ui); font-size: var(--fs-sm); line-height: var(--lh-sm); font-weight: var(--fw-semibold); letter-spacing: .02em; color: var(--ink); margin: var(--s-8) 0 var(--s-3); }
+  .paper .part small { font-weight: 400; color: var(--ink-3); }
+  .qi { position: relative; margin: 0 0 var(--s-4); padding-left: 0; }
+  .qi .no { font-weight: 600; }
+  .qi .opts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px var(--s-4); margin-top: 2px; }
+  .qi .opts.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .qi .src { position: absolute; right: calc(100% + 12px); top: 4px; font-family: var(--font-ui); font-size: 11px; line-height: 16px; color: var(--ink-3); white-space: nowrap; }
+  .qi.ai .src { color: var(--accent); }
+  .qi.writing { color: var(--ink); }
+  .qi.ghost { color: transparent; }
+  .gen { display: flex; flex-direction: column; gap: var(--s-3); padding: var(--s-4) var(--s-5); border-bottom: var(--bw) solid var(--line); background: var(--bg-raised); position: sticky; top: var(--top-h); z-index: 2; border-radius: var(--r-md) var(--r-md) 0 0; }
+  .gen .row b { font-weight: var(--fw-semibold); }
+  .checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-3); font-size: var(--fs-sm); }
+  .checks li { display: flex; gap: var(--s-2); align-items: flex-start; color: var(--ink-2); }
+  .checks li svg.i { margin-top: 2px; }
+  .checks .ok svg.i { color: var(--ok); } .checks .warn svg.i { color: var(--warn); }
+  .kv { display: grid; grid-template-columns: 1fr auto; gap: 6px var(--s-3); font-size: var(--fs-sm); }
+  .kv dt { color: var(--ink-3); } .kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--fw-medium); }
+  @media (max-width: 1180px) { .work { grid-template-columns: 280px minmax(0, 1fr); } .qi .src { position: static; display: block; } .paper { padding-left: 24px; padding-right: 24px; } }
+  @media (max-width: 720px) { .work { grid-template-columns: 1fr; } .work > section { order: -1; } .sticky { position: static; } .qi .opts { grid-template-columns: 1fr 1fr; } .paper { font-size: 16px; line-height: 26px; } .paper .hdr { grid-template-columns: 1fr; } .paper .hdr .c, .paper .hdr .rt { text-align: left; } .paper { padding: var(--s-6) var(--s-4); } }
+</style>
+</head>
+<body data-shell="gv" data-nav="de-thi" data-crumb="Đề thi|Kiểm tra giữa kỳ I · Toán 10">
+<script src="icons.js"></script>
+<main id="main">
+  <div class="page-head">
+    <div class="t">
+      <h1 style="font-family:var(--font-read)">Kiểm tra giữa kỳ I · Toán 10</h1>
+      <div class="caption">Bản nháp · lưu tự động 14:02 · theo CV 7991</div>
+    </div>
+    <div class="acts">
+      <button class="btn"><svg class="i sm"><use href="#i-shuffle"/></svg><span>4 mã đề</span></button>
+      <button class="btn" data-busy="1200" data-done="Đã xuất" data-toast="Đã xuất de-giua-ky-1-toan-10.docx" data-toast-msg="4 mã đề + đáp án · 186 KB"><svg class="i sm"><use href="#i-down"/></svg><span>Xuất .docx</span></button>
+      <button class="btn primary"><svg class="i sm"><use href="#i-send"/></svg><span>Giao cho lớp</span></button>
+    </div>
+  </div>
+
+  <div class="work">
+    <!-- 1. Đầu vào: ma trận -->
+    <aside class="stack">
+      <section class="panel">
+        <div class="hd"><h2>Ma trận</h2><span class="grow"></span><span class="badge outline">90 phút</span></div>
+        <div class="bd stack" style="gap:var(--s-5)">
+          <table class="matrix">
+            <thead><tr><th>Chủ đề</th><th><span class="lvl l1">NB</span></th><th><span class="lvl l2">TH</span></th><th><span class="lvl l3">VD</span></th></tr></thead>
+            <tbody>
+              <tr><td>Mệnh đề, tập hợp</td><td><input value="3" aria-label="NB"></td><td><input value="1"></td><td><input value="0"></td></tr>
+              <tr><td>BPT bậc nhất 2 ẩn</td><td><input value="2"></td><td><input value="2"></td><td><input value="1"></td></tr>
+              <tr><td>Hàm số bậc hai</td><td><input value="3"></td><td><input value="3"></td><td><input value="2"></td></tr>
+              <tr><td>Hệ thức lượng</td><td><input value="2"></td><td><input value="2"></td><td><input value="1"></td></tr>
+            </tbody>
+            <tfoot><tr><td>Tổng 22 câu</td><td>10</td><td>8</td><td>4</td></tr></tfoot>
+          </table>
+          <div class="field">
+            <span class="lbl">Cấu trúc</span>
+            <dl class="kv" style="margin:0">
+              <dt>I · Nhiều lựa chọn</dt><dd>12 × 0,25</dd>
+              <dt>II · Đúng/Sai</dt><dd>4 × 1,0</dd>
+              <dt>III · Trả lời ngắn</dt><dd>6 × 0,5</dd>
+            </dl>
+          </div>
+          <div class="field">
+            <label for="nt">Ghi chú cho AI</label>
+            <textarea id="nt" class="textarea" style="min-height:92px">Ưu tiên bối cảnh thực tế (cổng parabol, lợi nhuận). Tránh câu đã dùng ở KT 15′.</textarea>
+          </div>
+        </div>
+        <div class="ft row"><span class="caption grow">Lấy ngân hàng trước, AI bù phần thiếu</span><button class="btn sm"><svg class="i sm"><use href="#i-refresh"/></svg><span>Soạn lại</span></button></div>
+      </section>
+      <section class="panel">
+          <div class="hd"><h2>Phân bố điểm</h2></div>
+          <div class="bd stack" style="gap:var(--s-3)">
+            <div id="pts"></div>
+            <div class="legend" style="font-size:12px;gap:10px"><span><i style="--c:var(--lvl-1)"></i>NB 4,0</span><span><i style="--c:var(--lvl-2)"></i>TH 3,5</span><span><i style="--c:var(--lvl-3)"></i>VD 2,5</span></div>
+            <dl class="kv" style="margin:0"><dt>Tổng điểm</dt><dd>10,0</dd><dt>Thời gian ước tính</dt><dd>78 phút</dd><dt>Câu từ ngân hàng</dt><dd>14/22</dd></dl>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="hd"><h2>Kiểm tra</h2></div>
+          <div class="bd">
+            <ul class="checks">
+              <li class="ok"><svg class="i sm"><use href="#i-ok"/></svg><span>Đúng ma trận 40/35/25</span></li>
+              <li class="ok"><svg class="i sm"><use href="#i-ok"/></svg><span>Đáp án A–D cân bằng (3/3/3/3)</span></li>
+              <li class="warn"><svg class="i sm"><use href="#i-alert"/></svg><span>Câu I.2 trùng KT 15′ ngày 03/11 · <a class="link" href="#">đổi câu</a></span></li>
+            </ul>
+          </div>
+        </section>
+    </aside>
+
+    <!-- 2. Kết quả đang stream -->
+    <section class="panel" aria-live="polite" aria-busy="true">
+      <div class="gen">
+        <div class="row"><span class="badge accent"><svg class="i"><use href="#i-spark"/></svg>AI đang soạn</span><span class="caption grow"><b class="num" id="cnt">17</b>/22 câu · còn khoảng <span class="num">20</span> giây</span><button class="btn sm" id="btn-stop"><svg class="i sm"><use href="#i-stop"/></svg><span>Dừng</span></button></div>
+        <div class="stream-bar det" style="--p:77%"></div>
+        <ol class="steps" style="flex-direction:row;flex-wrap:wrap;gap:4px 20px">
+          <li class="done"><span class="dot"><svg class="i"><use href="#i-check"/></svg></span>Đọc ma trận</li>
+          <li class="done"><span class="dot"><svg class="i"><use href="#i-check"/></svg></span>Lấy 14 câu từ ngân hàng</li>
+          <li class="now"><span class="dot"></span>Soạn câu mới (3/8)</li>
+          <li><span class="dot"></span>Kiểm đáp án</li>
+          <li><span class="dot"></span>Trộn mã đề</li>
+        </ol>
+      </div>
+      <article class="paper">
+        <div class="hdr">
+          <div><b>SỞ GD&amp;ĐT HÀ NỘI</b>THPT Chu Văn An</div>
+          <div class="c"><b>ĐỀ KIỂM TRA GIỮA KỲ I</b>Năm học 2026–2027</div>
+          <div class="rt"><b>Môn: Toán 10</b>Thời gian: 90 phút</div>
+        </div>
+        <div class="part">PHẦN I. Câu trắc nghiệm nhiều phương án lựa chọn <small>· 12 câu · 3,0 điểm</small></div>
+        <div class="qi"><span class="src">#1040</span><span class="no">Câu 1.</span> Parabol (P): y = x² − 4x + 3 có đỉnh là
+          <div class="opts"><span>A. I(2; −1)</span><span>B. I(−2; 15)</span><span>C. I(2; 1)</span><span>D. I(4; 3)</span></div></div>
+        <div class="qi"><span class="src">#1044</span><span class="no">Câu 2.</span> Tập nghiệm của bất phương trình x² − 5x + 6 ≤ 0 là
+          <div class="opts"><span>A. [2; 3]</span><span>B. (2; 3)</span><span>C. (−∞; 2]</span><span>D. [3; +∞)</span></div></div>
+        <div class="qi"><span class="src">#0412</span><span class="no">Câu 3.</span> Mệnh đề phủ định của “∀x ∈ ℝ, x² + 1 > 0” là
+          <div class="opts two"><span>A. ∃x ∈ ℝ, x² + 1 ≤ 0</span><span>B. ∀x ∈ ℝ, x² + 1 ≤ 0</span><span>C. ∃x ∈ ℝ, x² + 1 &lt; 0</span><span>D. ∀x ∈ ℝ, x² + 1 &lt; 0</span></div></div>
+        <div class="caption" style="font-family:var(--font-ui);margin:var(--s-4) 0">… Câu 4–12 (đã soạn)</div>
+        <div class="part">PHẦN II. Câu trắc nghiệm đúng sai <small>· 4 câu · 4,0 điểm</small></div>
+        <div class="qi ai"><span class="src">AI · mới</span><span class="no">Câu 1.</span> Cho hàm số f(x) = −x² + 6x − 5.
+          <div style="padding-left:20px">a) Đồ thị hàm số có trục đối xứng x = 3.<br>b) f(x) > 0 khi và chỉ khi 1 &lt; x &lt; 5.<br>c) Giá trị lớn nhất của f(x) trên ℝ bằng 5.<br>d) Hàm số nghịch biến trên khoảng (3; +∞).</div></div>
+        <div class="qi ai writing"><span class="src">AI · đang viết</span><span class="no">Câu 2.</span> <span id="w">Một cổng hình parabol có chiều rộng chân cổng 8 m và chiều cao 6 m. Chọn hệ trục Oxy sao cho chân cổng nằm trên Ox, đỉnh cổng</span></div>
+        <div class="qi ghost" aria-hidden="true"><div class="skel line w80"></div><div class="skel line w60"></div><div class="skel line w40"></div></div>
+      </article>
+    </section>
+
+  </div>
+</main>
+<script src="ui.js"></script>
+<script src="shell.js"></script>
+<script src="charts.js"></script>
+<script>
+  Charts.segbar(document.getElementById("pts"), [{ l: "NB 4,0 điểm", v: 40, c: "var(--lvl-1)" }, { l: "TH 3,5 điểm", v: 35, c: "var(--lvl-2)" }, { l: "VD 2,5 điểm", v: 25, c: "var(--lvl-3)" }]);
+  // Mô phỏng SSE: chỉ chạy khi người dùng không bật giảm chuyển động
+  const w = document.getElementById("w");
+  w.classList.add("caret");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const rest = " là điểm I(4; 6). Xét tính đúng/sai:\n a) Phương trình parabol là y = −(3/8)x² + 3x.\n b) Tại điểm cách chân cổng 1 m, cổng cao 2,625 m.";
+    const base = w.textContent;
+    const stop = UI.stream(w, base + rest, { cps: 40, onDone: () => { document.getElementById("cnt").textContent = 18; } });
+    document.getElementById("btn-stop").onclick = () => { stop(); UI.toast({ title: "Đã dừng soạn", msg: "Giữ 17 câu đã có. Bấm Soạn lại để tiếp tục.", kind: "info" }); };
+  }
+</script>
+</body>
+</html>

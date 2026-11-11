@@ -51,6 +51,8 @@ export type Question = {
   level: "NB" | "TH" | "VD";
   type: "mcq" | "true_false" | "short_answer" | "essay";
   stem: string;
+  /** Hình vẽ kèm câu (PNG data URL) */
+  figure?: string;
 };
 export type KeyEntry = { no: number; section: string; sectionNo: number; answer: string };
 
@@ -143,3 +145,21 @@ import type { DiagramDoc } from "./diagram/types";
 export type DiagramSummary = { id: string; title: string; subject: string; grade: number; topic: string; kind: "mind" | "flow"; nodeCount: number; updatedAt: string };
 export type DiagramDetail = DiagramSummary & { doc: DiagramDoc };
 export type AiDiagramResult = { nodes: { id: string; label: string; parent: string | null }[]; links: { from: string; to: string; label?: string }[] };
+
+/** Nút AI dùng skill sư phạm (P8): trả bản nháp để giáo viên duyệt. */
+export const aiSkill = <T,>(path: string, body: unknown) => api<T>(`/api/ai-skills/${path}`, { method: "POST", body });
+
+/** POST rồi tải tệp trả về (cần header đăng nhập nên không dùng link trực tiếp). */
+export async function downloadPost(path: string, body: unknown, filename: string) {
+  const user = await userManager.getUser();
+  if (!user || user.expired) throw new ApiError(401, { error: "Hết phiên đăng nhập" });
+  const headers: Record<string, string> = { authorization: `Bearer ${user.access_token}`, "content-type": "application/json" };
+  const org = getOrgId();
+  if (org) headers["x-org-id"] = org;
+  const res = await fetch(path, { method: "POST", headers, body: JSON.stringify(body) });
+  if (!res.ok) throw new ApiError(res.status, await res.json().catch(() => null));
+  const url = URL.createObjectURL(await res.blob());
+  const a = Object.assign(document.createElement("a"), { href: url, download: filename });
+  a.click();
+  URL.revokeObjectURL(url);
+}

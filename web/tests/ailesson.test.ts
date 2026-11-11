@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cqwToPx, gradeQuestion, splitCues } from "../src/ailesson/pure";
+import { coerceField, cqwToPx, gradeQuestion, splitCues } from "../src/ailesson/pure";
 import { elementHtml, quizHtml, slideHtml } from "../../server/src/export/slideHtml";
 
 const latex = (t: string) => `<i>${t}</i>`;
@@ -28,5 +28,15 @@ describe("bài giảng AI — module thuần", () => {
     expect(elementHtml({ id: "m", type: "latex", left: 0, top: 0, width: 100, height: 50, latex: "x^2" }, { latex })).toContain("<i>x^2</i>");
     const q = quizHtml("Quiz", [{ type: "single", question: "1+1?", options: [{ value: "A", label: "2" }], answer: ["A"], analysis: "Phép cộng" }], { latex, reveal: true });
     expect(q).toContain("Phép cộng");
+  });
+});
+
+describe("form thư viện hoạt hình", () => {
+  it("ép giá trị theo kiểu của ví dụ", () => {
+    expect(coerceField(2, "3.5")).toBe(3.5);
+    expect(coerceField("a", "xin chào")).toBe("xin chào");
+    expect(coerceField(true, false)).toBe(false);
+    expect(coerceField([], "[[1,2],[3,4]]")).toEqual([[1, 2], [3, 4]]);
+    expect(() => coerceField({}, "{sai")).toThrow();
   });
 });

@@ -1,18 +1,27 @@
 // web/src/diagram/layout.ts — sắp xếp nút: sơ đồ tư duy (cây 2 bên) và lưu đồ (xếp tầng).
 import type { DEdge, DiagramDoc, DNode, Shape } from "./types";
 
-/** Ước lượng kích thước hình theo chữ (công thức LaTeX tính gần đúng). */
+/** Đo kích thước chữ + công thức đã render thật (trình duyệt cài qua setLabelMeasurer); null → ước lượng. */
+export type LabelMeasurer = (label: string) => { w: number; h: number } | null;
+let measurer: LabelMeasurer | null = null;
+export const setLabelMeasurer = (m: LabelMeasurer | null): void => {
+  measurer = m;
+};
+
+/** Kích thước hình theo chữ: đo bằng render thật nếu có, không thì ước lượng theo ký tự (môi trường test). */
 export function estimateSize(label: string, shape: Shape, image?: string): { w: number; h: number } {
   if (image) return { w: 168, h: 112 };
-  const lines = label.split("\n");
   let w = 0;
   let h = 0;
-  for (const ln of lines) {
-    const tall = /\\d?frac|\\sqrt|\\sum|\\int/.test(ln);
-    const plain = ln.replace(/\\[a-zA-Z]+/g, "x").replace(/[${}\\^_]/g, "");
-    w = Math.max(w, plain.length * (ln.includes("$") ? 8 : 7.2));
-    h += tall ? 36 : 22;
-  }
+  const m = measurer?.(label);
+  if (m) ({ w, h } = m);
+  else
+    for (const ln of label.split("\n")) {
+      const tall = /\\d?frac|\\sqrt|\\sum|\\int/.test(ln);
+      const plain = ln.replace(/\\[a-zA-Z]+/g, "x").replace(/[${}\\^_]/g, "");
+      w = Math.max(w, plain.length * (ln.includes("$") ? 8 : 7.2));
+      h += tall ? 36 : 22;
+    }
   const f = shape === "diamond" ? [1.7, 1.9] : shape === "ellipse" ? [1.35, 1.5] : shape === "parallelogram" ? [1.3, 1] : shape === "cloud" ? [1.3, 1.4] : [1, 1];
   return { w: Math.round(Math.max(w * f[0]! + 28, 64)), h: Math.round(Math.max(h * f[1]! + 16, 38)) };
 }

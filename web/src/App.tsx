@@ -1,6 +1,6 @@
 import { lazy, Suspense, useSyncExternalStore } from "react";
 import { mathStore } from "./math/mathStore";
-import { Navigate, Route, Routes } from "react-router";
+import { Navigate, Route, Routes, useLocation } from "react-router";
 import { useAuth } from "./auth";
 import { Shell } from "./Shell";
 import { Login, Callback } from "./pages/Login";
@@ -8,6 +8,7 @@ import { Home } from "./pages/Home";
 import { Placeholder } from "./pages/Placeholder";
 import { TOOLS } from "./tools";
 
+const StudentApp = lazy(() => import("./student/StudentApp").then((m) => ({ default: m.StudentApp })));
 const Bank = lazy(() => import("./pages/Bank").then((m) => ({ default: m.Bank })));
 const Exams = lazy(() => import("./pages/Exams").then((m) => ({ default: m.Exams })));
 const Grade = lazy(() => import("./pages/Grade").then((m) => ({ default: m.Grade })));
@@ -17,6 +18,7 @@ const ClassDetailPage = lazy(() => import("./pages/Classes").then((m) => ({ defa
 const Gradebook = lazy(() => import("./pages/Gradebook").then((m) => ({ default: m.Gradebook })));
 const LessonDetailPage = lazy(() => import("./pages/Lessons").then((m) => ({ default: m.LessonDetailPage })));
 const Lessons = lazy(() => import("./pages/Lessons").then((m) => ({ default: m.Lessons })));
+const DeCuong = lazy(() => import("./pages/DeCuong").then((m) => ({ default: m.DeCuong })));
 const VanBan = lazy(() => import("./pages/VanBan").then((m) => ({ default: m.VanBan })));
 const Slides = lazy(() => import("./pages/Slides").then((m) => ({ default: m.Slides })));
 const AiLessons = lazy(() => import("./pages/AiLessons").then((m) => ({ default: m.AiLessons })));
@@ -26,6 +28,10 @@ const BoardPage = lazy(() => import("./board/BoardPage").then((m) => ({ default:
 const Diagrams = lazy(() => import("./pages/Diagrams").then((m) => ({ default: m.Diagrams })));
 const DiagramPage = lazy(() => import("./diagram/DiagramPage").then((m) => ({ default: m.DiagramPage })));
 const Games = lazy(() => import("./pages/Games").then((m) => ({ default: m.Games })));
+const Arena = lazy(() => import("./live/Host").then((m) => ({ default: m.Arena })));
+const SessionPage = lazy(() => import("./live/Host").then((m) => ({ default: m.SessionPage })));
+const HostScreen = lazy(() => import("./live/HostScreen").then((m) => ({ default: m.HostScreen })));
+const Play = lazy(() => import("./live/Play").then((m) => ({ default: m.Play })));
 const Connect = lazy(() => import("./pages/Connect").then((m) => ({ default: m.Connect })));
 const MathKeyboard = lazy(() => import("./math/MathKeyboard").then((m) => ({ default: m.MathKeyboard })));
 const Books = lazy(() => import("./hoc/Books").then((m) => ({ default: m.Books })));
@@ -37,11 +43,14 @@ const Tutor = lazy(() => import("./hoc/Tutor").then((m) => ({ default: m.Tutor }
 
 export function App() {
   const { user, ready } = useAuth();
+  const inHs = /^\/hs(\/|$)/.test(useLocation().pathname);
   return (
     <>
     <Suspense fallback={<div className="center">…</div>}>
     <Routes>
       <Route path="/callback" element={<Callback />} />
+      <Route path="/choi" element={<Play />} />
+      <Route path="/hs/*" element={<StudentApp />} />
       {!ready ? (
         <Route path="*" element={<div className="center">…</div>} />
       ) : !user ? (
@@ -50,6 +59,7 @@ export function App() {
         <>
         <Route path="bang-giang/:id" element={<BoardPage />} />
         <Route path="so-do/:id" element={<DiagramPage />} />
+        <Route path="dau-truong/:pin" element={<HostScreen />} />
         <Route element={<Shell />}>
           <Route path="bang-giang" element={<Boards />} />
           <Route path="so-do" element={<Diagrams />} />
@@ -63,10 +73,13 @@ export function App() {
           <Route path="so-diem" element={<Gradebook />} />
           <Route path="giao-an" element={<Lessons />} />
           <Route path="giao-an/:id" element={<LessonDetailPage />} />
+          <Route path="de-cuong" element={<DeCuong />} />
           <Route path="slide" element={<Slides />} />
           <Route path="bai-giang-ai" element={<AiLessons />} />
           <Route path="bai-giang-ai/:id" element={<AiLessonPage />} />
           <Route path="tro-choi" element={<Games />} />
+          <Route path="dau-truong" element={<Arena />} />
+          <Route path="dau-truong/phien/:id" element={<SessionPage />} />
           <Route path="van-ban" element={<VanBan />} />
           <Route path="ket-noi" element={<Connect />} />
           <Route path="kho-tri-thuc" element={<KhoTriThuc />} />
@@ -89,7 +102,7 @@ export function App() {
       )}
     </Routes>
     </Suspense>
-    {user && <LazyMathKeyboard />}
+    {(user || inHs) && <LazyMathKeyboard />}
     </>
   );
 }

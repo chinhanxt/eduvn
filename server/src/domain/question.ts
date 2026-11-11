@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { hasBalancedMath } from "./mathText";
+import { ambiguousKey } from "./shortAnswer";
 
 export const LEVELS = ["NB", "TH", "VD"] as const; // Nhận biết, Thông hiểu, Vận dụng
 export const QUESTION_TYPES = ["mcq", "true_false", "short_answer", "essay"] as const;
@@ -13,6 +14,13 @@ const MATH_MSG = "Công thức thiếu dấu $ đóng (ký hiệu đô la thư�
 /** Chuỗi bắt buộc, cho phép công thức $…$. */
 const mathText = () => z.string().trim().min(1).refine(hasBalancedMath, MATH_MSG);
 
+/** Hình vẽ kèm câu hỏi (PNG đen trắng, vd hình không gian dựng ở bảng giảng): data URL, tối đa 400 KB. */
+export const MAX_FIGURE_BYTES = 400 * 1024;
+const Figure = z
+  .string()
+  .regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/, "Hình vẽ phải là ảnh PNG (data URL)")
+  .refine((s) => Math.floor(((s.length - 22) * 3) / 4) <= MAX_FIGURE_BYTES, "Hình vẽ tối đa 400 KB");
+
 const base = {
   subject: z.string().trim().normalize("NFC").min(1),
   /** 1–12: lớp phổ thông; 13–16: năm 1–4 đại học. */
@@ -22,6 +30,7 @@ const base = {
   stem: mathText(),
   explanation: z.string().refine(hasBalancedMath, MATH_MSG).optional(),
   tags: z.array(z.string()).default([]),
+  figure: Figure.optional(),
 };
 
 export const McqQuestion = z.object({
@@ -42,7 +51,10 @@ export const TrueFalseQuestion = z.object({
 export const ShortAnswerQuestion = z.object({
   ...base,
   type: z.literal("short_answer"),
-  answer: mathText(),
+  answer: mathText().superRefine((v, ctx) => {
+    const k = ambiguousKey(v);
+    if (k) ctx.addIssue({ code: "custom", message: `Đáp án "${k}" dễ hiểu nhầm: viết "${k.replace(".", ",")}" nếu là số thập phân, hoặc "${k.replace(".", "")}" nếu là số nguyên.` });
+  }),
 });
 
 export const EssayQuestion = z.object({

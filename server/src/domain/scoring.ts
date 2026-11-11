@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { QuestionInput } from "./question";
+import { matchShortAnswer } from "./shortAnswer";
 
 export type PointRules = {
   mcq: number;
@@ -12,6 +13,7 @@ export type PointRules = {
 export const DEFAULT_RULES: PointRules = { mcq: 0.25, trueFalseByCorrect: [0, 0.1, 0.25, 0.5, 1], shortAnswer: 0.25 };
 export const MATH_RULES: PointRules = { ...DEFAULT_RULES, shortAnswer: 0.5 };
 
+/** Đúng/sai: mảng 4 ý, ý chưa chọn = null (tính là sai ý đó). */
 export const ResponseValue = z.union([z.number().int(), z.array(z.boolean().nullable()), z.string(), z.null()]);
 export type ResponseValue = z.infer<typeof ResponseValue>;
 
@@ -54,7 +56,7 @@ export function scoreItem(q: QuestionInput, r: ResponseValue | undefined, rules:
       return rules.trueFalseByCorrect[correct] ?? 0;
     }
     case "short_answer":
-      return typeof r === "string" && normalizeShort(r) === normalizeShort(q.answer) ? rules.shortAnswer : 0;
+      return typeof r === "string" && matchShortAnswer(r, q.answer) ? rules.shortAnswer : 0;
     case "essay":
       return null;
   }

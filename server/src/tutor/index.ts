@@ -11,7 +11,7 @@ import { parseOverrides, withTaskOverrides } from "./tasks";
 /** Gom các dịch vụ gia sư AI (P6). `overrides` = ánh xạ tạm tên tác vụ cổng AI (xem AI_TASK_OVERRIDES). */
 export function createTutor(db: Db, aiIn: Ai | undefined, overrides: string | undefined = process.env.AI_TASK_OVERRIDES) {
   const ai = withTaskOverrides(aiIn ?? disabledAi, parseOverrides(overrides));
-  const kb = createKbService(db);
+  const kb = createKbService(db, ai);
   const practice = createPracticeService(db, ai);
   return {
     kb,

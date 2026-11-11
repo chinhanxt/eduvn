@@ -1,0 +1,16 @@
+{
+  "skill": "rubric-tu-luan",
+  "task": "cham_tu_luan",
+  "common": [
+    "Đầu ra là JSON hợp lệ {totalPoints, criteria[], notes}.",
+    "Tổng maxPoints của các tiêu chí đúng bằng totalPoints; mỗi tiêu chí có mức cao nhất bằng maxPoints và mức thấp nhất bằng 0.",
+    "Mô tả mức quan sát được, không mơ hồ; điểm là bội của 0,25."
+  ],
+  "cases": [
+    {"id": "toan-giai-bai", "input": "Đề (3 điểm, Toán 10): Cho tam giác ABC có AB = 5, AC = 7, góc A = 60°. Tính cạnh BC và diện tích tam giác. Đáp án: BC = √39; S = 35√3/4.", "criteria": ["Có tiêu chí cho cả phần tính BC và phần tính diện tích, mô tả theo bước (định lí cosin, công thức diện tích).", "Tổng điểm bằng 3.", "notes có quy tắc không trừ lặp lỗi dây chuyền và chấp nhận cách giải khác."]},
+    {"id": "van-nghi-luan", "input": "Đề (4 điểm, Ngữ văn 11): Viết đoạn văn nghị luận khoảng 200 chữ về ý nghĩa của lòng biết ơn trong cuộc sống.", "criteria": ["Tiêu chí gồm nội dung/ý, lập luận và dẫn chứng, bố cục-liên kết, diễn đạt-chính tả.", "Tổng điểm bằng 4.", "Mô tả mức nêu được số ý hoặc dẫn chứng cụ thể."]},
+    {"id": "sinh-tuluan", "input": "Đề (2 điểm, Sinh 12): Trình bày cơ chế di truyền ở cấp độ phân tử từ gen đến tính trạng và nêu một ví dụ.", "criteria": ["Có tiêu chí cho phiên mã, dịch mã và ví dụ, hoặc tương đương đúng chuyên môn.", "Tổng điểm bằng 2, bội của 0,25.", "Mức thấp nhất của mỗi tiêu chí là 0."]},
+    {"id": "dh-tieuluan", "input": "Bài tiểu luận cuối kì (10 điểm, đại học năm 3, học phần Phương pháp nghiên cứu khoa học): Viết đề cương nghiên cứu cho một vấn đề giáo dục địa phương, 8–10 trang.", "criteria": ["Tiêu chí gồm xác định vấn đề/câu hỏi nghiên cứu, phương pháp, tài liệu và trích dẫn, trình bày; phù hợp bậc đại học.", "Tổng điểm bằng 10.", "Có mô tả mức dùng số lượng quan sát được."]},
+    {"id": "khong-dap-an", "input": "Đề (1 điểm, Lịch sử 9): Nêu ý nghĩa của chiến thắng Điện Biên Phủ năm 1954. (Không có đáp án mẫu.)", "criteria": ["Rubric tự suy ra các ý chính hợp lí (kết thúc chiến tranh, buộc Pháp kí Giơ-ne-vơ, cổ vũ phong trào giải phóng dân tộc…).", "Tổng điểm bằng 1.", "notes cho phép cách diễn đạt khác đúng bản chất."]}
+  ]
+}

@@ -1,0 +1,51 @@
+/* Hướng C — "Học đường hiện đại"
+   Mảng màu ấm, chữ đậm lớn, thẻ bo tròn có chiều sâu nhẹ; thân thiện nhưng không trẻ con.
+   Lệch khỏi D4 (phẳng, bo nhỏ) có chủ ý: thẻ nổi + bo 16 cho cảm giác "chạm được" trên điện thoại, mảng màu tạo điểm nhìn đầu tiên. */
+:root {
+  --bg: #f7f4ee; --bg-sunken: #efebe3; --bg-raised: #ffffff; --bg-hover: #f1ede5;
+  --ink: #17181c; --ink-2: #3f4350; --ink-3: #5a5f6b;   /* 5,8:1 trên nền kem */
+  --line: #ebe6dc; --line-2: #ddd7cb;
+  --r-md: 16px; --r-lg: 20px; --r-sm: 10px;
+  --shadow-card: 0 1px 2px rgb(40 30 10 / .05), 0 6px 20px rgb(40 30 10 / .06);
+  --display: 800;
+}
+body { background: var(--bg); }
+.side { background: var(--bg); border-right-color: var(--line); }
+.nav a { border-radius: 10px; }
+.nav a[aria-current="page"] { background: var(--accent); color: #fff; box-shadow: none; }
+.nav a[aria-current="page"] svg.i, .nav a[aria-current="page"] .count { color: #fff; }
+.top, .hoc-top { background: var(--bg); }
+.btn { border-radius: 10px; }
+.btn.lg { --h: 48px; font-weight: 600; }
+.card { background: var(--bg-raised); border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: var(--s-6); min-width: 0; }
+.card h2 { font-size: 18px; line-height: 26px; font-weight: 700; }
+.card .hd { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-4); }
+.card .hd .grow + * { margin-left: auto; }
+
+/* Mảng màu chính */
+.field { position: relative; overflow: hidden; border-radius: var(--r-lg); color: #fff; padding: var(--s-8); background: var(--accent); }
+.field::after { content: ""; position: absolute; right: -60px; top: -80px; width: 320px; height: 320px; border-radius: 50%; background: rgb(255 255 255 / .07); pointer-events: none; }
+.field::before { content: ""; position: absolute; right: 120px; bottom: -140px; width: 260px; height: 260px; border-radius: 50%; background: rgb(255 255 255 / .05); pointer-events: none; }
+.field .eyebrow { color: rgb(255 255 255 / .82); }
+.field h1 { font-size: 44px; line-height: 50px; font-weight: var(--display); letter-spacing: -.025em; margin-top: var(--s-2); }
+.field .sub { font-size: 17px; line-height: 26px; color: #e6e9ff; margin-top: var(--s-2); max-width: 52ch; }
+.field .btn.on-field { background: #fff; color: var(--accent); border-color: #fff; font-weight: 700; }
+.field .btn.on-field:hover { background: #f1f3ff; }
+.field .btn.ghost-field { background: rgb(255 255 255 / .12); color: #fff; border-color: rgb(255 255 255 / .28); }
+.field .btn.ghost-field:hover { background: rgb(255 255 255 / .2); }
+
+.big { font-size: 40px; line-height: 44px; font-weight: var(--display); letter-spacing: -.03em; font-variant-numeric: lining-nums; }
+.tint { --h: var(--c1); background: color-mix(in srgb, var(--h) 11%, #fff); }
+.chipc { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--bg-sunken); color: var(--ink-2); }
+.chipc.warn { background: var(--warn-bg); color: var(--warn); }
+.chipc.ok { background: var(--ok-bg); color: var(--ok); }
+.up { color: var(--ok); } .dn { color: var(--danger); }
+
+@media (max-width: 720px) {
+  .field { padding: var(--s-6) var(--s-5); border-radius: 18px; }
+  .field h1 { font-size: 32px; line-height: 38px; }
+  .card { padding: var(--s-5); }
+  .page-head.field .acts .btn:not(.primary) { width: auto; padding: 0 var(--s-4); }
+  .page-head.field .acts .btn:not(.primary) > span { display: inline; }
+  .big { font-size: 34px; line-height: 38px; }
+}

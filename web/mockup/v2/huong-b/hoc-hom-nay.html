@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi" data-portal="hoc">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230b7466%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Hôm nay · EDUVN Học sinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="b.css">
+<style>
+  .hoc-top { height: 48px; }
+  .hoc-nav a { font-size: 13px; }
+  .hoc-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s-4); margin-top: var(--s-4); align-items: start; }
+  .qrow { display: grid; grid-template-columns: 34px minmax(0, 1fr) 90px 128px 28px; align-items: center; gap: 12px; min-height: 52px; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  .qrow:last-child { border-bottom: 0; }
+  .qrow[aria-selected="true"] { background: var(--accent-bg); box-shadow: inset 2px 0 0 var(--accent); }
+  .ring { width: 30px; height: 30px; border-radius: 50%; background: conic-gradient(var(--accent) 0 var(--p), var(--line) 0); display: grid; place-items: center; font: 600 9px/1 var(--font-ui); font-variant-numeric: tabular-nums; }
+  .ring::before { content: ""; grid-area: 1/1; width: 22px; height: 22px; border-radius: 50%; background: var(--bg); }
+  .ring span { grid-area: 1/1; position: relative; }
+  .qrow .t { font-weight: 500; } .qrow .t small { display: block; font-weight: 400; color: var(--ink-3); font-size: 12px; }
+  .qrow .pr { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; }
+  .qrow .cd { font-size: 12px; text-align: right; color: var(--ink-2); white-space: nowrap; }
+  .qrow .cd.hot { color: var(--warn); font-weight: 600; }
+  .qrow kbd { justify-self: end; }
+  .topics td .bar { display: flex; align-items: center; gap: 8px; }
+  .topics .m { flex: 1; height: 6px; border-radius: 3px; background: var(--line); position: relative; overflow: hidden; }
+  .topics .m i { position: absolute; inset: 0 auto 0 0; width: var(--v); background: var(--c1); }
+  .topics .m.low i { background: var(--c2); }
+  .topics .pc { width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+  .hm { padding: 12px 16px 14px; }
+  .sumrow { display: flex; gap: 20px; font-size: 12px; color: var(--ink-3); margin-top: 10px; }
+  .sumrow b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  @media (max-width: 1180px) { .hoc-grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 720px) {
+    .qrow { grid-template-columns: 34px minmax(0, 1fr) auto; } .qrow .pr, .qrow kbd { display: none; }
+    .topics .hide-sm { display: none; }
+  }
+</style>
+</head>
+<body data-shell="hoc" data-nav="trang-chu">
+<script src="../icons.js"></script>
+<main id="main">
+  <div class="page-head bar">
+    <h1>Hôm nay</h1>
+    <nav class="tabs" aria-label="Lọc">
+      <a href="?xem=viec" aria-current="page">Việc <span class="count">3</span></a>
+      <a href="?xem=on">Ôn <span class="count">12</span></a>
+      <a href="?xem=diem">Điểm <span class="count">4</span></a>
+    </nav>
+    <div class="acts"><a class="btn primary sm" href="../hoc-lam-bai.html"><span>Làm tiếp câu 7</span><kbd class="k">↵</kbd></a></div>
+  </div>
+
+  <section class="kpis" aria-label="Chỉ số">
+    <div><div class="k">Chuỗi ngày</div><div class="v">12 <small class="mu">dài nhất 15</small></div></div>
+    <div><div class="k">Câu 7 ngày qua</div><div class="v">109 <small class="up">+13</small></div></div>
+    <div><div class="k">Đúng 7 ngày qua</div><div class="v">82% <small class="up">+4</small></div></div>
+    <div><div class="k">Thẻ đến hạn</div><div class="v">12 <small class="mu">~5 phút</small></div></div>
+    <div><div class="k">Điểm gần nhất</div><div class="v">7,25 <small class="up">+0,5</small></div></div>
+    <div><div class="k">Thành thạo Toán 10</div><div class="v">68% <small class="mu">3/4 chủ đề ≥ 50%</small></div></div>
+  </section>
+
+  <div class="hoc-grid">
+    <div class="stack" style="gap:var(--s-4)">
+      <section class="pane" aria-label="Việc cần làm">
+        <div class="ghd">Hạn gần nhất trước <span class="n">3</span></div>
+        <div class="qrow" aria-selected="true"><span class="ring" style="--p:50%"><span>50%</span></span><span class="t">Luyện tập · Hàm số bậc hai<small>Toán · 6/12 câu · ~12 phút</small></span><span class="pr">6/12</span><span class="cd hot">còn 10 giờ 48′</span><kbd>↵</kbd></div>
+        <div class="qrow"><span class="ring" style="--p:0%"><span>0%</span></span><span class="t">Kiểm tra 15′ · Tích vô hướng<small>Toán · 10 câu · làm 1 lần</small></span><span class="pr">0/10</span><span class="cd">T4 07:30 · 2 ngày</span><kbd>2</kbd></div>
+        <div class="qrow"><span class="ring" style="--p:0%"><span>0%</span></span><span class="t">Đoạn văn nghị luận · 200 chữ<small>Ngữ văn · tự luận</small></span><span class="pr">0/200 chữ</span><span class="cd">T6 · 4 ngày</span><kbd>3</kbd></div>
+      </section>
+      <section class="pane topics" aria-label="Theo chủ đề">
+        <table class="ctable">
+          <thead><tr><th>Chủ đề · Toán 10</th><th style="width:42%">Thành thạo</th><th class="r hide-sm">Δ 7 ngày</th><th class="r">Thẻ đến hạn</th></tr></thead>
+          <tbody>
+            <tr><td>Mệnh đề, tập hợp</td><td><div class="bar"><span class="m"><i style="--v:92%"></i></span><span class="pc">92%</span></div></td><td class="r up hide-sm">+2</td><td class="r">0</td></tr>
+            <tr><td>BPT bậc nhất 2 ẩn</td><td><div class="bar"><span class="m"><i style="--v:78%"></i></span><span class="pc">78%</span></div></td><td class="r up hide-sm">+6</td><td class="r">2</td></tr>
+            <tr><td>Hàm số bậc hai</td><td><div class="bar"><span class="m"><i style="--v:64%"></i></span><span class="pc">64%</span></div></td><td class="r up hide-sm">+11</td><td class="r">1</td></tr>
+            <tr><td><b style="font-weight:600">Dấu tam thức</b> <svg class="i sm" style="color:var(--warn);vertical-align:-3px" aria-label="dưới 50%"><use href="#i-alert"/></svg></td><td><div class="bar"><span class="m low"><i style="--v:38%"></i></span><span class="pc"><b>38%</b></span></div></td><td class="r dn hide-sm">−3</td><td class="r"><b>5</b></td></tr>
+            <tr><td class="muted">Hệ thức lượng</td><td class="muted">chưa học</td><td class="r hide-sm muted">—</td><td class="r muted">—</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+    <aside class="stack" style="gap:var(--s-4)">
+      <section class="pane">
+        <div class="ghd">Hoạt động 10 tuần <span class="n">· số câu mỗi ngày</span></div>
+        <div class="hm"><div id="heat"></div>
+          <div class="sumrow"><span>Hôm nay <b>18</b></span><span>Ngày ≥ 10 câu <b id="n10"></b></span><span>Trung bình <b id="avg"></b>/ngày</span></div>
+        </div>
+      </section>
+      <section class="pane">
+        <div class="ghd">Điểm 5 bài gần nhất <span class="n">· thang 0–10</span></div>
+        <div class="hm"><div id="trk"></div><div class="caption" style="margin-top:6px">Vạch: 5,0. Mới nhất <b>7,25</b> (KT 15′ 07/11), cao nhất 5 bài.</div></div>
+      </section>
+      <div class="keys"><span><kbd>↵</kbd> làm tiếp</span><span><kbd>O</kbd> ôn thẻ</span><span><kbd>G</kbd> <kbd>S</kbd> gia sư</span></div>
+    </aside>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell.js"></script>
+<script src="../charts.js"></script>
+<script>
+  const last14 = [12, 0, 8, 15, 22, 9, 30, 14, 18, 25, 11, 7, 16, 18];
+  const early = [5, 0, 12, 8, 0, 3, 14, 9, 11, 0, 0, 6, 10, 15, 7, 0, 4, 12, 20, 9, 0, 6, 8, 13, 0, 11, 9, 5, 16, 0, 7, 10, 12, 0, 8, 14, 6, 0, 9, 11, 13, 7, 0, 10, 12, 5, 0, 9, 15, 8, 6, 10, 0, 7, 12, 9];
+  const vals = early.concat(last14); // 70 ngày, kết thúc thứ Hai hôm nay → ô đầu lệch 1 để hôm nay nằm hàng T2
+  Charts.heatmap(document.getElementById("heat"), { vals, startDow: 1, bins: [0, 1, 10, 20] });
+  document.getElementById("n10").textContent = vals.filter((v) => v >= 10).length + "/70";
+  document.getElementById("avg").textContent = Charts.vn(vals.reduce((a, b) => a + b, 0) / vals.length, 1);
+  Charts.track(document.getElementById("trk"), { vals: [5.5, 6.25, 6, 6.75, 7.25], labels: ["03/10", "17/10", "24/10", "31/10", "07/11"], threshold: 5, height: 34, showAxis: true });
+</script>
+</body>
+</html>

@@ -20,11 +20,18 @@ const doc = {
 let app: ReturnType<typeof buildApp>;
 let auth: Record<string, string>;
 let aiReply = "";
-const fakeAi: Ai = { chat: async () => aiReply, stream: async function* () {} };
+let lastPrompt = "";
+const fakeAi: Ai = {
+  chat: async (_t, m) => {
+    lastPrompt = String(m[m.length - 1]!.content);
+    return aiReply;
+  },
+  stream: async function* () {},
+};
 
 async function boot(ai?: Ai) {
   const kc = await makeIssuer();
-  app = buildApp({ db: await testDb(), verify: createVerifier({ issuer: ISSUER, audience: AUDIENCE, keys: kc.keys }), issuer: ISSUER, publicUrl: "http://eduvn.test", downloadSecret: "test-secret-test-secret-test-secret!", ai });
+  app = buildApp({ db: await testDb(), verify: createVerifier({ issuer: ISSUER, audience: AUDIENCE, keys: kc.keys }), issuer: ISSUER, publicUrl: "http://eduvn.test", downloadSecret: "test-secret-test-secret-test-secret!", studentSecret: "student-secret-student-secret-0123", ai });
   auth = { authorization: `Bearer ${await kc.sign({ sub: "gv-1", name: "Cô Lan" })}` };
 }
 afterEach(async () => {
@@ -71,6 +78,25 @@ describe("HTTP sơ đồ", () => {
     aiReply = JSON.stringify({ root: { text: "Gốc", children: [{ text: "A", children: [] }, { text: "B", children: [] }] } });
     const r = await call("POST", "/api/diagrams/ai", { topic: "x" });
     expect(r.json().nodes.map((n: { parent: string | null }) => n.parent)).toEqual([null, "a1", "a1"]);
+  });
+
+  it("Sơ đồ công thức: lời nhắc yêu cầu mỗi nút lá là một công thức LaTeX, giữ nguyên LaTeX", async () => {
+    aiReply = JSON.stringify({ nodes: [{ id: "r", label: "Đạo hàm", parent: null }, { id: "g", label: "Quy tắc", parent: "r" }, { id: "f", label: "Thương: $\\left(\\dfrac{u}{v}\\right)'=\\dfrac{u'v-uv'}{v^2}$", parent: "g" }], links: [] });
+    const r = await call("POST", "/api/diagrams/ai", { topic: "Đạo hàm", kind: "mind", formulas: true });
+    expect(r.statusCode).toBe(200);
+    expect(lastPrompt).toContain("SƠ ĐỒ CÔNG THỨC");
+    expect(r.json().nodes[2].label).toContain("\\dfrac{u'v-uv'}{v^2}");
+    await call("POST", "/api/diagrams/ai", { topic: "Đạo hàm" });
+    expect(lastPrompt).not.toContain("SƠ ĐỒ CÔNG THỨC");
+  });
+
+  it("AI trả quá nhiều nút → giữ 40 nút đầu, bỏ nối tới nút bị cắt", async () => {
+    const nodes = Array.from({ length: 55 }, (_, i) => ({ id: `n${i}`, label: `$x^{${i}}$`, parent: i ? "n0" : null }));
+    aiReply = JSON.stringify({ nodes, links: [{ from: "n1", to: "n50" }, { from: "n1", to: "n2" }] });
+    const r = await call("POST", "/api/diagrams/ai", { topic: "Lũy thừa", formulas: true });
+    expect(r.statusCode).toBe(200);
+    expect(r.json().nodes).toHaveLength(40);
+    expect(r.json().links).toEqual([{ from: "n1", to: "n2" }]);
   });
 
   it("AI trả rác → 503", async () => {

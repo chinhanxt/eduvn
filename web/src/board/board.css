@@ -60,29 +60,17 @@
 .bd-dlg-ft { display: flex; justify-content: flex-end; gap: 8px; }
 
 /* Task 13 — hình không gian */
-.bd-face { fill: rgba(140,165,255,.06); cursor: grab; }
-.bd-edge { stroke: #fff; stroke-width: 2.6; stroke-linecap: round; pointer-events: none; }
-.bd-edge.hid { stroke: rgba(255,255,255,.38); stroke-width: 1.6; stroke-dasharray: 7 7; }
-.bd-sec { fill: rgba(255,181,71,.30); stroke: #ffc56b; stroke-width: 2.6; stroke-linejoin: round; pointer-events: none; }
-.bd-arc { fill: none; stroke: #fff; stroke-width: 2; pointer-events: none; }
-.bd-alabel { fill: #fff; font-size: 16px; font-weight: 600; pointer-events: none; }
-.bd-hit { fill: transparent; }
-.bd-hit.on { fill: rgba(143,162,255,.35); }
-.bd-v { fill: #fff; }
-.bd-p { fill: #ffb547; stroke: #242b35; stroke-width: 2; }
-.bd-vl { fill: rgba(255,255,255,.85); font-size: 17px; font-weight: 500; pointer-events: none; }
-.bd-pl { fill: #ffb547; font-size: 18px; font-weight: 700; pointer-events: none; }
 .bd-tbw { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.bd-info { background: rgba(36,43,53,.85); color: #fff; padding: 5px 14px; border-radius: 999px; font-size: 15px; font-weight: 500; }
+.bd-info { background: rgba(36,43,53,.88); color: #fff; padding: 5px 14px; border-radius: 14px; font-size: 14.5px; font-weight: 500; text-align: center; }
 .bd-tb { display: flex; gap: 2px; padding: 5px; background: #fff; border-radius: 14px; box-shadow: var(--shadow-hi); }
 .bd-tb button { border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 9px; border-radius: 10px; font-size: 11.5px; color: var(--muted); touch-action: none; }
 .bd-tb button svg.i { width: 22px; height: 22px; color: var(--ink); }
 .bd-tb button.on { background: var(--blue-bg); color: var(--brand); }
 .bd-tb button.on svg.i { color: var(--brand); }
-.bd-lib { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.bd-lib-item { border: 0; background: var(--bg); border-radius: 14px; padding: 10px; display: grid; justify-items: center; gap: 2px; }
-.bd-lib-item:hover { box-shadow: var(--shadow-hi); background: #fff; }
-.bd-lib-item small { color: var(--muted); }
+.bd-tb.wrap { flex-wrap: wrap; justify-content: center; max-width: 600px; }
+.bd-tb.wrap button { flex-direction: row; font-size: 12px; padding: 5px 8px; color: var(--ink); }
+.bd-tb.wrap button svg.i { width: 16px; height: 16px; }
+.bd-tb-sep { width: 1px; background: var(--line); margin: 3px 4px; }
 
 .bd-side { width: 320px; background: var(--card); color: var(--ink); box-shadow: -1px 0 0 var(--line); display: flex; flex-direction: column; min-height: 0; padding: 0 0 14px; position: static; height: auto; overflow: hidden; }
 .bd-side-hd { display: flex; align-items: center; gap: 10px; padding: 18px 16px 8px; font-weight: 600; }
@@ -116,7 +104,8 @@
 .bd-proj-card > .bd-btn { justify-self: start; }
 
 /* P10 đợt 4 — hình phẳng, ô chữ */
-.bd-tool-line .bd-obj, .bd-tool-arrow .bd-obj, .bd-tool-rect .bd-obj, .bd-tool-triangle .bd-obj, .bd-tool-circle .bd-obj, .bd-tool-polygon .bd-obj, .bd-tool-text .bd-obj { pointer-events: none; }
+.bd-tool-line .bd-obj, .bd-tool-arrow .bd-obj, .bd-tool-rect .bd-obj, .bd-tool-triangle .bd-obj, .bd-tool-circle .bd-obj, .bd-tool-polygon .bd-obj, .bd-tool-text .bd-obj, .bd-tool-formula .bd-obj { pointer-events: none; }
+.bd-tool-formula { cursor: crosshair; }
 .bd-tool-line, .bd-tool-arrow, .bd-tool-rect, .bd-tool-triangle, .bd-tool-circle, .bd-tool-polygon { cursor: crosshair; }
 .bd-tool-text { cursor: text; }
 .bd-text { color: #f3f0e6; line-height: 1.5; padding: 2px 12px; white-space: nowrap; }

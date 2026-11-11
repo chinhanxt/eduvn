@@ -16,6 +16,9 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
   const audio = useRef<HTMLAudioElement | null>(null);
   const cache = useRef(new Map<string, string>());
   const scene = scenes[Math.min(idx, scenes.length - 1)];
+  const video = useRef<HTMLVideoElement | null>(null);
+  const [animUrl, setAnimUrl] = useState<string | null>(null);
+  const animHash = scene?.type === "slide" && scene.animation?.status === "xong" ? scene.animation.hash : undefined;
 
   const audioUrl = useCallback(
     async (file: string): Promise<string> => {
@@ -36,6 +39,36 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
       audio.current?.pause();
     };
   }, []);
+
+  // clip hoạt hình toán của cảnh hiện tại (tải kèm token rồi phát bằng blob)
+  useEffect(() => {
+    setAnimUrl(null);
+    if (!animHash) return;
+    let url: string | null = null;
+    let dead = false;
+    blobFetch(`${BASE}/${lessonId}/hoat-hinh/${animHash}`).then((b) => {
+      if (dead) return;
+      url = URL.createObjectURL(b);
+      setAnimUrl(url);
+    }).catch(() => undefined);
+    return () => {
+      dead = true;
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [animHash, lessonId]);
+  // clip chạy cùng lời giảng: vào cảnh thì về 0 giây; tạm dừng/tiếp theo nút Phát
+  useEffect(() => {
+    const v = video.current;
+    if (!v || !animUrl) return;
+    v.currentTime = 0;
+    if (!paused.current) void v.play().catch(() => undefined);
+  }, [animUrl, idx]);
+  useEffect(() => {
+    const v = video.current;
+    if (!v) return;
+    if (playing) void v.play().catch(() => undefined);
+    else v.pause();
+  }, [playing, animUrl]);
 
   const wait = (ms: number, token: number) =>
     new Promise<void>((resolve) => {
@@ -212,6 +245,12 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
             <iframe className="ail-frame" title={scene.title} sandbox="allow-scripts" srcDoc={scene.content.html ?? ""} data-testid="ail-interactive" />
             {showSub && sub && <div className="ail-sub">{sub}</div>}
           </>
+        ) : animHash ? (
+          <>
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <video ref={video} className="ail-frame ail-anim" src={animUrl ?? undefined} muted playsInline data-testid="ail-anim" />
+            {showSub && sub && <div className="ail-sub">{sub}</div>}
+          </>
         ) : (
           <iframe className="ail-frame" title={scene.title} sandbox="" srcDoc={html} data-testid="ail-slide" />
         )}
@@ -229,7 +268,7 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
           <button key={s.id} className={`ail-th${i === idx ? " on" : ""}`} onClick={() => go(i)} data-testid="ail-scene-btn">
             <span>{i + 1}</span>
             {s.title}
-            <small>{s.type === "slide" ? "Slide" : s.type === "quiz" ? "Quiz" : "Tương tác"}</small>
+            <small>{s.type === "slide" ? (s.animation?.status === "xong" ? "Slide + hoạt hình" : "Slide") : s.type === "quiz" ? "Quiz" : "Tương tác"}</small>
           </button>
         ))}
       </div>

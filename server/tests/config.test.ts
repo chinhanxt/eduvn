@@ -1,3 +1,5 @@
+import { homedir } from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config";
 
@@ -7,6 +9,7 @@ const env = {
   OIDC_JWKS_URL: "http://localhost:8180/realms/eduvn/protocol/openid-connect/certs",
   PUBLIC_URL: "http://localhost:4310/",
   DOWNLOAD_SECRET: "x".repeat(32),
+  STUDENT_SECRET: "y".repeat(32),
 };
 
 describe("loadConfig", () => {
@@ -20,14 +23,19 @@ describe("loadConfig", () => {
       PORT: 4310,
       GATEWAY_URL: "http://127.0.0.1:4340",
       DATA_DIR: "./data",
-      TTS_PROVIDER: "edge",
-      TTS_VOICE: "vi-VN-HoaiMyNeural",
+      TTS_PROVIDER: "vieneu",
+      VIENEU_CMD: "vieneu-say",
+      VIENEU_REF: path.join(homedir(), "video-studio/voices/Giọng dạy.wav"),
+      MANIM_HOME: path.join(homedir(), "Apps/manim"),
+      TINYTEX_BIN: path.join(homedir(), "Apps/tinytex/bin/x86_64-linux"),
       CHROME_PATH: "/usr/bin/google-chrome",
     });
   });
 
   it("từ chối secret ngắn và thiếu biến", () => {
     expect(() => loadConfig({ ...env, DOWNLOAD_SECRET: "short" })).toThrow();
+    expect(() => loadConfig({ ...env, STUDENT_SECRET: "short" })).toThrow();
+    expect(() => loadConfig({ ...env, STUDENT_SECRET: undefined })).toThrow();
     expect(() => loadConfig({ ...env, DATABASE_URL: undefined })).toThrow();
   });
 });

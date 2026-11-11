@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi" data-portal="gv">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233346d1%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Hôm nay · EDUVN Giáo viên</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="b.css">
+</head>
+<body data-shell="gv" data-nav="trang-chu" data-crumb="Hôm nay">
+<script src="../icons.js"></script>
+<main id="main">
+  <div class="page-head bar">
+    <h1>Hôm nay</h1>
+    <nav class="tabs" aria-label="Lọc">
+      <a href="?xem=tat-ca" aria-current="page">Tất cả <span class="count">7</span></a>
+      <a href="?xem=can-lam">Cần làm <span class="count">4</span></a>
+      <a href="?xem=cho-cham">Chờ chấm <span class="count">3</span></a>
+      <a href="?xem=hoc-sinh">Học sinh <span class="count">7</span></a>
+    </nav>
+    <div class="acts"><a class="btn primary sm" href="../gv-soan-de.html"><svg class="i sm"><use href="#i-plus"/></svg><span>Tạo đề</span><kbd class="k">N</kbd></a></div>
+  </div>
+
+  <section class="kpis" aria-label="Chỉ số">
+    <div><div class="k">Chờ chấm</div><div class="v">23 <small class="up">+8 hôm nay</small></div></div>
+    <div><div class="k">Nộp đúng hạn · 4 tuần</div><div class="v">91% <small class="up">+3</small></div></div>
+    <div><div class="k">Điểm TB tuần</div><div class="v">6,9 <small class="up">+0,3</small></div></div>
+    <div><div class="k">HS cần quan tâm</div><div class="v">7 <small class="mu">3 lớp</small></div></div>
+    <div><div class="k">Tiết hôm nay</div><div class="v">1 <small class="mu">07:30</small></div></div>
+    <div><div class="k">Hạn hôm nay</div><div class="v">2 <small class="mu">17:00 · 21:00</small></div></div>
+  </section>
+
+  <div class="split">
+    <div class="stack" style="gap:var(--s-4)">
+      <section class="pane" aria-label="Việc">
+        <div class="ghd">Hôm nay <span class="n">4</span></div>
+        <div class="rowi"><span class="st live" title="Đang tới"></span><span class="mono id">TIET-1011-10A1</span><span class="t">Lên lớp · Bất phương trình bậc hai</span><span class="cls">10A1</span><span class="pr">Bảng giảng sẵn</span><span class="due">07:30</span><kbd>O</kbd></div>
+        <div class="rowi" aria-selected="true"><span class="st half" style="--p:44%" title="Đang chấm 44%"></span><span class="mono id">KT-0711-10A3</span><span class="t">Chấm Kiểm tra 15′ · Bất phương trình</span><span class="cls">10A3</span><span class="pr"><span class="meter"><i style="--v:44%"></i></span>18/41</span><span class="due hot">17:00</span><kbd>C</kbd></div>
+        <div class="rowi"><span class="st half" style="--p:70%" title="Đã nộp 70%"></span><span class="mono id">LT-1011-11B2</span><span class="t">Hạn nộp · Luyện tập Hàm số bậc hai</span><span class="cls">11B2</span><span class="pr"><span class="meter"><i style="--v:70%"></i></span>28/40</span><span class="due hot">21:00</span><kbd>R</kbd></div>
+        <div class="rowi"><span class="st todo" title="Chưa làm"></span><span class="mono id">NX-GK1-10A1</span><span class="t">Duyệt nhận xét giữa kỳ (AI soạn nháp)</span><span class="cls">10A1</span><span class="pr"><span class="meter"><i style="--v:0%"></i></span>0/32</span><span class="due">T6</span><kbd>D</kbd></div>
+        <div class="ghd">Tuần này <span class="n">2</span></div>
+        <div class="rowi"><span class="st half" style="--p:84%"></span><span class="mono id">BT-1211-10A1</span><span class="t">Chấm Bài tập về nhà · Tích vô hướng</span><span class="cls">10A1</span><span class="pr"><span class="meter"><i style="--v:84%"></i></span>27/32</span><span class="due">12/11</span><kbd></kbd></div>
+        <div class="rowi"><span class="st half" style="--p:9%"></span><span class="mono id">BL-1511-K68</span><span class="t">Chấm Bài luận ngắn · Ứng dụng đạo hàm</span><span class="cls">K68 CNTT</span><span class="pr"><span class="meter"><i style="--v:9%"></i></span>8/86</span><span class="due">15/11</span><kbd></kbd></div>
+      </section>
+
+      <section class="pane" aria-label="Lớp">
+        <table class="ctable">
+          <thead><tr><th>Lớp</th><th class="hide-sm">Sĩ số</th><th style="width:44%">Học lực HK I (số HS)</th><th class="r">TB</th><th class="r">Δ tháng</th><th class="r hide-sm">Nộp đúng hạn</th></tr></thead>
+          <tbody>
+            <tr><td><b style="font-weight:500">10A1</b> <span class="muted">Toán 10</span></td><td class="hide-sm r">32</td><td><div class="gb" data-c="9,14,7,2"></div></td><td class="r">7,0</td><td class="r up">+0,4</td><td class="r hide-sm">94%</td></tr>
+            <tr><td><b style="font-weight:500">10A3</b> <span class="muted">Toán 10</span></td><td class="hide-sm r">41</td><td><div class="gb" data-c="5,16,17,3"></div></td><td class="r">6,1</td><td class="r dn">−0,4</td><td class="r hide-sm">85%</td></tr>
+            <tr><td><b style="font-weight:500">11B2</b> <span class="muted">Toán 11</span></td><td class="hide-sm r">40</td><td><div class="gb" data-c="12,18,8,2"></div></td><td class="r">7,5</td><td class="r up">+0,1</td><td class="r hide-sm">90%</td></tr>
+            <tr><td><b style="font-weight:500">K68</b> <span class="muted">Giải tích 1</span></td><td class="hide-sm r">86</td><td><div class="gb" data-c="21,38,22,5"></div></td><td class="r">7,2</td><td class="r up">+0,2</td><td class="r hide-sm">93%</td></tr>
+          </tbody>
+        </table>
+        <div class="ghd" style="justify-content:space-between;border-bottom:0"><span id="lg"></span></div>
+      </section>
+      <div class="keys"><span><kbd>J</kbd> <kbd>K</kbd> lên/xuống</span><span><kbd>↵</kbd> mở</span><span><kbd>C</kbd> chấm</span><span><kbd>R</kbd> nhắc</span><span><kbd>N</kbd> tạo đề</span><span><kbd>Ctrl</kbd> <kbd>K</kbd> lệnh</span></div>
+    </div>
+
+    <aside class="pane" aria-label="Chi tiết" style="position:sticky;top:calc(var(--top-h) + 16px)">
+      <div class="dhd"><span class="mono">KT-0711-10A3</span><h2>Chấm Kiểm tra 15′ · Bất phương trình bậc hai</h2></div>
+      <dl class="props" style="margin:0">
+        <dt>Lớp</dt><dd>10A3 · 41 HS</dd>
+        <dt>Hạn chấm</dt><dd style="color:var(--warn);font-weight:600">Hôm nay 17:00 · còn 6 giờ</dd>
+        <dt>Đã nộp</dt><dd>40/41 · thiếu Đỗ Hà Ngân</dd>
+        <dt>Đã chấm</dt><dd>18/41 · trắc nghiệm tự chấm xong</dd>
+        <dt>Còn lại</dt><dd>23 câu trả lời ngắn · ~25 phút</dd>
+      </dl>
+      <div class="dsec"><h3>Phổ điểm 18 bài đã chấm <span>TB 6,2</span></h3><div id="hist"></div></div>
+      <div class="dsec"><h3>Câu sai nhiều nhất <span>% làm đúng</span></h3><div id="diff"></div></div>
+      <div class="dact">
+        <a class="btn primary" href="#"><svg class="i sm"><use href="#i-grade"/></svg><span>Chấm tiếp</span><kbd class="k">C</kbd></a>
+        <button class="btn" data-busy="700" data-toast="Đã nhắc Đỗ Hà Ngân nộp bài"><svg class="i sm"><use href="#i-bell"/></svg><span>Nhắc 1 em chưa nộp</span><kbd>R</kbd></button>
+      </div>
+    </aside>
+  </div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell.js"></script>
+<script src="../charts.js"></script>
+<script>
+  document.querySelectorAll(".gb").forEach((el) => Charts.gradeBar(el, el.dataset.c.split(",").map(Number), { height: 18 }));
+  document.getElementById("lg").innerHTML = Charts.gradeLegend();
+  Charts.histogram(document.getElementById("hist"), { bins: [0, 0, 1, 1, 2, 4, 4, 3, 2, 1].map((n, i) => ({ x0: i, x1: i + 1, n })), threshold: 5, median: 6, height: 170 });
+  Charts.difficulty(document.getElementById("diff"), { rows: [{ label: "Câu 10", p: 17, topic: "Tìm m, vô nghiệm" }, { label: "Câu 9", p: 28, topic: "Tìm m, ∀x" }, { label: "Câu 8", p: 44, topic: "Tìm m, có nghiệm" }], flag: 40, rowH: 24 });
+  document.querySelectorAll(".rowi").forEach((r) => r.addEventListener("click", () => { document.querySelectorAll(".rowi").forEach((x) => x.removeAttribute("aria-selected")); r.setAttribute("aria-selected", "true"); }));
+</script>
+</body>
+</html>

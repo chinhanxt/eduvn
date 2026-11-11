@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="vi" data-portal="hoc">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%230b7466%22/%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · Hôm nay · EDUVN Học sinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../ui.css">
+<link rel="stylesheet" href="a.css">
+<style>
+  .paper { margin: 0 auto; }
+  .hoc-top { background: var(--bg); }
+  .todo { list-style: none; margin: 0; padding: 0; }
+  .todo li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--s-4); padding: var(--s-4) 0; border-top: 1px solid var(--line); align-items: baseline; }
+  .todo li:first-child { border-top: 0; }
+  .todo .what { font-family: var(--font-read); font-size: 18px; line-height: 27px; }
+  .todo .what small { display: block; font-family: var(--font-ui); font-size: var(--fs-sm); color: var(--ink-3); line-height: 20px; }
+  .todo .due { font-size: var(--fs-sm); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-2); }
+  .todo .due.hot { color: var(--warn); font-weight: 600; }
+  .prog { display: flex; align-items: center; gap: var(--s-3); margin-top: var(--s-5); font-size: var(--fs-sm); color: var(--ink-3); max-width: 420px; }
+  .prog .meter { flex: 1; background: var(--line); }
+</style>
+</head>
+<body data-shell="hoc" data-nav="trang-chu">
+<script src="../icons.js"></script>
+<main id="main">
+<div class="paper">
+  <section class="band first">
+    <div class="main page-head mast">
+      <div class="dateline">Thứ Hai · 10.11 · Lớp 10A1</div>
+      <h1 class="lede">Còn 6 câu Hàm số bậc hai, hạn 21:00.</h1>
+      <p class="deck">Khoảng 12 phút là xong. Sau đó ôn <b>12 thẻ</b> — trong đó 3 thẻ về dấu tam thức em hay quên.</p>
+      <div class="prog"><div class="meter"><i style="--v:50%"></i></div><span class="num">6/12 câu</span></div>
+      <div class="acts"><a class="btn primary lg" href="../hoc-lam-bai.html"><span>Làm tiếp câu 7</span><svg class="i sm"><use href="#i-right"/></svg></a></div>
+    </div>
+    <aside class="note"><p><span class="n">Cô Lan Anh dặn.</span>“Câu 9–12 có bối cảnh thực tế, đọc kỹ đơn vị trước khi tính.”</p></aside>
+  </section>
+
+  <section class="facts" aria-label="Số liệu của em">
+    <div><div class="k">Chuỗi ngày học</div><div class="v">12<small>ngày</small></div><div class="d">dài nhất của em: 15</div></div>
+    <div><div class="k">Câu 7 ngày qua</div><div class="v">109</div><div class="d"><span class="up">+13</span> so với 7 ngày trước</div></div>
+    <div><div class="k">Điểm gần nhất</div><div class="v">7,25</div><div class="d"><span class="up">+0,5</span> · KT 15′ ngày 07/11</div></div>
+    <div><div class="k">Thành thạo Toán 10</div><div class="v">68<small>%</small></div><div class="d">3/4 chủ đề đã học trên 50%</div></div>
+  </section>
+
+  <section class="band">
+    <div class="main">
+      <div class="sh"><span class="no">I</span><h2>Bài cần làm</h2><a class="link more" href="../hoc-lam-bai.html">Tất cả</a></div>
+      <ul class="todo">
+        <li><span class="what">Luyện tập · Hàm số bậc hai<small>Toán · 6/12 câu</small></span><span class="due hot">Hôm nay 21:00</span></li>
+        <li><span class="what">Kiểm tra 15′ · Tích vô hướng<small>Toán · 10 câu · làm 1 lần</small></span><span class="due">Thứ Tư 07:30</span></li>
+        <li><span class="what">Đoạn văn nghị luận · 200 chữ<small>Ngữ văn · tự luận</small></span><span class="due">Thứ Sáu</span></li>
+      </ul>
+    </div>
+    <aside class="note"><p><span class="n">Mẹo.</span>Kiểm tra thứ Tư chỉ làm 1 lần — ôn thẻ Vectơ (4 thẻ) trước tối thứ Ba.</p></aside>
+  </section>
+
+  <section class="band">
+    <figure class="main fig">
+      <div class="cap-top"><span class="no">HÌNH 1</span><h2>Em đã vững chủ đề nào?</h2></div>
+      <div id="mastery"></div>
+      <figcaption>Mức thành thạo từng chủ đề Toán 10 (0–100%), tính từ bài làm và thẻ ôn 30 ngày. Vạch: 50%. <b>Dấu tam thức 38%</b> là chủ đề duy nhất dưới vạch.</figcaption>
+    </figure>
+    <aside class="note"><p><span class="n">Gợi ý.</span>Gia sư đã chuẩn bị 5 câu ngắn về dấu tam thức — <a class="link" href="../hoc-gia-su.html">hỏi gia sư</a>.</p></aside>
+  </section>
+
+  <section class="band">
+    <figure class="main fig">
+      <div class="cap-top"><span class="no">HÌNH 2</span><h2>Em học đều đến đâu?</h2></div>
+      <div id="act"></div>
+      <figcaption>Số câu làm mỗi ngày trong 14 ngày; vạch: mục tiêu 15 câu. Đạt <b>7/14</b> ngày; hôm nay <b>18</b>.</figcaption>
+    </figure>
+    <aside class="note"><p><span class="n">Chuỗi.</span>Một ngày tính là “có học” khi làm ít nhất 1 câu; chuỗi 12 ngày bắt đầu từ 30/10.</p></aside>
+  </section>
+</div>
+</main>
+<script src="../ui.js"></script>
+<script src="../shell.js"></script>
+<script src="../charts.js"></script>
+<script>
+  Charts.dotplot(document.getElementById("mastery"), { rows: [{ label: "Mệnh đề, tập hợp", v: 92 }, { label: "BPT bậc nhất 2 ẩn", v: 78 }, { label: "Hàm số bậc hai", v: 64 }, { label: "Dấu tam thức", v: 38 }, { label: "Hệ thức lượng", v: null }], ref: 50, refLabel: "50%", labelW: 150 });
+  Charts.columns(document.getElementById("act"), { vals: [12, 0, 8, 15, 22, 9, 30, 14, 18, 25, 11, 7, 16, 18], labels: ["28/10", "29/10", "30/10", "31/10", "01/11", "02/11", "03/11", "04/11", "05/11", "06/11", "07/11", "08/11", "09/11", "Hôm nay"], height: 160, target: 15 });
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "skill": "giao-an-5512",
+  "task": "soan_giao_an",
+  "common": [
+    "Đầu ra là JSON hợp lệ đúng cấu trúc của chế độ được yêu cầu.",
+    "Nếu chế độ là hoạt động hoặc toàn bộ: không trường chữ nào rỗng, mỗi hoạt động đủ a) mục tiêu, b) nội dung, c) sản phẩm, d) bốn bước với phân vai GV và HS (chế độ khung chỉ cần các trường của khung).",
+    "Mục tiêu, năng lực, phẩm chất cụ thể (không khẩu hiệu), sản phẩm khớp mục tiêu."
+  ],
+  "cases": [
+    {"id": "toan10-menhde-khung", "input": "CHẾ ĐỘ: khung\nMôn Toán, lớp 10, bài \"Mệnh đề\", 2 tiết.", "criteria": ["Có header, objectives, materials và outline đúng 4 phần tử theo thứ tự mở đầu / hình thành / luyện tập / vận dụng.", "Mục tiêu kiến thức dùng động từ đo được; có năng lực chung, năng lực đặc thù Toán (tư duy và lập luận…), phẩm chất.", "Tổng minutes của outline khớp 2 tiết (khoảng 90 phút)."]},
+    {"id": "ly10-hd2", "input": "CHẾ ĐỘ: hoat_dong 2\nMôn Vật lí, lớp 10, bài \"Chuyển động thẳng biến đổi đều\", 2 tiết. Khung đã có: hoạt động 1 là thí nghiệm xe lăn trên máng nghiêng; hoạt động 2 hình thành công thức vận tốc và quãng đường; hoạt động 3 bài tập; hoạt động 4 đo gia tốc xe đồ chơi.", "criteria": ["Chỉ trả hoạt động 2 (hoặc subs của hoạt động 2), không lặp hoạt động khác.", "Mỗi hoạt động nhỏ đủ goal/content/product/steps bốn bước.", "Nội dung vật lí đúng (v = v0 + at, s = v0t + at²/2) và sản phẩm nêu kết quả mong đợi cụ thể."]},
+    {"id": "van8-toanbo", "input": "CHẾ ĐỘ: toan_bo\nMôn Ngữ văn, lớp 8, bài \"Lão Hạc\" (Nam Cao), 3 tiết. Ghi chú: lớp đông, ít máy chiếu.", "criteria": ["Có đủ 4 hoạt động đúng thứ tự, mỗi hoạt động đủ a–d.", "Thiết bị phù hợp ghi chú (ít máy chiếu: tranh, phiếu giấy, bảng).", "Hoạt động vận dụng gắn với đời sống/viết đoạn văn, không lặp hoạt động luyện tập."]},
+    {"id": "hoa9-toanbo", "input": "Soạn giáo án môn Hoá học lớp 9, bài \"Axit axetic\", 2 tiết.", "criteria": ["Không ghi chế độ vẫn trả giáo án toàn bộ.", "Nội dung hoá học đúng (CH3COOH, tính axit yếu, phản ứng este hoá).", "Có lưu ý an toàn thí nghiệm trong thiết bị hoặc tổ chức thực hiện."]},
+    {"id": "tin7-hd4", "input": "CHẾ ĐỘ: hoat_dong 4\nMôn Tin học, lớp 7, bài \"Phần mềm bảng tính\", 1 tiết. Khung: hoạt động 4 vận dụng lập bảng chi tiêu cá nhân.", "criteria": ["Trả đúng một hoạt động đủ goal/content/product/steps.", "Sản phẩm là một bảng tính cụ thể có công thức SUM hoặc tương đương.", "Tổ chức thực hiện phân vai GV – HS rõ ở cả bốn bước."]}
+  ]
+}
