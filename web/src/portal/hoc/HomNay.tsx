@@ -12,9 +12,12 @@ import type { HocToday } from "../today";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
 import { useLearner } from "./HocShell";
 import { HOC_PATH } from "../../student/paths";
+import { givenName, mascotLine } from "./mascot";
 
 // Biểu đồ thành thạo nằm dưới thẻ việc tiếp theo: tải riêng (giữ JS lần đầu < 100 KB).
 const DotPlot = lazy(() => import("../../ui/charts/DotPlot").then((m) => ({ default: m.DotPlot })));
+// Linh vật Mầm ở thẻ chuỗi ngày: trang trí, tải sau (không nằm trong JS lần đầu).
+const Mascot = lazy(() => import("./Mascot").then((m) => ({ default: m.Mascot })));
 const MasterySkel = ({ n }: { n: number }) => (
   // cùng chiều cao DotPlot (18 + 30/hàng + 22) + dòng "Xem dạng bảng" → không xô lệch khi biểu đồ về
   <div aria-hidden="true" style={{ paddingTop: 18, minHeight: 18 + n * 30 + 22 + 28 }}>
@@ -251,6 +254,13 @@ export function HomNay() {
             <span className="caption">mục tiêu {d.streak.goal} câu/ngày</span>
           </div>
           <StreakDays days={d.days} goal={d.streak.goal} />
+          {d.streak.current >= 2 && (
+            <Suspense fallback={<div style={{ height: 48, marginTop: "var(--s-3)" }} />}>
+              <div style={{ marginTop: "var(--s-3)" }}>
+                <Mascot mood="chuoi" size={48} say={mascotLine("chuoi", { streak: d.streak.current, name: givenName(d.student.name) })} />
+              </div>
+            </Suspense>
+          )}
         </section>
       </aside>
     </div>
