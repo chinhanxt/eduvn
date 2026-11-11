@@ -43,6 +43,8 @@ const GradeReq = z.object({
 const EssaySave = z.object({
   examId: Uuid.optional(),
   student: z.string().trim().max(80).default(""),
+  classId: Uuid.optional(),
+  studentId: Uuid.optional(),
   title: z.string().trim().max(200).default(""),
   maxPoints: z.number().positive().max(100),
   transcript: z.string().max(30000),
@@ -108,9 +110,16 @@ export function createPhotoGradingService(db: Db, service: Service, ai: Ai, clas
     assertCan(actor.role, "exam:grade");
     const b = EssaySave.parse(raw);
     const g = normalizeEssay(b.grading, b.maxPoints);
+    let st: { id: string; fullName: string; seat: number | null } | undefined;
+    if (b.studentId) {
+      if (!b.classId) throw new ValidationError(["Chọn lớp trước khi chọn học sinh"]);
+      st = (await roster(actor, b.classId)).students.find((s) => s.id === b.studentId);
+      if (!st) throw new ValidationError(["Học sinh không thuộc lớp đã chọn"]);
+    }
+    const student = st ? `${st.seat ?? "—"} · ${st.fullName}` : b.student;
     const [row] = await db
       .insert(photoResults)
-      .values({ orgId: actor.orgId, ownerId: actor.userId, kind: "essay", examId: b.examId ?? null, student: b.student, title: b.title, total: g.total, max: g.max, body: { transcript: b.transcript, criteria: g.criteria, comment: g.comment } })
+      .values({ orgId: actor.orgId, ownerId: actor.userId, kind: "essay", examId: b.examId ?? null, student, title: b.title, total: g.total, max: g.max, body: { transcript: b.transcript, criteria: g.criteria, comment: g.comment, classId: st ? b.classId : null, studentId: st?.id ?? null } })
       .returning();
     return { id: row!.id, total: g.total, max: g.max, criteria: g.criteria, comment: g.comment };
   }

@@ -141,6 +141,13 @@ describe("HTTP chấm từ ảnh", () => {
     expect(saved.statusCode).toBe(201);
     expect(saved.json().total).toBe(1);
     expect((await call("GET", "/api/photo/results?kind=essay")).json()[0]).toMatchObject({ student: "Nguyễn An", total: 1 });
+    const cls = (await call("POST", "/api/classes", { name: "10A3", schoolYear: "2026-2027" })).json();
+    await call("POST", `/api/classes/${cls.id}/students`, { text: "Phạm Hà" });
+    const sid = (await call("GET", `/api/classes/${cls.id}`)).json().students[0].id;
+    await t.db.update(students).set({ seat: 5 }).where(eq(students.id, sid));
+    const linked = (await call("POST", "/api/photo/essay", { examId, classId: cls.id, studentId: sid, title: "Câu 4", maxPoints: 1, transcript: "bài", grading: { criteria: edited.criteria } })).json();
+    expect((await call("GET", "/api/photo/results?kind=essay")).json().find((r: { id: string }) => r.id === linked.id)).toMatchObject({ student: "5 · Phạm Hà", body: { studentId: sid } });
+    expect((await call("POST", `/api/photo/results/${linked.id}/gradebook`, { column: "GK" })).json()).toMatchObject({ score: 10 });
   });
 
   it("AI trả sai định dạng → 503; ảnh sai → 400; chưa đăng nhập → 401", async () => {

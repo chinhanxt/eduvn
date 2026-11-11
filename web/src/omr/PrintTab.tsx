@@ -25,14 +25,19 @@ export function PrintTab({ exams, examId }: { exams: ExamSummary[]; examId: stri
 
   return (
     <>
-      <div className="bar">
-        <select className="inp" value={code} onChange={(e) => setCode(e.target.value)} aria-label="Mã đề" data-testid="p-code">
-          <option value="all">Tất cả mã đề</option>
-          {keys.map((k) => <option key={k.code} value={k.code}>Mã đề {k.code}</option>)}
-        </select>
-        <button className="btn" onClick={() => window.print()} disabled={pages.length === 0} data-testid="p-print"><Icon name="exam" size={18} />In / lưu PDF ({pages.length} trang)</button>
-        <span className="tag">A4 · 4 mốc góc + QR · tô bằng bút chì 2B</span>
+      <div className="pg-tools">
+        <label className="pg-field">
+          Mã đề
+          <select className="pg-in" value={code} onChange={(e) => setCode(e.target.value)} data-testid="p-code">
+            <option value="all">Tất cả mã đề</option>
+            {keys.map((k) => <option key={k.code} value={k.code}>Mã đề {k.code}</option>)}
+          </select>
+        </label>
+        <span className="pg-tag"><Icon name="qr" />A4 · 4 mốc góc + QR mã đề · tô bằng bút chì 2B</span>
+        <span className="pg-sp" />
+        <button className="pg-btn pri" onClick={() => window.print()} disabled={pages.length === 0} data-testid="p-print"><Icon name="printer" />In / lưu PDF ({pages.length} trang)</button>
       </div>
+      {keys.length === 0 && <div className="omr-page pg-sk" style={{ aspectRatio: "210 / 297" }} aria-busy="true" />}
       <div className="omr-print" data-testid="p-sheets">
         {pages.map((p) => <div className="omr-page" key={`${p.code}-${p.page}`} dangerouslySetInnerHTML={{ __html: p.svg }} />)}
       </div>

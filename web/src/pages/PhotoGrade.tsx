@@ -1,48 +1,73 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { type ExamSummary, api } from "../api";
+import { Icon } from "../Icon";
 import { EssayTab } from "../omr/EssayTab";
 import { PrintTab } from "../omr/PrintTab";
 import { ScanTab } from "../omr/ScanTab";
+import { ToastHost } from "../omr/ui";
+import "../omr/photo.css";
 
-type Tab = "print" | "scan" | "essay";
+const TABS = [
+  { id: "quet", label: "Quét phiếu", icon: "camera" },
+  { id: "viet-tay", label: "Bài viết tay", icon: "pen" },
+  { id: "in", label: "In phiếu", icon: "printer" },
+] as const;
+type Tab = (typeof TABS)[number]["id"];
 
-/** /cham-anh: in phiếu trắc nghiệm CV 7991, quét ảnh chấm, chấm bài viết tay. */
+/** /cham-anh?che-do=quet|viet-tay|in&de=<examId>: quét phiếu trắc nghiệm CV 7991, chấm bài viết tay, in phiếu. */
 export function PhotoGrade() {
+  const [q, setQ] = useSearchParams();
   const [exams, setExams] = useState<ExamSummary[] | null>(null);
-  const [examId, setExamId] = useState("");
-  const [tab, setTab] = useState<Tab>("scan");
+  const tab: Tab = TABS.some((t) => t.id === q.get("che-do")) ? (q.get("che-do") as Tab) : "quet";
+  const examId = q.get("de") ?? exams?.[0]?.id ?? "";
+  const set = (k: string, v: string, push = false) => {
+    const n = new URLSearchParams(q);
+    n.set(k, v);
+    setQ(n, { replace: !push });
+  };
   useEffect(() => {
-    api<ExamSummary[]>("/api/exams").then((l) => {
-      setExams(l);
-      if (l[0]) setExamId(l[0].id);
-    }).catch(() => setExams([]));
+    api<ExamSummary[]>("/api/exams").then(setExams).catch(() => setExams([]));
   }, []);
 
   return (
-    <>
-      <div className="bar no-print">
-        <Link to="/cham-bai" className="back" aria-label="Về Chấm bài">←</Link>
-        <h1 style={{ margin: 0 }}>Chấm từ ảnh</h1>
-        <span className="sp" />
-        <select className="inp" value={examId} onChange={(e) => setExamId(e.target.value)} aria-label="Đề" data-testid="pg-exam">
-          {exams?.map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
-        </select>
-        <div className="tabs" role="group" aria-label="Chế độ">
-          <button className={tab === "print" ? "on" : ""} onClick={() => setTab("print")} data-testid="tab-print">In phiếu</button>
-          <button className={tab === "scan" ? "on" : ""} onClick={() => setTab("scan")} data-testid="tab-scan">Quét phiếu</button>
-          <button className={tab === "essay" ? "on" : ""} onClick={() => setTab("essay")} data-testid="tab-essay">Bài viết tay</button>
-        </div>
+    <ToastHost>
+      <div className="pg" data-testid="pg">
+        <header className="pg-head no-print">
+          <div>
+            <Link to="/cham-bai" className="pg-crumb"><Icon name="chevl" size={14} />Chấm bài</Link>
+            <h1>Chấm từ ảnh</h1>
+          </div>
+          <label className="pg-field" style={{ minWidth: 260 }}>
+            Đề
+            <select className="pg-in" value={examId} onChange={(e) => set("de", e.target.value)} disabled={!exams?.length} data-testid="pg-exam">
+              {exams === null && <option>Đang tải…</option>}
+              {exams?.map((e) => <option key={e.id} value={e.id}>{e.title}</option>)}
+            </select>
+          </label>
+          <span className="pg-sp" />
+          <div className="pg-seg" role="group" aria-label="Chế độ">
+            {TABS.map((t) => (
+              <button key={t.id} aria-pressed={tab === t.id} onClick={() => set("che-do", t.id, true)} data-testid={`tab-${t.id}`}>
+                <Icon name={t.icon} size={14} />{t.label}
+              </button>
+            ))}
+          </div>
+        </header>
+        {exams?.length === 0 ? (
+          <div className="pg-pane pg-empty">Chưa có đề nào. <Link to="/de-thi">Tạo đề</Link> rồi quay lại để in phiếu và chấm.</div>
+        ) : exams === null ? (
+          <div className="pg-pane" style={{ padding: 16, display: "grid", gap: 10 }} aria-busy="true">
+            <div className="pg-sk l" style={{ width: "40%" }} /><div className="pg-sk" style={{ height: 64 }} /><div className="pg-sk l" style={{ width: "70%" }} />
+          </div>
+        ) : tab === "in" ? (
+          <PrintTab exams={exams} examId={examId} />
+        ) : tab === "quet" ? (
+          <ScanTab exams={exams} examId={examId} classId={q.get("lop") ?? ""} setClassId={(v) => set("lop", v)} />
+        ) : (
+          <EssayTab examId={examId} />
+        )}
       </div>
-      {exams?.length === 0 ? (
-        <div className="card empty">Chưa có đề. Hãy tạo đề trước.</div>
-      ) : tab === "print" ? (
-        <PrintTab exams={exams ?? []} examId={examId} />
-      ) : tab === "scan" ? (
-        <ScanTab exams={exams ?? []} examId={examId} />
-      ) : (
-        <EssayTab examId={examId} />
-      )}
-    </>
+    </ToastHost>
   );
 }
