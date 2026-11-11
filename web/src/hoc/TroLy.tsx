@@ -12,11 +12,11 @@ const STARTERS = ["Giải thích hằng đẳng thức $(a+b)^2$ bằng ví dụ
 
 export function TroLy() {
   const toast = useToast();
-  const [mach, setMach] = useUrlState("mach", "", { mode: "replace" });
+  const [mach, setMach] = useUrlState<string>("mach", "", { mode: "replace" });
   const [caps, setCaps] = useState<Capability[]>([]);
   const [cap, setCap] = useState("chat");
   const [restoring, setRestoring] = useState(!!mach);
-  const t = useAgentThread({ onError: (m) => toast({ title: m, kind: "error" }) });
+  const t = useAgentThread({ onError: (m) => toast({ title: m, kind: "err" }) });
   const end = useRef<HTMLDivElement>(null);
   const restored = useRef(false);
 
@@ -27,7 +27,7 @@ export function TroLy() {
     if (restored.current || !mach) return;
     restored.current = true;
     t.restore(mach)
-      .catch(() => (toast({ title: "Không mở được cuộc trò chuyện cũ", kind: "error" }), setMach("")))
+      .catch(() => (toast({ title: "Không mở được cuộc trò chuyện cũ", kind: "err" }), setMach("")))
       .finally(() => setRestoring(false));
   }, [mach, t, toast, setMach]);
   useEffect(() => {
@@ -63,7 +63,7 @@ export function TroLy() {
             action={
               <div className="tro-ly-starters">
                 {STARTERS.map((s) => (
-                  <Button key={s} size="sm" onClick={() => t.send({ message: s, capability: cap, attachments: [] }).catch((e: Error) => toast({ title: e.message, kind: "error" }))}>
+                  <Button key={s} size="sm" onClick={() => t.send({ message: s, capability: cap, attachments: [] }).catch((e: Error) => toast({ title: e.message, kind: "err" }))}>
                     {s.replace(/\$/g, "")}
                   </Button>
                 ))}
@@ -83,7 +83,7 @@ export function TroLy() {
           capabilities={caps}
           capability={cap}
           onCapability={setCap}
-          onError={(m) => toast({ title: m, kind: "error" })}
+          onError={(m) => toast({ title: m, kind: "err" })}
           autoFocus
         />
       </div>

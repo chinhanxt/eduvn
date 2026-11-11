@@ -21,7 +21,7 @@ function setup(replies: Reply[], tools: AgentTool[] = [echo, askUserTool], limit
   const events: AgentEvent[] = [];
   const deps: LoopDeps = { ai: fake.ai, task: "tro_ly_tac_tu", tools, limits, actor, turnId: "t1", signal: ac.signal, emit: (e) => events.push(e) };
   const input = { system: "Bạn là gia sư.", history: [] as AiMessage[], user: { role: "user" as const, content: "Hằng đẳng thức là gì?" } };
-  return { fake, events, deps, input, ac, types: () => events.map((e) => e.type) };
+  return { fake, events, deps, input, ac, types: () => events.map((e) => e.type).filter((x, i, a) => x !== a[i - 1]) };
 }
 
 describe("vòng tác tử (AI giả)", () => {

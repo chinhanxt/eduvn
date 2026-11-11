@@ -308,6 +308,7 @@ export function createAgentRuntime(deps: AgentRuntimeDeps) {
   });
 
   async function get(o: AgentOwner, turnId: string, withEvents = false) {
+    await load(o, turnId);
     await reap(turnId);
     const r = await load(o, turnId);
     if (!withEvents) return view(r);

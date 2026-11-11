@@ -123,9 +123,14 @@ export class StepParser {
 
   private decide(complete: boolean): void {
     if (this.lineState !== "undecided") return;
-    if (this.sawTool && OBSERVATION.test(this.line)) {
-      this.afterTool = true;
-      this.stop();
+    if (this.sawTool) {
+      if (OBSERVATION.test(this.line)) {
+        this.afterTool = true;
+        this.stop();
+      } else if (!complete) {
+        const w = /^\s*[*_#>`[]*\s*([A-Za-z]{1,11})$/.exec(this.line)?.[1];
+        if (w && "OBSERVATION".startsWith(w.toUpperCase())) return;
+      }
     }
     const m = this.matchLabel(this.line, complete);
     if (m) {

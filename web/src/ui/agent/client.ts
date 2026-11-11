@@ -59,7 +59,8 @@ export async function followTurn(turnId: string, onEvent: (e: AgentEvent) => voi
       parser.end();
       if (ended) {
         await reader.cancel().catch(() => undefined);
-        return ended;
+        // "running" ở cuối = lượt vừa được tiếp (ask_user) nhưng chưa lên bus: nối lại ngay.
+        if (ended !== "running") return ended;
       }
     } catch (e) {
       if (isAbort(e) || opts.signal?.aborted) return "stopped";

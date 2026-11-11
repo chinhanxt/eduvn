@@ -91,7 +91,7 @@ describe("/api/tro-ly: lượt + SSE", () => {
     const { ev } = await t.events(turnId);
     expect(ev.find((e) => e.type === "tool_call")).toMatchObject({ tool: "tra_kho_tri_thuc", title: "Tra kho tri thức", args: { q: "bình phương của một tổng" } });
     expect(ev.find((e) => e.type === "tool_result")).toMatchObject({ ok: true, summary: expect.stringContaining("toan8-bai3.docx") });
-    const src = ev.find((e) => e.type === "sources") as { items: { n: number; title: string; page: number }[] };
+    const src = ev.find((e) => e.type === "sources") as unknown as { items: { n: number; title: string; page: number }[] };
     expect(src.items[0]).toMatchObject({ n: 1, title: "toan8-bai3.docx", page: 1 });
     expect(ev.find((e) => e.type === "done")).toMatchObject({ answer: "Theo [1]: $(a+b)^2=a^2+2ab+b^2$." });
   });
