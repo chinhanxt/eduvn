@@ -50,11 +50,11 @@ function venn(spec: S<"so_do_venn">, theme: ThemeName, opts: StudioOpts): string
 #vs{position:absolute;left:0;top:0;z-index:1}#vo{position:absolute;left:0;top:0;z-index:3}
 .vn{position:absolute;font-weight:600;line-height:1.15;white-space:nowrap;z-index:4}
 .vn .lt{font-family:var(--read);font-style:italic;font-weight:600;margin-right:14px}
-.vn small{display:inline-block;font-size:36px;font-weight:600;margin-top:8px;letter-spacing:.01em;color:${cB};padding-bottom:4px;background-image:linear-gradient(${cB},${cB});background-repeat:no-repeat;background-position:0 100%;background-size:0% 3px}
+.vsub{position:absolute;z-index:4;white-space:nowrap;line-height:1.2;font-size:36px;font-weight:600;margin-top:8px;letter-spacing:.01em;color:${cB};padding-bottom:4px;background-image:linear-gradient(${cB},${cB});background-repeat:no-repeat;background-position:0 100%;background-size:0% 3px}
 .vi{position:absolute;z-index:2;text-align:center;font-size:36px;line-height:1.25;font-weight:500;color:var(--ink);text-wrap:balance}
-.vnum{position:absolute;z-index:2;font-size:48px;font-weight:700;text-align:center;width:200px;font-variant-numeric:tabular-nums}
+.vnum{position:absolute;z-index:4;font-size:48px;font-weight:700;text-align:center;width:200px;font-variant-numeric:tabular-nums}
 .vg{position:absolute;z-index:4;font-weight:600;color:${cG};text-align:center;text-wrap:balance;line-height:1.2}
-.om{position:absolute;z-index:2;font-size:40px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
+.om{position:absolute;z-index:4;font-size:40px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
 .dr{display:flex;align-items:center;gap:18px;height:58px;font-size:40px;color:var(--ink)}
 .dr i{flex:none;width:14px;height:14px;border-radius:50%}
 .dr .katex{font-size:1em}
@@ -68,8 +68,9 @@ function venn(spec: S<"so_do_venn">, theme: ThemeName, opts: StudioOpts): string
     const oy = G.stageTop;
     const ob = G.stageBottom;
     const cx = r2(x0 + w0 / 2);
-    const R = 220;
+    const R = 200;
     const d = Math.round(R * 1.2);
+    // dải tên phía trên đủ 3 dòng (tên + "không gian mẫu mới" xuống dòng cân) → vòng tròn không chạm nhãn
     const cy = oy + 395;
     const cxA = cx - d / 2;
     const cxB = cx + d / 2;
@@ -99,7 +100,10 @@ function venn(spec: S<"so_do_venn">, theme: ThemeName, opts: StudioOpts): string
     const sA = fitSize(p.tenA, nameW - 50, 44);
     const sB = fitSize(p.tenB, nameW - 50, 44);
     els.push(`<div id="na" class="vn" style="right:${W - (cx - 24)}px;top:${bandTop}px;font-size:${sA}px;color:${cA};text-align:right;max-width:${nameW}px">${nameOf("A", p.tenA)}</div>`);
-    els.push(`<div id="nb" class="vn" style="left:${cx + 24}px;top:${bandTop}px;font-size:${sB}px;color:${cB};max-width:${nameW}px">${nameOf("B", p.tenB)}<small id="nbs">${xs || symbolic ? "→ không gian mẫu mới" : ""}</small></div>`);
+    els.push(`<div id="nb" class="vn" style="left:${cx + 24}px;top:${bandTop}px;font-size:${sB}px;color:${cB};max-width:${nameW}px">${nameOf("B", p.tenB)}</div>`);
+    // "không gian mẫu mới": dòng riêng dưới tên B, căn phải theo mép trong khung Ω (không tràn khung)
+    if (xs || symbolic) els.push(`<div id="nbs" class="vsub" style="right:${W - (x0 + w0 - 28)}px;top:${bandTop + 62}px">→ không gian mẫu mới</div>`);
+    else els.push(`<div id="nbs" class="vsub"></div>`);
     // phần tử trong từng vùng (vừa thì nằm trong; không vừa thì đưa sang thẻ bên trái)
     const regionW = { A: d - 40, G: 2 * R - d - 24, B: d - 40 };
     const fits = (items: string[], w: number) => items.every((s) => textW(s, 36, 0.52) <= w * 2 - 20 && s.split(/\s+/).every((wd) => textW(wd, 36, 0.56) <= w));
@@ -179,7 +183,7 @@ function venn(spec: S<"so_do_venn">, theme: ThemeName, opts: StudioOpts): string
     const B = schedule(T, wts);
     const rowOn = (i: number, t: number) => {
       tl.enter(`#r${i}`, t, 0.6, 14);
-      if (i > 0) tl.to(`#r${i - 1}`, { opacity: 0.5, duration: 0.5 }, t);
+      if (i > 0) tl.to(`#r${i - 1}`, { opacity: 0.65, duration: 0.5 }, t);
     };
     let k = 0;
     const b0 = B[k++] as Beat;
@@ -222,8 +226,9 @@ function venn(spec: S<"so_do_venn">, theme: ThemeName, opts: StudioOpts): string
       tl.to("#mo", { opacity: 1, duration: 0.3 }, t4);
       tl.to("#mo", { attr: { x: cxB - ring, y: cy - ring, width: 2 * ring, height: 2 * ring, rx: ring, ry: ring }, duration: b4.d(1.6, 2), ease: MO.ease.move }, r2(t4 + 0.1));
       tl.to("#dim", { opacity: 1, duration: b4.d(1.2, 2), ease: "power1.inOut" }, r2(t4 + 0.4));
-      tl.to("#na", { opacity: MO.dim, duration: 0.8 }, r2(t4 + 0.4));
-      tl.to("#omg", { opacity: MO.dim, duration: 0.8 }, r2(t4 + 0.4));
+      // phần ngoài B lùi về màu xám (vẫn đọc được, ≥ 4,5:1), không làm mờ chữ
+      tl.from("#na, #na span", { color: cA }, { color: TH.ink3, duration: 0.8 }, r2(t4 + 0.4));
+      if (nums.length) tl.from("#pa", { color: cA }, { color: TH.ink3, duration: 0.8 }, r2(t4 + 0.4));
       tl.to("#nbs", { opacity: 1, duration: 0.6 }, b4.at(1, 3));
       // nhấn khái niệm mới: gạch chân quét dưới "không gian mẫu mới"
       tl.from("#nbs", { backgroundSize: "0% 3px" }, { backgroundSize: "100% 3px", duration: 0.9, ease: MO.ease.move }, b4.at(2, 3));
@@ -494,8 +499,12 @@ function tree(spec: S<"cay_xac_suat">, theme: ThemeName, opts: StudioOpts): stri
         }
         tl.from(`#rv${i}`, { color: TH.ink }, { color: focusC, duration: 0.4 }, bz.at(0, 3) + 0.4);
       } else {
-        tl.to(`#rs${i}`, { opacity: MO.dim + 0.1, duration: 0.6 }, bz.at(0, 3));
-        if (l.edge !== undefined) tl.to(`#lf${i}`, { opacity: MO.dim + 0.1, duration: 0.6 }, bz.at(0, 3));
+        // nhánh không thuộc ý chính: chữ chuyển xám (≥ 4,5:1), chấm nhạt — vẫn đọc được
+        tl.from(`#rv${i}`, { color: TH.ink }, { color: TH.ink3, duration: 0.6 }, bz.at(0, 3));
+        if (l.edge !== undefined) {
+          tl.from(`#lf${i} span`, { color: colors.get(l.name) ?? TH.ink }, { color: TH.ink3, duration: 0.6 }, bz.at(0, 3));
+          tl.to(`#ld${i}`, { opacity: 0.45, duration: 0.6 }, bz.at(0, 3));
+        }
       }
     });
     tl.from("#bx", { opacity: 0, x: -36 }, { opacity: 1, x: 0, duration: 0.8, ease: MO.ease.enter }, bz.at(1, 3));

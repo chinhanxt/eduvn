@@ -345,13 +345,15 @@ tl.to("#hf3", {"strokeDashoffset":1,"duration":0.4}, 7.6);
 tl.to("#he0", {"strokeDashoffset":0,"duration":0.6}, 7.6);
 tl.to("#hf0", {"strokeDashoffset":0,"duration":0.6}, 7.9);
 tl.fromTo("#rv0", {"color":"#1C1B1A"}, {"color":"#6F42C1","duration":0.4}, 8);
-tl.to("#rs1", {"opacity":0.4,"duration":0.6}, 7.6);
-tl.to("#lf1", {"opacity":0.4,"duration":0.6}, 7.6);
+tl.fromTo("#rv1", {"color":"#1C1B1A"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.fromTo("#lf1 span", {"color":"#2F5D8A"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.to("#ld1", {"opacity":0.45,"duration":0.6}, 7.6);
 tl.to("#he1", {"strokeDashoffset":0,"duration":0.6}, 7.6);
 tl.to("#hf2", {"strokeDashoffset":0,"duration":0.6}, 7.9);
 tl.fromTo("#rv2", {"color":"#1C1B1A"}, {"color":"#6F42C1","duration":0.4}, 8);
-tl.to("#rs3", {"opacity":0.4,"duration":0.6}, 7.6);
-tl.to("#lf3", {"opacity":0.4,"duration":0.6}, 7.6);
+tl.fromTo("#rv3", {"color":"#1C1B1A"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.fromTo("#lf3 span", {"color":"#2F5D8A"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.to("#ld3", {"opacity":0.45,"duration":0.6}, 7.6);
 tl.fromTo("#bx", {"opacity":0,"x":-36}, {"opacity":1,"x":0,"duration":0.8,"ease":"expo.out"}, 8.07);
 tl.fromTo("#bx .fr > *", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.45,"ease":"expo.out","stagger":0.1}, 8.27);
 tl.fromTo("#bk", {"opacity":0}, {"opacity":1,"duration":0.6,"ease":"power1.out"}, 8.53);
@@ -442,11 +444,11 @@ h1 .kw{color:var(--accent)}
 #vs{position:absolute;left:0;top:0;z-index:1}#vo{position:absolute;left:0;top:0;z-index:3}
 .vn{position:absolute;font-weight:600;line-height:1.15;white-space:nowrap;z-index:4}
 .vn .lt{font-family:var(--read);font-style:italic;font-weight:600;margin-right:14px}
-.vn small{display:inline-block;font-size:36px;font-weight:600;margin-top:8px;letter-spacing:.01em;color:#2B7A3B;padding-bottom:4px;background-image:linear-gradient(#2B7A3B,#2B7A3B);background-repeat:no-repeat;background-position:0 100%;background-size:0% 3px}
+.vsub{position:absolute;z-index:4;white-space:nowrap;line-height:1.2;font-size:36px;font-weight:600;margin-top:8px;letter-spacing:.01em;color:#2B7A3B;padding-bottom:4px;background-image:linear-gradient(#2B7A3B,#2B7A3B);background-repeat:no-repeat;background-position:0 100%;background-size:0% 3px}
 .vi{position:absolute;z-index:2;text-align:center;font-size:36px;line-height:1.25;font-weight:500;color:var(--ink);text-wrap:balance}
-.vnum{position:absolute;z-index:2;font-size:48px;font-weight:700;text-align:center;width:200px;font-variant-numeric:tabular-nums}
+.vnum{position:absolute;z-index:4;font-size:48px;font-weight:700;text-align:center;width:200px;font-variant-numeric:tabular-nums}
 .vg{position:absolute;z-index:4;font-weight:600;color:#6F42C1;text-align:center;text-wrap:balance;line-height:1.2}
-.om{position:absolute;z-index:2;font-size:40px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
+.om{position:absolute;z-index:4;font-size:40px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
 .dr{display:flex;align-items:center;gap:18px;height:58px;font-size:40px;color:var(--ink)}
 .dr i{flex:none;width:14px;height:14px;border-radius:50%}
 .dr .katex{font-size:1em}
@@ -459,29 +461,30 @@ h1 .kw{color:var(--accent)}
 <div id="fig">
 <svg id="vs" width="1920" height="1080" viewBox="0 0 1920 1080">
 <rect id="om" x="972" y="150" width="828" height="750" rx="14" fill="#FFFFFF" stroke="#E6DECC" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
-<circle id="caf" cx="1254" cy="545" r="220" fill="#2F5D8A" fill-opacity="0.12"/>
-<circle id="cbf" cx="1518" cy="545" r="220" fill="#2B7A3B" fill-opacity="0.12"/>
-<path id="lf" d="M1386,369 A220,220 0 0 1 1386,721 A220,220 0 0 1 1386,369 Z" fill="#6F42C1" fill-opacity="0.2"/>
-<circle id="ca" cx="1254" cy="545" r="220" fill="none" stroke="#2F5D8A" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 1254 545)"/>
-<circle id="cb" cx="1518" cy="545" r="220" fill="none" stroke="#2B7A3B" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 1518 545)"/>
-<path id="ls" d="M1386,369 A220,220 0 0 1 1386,721 A220,220 0 0 1 1386,369 Z" fill="none" stroke="#6F42C1" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
-<line id="gl" x1="1386" y1="731" x2="1386" y2="813" stroke="#6F42C1" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+<circle id="caf" cx="1266" cy="545" r="200" fill="#2F5D8A" fill-opacity="0.12"/>
+<circle id="cbf" cx="1506" cy="545" r="200" fill="#2B7A3B" fill-opacity="0.12"/>
+<path id="lf" d="M1386,385 A200,200 0 0 1 1386,705 A200,200 0 0 1 1386,385 Z" fill="#6F42C1" fill-opacity="0.2"/>
+<circle id="ca" cx="1266" cy="545" r="200" fill="none" stroke="#2F5D8A" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 1266 545)"/>
+<circle id="cb" cx="1506" cy="545" r="200" fill="none" stroke="#2B7A3B" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 1506 545)"/>
+<path id="ls" d="M1386,385 A200,200 0 0 1 1386,705 A200,200 0 0 1 1386,385 Z" fill="none" stroke="#6F42C1" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+<line id="gl" x1="1386" y1="715" x2="1386" y2="793" stroke="#6F42C1" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
 </svg>
 <svg id="vo" width="1920" height="1080" viewBox="0 0 1920 1080">
-<path id="dim" fill-rule="evenodd" fill="#FFFFFF" fill-opacity="0.8" d="M974,152 h824 v746 h-824 Z M1298,545 a220,220 0 1 0 440,0 a220,220 0 1 0 -440,0 Z"/>
+<path id="dim" fill-rule="evenodd" fill="#FFFFFF" fill-opacity="0.8" d="M974,152 h824 v746 h-824 Z M1306,545 a200,200 0 1 0 400,0 a200,200 0 1 0 -400,0 Z"/>
 <rect id="mo" x="972" y="150" width="828" height="750" rx="14" ry="14" fill="none" stroke="#2B7A3B" stroke-width="6"/>
 </svg>
 <div id="na" class="vn" style="right:558px;top:180px;font-size:44px;color:#2F5D8A;text-align:right;max-width:366px"><span class="lt">A</span><span style="color:var(--ink)">Số chẵn</span></div>
-<div id="nb" class="vn" style="left:1410px;top:180px;font-size:44px;color:#2B7A3B;max-width:366px"><span class="lt">B</span><span style="color:var(--ink)">Bội của 3</span><small id="nbs"></small></div>
-<div id="ia0" class="vi" style="left:1054px;width:224px;top:470px">2</div>
-<div id="ia1" class="vi" style="left:1054px;width:224px;top:522px">4</div>
-<div id="ia2" class="vi" style="left:1054px;width:224px;top:574px">8</div>
-<div id="ib0" class="vi" style="left:1494px;width:224px;top:470px">3</div>
-<div id="ib1" class="vi" style="left:1494px;width:224px;top:522px">9</div>
-<div id="ib2" class="vi" style="left:1494px;width:224px;top:574px">15</div>
-<div id="ig0" class="vi" style="left:1310px;width:152px;top:496px">6</div>
-<div id="ig1" class="vi" style="left:1310px;width:152px;top:548px">12</div>
-<div id="ng" class="vg" style="left:1126px;width:520px;top:819px;font-size:40px">Chia hết cho 6</div>
+<div id="nb" class="vn" style="left:1410px;top:180px;font-size:44px;color:#2B7A3B;max-width:366px"><span class="lt">B</span><span style="color:var(--ink)">Bội của 3</span></div>
+<div id="nbs" class="vsub"></div>
+<div id="ia0" class="vi" style="left:1086px;width:200px;top:470px">2</div>
+<div id="ia1" class="vi" style="left:1086px;width:200px;top:522px">4</div>
+<div id="ia2" class="vi" style="left:1086px;width:200px;top:574px">8</div>
+<div id="ib0" class="vi" style="left:1486px;width:200px;top:470px">3</div>
+<div id="ib1" class="vi" style="left:1486px;width:200px;top:522px">9</div>
+<div id="ib2" class="vi" style="left:1486px;width:200px;top:574px">15</div>
+<div id="ig0" class="vi" style="left:1318px;width:136px;top:496px">6</div>
+<div id="ig1" class="vi" style="left:1318px;width:136px;top:548px">12</div>
+<div id="ng" class="vg" style="left:1126px;width:520px;top:799px;font-size:40px">Chia hết cho 6</div>
 <div id="omg" class="om" style="left:1002px;top:172px;font-size:46px"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Ω</span></span></span></span></div>
 <div id="k1" class="card" style="left:120px;top:283px;width:686px"><h3>Các vùng</h3><div id="r0" class="dr"><i style="background:#2F5D8A"></i><span>Chỉ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></span></div><div id="r1" class="dr"><i style="background:#2B7A3B"></i><span>Chỉ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></span></div><div id="r2" class="dr"><i style="background:#6F42C1"></i><span>Cả hai</span></div></div>
 <div id="k2" class="card" style="left:120px;top:583px;width:686px;border-left-color:#6F42C1"><h3>Ý chính</h3><div class="fx"><span id="f1"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∩</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span> <span style="font-weight:600;color:#6F42C1">= { 6, 12 }</span></span></div><div id="f3" class="p">Phần chung thuộc cả <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span> và <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></div></div>
@@ -511,7 +514,7 @@ tl.fromTo("#cb", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.67,"
 tl.fromTo("#cbf", {"opacity":0}, {"opacity":1,"duration":0.67}, 4.01);
 tl.fromTo("#nb", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 4.31);
 tl.fromTo("#r1", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 4.86);
-tl.to("#r0", {"opacity":0.5,"duration":0.5}, 4.86);
+tl.to("#r0", {"opacity":0.65,"duration":0.5}, 4.86);
 tl.fromTo("#ib0", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 4.86);
 tl.fromTo("#ib1", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 5.01);
 tl.fromTo("#ib2", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 5.16);
@@ -520,7 +523,7 @@ tl.fromTo("#ls", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.36,"
 tl.fromTo("#gl", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.5,"ease":"power2.inOut"}, 5.86);
 tl.fromTo("#ng", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 6.11);
 tl.fromTo("#r2", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 6.31);
-tl.to("#r1", {"opacity":0.5,"duration":0.5}, 6.31);
+tl.to("#r1", {"opacity":0.65,"duration":0.5}, 6.31);
 tl.fromTo("#ig0", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 6.31);
 tl.fromTo("#ig1", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 6.46);
 tl.fromTo("#ls", {"strokeWidth":5}, {"strokeWidth":9,"duration":0.6}, 7.21);

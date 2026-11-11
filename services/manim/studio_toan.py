@@ -99,13 +99,40 @@ class DoThiHamSo(StudioScene):
             Arrow(pt(xmin, 0), pt(xmax, 0) + RIGHT * L(24), buff=0, stroke_width=3, stroke_color=TH["ink2"], tip_length=L(18), max_tip_length_to_length_ratio=1),
             Arrow(pt(0, ymin), pt(0, ymax) + UP * L(24), buff=0, stroke_width=3, stroke_color=TH["ink2"], tip_length=L(18), max_tip_length_to_length_ratio=1),
         )
+        # điểm đặc biệt (để ẩn số trên trục trùng chỗ với chấm/nhãn của điểm)
+        a0 = float(ts["den"]) if ts else 0.0
+        special = []
+        for q in pts:
+            yq = ev(ast, float(q["x"]), a0)
+            if yq == yq and ymin <= yq <= ymax:
+                special.append(pt(float(q["x"]), yq))
+
+        curve_px = []
+        for i in range(601):
+            xq = xmin + (xmax - xmin) * i / 600
+            yq = ev(ast, xq, a0)
+            if yq == yq and ymin <= yq <= ymax:
+                curve_px.append(pt(xq, yq))
+
+        def clear_of(mob):
+            # số trên trục bị ẩn nếu trùng chỗ điểm đặc biệt hoặc bị đường cong cắt qua
+            if any(np.linalg.norm(mob.get_center()[:2] - sp[:2]) < L(70) for sp in special):
+                return False
+            x1, x2 = mob.get_left()[0] - L(6), mob.get_right()[0] + L(6)
+            y1, y2 = mob.get_bottom()[1] - L(6), mob.get_top()[1] + L(6)
+            return not any(x1 <= v[0] <= x2 and y1 <= v[1] <= y2 for v in curve_px)
+
         labels = VGroup()
         for gx in range(math.ceil(xmin), math.floor(xmax) + 1):
             if gx != 0 and gx % step_x == 0:
-                labels.add(text(vn(gx), 32, TH["ink3"]).move_to(pt(gx, 0) + DOWN * L(30)))
+                t_ = text(vn(gx), 32, TH["ink3"]).move_to(pt(gx, 0) + DOWN * L(30))
+                if clear_of(t_):
+                    labels.add(t_)
         for gy in range(math.ceil(ymin), math.floor(ymax) + 1):
             if gy != 0 and gy % step_y == 0:
-                labels.add(text(vn(gy), 32, TH["ink3"]).next_to(pt(0, gy), LEFT, buff=L(14)))
+                t_ = text(vn(gy), 32, TH["ink3"]).next_to(pt(0, gy), LEFT, buff=L(14))
+                if clear_of(t_):
+                    labels.add(t_)
         labels.add(text("O", 32, TH["ink3"]).move_to(pt(0, 0) + LEFT * L(22) + DOWN * L(28)))
         labels.add(math_tex("x", 40, TH["ink2"]).next_to(pt(xmax, 0) + RIGHT * L(24), DOWN, buff=L(10)))
         labels.add(math_tex("y", 40, TH["ink2"]).next_to(pt(0, ymax) + UP * L(24), RIGHT, buff=L(12)))
