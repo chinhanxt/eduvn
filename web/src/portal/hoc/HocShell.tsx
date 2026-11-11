@@ -8,7 +8,7 @@ import { useQuery } from "../../ui/data/query";
 import { AppShell, type MenuItem, type Notice } from "../../ui/shell/AppShell";
 import { PageSkeleton } from "../../ui/shell/PageSkeleton";
 import { GV_ROLES } from "../entries";
-import { fetchMe, ME_KEY } from "../gv/data";
+import { fetchMe, ME_KEY } from "../meData";
 import { InShellCtx } from "../inShell";
 import { initialsOf, MeCtx } from "../me";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
