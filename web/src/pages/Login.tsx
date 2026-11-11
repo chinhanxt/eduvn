@@ -26,7 +26,7 @@ export function Callback() {
       .then(() => {
         const after = window.sessionStorage.getItem(AFTER_LOGIN_KEY);
         window.sessionStorage.removeItem(AFTER_LOGIN_KEY);
-        window.location.replace(after?.startsWith("/hs") ? after : "/");
+        window.location.replace(after && /^\/(hs|hoc|gv)(\/|\?|$)/.test(after) ? after : "/");
       })
       .catch((e: unknown) => setErr(e instanceof Error ? e.message : "Lỗi đăng nhập"));
   }, [nav]);

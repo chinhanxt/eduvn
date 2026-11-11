@@ -75,4 +75,40 @@ describe("buildGateway proxy và health", () => {
     expect(lines.at(-1)).toBe(`proxy stop --port ${port} --pid-file ${join(work, "proxy.pid")}`);
     expect(existsSync(log)).toBe(true);
   });
+
+  it("proxy do cổng quản bị tắt từ ngoài thì cổng tự bật lại", async () => {
+    const { writeFileSync, chmodSync, readFileSync } = await import("node:fs");
+    const { createServer, connect } = await import("node:net");
+    const work = mkdtempSync(join(tmpdir(), "gw-"));
+    const bin = join(work, "agy-switch");
+    const log = join(work, "switch.log");
+    const fakeSwitch = fileURLToPath(new URL("./fixtures/fake-switch.mjs", import.meta.url));
+    writeFileSync(bin, `#!/bin/sh\necho "$@" >> "${log}"\nif [ "$2" = "start" ]; then exec "${process.execPath}" "${fakeSwitch}" "$@"; else kill $(cat "$5" 2>/dev/null) 2>/dev/null; fi\n`);
+    chmodSync(bin, 0o755);
+    const s = createServer();
+    await new Promise<void>((r) => s.listen(0, "127.0.0.1", r));
+    const port = (s.address() as { port: number }).port;
+    await new Promise<void>((r) => s.close(() => r()));
+    const open = () =>
+      new Promise<boolean>((r) => {
+        const c = connect(port, "127.0.0.1");
+        c.once("connect", () => (c.destroy(), r(true)));
+        c.once("error", () => r(false));
+      });
+    const cfg = loadConfig({ GATEWAY_TOKEN: TOKEN, WORK_DIR: work, TASKS_FILE: tasksFile, AGY_SWITCH_BIN: bin, AGY_PROXY_PORT: String(port), AGY_PROCESSES: "1", PROXY_WATCH_MS: "200" });
+    const gw = await buildGateway(cfg, { logger: false, agentOptions: () => ({ command: process.execPath, args: [fake], cwd: work }) });
+    expect(await open()).toBe(true);
+    process.kill(Number(readFileSync(join(work, "proxy.pid"), "utf8").trim())); // tắt từ ngoài
+    const until = Date.now() + 10000;
+    let starts = 0;
+    while (Date.now() < until) {
+      await new Promise((r) => setTimeout(r, 200));
+      starts = readFileSync(log, "utf8").split("\n").filter((l) => l.startsWith("proxy start")).length;
+      if (starts >= 2 && (await open())) break;
+    }
+    expect(starts).toBe(2);
+    expect(await open()).toBe(true);
+    await gw.close();
+    expect(readFileSync(log, "utf8").trim().split("\n").at(-1)).toBe(`proxy stop --port ${port} --pid-file ${join(work, "proxy.pid")}`);
+  });
 });

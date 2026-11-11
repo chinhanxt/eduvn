@@ -1,28 +1,12 @@
 import { userManager } from "./auth";
 import type { BoardDoc } from "./board/doc";
 
-const ORG_KEY = "eduvn.org";
-export const getOrgId = () => window.localStorage.getItem(ORG_KEY);
-export const setOrgId = (id: string) => window.localStorage.setItem(ORG_KEY, id);
-
-export class ApiError extends Error {
-  constructor(
-    public status: number,
-    public body: unknown,
-  ) {
-    super((body as { error?: string } | null)?.error ?? `HTTP ${status}`);
-  }
-}
+export { ApiError, authHeaders, getOrgId, ORG_KEY, setOrgId } from "./apiCore";
+import { ApiError, authHeaders, getOrgId, ORG_KEY } from "./apiCore";
 
 export async function api<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
-  const user = await userManager.getUser();
-  if (!user || user.expired) {
-    void userManager.removeUser();
-    throw new ApiError(401, { error: "Hết phiên đăng nhập" });
-  }
-  const headers: Record<string, string> = { authorization: `Bearer ${user.access_token}` };
-  const org = getOrgId();
-  if (org) headers["x-org-id"] = org;
+  const headers = await authHeaders();
+  const org = headers["x-org-id"];
   if (init.body !== undefined) headers["content-type"] = "application/json";
   const res = await fetch(path, { method: init.method ?? "GET", headers, body: init.body === undefined ? undefined : JSON.stringify(init.body) });
   const text = await res.text();

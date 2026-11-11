@@ -1,6 +1,7 @@
-import { useState, type ReactNode } from "react";
+import { useContext, useState, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { Icon } from "../Icon";
+import { InShellCtx } from "../portal/inShell";
 import { ExamRoom } from "./ExamRoom";
 import { MyAssignments } from "./MyAssignments";
 import { QrLogin, StudentLogin } from "./StudentLogin";
@@ -40,7 +41,9 @@ function HsHome() {
 
 export function HsHead({ onLogout }: { onLogout?: () => void }) {
   const s = loadSession();
-  if (!s) return null;
+  // Trong khung cổng Học v2: tên, lớp và Đăng xuất đã nằm ở thanh trên.
+  const inShell = useContext(InShellCtx);
+  if (!s || inShell) return null;
   const given = s.student.fullName.trim().split(/\s+/).pop() ?? "";
   const out = () => {
     clearSession();

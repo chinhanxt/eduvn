@@ -1,9 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
-import { App } from "./App";
 import { AuthProvider } from "./auth";
 import { Sprite } from "./Icon";
+import { RootApp } from "./portal/RootApp";
 import "./styles.css";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
@@ -11,7 +11,7 @@ createRoot(document.getElementById("root") as HTMLElement).render(
     <Sprite />
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <RootApp />
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
