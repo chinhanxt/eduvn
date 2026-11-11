@@ -1,4 +1,4 @@
-import { ApiError } from "../../api";
+import { ApiError } from "../../apiCore";
 import { isAbort, rawFetch, type AuthMode } from "./http";
 
 export type SseEvent = { event: string; data: unknown; id?: string };

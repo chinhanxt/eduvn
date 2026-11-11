@@ -1,20 +1,49 @@
-import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
+import type { SigninRedirectArgs, User, UserManager } from "oidc-client-ts";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 /** Trang quay về sau khi đăng nhập Keycloak (khu HS: /hs?ma=…). */
 export const AFTER_LOGIN_KEY = "eduvn.after";
 const KEYCLOAK = (import.meta.env.VITE_OIDC_AUTHORITY as string | undefined) ?? "http://localhost:8180/realms/eduvn";
 
-export const userManager = new UserManager({
-  authority: KEYCLOAK,
-  client_id: "eduvn-dev",
-  redirect_uri: `${window.location.origin}/callback`,
-  post_logout_redirect_uri: window.location.origin,
-  response_type: "code",
-  scope: "openid profile email",
-  userStore: new WebStorageStateStore({ store: window.localStorage }),
-  automaticSilentRenew: true,
-});
+/**
+ * oidc-client-ts (~18 KB gzip) tải riêng, không nằm trong JS lần đầu của cổng: bắt đầu tải ngay khi module này chạy
+ * (song song với vẽ khung), mọi lệnh gọi chờ cùng một promise.
+ */
+let mgr: Promise<UserManager> | null = null;
+export function getUserManager(): Promise<UserManager> {
+  mgr ??= import("oidc-client-ts").then(
+    ({ UserManager: UM, WebStorageStateStore }) =>
+      new UM({
+        authority: KEYCLOAK,
+        client_id: "eduvn-dev",
+        redirect_uri: `${window.location.origin}/callback`,
+        post_logout_redirect_uri: window.location.origin,
+        response_type: "code",
+        scope: "openid profile email",
+        userStore: new WebStorageStateStore({ store: window.localStorage }),
+        automaticSilentRenew: true,
+      }),
+  );
+  return mgr;
+}
+/** Có phiên Keycloak đã lưu (đọc đồng bộ, không cần tải oidc) — để chưa đăng nhập thì hiện trang đăng nhập ngay. */
+export const hasStoredUser = (): boolean => {
+  try {
+    return Object.keys(window.localStorage).some((k) => k.startsWith("oidc.user:"));
+  } catch {
+    return false;
+  }
+};
+if (typeof window !== "undefined" && hasStoredUser()) void getUserManager();
+
+/** Lớp mỏng giữ API cũ (userManager.getUser() …) cho mã hiện có. */
+export const userManager = {
+  getUser: (): Promise<User | null> => getUserManager().then((m) => m.getUser()),
+  removeUser: (): Promise<void> => getUserManager().then((m) => m.removeUser()),
+  signinRedirect: (args?: SigninRedirectArgs): Promise<void> => getUserManager().then((m) => m.signinRedirect(args)),
+  signoutRedirect: (): Promise<void> => getUserManager().then((m) => m.signoutRedirect()),
+  signinRedirectCallback: (): Promise<User> => getUserManager().then((m) => m.signinRedirectCallback()),
+};
 
 type AuthState = { user: User | null; ready: boolean; login: (idp?: "google" | "microsoft") => void; logout: () => void };
 const Ctx = createContext<AuthState | null>(null);
@@ -33,21 +62,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const onLoaded = (u: User) => setUser(u);
     const onGone = () => setUser(null);
-    userManager.events.addUserLoaded(onLoaded);
-    userManager.events.addUserUnloaded(onGone);
-    userManager.events.addAccessTokenExpired(onGone);
-    if (window.location.pathname === "/callback") {
-      setReady(true);
-    } else {
-      userManager
-        .getUser()
-        .then((u) => setUser(u && !u.expired ? u : null))
-        .finally(() => setReady(true));
-    }
+    let um: UserManager | null = null;
+    let live = true;
+    const isCallback = window.location.pathname === "/callback";
+    // Chưa từng đăng nhập: không chờ tải oidc.
+    if (isCallback || !hasStoredUser()) setReady(true);
+    if (!isCallback && !hasStoredUser()) return;
+    void getUserManager().then((m) => {
+      if (!live) return;
+      um = m;
+      m.events.addUserLoaded(onLoaded);
+      m.events.addUserUnloaded(onGone);
+      m.events.addAccessTokenExpired(onGone);
+      if (!isCallback)
+        m.getUser()
+          .then((u) => live && setUser(u && !u.expired ? u : null))
+          .finally(() => live && setReady(true));
+    });
     return () => {
-      userManager.events.removeUserLoaded(onLoaded);
-      userManager.events.removeUserUnloaded(onGone);
-      userManager.events.removeAccessTokenExpired(onGone);
+      live = false;
+      um?.events.removeUserLoaded(onLoaded);
+      um?.events.removeUserUnloaded(onGone);
+      um?.events.removeAccessTokenExpired(onGone);
     };
   }, []);
 

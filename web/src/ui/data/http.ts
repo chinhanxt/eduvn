@@ -1,5 +1,5 @@
-import { ApiError, authHeaders, getOrgId } from "../../api";
-import { loadSession } from "../../student/studentApi";
+import { ApiError, authHeaders, getOrgId } from "../../apiCore";
+import { loadSession } from "../../student/session";
 import { reportFetchFailure, reportFetchSuccess } from "./online";
 
 /** "user": Keycloak (GV/HS) · "hs": phiên HS mã lớp/PIN (P9a) · "none": công khai. */
