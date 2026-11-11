@@ -1,5 +1,5 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router";
-import { DotPlot } from "../../ui/charts/DotPlot";
 import { StreakDays } from "../../ui/charts/Heatmap";
 import { RingBig } from "../../ui/components/Progress";
 import { Skeleton } from "../../ui/components/Skeleton";
@@ -11,6 +11,20 @@ import { heroAction, heroTitle, longDay, metricText, subjectColor, subjectIcon }
 import type { HocToday } from "../today";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
 import { useLearner } from "./HocShell";
+
+// Biểu đồ thành thạo nằm dưới thẻ việc tiếp theo: tải riêng (giữ JS lần đầu < 100 KB).
+const DotPlot = lazy(() => import("../../ui/charts/DotPlot").then((m) => ({ default: m.DotPlot })));
+const MasterySkel = ({ n }: { n: number }) => (
+  // cùng chiều cao DotPlot (18 + 30/hàng + 22) + dòng "Xem dạng bảng" → không xô lệch khi biểu đồ về
+  <div aria-hidden="true" style={{ paddingTop: 18, minHeight: 18 + n * 30 + 22 + 28 }}>
+    {Array.from({ length: n }, (_, i) => (
+      <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", height: 30 }}>
+        <Skeleton w={150} h={12} />
+        <Skeleton w={`${[70, 55, 45, 30, 60, 50, 40, 65][i % 8]}%`} h={8} />
+      </div>
+    ))}
+  </div>
+);
 
 const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -131,7 +145,7 @@ export function HomNay() {
       <div style={{ minWidth: 0 }}>
         <Hero d={d} />
         {d.subjects.length > 0 && (
-          <div className="subjects enter">
+          <div className="subjects enter" style={{ ["--n" as string]: d.subjects.length }}>
             {d.subjects.map((s, i) => {
               const c = subjectColor(s.subject, i);
               const m = metricText(s.metric);
@@ -165,7 +179,9 @@ export function HomNay() {
           </div>
           {d.mastery && d.mastery.rows.length > 0 ? (
             <>
-              <DotPlot rows={d.mastery.rows.map((r) => ({ label: r.topic, v: r.pct }))} refValue={50} refLabel="50%" labelW={160} nullLabel="chưa đủ câu" />
+              <Suspense fallback={<MasterySkel n={d.mastery.rows.length} />}>
+                <DotPlot rows={d.mastery.rows.map((r) => ({ label: r.topic, v: r.pct }))} refValue={50} refLabel="50%" labelW={160} nullLabel="chưa đủ câu" />
+              </Suspense>
               <p className="caption" style={{ marginTop: "var(--s-2)" }}>
                 Thang 0–100%, vạch 50%; tính từ bài làm{account ? " và thẻ ôn" : ""} 30 ngày.{" "}
                 {d.mastery.weakest && (

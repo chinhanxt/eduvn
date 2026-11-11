@@ -1,4 +1,4 @@
-import { createContext, lazy, type ReactNode, Suspense, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, ViewTransition } from "react";
+import { createContext, lazy, type ReactNode, Suspense, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useHref, useLocation, useNavigate, useNavigationType } from "react-router";
 import { Icon } from "../Icon";
 import type { Command } from "../components/CommandPalette";
@@ -6,6 +6,8 @@ import { useOnline } from "../data/online";
 import { type Crumb, defaultCrumbs, isItem, matchNav, type MenuItem, type NavEntry, type NavItem, type Notice } from "./nav";
 
 export type { Crumb, MenuItem, NavEntry, NavItem, Notice } from "./nav";
+import { navigateWithTransition, routerPathOf, viewTransitionActive } from "./motion";
+import { preloadPath } from "./routes";
 import { toggleTheme, useTheme } from "./theme";
 
 // Bảng lệnh tải riêng (không nằm trong JS lần đầu): tải trước lúc rảnh, mở bằng Ctrl K hoặc ô Tìm nhanh.
@@ -125,9 +127,9 @@ function usePageMotion(main: React.RefObject<HTMLElement | null>, pathname: stri
       return;
     }
     if (navType === "PUSH") window.scrollTo({ top: 0 });
-    const d = document as Document & { startViewTransition?: unknown };
+    // Đã chạy View Transition (link trong cổng) thì thôi; còn lại (Back/Forward, điều hướng từ code, trình duyệt cũ) → Web Animations.
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (!d.startViewTransition && !reduce && main.current?.animate) {
+    if (!viewTransitionActive() && !reduce && main.current?.animate) {
       main.current.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "cubic-bezier(.2,.8,.2,1)" });
     }
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -218,6 +220,24 @@ export function AppShell(p: AppShellProps) {
   }, [cmdkUsed]);
 
   usePageMotion(main, pathname);
+  // Link nội bộ của cổng → chuyển trang có View Transition (bắt ở pha capture, trước Link của React Router).
+  const navRef = useRef(navigate);
+  navRef.current = navigate;
+  useEffect(() => {
+    const scope = p.base ? new RegExp(`^${p.base}(/|$)`) : /^\/hoc(\/|$)/;
+    const click = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || a.closest("[data-no-vt]")) return;
+      const to = routerPathOf(a, p.base, scope);
+      if (to === null) return;
+      if (to.split(/[?#]/)[0] === (window.location.pathname.slice(p.base.length) || "/")) return;
+      e.preventDefault();
+      void navigateWithTransition(() => navRef.current(to), preloadPath(to.split(/[?#]/)[0]!));
+    };
+    document.addEventListener("click", click, true);
+    return () => document.removeEventListener("click", click, true);
+  }, [p.base]);
   useEffect(() => {
     let off: (() => void) | null = null;
     let live = true;
@@ -382,15 +402,13 @@ export function AppShell(p: AppShellProps) {
               <OfflineBanner savedAt={savedAt} onRetry={() => window.location.reload()} />
             </Suspense>
           )}
-          <ViewTransition default="vt-page">
-            <main id="main" className="page" ref={main} tabIndex={-1}>
-              {p.children}
-            </main>
-          </ViewTransition>
+          <main id="main" className="page" ref={main} tabIndex={-1}>
+            {p.children}
+          </main>
         </div>
       </div>
       {p.tabs && (
-        <nav className="tabbar" aria-label="Điều hướng chính">
+        <nav className="tabbar" aria-label="Điều hướng chính" style={{ gridTemplateColumns: `repeat(${p.tabs.length}, 1fr)` }}>
           {p.tabs.map((n) =>
             n.href ? (
               <a key={n.to} href={n.href}>

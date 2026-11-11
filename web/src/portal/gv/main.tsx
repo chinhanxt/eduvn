@@ -13,7 +13,8 @@ import "../../ui/styles/legacy.css";
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     <LegacySprite />
-    <BrowserRouter basename="/gv">
+    {/* useTransitions=false: điều hướng vẽ đồng bộ để View Transitions chụp đúng trang mới (ui/shell/motion.ts) */}
+    <BrowserRouter basename="/gv" useTransitions={false}>
       <AuthProvider>
         <GvApp />
       </AuthProvider>

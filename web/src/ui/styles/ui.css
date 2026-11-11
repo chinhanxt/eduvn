@@ -356,19 +356,18 @@ table.data.dense td { height: var(--row-h-dense); padding-top: var(--s-1); paddi
 .avatar.sm { width: 24px; height: 24px; font-size: 10px; }
 
 /* ======================= Chuyển trang (View Transitions) ======================= */
-/* Đổi cổng / tải trang mới (MPA): trình duyệt tự mờ chéo. Trong app: React <ViewTransition default="vt-page"> bọc <main>,
-   nên chỉ vùng nội dung mờ-trượt; thanh bên + tab dưới có tên riêng nên đứng yên; thanh trên nằm trong root (chỉ mờ chéo).
-   Thời lượng 120–220 ms (trong khoảng 150–250 ms cảm nhận), giảm chuyển động → 1 ms (tokens.css). */
+/* Đổi cổng / tải trang mới (MPA): trình duyệt tự mờ chéo. Trong cổng: ui/shell/motion.ts gọi startViewTransition,
+   vùng nội dung có tên "page" (chỉ trong lúc chuyển, lớp .vt-nav) nên chỉ nội dung mờ-trượt; thanh bên + tab dưới có tên
+   riêng nên đứng yên; thanh trên nằm trong root (chỉ mờ chéo). 120–220 ms; giảm chuyển động → 1 ms. */
 @view-transition { navigation: auto; }
-::view-transition-group(root) { animation-duration: var(--dur-2); }
 ::view-transition-old(root) { animation: vt-fade-out var(--dur-2) var(--ease-in) both; }
 ::view-transition-new(root) { animation: vt-fade-in var(--dur-2) var(--ease-out) both; }
-::view-transition-group(.vt-page) { animation-duration: var(--dur-page); animation-timing-function: var(--ease-out); }
-::view-transition-old(.vt-page) { animation: vt-fade-out var(--dur-page-out) var(--ease-in) both; }
-::view-transition-new(.vt-page) { animation: vt-in var(--dur-page) var(--ease-out) both; }
+.vt-nav .page { view-transition-name: page; }
+::view-transition-group(page) { animation-duration: var(--dur-page); animation-timing-function: var(--ease-out); }
+::view-transition-old(page) { animation: vt-fade-out var(--dur-page-out) var(--ease-in) both; }
+::view-transition-new(page) { animation: vt-in var(--dur-page) var(--ease-out) both; }
 @keyframes vt-fade-out { to { opacity: 0; } }
 @keyframes vt-fade-in { from { opacity: 0; } }
-@keyframes vt-out { to { opacity: 0; } }
 @keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
 :root { --dur-page: 220ms; --dur-page-out: 120ms; }
 @media (prefers-reduced-motion: reduce) { :root { --dur-page: 1ms; --dur-page-out: 1ms; } }

@@ -19,9 +19,9 @@ export function setTheme(t: Theme): void {
     subs.forEach((f) => f());
   };
   // Đổi giao diện mờ chéo bằng View Transitions khi có (trình duyệt cũ: đổi ngay).
-  const d = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+  const d = document as Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void> } };
   const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  if (d.startViewTransition && !reduce) d.startViewTransition(apply);
+  if (d.startViewTransition && !reduce) d.startViewTransition(apply).ready.catch(() => {});
   else apply();
 }
 export const toggleTheme = (): void => setTheme(getTheme() === "dark" ? "light" : "dark");
