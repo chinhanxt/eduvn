@@ -56,7 +56,6 @@ async function main() {
     for (let r = 0; r < repeat; r++)
       for (const p of PROMPTS) {
         const events: AgentEvent[] = [];
-        const steps: { quality?: string; issues?: string[] }[] = [];
         const t0 = Date.now();
         let firstToken = 0;
         const emit = (e: AgentEvent) => {
@@ -74,11 +73,10 @@ async function main() {
           o = await runAgentLoop(deps, { ...input, resume: { state: o.state, answers } }).catch((e: Error) => ({ status: "error", answer: "", error: e.message, state: o.state }));
         }
         const usage = o.state?.usage;
-        const tools = events.filter((e) => e.type === "tool_call").map((e) => (e as { tool: string }).tool);
-        const row = { model, prompt: p.id, run: r, status: o.status, error: (o as { error?: string }).error, ms: Date.now() - t0, firstTokenMs: firstToken, steps: usage?.steps, parse: usage?.parse, tools, asked, sources: o.state?.sources?.length ?? 0, answer: o.answer.slice(0, 240) };
+        const used = events.filter((e) => e.type === "tool_call").map((e) => (e as { tool: string }).tool);
+        const row = { model, prompt: p.id, run: r, status: o.status, error: (o as { error?: string }).error, ms: Date.now() - t0, firstTokenMs: firstToken, steps: usage?.steps, parse: usage?.parse, tools: used, asked, sources: o.state?.sources?.length ?? 0, answer: o.answer.slice(0, 240) };
         rows.push(row);
-        steps.length = 0;
-        console.log(JSON.stringify({ model, prompt: p.id, status: o.status, ms: row.ms, steps: usage?.steps, parse: usage?.parse, tools, asked, answer: o.answer.slice(0, 90).replace(/\n/g, " ") }));
+        console.log(JSON.stringify({ model, prompt: p.id, status: o.status, error: row.error, ms: row.ms, steps: usage?.steps, parse: usage?.parse, tools: used, asked, answer: o.answer.slice(0, 90).replace(/\n/g, " ") }));
       }
   }
   // Tổng hợp theo model.
