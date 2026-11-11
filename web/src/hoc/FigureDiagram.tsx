@@ -20,8 +20,9 @@ export default function FigureDiagram({ code, title }: { code: string; title: st
   const out = useMemo(() => mermaidSvg(code), [code]);
   if (!out) return null;
   return (
-    <figure className="fig-diagram" role="img" aria-label={title} style={{ maxWidth: Math.min(out.w, 900) }}>
-      <div dangerouslySetInnerHTML={{ __html: out.svg.replace(/^<svg /, '<svg style="width:100%;height:auto" ') }} />
+    // co theo khung nhưng không nhỏ hơn 85% cỡ thật (chữ vẫn đọc được); rộng hơn thì cuộn ngang
+    <figure className="fig-diagram" role="img" aria-label={title} style={{ maxWidth: out.w }}>
+      <div className="fig-scroll" dangerouslySetInnerHTML={{ __html: out.svg.replace(/^<svg /, `<svg style="display:block;width:100%;min-width:${Math.round(out.w * 0.85)}px;height:auto" `) }} />
     </figure>
   );
 }

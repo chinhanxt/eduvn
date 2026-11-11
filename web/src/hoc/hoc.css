@@ -72,7 +72,7 @@
 .page-body { max-width: 760px; line-height: 1.75; }
 .blk { margin-bottom: 18px; }
 .callout-label { display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: .02em; }
-.fig-diagram { margin: 12px auto 8px; } .fig-diagram.sk { height: 220px; border-radius: 12px; background: var(--bg); }
+.fig-diagram { margin: 12px auto 8px; } .fig-scroll { overflow-x: auto; } .fig-diagram.sk { height: 220px; border-radius: 12px; background: var(--bg); }
 .fig-caption { color: var(--muted); font-size: 14px; }
 .callout { border-left: 4px solid var(--amber); background: var(--amber-bg); padding: 10px 14px; border-radius: 0 12px 12px 0; }
 .fc { display: inline-block; width: 200px; min-height: 90px; margin: 4px; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); cursor: pointer; vertical-align: top; text-align: center; }
