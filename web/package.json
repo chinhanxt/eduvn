@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@cortex-js/compute-engine": "^0.181.1",
+    "@techstark/opencv-js": "5.0.0-release.1",
+    "jsqr": "^1.4.0",
     "katex": "0.16.38",
     "dexie": "^4.4.7",
     "mathlive": "^0.111.4",
