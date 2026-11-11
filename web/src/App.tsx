@@ -39,6 +39,9 @@ const KhoTriThuc = lazy(() => import("./hoc/KhoTriThuc").then((m) => ({ default:
 const Paths = lazy(() => import("./hoc/Paths").then((m) => ({ default: m.Paths })));
 const Practice = lazy(() => import("./hoc/Practice").then((m) => ({ default: m.Practice })));
 const Tutor = lazy(() => import("./hoc/Tutor").then((m) => ({ default: m.Tutor })));
+// P13 — thư viện lời giải công khai (không cần đăng nhập)
+const SolutionLibrary = lazy(() => import("./solution/SolutionLibrary").then((m) => ({ default: m.SolutionLibrary })));
+const SolutionPublicPage = lazy(() => import("./solution/SolutionLibrary").then((m) => ({ default: m.SolutionPublicPage })));
 
 export function App() {
   const { user, ready } = useAuth();
@@ -50,6 +53,8 @@ export function App() {
       <Route path="/callback" element={<Callback />} />
       <Route path="/choi" element={<Play />} />
       <Route path="/hs/*" element={<StudentApp />} />
+      <Route path="/loi-giai" element={<SolutionLibrary />} />
+      <Route path="/loi-giai/:slug" element={<SolutionPublicPage />} />
       {!ready ? (
         <Route path="*" element={<div className="center">…</div>} />
       ) : !user ? (

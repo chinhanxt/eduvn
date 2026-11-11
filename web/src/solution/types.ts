@@ -17,6 +17,7 @@ export type Step = { title: string; body: string; refs: string[]; check?: unknow
 export type Solution = { problem: string; subject: string; topic: string; answer: string; steps: Step[]; figure?: Figure; checks: unknown[]; verification: Verification };
 
 export type SolveEvent =
+  | { type: "figure"; figure: Figure | null }
   | { type: "step"; index: number; step: Partial<Step> }
   | { type: "partial"; index: number; title: string; body: string }
   | { type: "status"; message: string }

@@ -48,9 +48,47 @@ export const publicList = (q: { topic?: string; q?: string; page?: number }) => 
 };
 export const publicSolution = (slug: string) => pub<PublicSolution>(`/api/public/solutions/${encodeURIComponent(slug)}`);
 
-/** Lời nhắn gửi gia sư khi HS bấm "Chưa hiểu bước này": đề + các bước trước + bước đang vướng. */
-export function stuckMessage(s: Pick<Solution, "problem" | "steps">, index: number): string {
-  const prev = s.steps.slice(0, index).map((st, i) => `Bước ${i + 1} — ${st.title}: ${st.body}`).join("\n");
-  const cur = s.steps[index]!;
-  return `Em đang xem lời giải bài sau và chưa hiểu bước ${index + 1}.\n\nĐề bài:\n${s.problem}\n\n${prev ? `Các bước trước:\n${prev}\n\n` : ""}Bước em chưa hiểu — Bước ${index + 1}: ${cur.title}\n${cur.body}\n\nThầy/cô gợi ý từng chút để em tự hiểu bước này (vì sao làm vậy, dùng kiến thức gì), đừng giải lại cả bài nhé.`;
+// ——— gia sư "Chưa hiểu bước này" ———
+export type HintEvent = { type: "meta"; sessionId: string } | { type: "delta"; text: string } | { type: "done" } | { type: "error"; message: string } | { type: "end" } | { type: "title" };
+export type HintAsk = (body: { sessionId?: string; message: string; hintLevel: number }, onEvent: (e: HintEvent) => void, signal: AbortSignal) => Promise<void>;
+
+async function readSse(res: Response, onEvent: (e: HintEvent) => void) {
+  const reader = res.body!.pipeThrough(new TextDecoderStream()).getReader();
+  let buf = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += value;
+    const { events, rest } = parseSse(buf);
+    buf = rest;
+    for (const e of events) onEvent(e as HintEvent);
+  }
 }
+
+/** Người dùng đăng nhập OIDC (GV, HS/SV cổng /hoc): gia sư P6 /api/tutor/chat chế độ gợi ý; phiên hiện trong trang Gia sư. */
+export const staffHint: HintAsk = async (body, onEvent, signal) => {
+  const user = await userManager.getUser();
+  if (!user || user.expired) throw new ApiError(401, { error: "Đăng nhập để hỏi gia sư" });
+  const headers: Record<string, string> = { authorization: `Bearer ${user.access_token}`, "content-type": "application/json" };
+  const org = getOrgId();
+  if (org) headers["x-org-id"] = org;
+  const res = await fetch("/api/tutor/chat", { method: "POST", headers, body: JSON.stringify({ ...body, mode: "hint" }), signal });
+  if (!res.ok || !res.body) throw new ApiError(res.status, await res.json().catch(() => null));
+  await readSse(res, onEvent);
+};
+
+/** HS cổng /hs (phiên mã/thẻ): cùng gia sư P6, phiên riêng của HS. */
+export function studentHint(token: string): HintAsk {
+  return async (body, onEvent, signal) => {
+    const res = await fetch("/api/student/tutor/step", { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body), signal });
+    if (!res.ok || !res.body) throw new ApiError(res.status, await res.json().catch(() => null));
+    await readSse(res, onEvent);
+  };
+}
+
+export const studentSolutions = (submissionId: string, token: string) =>
+  fetch(`/api/student/submissions/${submissionId}/solutions`, { headers: { authorization: `Bearer ${token}` } }).then(async (r) => {
+    const data = await r.json().catch(() => null);
+    if (!r.ok) throw new ApiError(r.status, data);
+    return (data as { solutions: Record<string, Solution> }).solutions;
+  });

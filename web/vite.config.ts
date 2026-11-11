@@ -5,5 +5,5 @@ const api = process.env.API_URL ?? "http://localhost:4310";
 
 export default defineConfig({
   plugins: [react()],
-  server: { port: Number(process.env.WEB_PORT ?? 5173), strictPort: true, proxy: { "/api": api, "/dl": api, "/mcp": api, "/vendor": api } },
+  server: { port: Number(process.env.WEB_PORT ?? 5173), strictPort: true, proxy: { "/api": api, "/dl": api, "/mcp": api, "/vendor": api, "/chia-se": api } },
 });

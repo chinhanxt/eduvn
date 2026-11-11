@@ -323,25 +323,26 @@ export function figureSvg(m: FigureModel, refs: string[]): { svg: string; w: num
   return { svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(w)}" height="${Math.ceil(h)}" viewBox="${x} ${y} ${w} ${h}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>${body}</svg>`, w: Math.ceil(w), h: Math.ceil(h) };
 }
 
-export const ACCENT = "#e8590c";
+export const ACCENT = "#d9480f";
+const INK = "#1b2130";
 const xesc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 function elSvg(e: El, h: "hl" | "dim" | null): string {
-  const stroke = h === "hl" ? ACCENT : "#1f2937";
+  const stroke = h === "hl" ? ACCENT : INK;
   const op = h === "dim" ? ' opacity="0.3"' : "";
   const sw = (base: number) => (h === "hl" ? base + 1.6 : base);
   switch (e.t) {
     case "line":
       return `<line x1="${e.x1}" y1="${e.y1}" x2="${e.x2}" y2="${e.y2}" stroke="${e.role === "axis" ? "#9ca3af" : stroke}" stroke-width="${sw(e.role === "axis" ? 1 : 1.8)}"${e.dash ? ' stroke-dasharray="4 4"' : ""}${op}/>`;
     case "path":
-      return `<path d="${e.d}" fill="none" stroke="${e.role === "curve" && h !== "hl" ? "#2563eb" : stroke}" stroke-width="${sw(e.role === "curve" ? 2.4 : 1.8)}"${op}/>`;
+      return `<path d="${e.d}" fill="none" stroke="${e.role === "curve" && h !== "hl" ? "#2a78d6" : stroke}" stroke-width="${sw(e.role === "curve" ? 2.4 : 1.8)}"${op}/>`;
     case "poly":
       return `<polygon points="${e.pts.map((p) => p.join(",")).join(" ")}" fill="${ACCENT}" fill-opacity="0.16" stroke="${ACCENT}" stroke-width="2.6"/>`;
     case "circle":
       return `<circle cx="${e.cx}" cy="${e.cy}" r="${e.r}" fill="${e.fill ? stroke : "none"}" stroke="${stroke}" stroke-width="${sw(1.6)}"${op}/>`;
     case "rect":
-      return `<rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" rx="${e.rx}" fill="${h === "hl" ? "#fff4e6" : "#ffffff"}" stroke="${stroke}" stroke-width="${sw(1.4)}"${op}/>`;
+      return `<rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" rx="${e.rx}" fill="${h === "hl" ? "#fff1e8" : "#ffffff"}" stroke="${stroke}" stroke-width="${sw(1.4)}"${op}/>`;
     case "text":
-      return `<text x="${e.x}" y="${e.y}" font-size="${e.size}" text-anchor="${e.anchor ?? "middle"}" font-family="'Be Vietnam Pro', system-ui, sans-serif" fill="${h === "hl" ? ACCENT : e.role === "axis" ? "#6b7280" : "#111827"}"${h === "hl" ? ' font-weight="700"' : ""}${op}>${xesc(e.text)}</text>`;
+      return `<text x="${e.x}" y="${e.y}" font-size="${e.size}" text-anchor="${e.anchor ?? "middle"}" font-family="${e.role === "label" || e.role === "axis" ? "'Source Serif 4', Georgia, serif" : "Inter, system-ui, sans-serif"}"${e.role === "label" || e.role === "axis" ? ' font-style="italic"' : ""} fill="${h === "hl" ? ACCENT : e.role === "axis" ? "#646c80" : INK}"${h === "hl" ? ' font-weight="700"' : ""}${op}>${xesc(e.text)}</text>`;
   }
 }
 export { elSvg };
