@@ -108,3 +108,18 @@
 }
 
 @media (max-width: 720px) { [data-portal="gv"] .btn.sm:has(> .hide-sm) { width: 30px; padding: 0; } }
+
+/* ---- Code thật (màn Hôm nay): khung chi tiết dính, hàng HS cần quan tâm, ô chỉ số chữ dài ---- */
+[data-portal="gv"] .pane.detail { position: sticky; top: calc(var(--top-h) + 16px); }
+[data-portal="gv"] .pane.detail .empty { padding: var(--s-8) var(--s-4); }
+[data-portal="gv"] .kpis .v small.ell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-portal="gv"] .rowi.att { grid-template-columns: 24px minmax(0, 1fr) 64px minmax(0, 1.3fr) 44px; }
+[data-portal="gv"] .rowi.att .pr { color: var(--danger); }
+[data-portal="gv"] .rowi:focus-visible { outline-offset: -2px; }
+[data-portal="gv"] .ctable a:hover { color: var(--accent); }
+@media (max-width: 1180px) { [data-portal="gv"] .pane.detail { position: static; } }
+@media (max-width: 720px) {
+  [data-portal="gv"] .rowi.att { grid-template-columns: 24px minmax(0, 1fr) 44px; }
+  [data-portal="gv"] .rowi.att .cls { display: none; } [data-portal="gv"] .rowi.att .pr { display: block; grid-column: 2; grid-row: 2; white-space: normal; }
+  [data-portal="gv"] .rowi.att .due { grid-column: 3; grid-row: 1 / 3; }
+}

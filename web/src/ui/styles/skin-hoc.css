@@ -74,3 +74,50 @@
 [data-portal="hoc"] .ringbig span { font-size: 13px; color: #dcf3ef; }
 @media (max-width: 1180px) { [data-portal="hoc"] .ringbig { width: 120px; height: 120px; } [data-portal="hoc"] .ringbig::before { width: 96px; height: 96px; } [data-portal="hoc"] .ringbig b { font-size: 26px; line-height: 30px; } }
 @media (max-width: 720px) { [data-portal="hoc"] .ringbig { width: 92px; height: 92px; align-self: start; } [data-portal="hoc"] .ringbig::before { width: 72px; height: 72px; } [data-portal="hoc"] .ringbig b { font-size: 20px; line-height: 22px; } [data-portal="hoc"] .ringbig span { font-size: 10px; } }
+
+/* ---- Màn Hôm nay (chuyển từ CSS trong trang mockup hoc/hom-nay.html) ---- */
+[data-portal="hoc"] .today-hoc { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: var(--s-6); align-items: start; max-width: 1400px; }
+[data-portal="hoc"] .rail { display: flex; flex-direction: column; gap: var(--s-4); position: sticky; top: calc(var(--top-h) + var(--s-6)); }
+[data-portal="hoc"] .page-head.hero-field { display: grid; grid-template-columns: minmax(0, 1fr) 176px; gap: var(--s-4) var(--s-6); align-items: center; margin: 0; background: linear-gradient(135deg, #075149 0%, #0b7466 55%, #12857a 100%); }
+[data-portal="hoc"] .page-head.hero-field .sub { color: #dcf3ef; }
+[data-portal="hoc"] .hero-field .btn.on-field { color: #075149; }
+[data-portal="hoc"] .hero-field .acts { grid-column: 1; display: flex; gap: var(--s-2); flex-wrap: wrap; }
+[data-portal="hoc"] .hero-field .meta { grid-column: 1; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); font-size: 14px; color: #dcf3ef; }
+[data-portal="hoc"] .hero-field .meta span { display: inline-flex; align-items: center; gap: 6px; }
+[data-portal="hoc"] .hero-field .ringbig { grid-column: 2; grid-row: 1 / span 3; }
+[data-portal="hoc"] .hero-field .skel { background: rgb(255 255 255 / .16); }
+[data-portal="hoc"] .subjects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-4); margin-top: var(--s-4); }
+[data-portal="hoc"] .subj { padding: var(--s-5); border-radius: var(--r-md); display: flex; flex-direction: column; gap: var(--s-3); transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2); }
+[data-portal="hoc"] a.subj:hover { transform: translateY(-2px); box-shadow: var(--shadow-card); }
+[data-portal="hoc"] .subj.card-skel { background: var(--bg-raised); box-shadow: var(--shadow-card); }
+[data-portal="hoc"] .subj .tr { display: flex; align-items: center; gap: var(--s-2); }
+[data-portal="hoc"] .subj .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--bg-raised); flex: none; }
+[data-portal="hoc"] .subj h3 { font-size: 17px; font-weight: 800; }
+[data-portal="hoc"] .subj .pct { display: flex; align-items: baseline; gap: 6px; font-size: 12px; color: var(--ink-2); }
+[data-portal="hoc"] .subj .pct b { font-size: 26px; line-height: 30px; font-weight: 800; color: var(--ink); letter-spacing: -.02em; }
+[data-portal="hoc"] .subj .next { font-size: 14px; } [data-portal="hoc"] .subj .next small { display: block; color: var(--ink-2); font-size: 12px; }
+[data-portal="hoc"] .due { list-style: none; margin: 0; padding: 0; }
+[data-portal="hoc"] .due li > * { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: var(--s-3); align-items: center; padding: var(--s-3) 0; border-top: 1px solid var(--line); border-radius: 8px; }
+[data-portal="hoc"] .due li:first-child > * { border-top: 0; padding-top: 0; }
+[data-portal="hoc"] .due li > a:hover .t { color: var(--accent); }
+[data-portal="hoc"] .due .d { text-align: center; border-radius: 10px; background: var(--bg-sunken); padding: 4px 0; line-height: 1.1; }
+[data-portal="hoc"] .due .d b { display: block; font-size: 18px; font-weight: 800; } [data-portal="hoc"] .due .d small { font-size: 10px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; }
+[data-portal="hoc"] .due .d.hot { background: var(--warn-bg); } [data-portal="hoc"] .due .d.hot small, [data-portal="hoc"] .due .d.hot b { color: var(--warn); }
+[data-portal="hoc"] .due .t { font-weight: 600; font-size: 14px; transition: color var(--dur-1); } [data-portal="hoc"] .due .t small { display: block; font-weight: 400; color: var(--ink-3); font-size: 12px; }
+[data-portal="hoc"] .review { display: flex; align-items: center; gap: var(--s-4); }
+[data-portal="hoc"] .review .n { font-size: 34px; line-height: 38px; font-weight: 800; color: var(--accent); letter-spacing: -.02em; }
+[data-portal="hoc"] .card .empty { padding: var(--s-4) 0; }
+:root[data-theme="dark"][data-portal="hoc"] .tint { background: color-mix(in srgb, var(--h) 16%, var(--bg-raised)); }
+:root[data-theme="dark"][data-portal="hoc"] .hero-field .btn.on-field { color: #075149; }
+@media (max-width: 1180px) {
+  [data-portal="hoc"] .today-hoc { grid-template-columns: minmax(0, 1fr) 300px; gap: var(--s-4); }
+  [data-portal="hoc"] .subjects { grid-template-columns: minmax(0, 1fr); }
+  [data-portal="hoc"] .subj { flex-direction: row; align-items: center; } [data-portal="hoc"] .subj .next { margin-left: auto; text-align: right; } [data-portal="hoc"] .subj .pct { margin-left: var(--s-4); }
+  [data-portal="hoc"] .page-head.hero-field { grid-template-columns: minmax(0, 1fr) 120px; }
+}
+@media (max-width: 720px) {
+  [data-portal="hoc"] .today-hoc { grid-template-columns: minmax(0, 1fr); } [data-portal="hoc"] .rail { position: static; }
+  [data-portal="hoc"] .page-head.hero-field { grid-template-columns: minmax(0, 1fr) 92px; } [data-portal="hoc"] .hero-field .ringbig { grid-row: 1; }
+  [data-portal="hoc"] .hero-field .acts, [data-portal="hoc"] .hero-field .meta { grid-column: 1 / -1; } [data-portal="hoc"] .hero-field .acts .btn { width: 100%; }
+  [data-portal="hoc"] .subj { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: var(--s-4); } [data-portal="hoc"] .subj .pct { margin-left: 0; justify-self: end; } [data-portal="hoc"] .subj .pct b { font-size: 22px; line-height: 26px; } [data-portal="hoc"] .subj .next { grid-column: 1 / -1; margin-left: 0; text-align: left; }
+}

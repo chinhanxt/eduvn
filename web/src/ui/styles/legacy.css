@@ -12,6 +12,9 @@
   --violet: var(--c7); --violet-bg: color-mix(in srgb, var(--c7) 12%, var(--bg));
   --amber: var(--warn); --amber-bg: var(--warn-bg);
   --green: var(--ok); --green-bg: var(--ok-bg);
+  --red: var(--danger); --red-bg: var(--danger-bg);
+  /* bảng giảng, sơ đồ: thanh công cụ tối của bản cũ */
+  --side: #1e2340; --side-ink: #c9cee6; --side-active: #2f3663; --side-hi: #ffffff;
   font-family: var(--font-ui); font-size: 14px; line-height: 1.5; color: var(--ink);
 }
 /* Trang cũ bên trong khung mới: nền thẻ trên nền lõm nhẹ giống bản cũ. */
@@ -182,3 +185,5 @@
 @media (max-width: 900px) {
   .legacy .ail-gal-form { grid-template-columns: 1fr; }
 }
+/* P9a (hs.css) đặt màu nhấn đậm cố định → theo cổng */
+.legacy .hs { --brand-d: var(--accent-hover); --hs-muted: var(--ink-3); --gray-bg: var(--bg-sunken); background: transparent; min-height: 0; }

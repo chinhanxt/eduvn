@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { errText } from "../api";
 import { Icon } from "../Icon";
+import { StreamingText } from "../ui/components/StreamingText";
 import { MathText } from "../math/MathText";
 import { Markdown } from "./Markdown";
 import { type Citation, type Msg, fileToDataUrl, streamChat, tutorApi } from "./client";
@@ -10,6 +11,8 @@ export type ChatCtx = { kbId: string | null; bookPageId?: string };
 /** Khung chat gia sư dùng chung cho trang Gia sư và khung hỏi trên trang giáo trình. */
 export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starters }: { ctx: ChatCtx; sessionId: string | null; onSession: (id: string) => void; onTitle?: (id: string, title: string) => void; compact?: boolean; starters?: string[] }) {
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  const msgsRef = useRef(msgs);
+  msgsRef.current = msgs;
   const [input, setInput] = useState("");
   const [mode, setMode] = useState<"chat" | "hint">("chat");
   const [level, setLevel] = useState(1);
@@ -18,6 +21,8 @@ export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starter
   const [error, setError] = useState<string | null>(null);
   const [hint, setHint] = useState("");
   const [pop, setPop] = useState<Citation | null>(null);
+  /** Chỉ số tin trả lời bị Dừng/ngắt giữa chừng (giữ phần đã viết + ghi chú). */
+  const [cut, setCut] = useState<{ i: number; why: "stopped" | "error" } | null>(null);
   const sid = useRef<string | null>(sessionId);
   const abort = useRef<AbortController | null>(null);
   const log = useRef<HTMLDivElement>(null);
@@ -46,6 +51,7 @@ export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starter
       if (!message || busy) return;
       setError(null);
       setHint("");
+      setCut(null);
       setBusy(true);
       stick.current = true;
       const imgs = images;
@@ -73,6 +79,9 @@ export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starter
         if (sid.current && !ac.signal.aborted) tutorApi<{ hint: string }>(`/sessions/${sid.current}/ask-hint`, { method: "POST" }).then((h) => setHint(h.hint)).catch(() => {});
       } catch (e) {
         if (!ac.signal.aborted) setError(errText(e));
+        const all = msgsRef.current;
+        const last = all.length - 1;
+        if (all[last]?.role === "assistant" && all[last]!.content) setCut({ i: last, why: ac.signal.aborted ? "stopped" : "error" });
       } finally {
         setBusy(false);
         setMsgs((all) => all.filter((m, i) => !(i === all.length - 1 && m.role === "assistant" && !m.content)));
@@ -109,8 +118,16 @@ export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starter
           </div>
         )}
         {msgs.map((m, i) => (
-          <div key={i} className={`bub ${m.role}${busy && i === msgs.length - 1 && m.role === "assistant" ? " typing" : ""}`} data-testid={`msg-${m.role}`}>
-            {m.role === "user" ? <MathText value={m.content} /> : <Markdown text={m.content} cites={cited(m)} onCite={setPop} />}
+          <div key={i} className={`bub ${m.role}${busy && i === msgs.length - 1 && m.role === "assistant" && !m.content ? " typing" : ""}`} data-testid={`msg-${m.role}`}>
+            {m.role === "user" ? (
+              <MathText value={m.content} />
+            ) : (
+              <StreamingText
+                text={m.content}
+                state={busy && i === msgs.length - 1 ? "streaming" : cut?.i === i ? cut.why : "done"}
+                render={(t) => <Markdown text={t} cites={cited(m)} onCite={setPop} />}
+              />
+            )}
             {m.role === "assistant" && m.citations.length > 0 && !busy && (
               <div className="srcs">
                 Nguồn: {m.citations.map((c) => <button key={c.n} onClick={() => setPop(c)}>[{c.n}] {c.doc}, trang {c.page}</button>)}

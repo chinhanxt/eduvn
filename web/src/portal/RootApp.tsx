@@ -3,7 +3,7 @@ import { Route, Routes, useLocation } from "react-router";
 import { api, ApiError, type Me } from "../api";
 import { useAuth } from "../auth";
 import { Callback, Login } from "../pages/Login";
-import { loadSession } from "../student/studentApi";
+import { loadSession } from "../student/session";
 import { legacyRedirect, portalForRole } from "./entries";
 import { GoTo } from "./Redirect";
 

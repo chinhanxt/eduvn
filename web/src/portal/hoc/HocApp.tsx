@@ -1,69 +1,95 @@
-import { lazy, Suspense, useEffect, type ReactNode } from "react";
-import { Navigate, NavLink, Route, Routes, useLocation } from "react-router";
+import { type ComponentType, lazy, type ReactNode, Suspense, useEffect } from "react";
+import { Navigate, Route, Routes } from "react-router";
 import { useAuth } from "../../auth";
-import { loadSession } from "../../student/studentApi";
-import { legacyRedirect } from "../entries";
-import { HocLayout } from "../layouts";
+import { ToastProvider } from "../../ui/components/Toast";
+import { prefetch } from "../../ui/data/query";
+import { PageSkeleton } from "../../ui/shell/PageSkeleton";
+import { lazyPage, preloadPath, registerPreload, type Page } from "../../ui/shell/routes";
 import { LazyMathKeyboard } from "../MathKeyboardLazy";
 import { goLogin } from "../needLogin";
-import { GoTo } from "../Redirect";
+import { fetchHocToday, HOC_TODAY_KEY } from "./data";
+import { HocShell, useLearner } from "./HocShell";
 
-const StudentApp = lazy(() => import("../../student/StudentApp").then((m) => ({ default: m.StudentApp })));
-const P6Layout = lazy(() => import("../../hoc/HocLayout").then((m) => ({ default: m.HocLayout })));
-const Books = lazy(() => import("../../hoc/Books").then((m) => ({ default: m.Books })));
-const Paths = lazy(() => import("../../hoc/Paths").then((m) => ({ default: m.Paths })));
-const Practice = lazy(() => import("../../hoc/Practice").then((m) => ({ default: m.Practice })));
-const Tutor = lazy(() => import("../../hoc/Tutor").then((m) => ({ default: m.Tutor })));
+const pick = <M,>(load: () => Promise<M>, f: (m: M) => ComponentType): Page => lazyPage(() => load().then(f));
+// Trang P6 dùng hoc.css (trước đây nạp qua HocLayout cũ).
+const p6 = <M,>(load: () => Promise<M>, f: (m: M) => ComponentType): Page => pick(() => Promise.all([load(), import("../../hoc/hoc.css")]).then(([m]) => m), f);
 
-/** Trang P6 cần Keycloak; chưa đăng nhập mà có phiên HS (mã lớp/PIN) → khu bài tập P9a, không thì đăng nhập. */
-function NeedUser({ children }: { children: ReactNode }) {
-  const { user, ready } = useAuth();
-  const hs = !user && ready && !!loadSession();
-  useEffect(() => {
-    if (ready && !user && !hs) goLogin();
-  }, [ready, user, hs]);
-  if (hs) return <Navigate to="/hoc/hs" replace />;
-  if (!ready || !user) return <div className="center">…</div>;
+const P = {
+  homNay: pick(() => import("./HomNay"), (m) => m.HomNay),
+  student: pick(() => import("../../student/StudentApp"), (m) => m.StudentApp),
+  tutor: p6(() => import("../../hoc/Tutor"), (m) => m.Tutor),
+  practice: p6(() => import("../../hoc/Practice"), (m) => m.Practice),
+  paths: p6(() => import("../../hoc/Paths"), (m) => m.Paths),
+  books: p6(() => import("../../hoc/Books"), (m) => m.Books),
+};
+
+registerPreload([
+  {
+    path: "/hoc",
+    preload: P.homNay.preload,
+    data: () => {
+      const s = window.localStorage.getItem("eduvn.hs");
+      // tài khoản Keycloak ưu tiên; không thì phiên mã lớp
+      const auth = Object.keys(window.localStorage).some((k) => k.startsWith("oidc.user:")) ? "user" : s ? "hs" : null;
+      if (auth) void prefetch(`${HOC_TODAY_KEY}:${auth}`, fetchHocToday(auth));
+    },
+  },
+  { path: "/hoc/hs/*", preload: P.student.preload },
+  { path: "/hoc/gia-su", preload: P.tutor.preload },
+  { path: "/hoc/luyen-tap", preload: P.practice.preload },
+  { path: "/hoc/lo-trinh", preload: P.paths.preload },
+  { path: "/hoc/giao-trinh", preload: P.books.preload },
+]);
+
+// Mở thẳng /hoc: tải code + dữ liệu Hôm nay ngay khi entry chạy.
+if (/^\/hoc\/?$/.test(window.location.pathname)) preloadPath("/hoc");
+
+const L = ({ children }: { children: ReactNode }) => <div className="legacy">{children}</div>;
+
+/** Hôm nay: cần tài khoản hoặc phiên mã lớp; chưa có → đăng nhập bằng mã lớp (P9a, có nút tài khoản). */
+function NeedLearner({ children }: { children: ReactNode }) {
+  const { ready, auth } = useLearner();
+  if (!ready) return <PageSkeleton />;
+  if (!auth) return <Navigate to="/hoc/hs" replace />;
   return <>{children}</>;
 }
 
-/** Link P9a cũ (/hs/…) bên trong StudentApp và đường lạ: đổi sang đường mới. */
-function Legacy() {
-  const { pathname, search, hash } = useLocation();
-  const to = legacyRedirect(pathname);
-  return <GoTo here="hoc.html" to={to ? `${to}${search}${hash}` : "/hoc"} />;
+/** Trang P6 cần Keycloak; chỉ có phiên mã lớp → khu Bài tập; chưa đăng nhập → đăng nhập. */
+function NeedUser({ children }: { children: ReactNode }) {
+  const { user, ready } = useAuth();
+  const { session } = useLearner();
+  useEffect(() => {
+    if (ready && !user && !session) goLogin();
+  }, [ready, user, session]);
+  if (ready && !user && session) return <Navigate to="/hoc/hs" replace />;
+  if (!ready || !user) return <PageSkeleton />;
+  return <L>{children}</L>;
 }
 
-function PortalNav() {
-  return (
-    <nav className="hoc-tabs" aria-label="Cổng học">
-      <NavLink to="/hoc/gia-su">Học</NavLink>
-      <NavLink to="/hoc/hs">Bài tập</NavLink>
-      <a href="/choi">Vào đấu trường</a>
-    </nav>
-  );
-}
+const Legacy = lazy(() => import("./LegacyHoc").then((m) => ({ default: m.LegacyHoc })));
 
-/** Cổng học sinh: P6 (/hoc/gia-su…) cho HS Keycloak, P9a (/hoc/hs/…) cho phiên HS. */
+/** Cổng học sinh /hoc: Hôm nay + P6 (gia sư, luyện tập, lộ trình, giáo trình) cho tài khoản, P9a (/hoc/hs/…) cho cả phiên mã lớp. */
 export function HocApp() {
-  const { user } = useAuth();
+  const H = P.homNay.Component;
+  const S = P.student.Component;
+  const T = P.tutor.Component;
+  const Pr = P.practice.Component;
+  const Pa = P.paths.Component;
+  const B = P.books.Component;
   return (
-    <HocLayout>
-      {user && <PortalNav />}
-      <Suspense fallback={<div className="center">…</div>}>
-        <Routes>
-          <Route path="/hoc/hs/*" element={<StudentApp />} />
-          <Route path="/hoc" element={<NeedUser><P6Layout /></NeedUser>}>
-            <Route index element={<Navigate to="gia-su" replace />} />
-            <Route path="gia-su" element={<Tutor />} />
-            <Route path="luyen-tap" element={<Practice />} />
-            <Route path="lo-trinh" element={<Paths />} />
-            <Route path="giao-trinh" element={<Books />} />
-          </Route>
-          <Route path="*" element={<Legacy />} />
-        </Routes>
-      </Suspense>
+    <ToastProvider>
+      <Routes>
+        <Route element={<HocShell />}>
+          <Route path="/hoc" element={<NeedLearner><H /></NeedLearner>} />
+          <Route path="/hoc/hs/*" element={<L><S /></L>} />
+          <Route path="/hoc/gia-su" element={<NeedUser><T /></NeedUser>} />
+          <Route path="/hoc/luyen-tap" element={<NeedUser><Pr /></NeedUser>} />
+          <Route path="/hoc/lo-trinh" element={<NeedUser><Pa /></NeedUser>} />
+          <Route path="/hoc/giao-trinh" element={<NeedUser><B /></NeedUser>} />
+        </Route>
+        <Route path="*" element={<Suspense fallback={<PageSkeleton />}><Legacy /></Suspense>} />
+      </Routes>
       <LazyMathKeyboard />
-    </HocLayout>
+    </ToastProvider>
   );
 }
