@@ -1,9 +1,8 @@
 import { lazy, startTransition, Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Skeleton } from "../../ui/components/Skeleton";
 import { EmptyState, ErrorState } from "../../ui/components/States";
 import { useQuery } from "../../ui/data/query";
-import { useUrlState } from "../../ui/data/urlState";
 import { usePageMeta } from "../../ui/shell/AppShell";
 import { PageHead } from "../../ui/shell/PageHead";
 import { initialsOf } from "../me";
@@ -144,7 +143,10 @@ export function HomNay() {
   const navigate = useNavigate();
   const q = useQuery(GV_TODAY_KEY, fetchGvToday);
   const d = q.data;
-  const [view, setView] = useUrlState<string>("xem", "tat-ca", { mode: "push" });
+  // ?xem= đọc trực tiếp (không kéo ui/data/urlState vào JS lần đầu của cổng): đổi tab = bước lịch sử
+  const [params, setParams] = useSearchParams();
+  const view = params.get("xem") || "tat-ca"; // Hôm nay chỉ có ?xem=
+  const setView = useCallback((x: string) => setParams(x === "tat-ca" ? {} : { xem: x }), [setParams]);
   const v: GvView = (GV_VIEWS as readonly string[]).includes(view) ? (view as GvView) : "tat-ca";
   // Tab đổi ngay (phản hồi bấm), danh sách vẽ lại trong transition → INP thấp kể cả máy chậm.
   const [tabNow, setTabNow] = useState<GvView | null>(null);
@@ -183,7 +185,7 @@ export function HomNay() {
         e.preventDefault();
         setSel((s) => Math.max(0, Math.min(list.length - 1, s + (k === "j" ? 1 : -1))));
       } else if (e.key === "Enter" && (e.target as HTMLElement).closest?.(".rowi")) open(cur);
-      else if (k === "n") navigate("/de-thi");
+      else if (k === "n") navigate("/de-thi?tao=1");
       else if ((k === "c" && cur?.kind === "grade") || (k === "o" && cur?.kind === "lesson") || (k === "r" && cur?.kind === "due")) open(cur);
     };
     window.addEventListener("keydown", key);
@@ -220,7 +222,7 @@ export function HomNay() {
 
   return (
     <>
-      <PageHead title="Hôm nay" tabs={tabs} primary={{ label: "Tạo đề", icon: "plus", kbd: "N", to: "/de-thi" }} />
+      <PageHead title="Hôm nay" tabs={tabs} primary={{ label: "Tạo đề", icon: "plus", kbd: "N", to: "/de-thi?tao=1" }} />
       <Kpis d={d} />
       <div className="split">
         <div className="stack" style={{ gap: "var(--s-4)" }}>

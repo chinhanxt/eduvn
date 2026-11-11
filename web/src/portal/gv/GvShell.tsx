@@ -35,8 +35,8 @@ export function GvShell() {
     () => [
       ...(d?.classes ?? []).map((c) => ({ group: "Lớp", title: `${c.name}${c.subject ? ` · ${c.subject}` : ""}`, icon: "users", href: `/lop-hoc/${c.id}` })),
       ...(d?.tasks ?? []).slice(0, 6).map((t) => ({ group: "Việc", title: t.title, icon: t.kind === "grade" ? "grade" : t.kind === "lesson" ? "board" : "clock", href: t.href, keywords: `${t.id} ${t.className}` })),
-      { group: "Thao tác", title: "Tạo đề mới", icon: "plus", href: "/de-thi", kbd: "N" },
-      { group: "Thao tác", title: "Soạn giáo án", icon: "pen", href: "/giao-an" },
+      { group: "Thao tác", title: "Tạo đề mới", icon: "plus", href: "/de-thi?tao=1", kbd: "N" },
+      { group: "Thao tác", title: "Soạn giáo án", icon: "pen", href: "/giao-an?tao=1" },
       { group: "Thao tác", title: "Sang cổng Học", icon: "cap", href: "/hoc", keywords: "hoc sinh gia su" },
     ],
     [d],

@@ -1,48 +1,53 @@
-import { useEffect, useState } from "react";
-import { api, errText, exportVanBan, type VanBanSummary } from "../api";
-import { Icon } from "../Icon";
+import { useMemo } from "react";
+import { Link } from "react-router";
+import type { VanBanSummary } from "../api";
+import { DocList } from "../portal/gv/DocList";
+import { dateVi, get, openLink, useRun } from "../portal/gv/kit";
+import { Button } from "../ui/components/Button";
+import { Badge } from "../ui/components/Chip";
+import type { Column } from "../ui/components/Table";
+import { useQuery } from "../ui/data/query";
+import { usePageMeta } from "../ui/shell/AppShell";
 
-const LOAI: Record<string, { ten: string; ma: string; tag: string }> = {
-  thong_bao: { ten: "Thông báo", ma: "TB", tag: "" },
-  ke_hoach: { ten: "Kế hoạch", ma: "KH", tag: "violet" },
-  bao_cao: { ten: "Báo cáo", ma: "BC", tag: "green" },
-  bien_ban: { ten: "Biên bản", ma: "BB", tag: "amber" },
-  to_trinh: { ten: "Tờ trình", ma: "TTr", tag: "violet" },
-  giay_moi: { ten: "Giấy mời", ma: "GM", tag: "green" },
-  quyet_dinh: { ten: "Quyết định", ma: "QĐ", tag: "amber" },
-  cong_van: { ten: "Công văn", ma: "CV", tag: "" },
+const LOAI: Record<string, { ten: string; ma: string }> = {
+  thong_bao: { ten: "Thông báo", ma: "TB" },
+  ke_hoach: { ten: "Kế hoạch", ma: "KH" },
+  bao_cao: { ten: "Báo cáo", ma: "BC" },
+  bien_ban: { ten: "Biên bản", ma: "BB" },
+  to_trinh: { ten: "Tờ trình", ma: "TTr" },
+  giay_moi: { ten: "Giấy mời", ma: "GM" },
+  quyet_dinh: { ten: "Quyết định", ma: "QĐ" },
+  cong_van: { ten: "Công văn", ma: "CV" },
 };
+const loaiVi = (k: string) => LOAI[k]?.ten ?? k;
 
+/** /van-ban — văn bản hành chính theo NĐ 30/2020 (soạn qua trợ lý AI): bảng v2, lọc loại, tải Word. */
 export function VanBan() {
-  const [rows, setRows] = useState<VanBanSummary[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    api<VanBanSummary[]>("/api/van-ban").then(setRows).catch((e: unknown) => setError(errText(e)));
-  }, []);
+  usePageMeta("Văn bản hành chính");
+  const q = useQuery("gv/van-ban", get<VanBanSummary[]>("/api/van-ban"));
+  const run = useRun();
+  const sorts = useMemo(() => ({ ngay: (v: VanBanSummary) => v.ngay, sua: (v: VanBanSummary) => v.updatedAt }), []);
+  const cols: Column<VanBanSummary>[] = [
+    { key: "loai", header: "Loại", width: 120, cell: (v) => <Badge tone="outline">{loaiVi(v.loai)}</Badge> },
+    { key: "trich-yeu", header: "Trích yếu", cell: (v) => <span><span className="t-title">{v.trichYeu}</span><span className="t-sub mono">Số: {v.soKyHieu || "—"}</span></span> },
+    { key: "ngay", header: "Ngày ban hành", numeric: true, sortable: true, hideSm: true, cell: (v) => dateVi(v.ngay) },
+    { key: "sua", header: "Sửa lần cuối", numeric: true, sortable: true, hideSm: true, cell: (v) => dateVi(v.updatedAt) },
+    { key: "act", header: "", numeric: true, cell: (v) => <span className="t-acts"><Button size="sm" icon="down" onClick={() => run(() => openLink(`/api/van-ban/${v.id}/export`), "Đang tải văn bản .docx")} data-testid="vb-download">Tải Word</Button></span> },
+  ];
   return (
-    <>
-      <h1>Văn bản hành chính</h1>
-      {error && <div className="err">{error}</div>}
-      {rows?.length === 0 && <div className="card"><div className="empty">—</div></div>}
-      {rows && rows.length > 0 && (
-        <div className="card" data-testid="vb-list">
-          {rows.map((v) => {
-            const l = LOAI[v.loai] ?? { ten: v.loai, ma: "", tag: "" };
-            return (
-              <div key={v.id} data-testid="vb-row" style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 0", borderBottom: "1px solid #eef0f5" }}>
-                <Icon name="exam" size={22} />
-                <span className={`tag ${l.tag}`} style={{ minWidth: 76, textAlign: "center" }}>{l.ten}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600 }}>{v.trichYeu}</div>
-                  <div style={{ fontSize: 12, color: "var(--muted)" }}>Số: {v.soKyHieu}{v.ngay ? ` · ${v.ngay.split("-").reverse().join("/")}` : ""}</div>
-                </div>
-                <span style={{ fontSize: 12, color: "var(--muted)" }}>{new Date(v.updatedAt).toLocaleDateString("vi-VN")}</span>
-                <button className="btn" onClick={() => void exportVanBan(v.id)} data-testid="vb-download"><Icon name="down" size={18} />Tải Word</button>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </>
+    <DocList
+      title="Văn bản hành chính"
+      caption={`${q.data?.length ?? 0} văn bản · thể thức NĐ 30/2020`}
+      q={q}
+      columns={cols}
+      rowKey={(v) => v.id}
+      text={(v) => `${v.trichYeu} ${v.soKyHieu} ${loaiVi(v.loai)}`}
+      sorts={sorts}
+      defSort="-sua"
+      facet={{ key: "loai", label: "Loại văn bản", of: (v) => v.loai, name: loaiVi }}
+      searchHint="Tìm trích yếu, số ký hiệu…"
+      testId="vb-list"
+      empty={{ icon: "clip", title: "Chưa có văn bản", text: "Nhờ trợ lý AI (Claude, ChatGPT) soạn thông báo, kế hoạch, biên bản… đúng thể thức — văn bản lưu ở đây để tải Word.", action: <Link className="btn primary sm" to="/ket-noi">Kết nối trợ lý AI</Link> }}
+    />
   );
 }
