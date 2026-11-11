@@ -185,7 +185,7 @@ export function HomNay() {
         e.preventDefault();
         setSel((s) => Math.max(0, Math.min(list.length - 1, s + (k === "j" ? 1 : -1))));
       } else if (e.key === "Enter" && (e.target as HTMLElement).closest?.(".rowi")) open(cur);
-      else if (k === "n") navigate("/de-thi");
+      else if (k === "n") navigate("/de-thi?tao=1");
       else if ((k === "c" && cur?.kind === "grade") || (k === "o" && cur?.kind === "lesson") || (k === "r" && cur?.kind === "due")) open(cur);
     };
     window.addEventListener("keydown", key);
@@ -222,7 +222,7 @@ export function HomNay() {
 
   return (
     <>
-      <PageHead title="Hôm nay" tabs={tabs} primary={{ label: "Tạo đề", icon: "plus", kbd: "N", to: "/de-thi" }} />
+      <PageHead title="Hôm nay" tabs={tabs} primary={{ label: "Tạo đề", icon: "plus", kbd: "N", to: "/de-thi?tao=1" }} />
       <Kpis d={d} />
       <div className="split">
         <div className="stack" style={{ gap: "var(--s-4)" }}>
