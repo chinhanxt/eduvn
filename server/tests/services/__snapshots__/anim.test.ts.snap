@@ -2,42 +2,73 @@
 
 exports[`HTML HyperFrames từ mẫu (snapshot) > dien_giai_tung_buoc: dòng hiện lần lượt, công thức KaTeX, chữ AI bị escape 1`] = `
 "<!doctype html>
-<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1280, height=720">
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1920, height=1080">
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 <link rel="stylesheet" href="assets/katex/katex.min.css">
-<style>
-@font-face{font-family:"Noto Sans";src:local("Noto Sans"),local("NotoSans-Regular")}
+<style>@font-face{font-family:"Inter";font-weight:400;font-style:normal;src:url("assets/fonts/Inter-Regular.ttf") format("truetype")}
+@font-face{font-family:"Inter";font-weight:600;font-style:normal;src:url("assets/fonts/Inter-SemiBold.ttf") format("truetype")}
+@font-face{font-family:"Inter";font-weight:700;font-style:normal;src:url("assets/fonts/Inter-Bold.ttf") format("truetype")}
+@font-face{font-family:"Source Serif 4";font-weight:400;font-style:normal;src:url("assets/fonts/SourceSerif4-Regular.ttf") format("truetype")}
+@font-face{font-family:"Source Serif 4";font-weight:600;font-style:normal;src:url("assets/fonts/SourceSerif4-SemiBold.ttf") format("truetype")}
+:root{--bg:#FDFCF9;--bgEdge:#FDFCF9;--surface:#FFFFFF;--sunken:#F5F2EA;--fill:#F5F2EA;--line:#E6DECC;--grid:#EEE8DC;--ink:#1C1B1A;--ink2:#3E3B37;--ink3:#6D645A;--accent:#2F5D8A;--accentSoft:#E8EEF5;--accentInk:#FFFFFF;--mark:#2F5D8A;--ok:#2B7A3B;--bad:#B42318;--p-lam:#2F5D8A;--p-lucLam:#0B7285;--p-xanhLa:#2B7A3B;--p-tim:#6F42C1;--p-doSon:#B42318;--p-vangDam:#8A6200;--p-hong:#B8336A;--p-cam:#B4530A;--ui:"Inter",sans-serif;--read:"Source Serif 4",serif}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:1280px;height:720px;overflow:hidden;background:#10142b}
-#root{position:absolute;inset:0;background:#10142b;font-family:"Noto Sans","DejaVu Sans",sans-serif;color:#f3f5ff}
-#tt{position:absolute;left:64px;right:64px;top:30px;font-size:38px;font-weight:700;color:#ffd166}
-.body{position:absolute;left:64px;right:64px;top:100px;bottom:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
-.line{font-size:36px;line-height:1.35;padding:12px 22px;border-left:6px solid #4f6bed;border-radius:6px;background:rgba(79,107,237,.12)}
-.flow{flex-direction:row;align-items:center;justify-content:center;gap:0}
-.box{width:180px;min-height:170px;padding:18px 14px;border-radius:14px;background:#1c2350;border:3px solid #4f6bed;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:10px}
-.box b{font-size:30px;color:#ffd166}.box span{font-size:22px;color:#c9d0ff}
-.arr{width:50px;height:40px;display:flex;align-items:center;justify-content:center}
-.row{display:grid;grid-template-columns:repeat(2,1fr);gap:0;font-size:30px;border-radius:8px;overflow:hidden}
-.row div{padding:14px 18px;border-bottom:1px solid #2c3470}
-.hd div{background:#4f6bed;font-weight:700;color:#fff}
-.rw div{background:rgba(79,107,237,.10)}
-.katex{font-size:1.05em}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+#root{position:absolute;inset:0;overflow:hidden;background:var(--bg);font-family:var(--ui);color:var(--ink);font-feature-settings:"cv11" 1;-webkit-font-smoothing:antialiased}
+#fig{position:absolute;inset:0}
+.meta{position:absolute;font-size:30px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);line-height:1}
+.eb{position:absolute;font-size:36px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);line-height:1}
+h1{position:absolute;font-family:var(--read);font-weight:600;line-height:1.16;color:var(--ink);text-wrap:balance;letter-spacing:-0.01em}
+h1 .kw{color:var(--accent)}
+.w{display:inline-block;white-space:pre}
+#rule{position:absolute;height:2px;background:var(--line);transform-origin:0 50%}
+.cap{position:absolute;font-size:42px;font-weight:500;line-height:1.3;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card{position:absolute;background:var(--surface);border:2px solid var(--line);border-left:6px solid var(--accent);border-radius:4px 12px 12px 4px;padding:22px 30px 24px;box-shadow:0 1px 2px rgb(28 27 26 / .04), 0 4px 14px rgb(28 27 26 / .05)}
+.card h3{font-size:40px;font-weight:600;color:var(--ink);line-height:1.25;margin-bottom:8px}
+.card p,.card .p{font-size:38px;line-height:1.4;color:var(--ink2)}
+.katex{font-size:1.06em}
+
+#lst{position:absolute;left:120px;top:273px;width:1680px;display:flex;flex-direction:column;gap:23px}
+.st{position:relative;display:flex;gap:40px;align-items:flex-start;font-family:var(--read);font-size:52px;line-height:1.42;color:var(--ink)}
+.st .bd{flex:none;position:relative;z-index:2;display:grid;place-items:center;width:56px;height:56px;margin-top:9px;border-radius:50%;font-family:var(--ui);font-size:28px;font-weight:700;border:3px solid var(--line);background:var(--bg);color:var(--ink3)}
+.st .tx{flex:1;text-wrap:pretty}
+.st .katex{font-size:1.02em}
+.cn,.cf{position:absolute;left:27px;top:37px;width:3px;height:calc(100% + 23px);border-radius:2px;z-index:1}
+.cn{background:var(--line)}.cf{background:var(--accent);transform-origin:50% 0}
+.mk{background-image:linear-gradient(rgba(47,93,138,0.13),rgba(47,93,138,0.13));background-repeat:no-repeat;background-size:0% 100%;background-position:0 0;border-radius:6px;padding:0 6px;margin:0 -2px}
+.st.end .tx{border:2px solid var(--line);border-left:6px solid #6F42C1;border-radius:4px 12px 12px 4px;padding:14px 30px 18px;background:var(--surface);box-shadow:0 1px 2px rgb(28 27 26 / .04), 0 4px 14px rgb(28 27 26 / .05)}
+.st.end .ecap{display:block;font-family:var(--ui);font-size:36px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6F42C1;margin-bottom:4px;line-height:1.3}
+.st.end .bd{margin-top:74px}
 </style></head><body>
-<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1280" data-height="720">
-<h1 id="tt" class="clip" data-start="0" data-duration="10" data-track-index="0">Giải phương trình</h1>
-<div class="body">
-<div id="l0" class="line clip" data-start="0.4" data-duration="9.6" data-track-index="1">Ta có <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></div>
-<div id="l1" class="line clip" data-start="4.8" data-duration="5.2" data-track-index="2">&lt;script&gt;alert(1)&lt;/script&gt; Vậy x = ±2</div>
+<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+<div id="hm" class="meta" style="left:120px;top:64px">Diễn giải từng bước</div><div id="he" class="eb" style="left:120px;top:118px">Lời giải</div><h1 id="tt" style="left:120px;top:168px;width:1680px;font-size:66px"><span class="w">Giải</span> <span class="w">phương</span> <span class="w">trình</span></h1>
+<div id="fig">
+<div id="lst"><div id="s0" class="st"><i class="cn" style="height:calc(100% + 88px)"></i><i id="c0" class="cf" style="height:calc(100% + 88px)"></i><div id="d0" class="bd">1</div><div class="tx" id="x0"><span id="t0"><span class="w">Ta</span> <span class="w">có</span> <span class="w mk"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></span></span></div></div>
+<div id="s1" class="st end"><div id="d1" class="bd">2</div><div class="tx" id="x1"><span class="ecap">Kết luận</span><span id="t1"><span class="w">&lt;script&gt;alert(1)&lt;/script&gt;</span> <span class="w">Vậy</span> <span class="w">x</span> <span class="w">=</span> <span class="w">±2</span></span></div></div></div>
 </div>
+<div id="rule" style="left:120px;top:936px;width:1680px"></div>
 </div>
 <script>
 const tl = gsap.timeline({ paused: true });
-tl.fromTo("#l0", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 0.4);
-tl.fromTo("#l0", { backgroundColor: "rgba(255,209,102,0.28)", borderLeftColor: "#ffd166" }, { backgroundColor: "rgba(79,107,237,0.12)", borderLeftColor: "#4f6bed", duration: 0.4 }, 4.8);
-tl.to("#l0", { opacity: 0.55, duration: 0.3 }, 4.8);
-tl.fromTo("#l1", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 4.8);
-tl.fromTo("#l1", { backgroundColor: "rgba(255,209,102,0.28)", borderLeftColor: "#ffd166" }, { backgroundColor: "rgba(79,107,237,0.12)", borderLeftColor: "#4f6bed", duration: 0.4 }, 9.7);
-tl.to("#l1", { opacity: 0.55, duration: 0.3 }, 9.7);
+tl.fromTo("#hm", {"opacity":0}, {"opacity":1,"duration":0.6,"ease":"power1.out"}, 0.05);
+tl.fromTo("#he", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 0.15);
+tl.fromTo("#tt .w", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.7,"ease":"expo.out","stagger":0.06}, 0.3);
+tl.fromTo("#s0", {"opacity":0}, {"opacity":1,"duration":0.3}, 0.8);
+tl.fromTo("#d0", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 0.8);
+tl.fromTo("#d0", {"backgroundColor":"#FDFCF9","color":"#6D645A","borderColor":"#E6DECC"}, {"backgroundColor":"#2F5D8A","color":"#FFFFFF","borderColor":"#2F5D8A","duration":0.4}, 0.8);
+tl.fromTo("#t0 .w", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out","stagger":0.3}, 0.95);
+tl.fromTo("#s0 .mk", {"backgroundSize":"0% 100%"}, {"backgroundSize":"100% 100%","duration":0.8,"ease":"power3.inOut","stagger":0.25}, 2.23);
+tl.fromTo("#c0", {"scaleY":0}, {"scaleY":1,"duration":3.42,"ease":"none"}, 0.8);
+tl.fromTo("#s1", {"opacity":0}, {"opacity":1,"duration":0.3}, 4.22);
+tl.fromTo("#d1", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 4.22);
+tl.fromTo("#d1", {"backgroundColor":"#FDFCF9","color":"#6D645A","borderColor":"#E6DECC"}, {"backgroundColor":"#2F5D8A","color":"#FFFFFF","borderColor":"#2F5D8A","duration":0.4}, 4.22);
+tl.fromTo("#x1", {"opacity":0,"x":-30}, {"opacity":1,"x":0,"duration":0.7,"ease":"expo.out"}, 4.22);
+tl.fromTo("#t1 .w", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out","stagger":0.3}, 4.37);
+tl.to("#d0", {"backgroundColor":"#FDFCF9","color":"#6D645A","borderColor":"#E6DECC","duration":0.4}, 4.22);
+tl.fromTo("#t0", {"color":"#1C1B1A"}, {"color":"#6D645A","duration":0.5}, 4.22);
+tl.to("#s0 .mk", {"backgroundSize":"0% 100%","duration":0.5,"ease":"power2.in"}, 4.22);
+tl.fromTo("#s1 .mk", {"backgroundSize":"0% 100%"}, {"backgroundSize":"100% 100%","duration":0.8,"ease":"power3.inOut","stagger":0.25}, 5.81);
+tl.fromTo("#rule", {"scaleX":0}, {"scaleX":1,"duration":1.2,"ease":"power3.inOut"}, 0.2);
+
 window.__timelines["main"] = tl;
 tl.seek(0);
 </script></body></html>
@@ -198,70 +229,135 @@ tl.seek(0);
 
 exports[`HTML HyperFrames — các mẫu mới (snapshot) > cay_xac_suat: dựng đủ, đúng thời lượng, escape chữ AI, khớp snapshot 1`] = `
 "<!doctype html>
-<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1280, height=720">
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1920, height=1080">
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 <link rel="stylesheet" href="assets/katex/katex.min.css">
-<style>
-@font-face{font-family:"Noto Sans";src:local("Noto Sans"),local("NotoSans-Regular")}
+<style>@font-face{font-family:"Inter";font-weight:400;font-style:normal;src:url("assets/fonts/Inter-Regular.ttf") format("truetype")}
+@font-face{font-family:"Inter";font-weight:600;font-style:normal;src:url("assets/fonts/Inter-SemiBold.ttf") format("truetype")}
+@font-face{font-family:"Inter";font-weight:700;font-style:normal;src:url("assets/fonts/Inter-Bold.ttf") format("truetype")}
+@font-face{font-family:"Source Serif 4";font-weight:400;font-style:normal;src:url("assets/fonts/SourceSerif4-Regular.ttf") format("truetype")}
+@font-face{font-family:"Source Serif 4";font-weight:600;font-style:normal;src:url("assets/fonts/SourceSerif4-SemiBold.ttf") format("truetype")}
+:root{--bg:#FDFCF9;--bgEdge:#FDFCF9;--surface:#FFFFFF;--sunken:#F5F2EA;--fill:#F5F2EA;--line:#E6DECC;--grid:#EEE8DC;--ink:#1C1B1A;--ink2:#3E3B37;--ink3:#6D645A;--accent:#2F5D8A;--accentSoft:#E8EEF5;--accentInk:#FFFFFF;--mark:#2F5D8A;--ok:#2B7A3B;--bad:#B42318;--p-lam:#2F5D8A;--p-lucLam:#0B7285;--p-xanhLa:#2B7A3B;--p-tim:#6F42C1;--p-doSon:#B42318;--p-vangDam:#8A6200;--p-hong:#B8336A;--p-cam:#B4530A;--ui:"Inter",sans-serif;--read:"Source Serif 4",serif}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:1280px;height:720px;overflow:hidden;background:#10142b}
-#root{position:absolute;inset:0;background:#10142b;font-family:"Noto Sans","DejaVu Sans",sans-serif;color:#f3f5ff}
-#tt{position:absolute;left:64px;right:64px;top:30px;font-size:38px;font-weight:700;color:#ffd166}
-.body{position:absolute;left:64px;right:64px;top:100px;bottom:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
-.line{font-size:36px;line-height:1.35;padding:12px 22px;border-left:6px solid #4f6bed;border-radius:6px;background:rgba(79,107,237,.12)}
-.flow{flex-direction:row;align-items:center;justify-content:center;gap:0}
-.box{width:180px;min-height:170px;padding:18px 14px;border-radius:14px;background:#1c2350;border:3px solid #4f6bed;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:10px}
-.box b{font-size:30px;color:#ffd166}.box span{font-size:22px;color:#c9d0ff}
-.arr{width:50px;height:40px;display:flex;align-items:center;justify-content:center}
-.row{display:grid;grid-template-columns:repeat(2,1fr);gap:0;font-size:30px;border-radius:8px;overflow:hidden}
-.row div{padding:14px 18px;border-bottom:1px solid #2c3470}
-.hd div{background:#4f6bed;font-weight:700;color:#fff}
-.rw div{background:rgba(79,107,237,.10)}
-.katex{font-size:1.05em}
-.nd{position:absolute;text-align:center;font-size:22px;padding:8px 6px;border-radius:12px;background:#1c2350;border:3px solid #56B4E9}.root{border-color:#ffd166;font-weight:700}.leaf{border-color:#009E73;background:#14392f;font-size:20px}.leaf small{font-size:22px;color:#F0E442;font-weight:700}.pl2{position:absolute;text-align:center;font-size:22px;color:#F0E442;font-weight:700}.ln2{position:absolute}</style></head><body>
-<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1280" data-height="720">
-<h1 id="tt" class="clip" data-start="0" data-duration="10" data-track-index="0">Tiêu đề &lt;b&gt;x&lt;/b&gt;</h1>
-<div id="nroot" class="nd root clip" style="left:70px;top:378px;width:160px" data-start="0.4" data-duration="9.6" data-track-index="1">Bốc bi</div>
-<div id="e0" class="ln2 clip" style="inset:0" data-start="1.66" data-duration="8.34" data-track-index="2"><svg width="1280" height="720" viewBox="0 0 1280 720"><line id="e0s" x1="230" y1="400" x2="440" y2="246.66666666666669" pathLength="1" stroke="#9aa3d0" stroke-width="3" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
-<div id="p0" class="pl2 clip" style="left:295px;top:293.33333333333337px;width:80px" data-start="1.66" data-duration="8.34" data-track-index="3">0,6</div>
-<div id="n0" class="nd clip" style="left:440px;top:224.66666666666669px;width:160px" data-start="1.66" data-duration="8.34" data-track-index="4">Đỏ</div>
-<div id="e1" class="ln2 clip" style="inset:0" data-start="2.91" data-duration="7.09" data-track-index="5"><svg width="1280" height="720" viewBox="0 0 1280 720"><line id="e1s" x1="230" y1="400" x2="440" y2="553.3333333333334" pathLength="1" stroke="#9aa3d0" stroke-width="3" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
-<div id="p1" class="pl2 clip" style="left:295px;top:446.6666666666667px;width:80px" data-start="2.91" data-duration="7.09" data-track-index="6">0,4</div>
-<div id="n1" class="nd clip" style="left:440px;top:531.3333333333334px;width:160px" data-start="2.91" data-duration="7.09" data-track-index="7">Xanh</div>
-<div id="f0" class="ln2 clip" style="inset:0" data-start="4.17" data-duration="5.83" data-track-index="8"><svg width="1280" height="720" viewBox="0 0 1280 720"><line id="f0s" x1="600" y1="246.66666666666669" x2="880" y2="170" pathLength="1" stroke="#9aa3d0" stroke-width="3" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
-<div id="q0" class="pl2 clip" style="left:700px;top:178.33333333333334px;width:80px" data-start="4.17" data-duration="5.83" data-track-index="9">0,5</div>
-<div id="l0" class="nd leaf clip" style="left:880px;top:148px;width:160px" data-start="4.17" data-duration="5.83" data-track-index="10">Đỏ, Đỏ<br><small>= 0,3</small></div>
-<div id="f1" class="ln2 clip" style="inset:0" data-start="5.43" data-duration="4.57" data-track-index="11"><svg width="1280" height="720" viewBox="0 0 1280 720"><line id="f1s" x1="600" y1="246.66666666666669" x2="880" y2="323.33333333333337" pathLength="1" stroke="#9aa3d0" stroke-width="3" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
-<div id="q1" class="pl2 clip" style="left:700px;top:255px;width:80px" data-start="5.43" data-duration="4.57" data-track-index="12">0,5</div>
-<div id="l1" class="nd leaf clip" style="left:880px;top:301.33333333333337px;width:160px" data-start="5.43" data-duration="4.57" data-track-index="13">Đỏ, Xanh<br><small>= 0,3</small></div>
-<div id="f2" class="ln2 clip" style="inset:0" data-start="6.69" data-duration="3.31" data-track-index="14"><svg width="1280" height="720" viewBox="0 0 1280 720"><line id="f2s" x1="600" y1="553.3333333333334" x2="880" y2="476.6666666666667" pathLength="1" stroke="#9aa3d0" stroke-width="3" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
-<div id="q2" class="pl2 clip" style="left:700px;top:485px;width:80px" data-start="6.69" data-duration="3.31" data-track-index="15">0,7</div>
-<div id="l2" class="nd leaf clip" style="left:880px;top:454.6666666666667px;width:160px" data-start="6.69" data-duration="3.31" data-track-index="16">Xanh, Đỏ<br><small>= 0,28</small></div>
-<div id="f3" class="ln2 clip" style="inset:0" data-start="7.94" data-duration="2.06" data-track-index="17"><svg width="1280" height="720" viewBox="0 0 1280 720"><line id="f3s" x1="600" y1="553.3333333333334" x2="880" y2="630" pathLength="1" stroke="#9aa3d0" stroke-width="3" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div>
-<div id="q3" class="pl2 clip" style="left:700px;top:561.6666666666667px;width:80px" data-start="7.94" data-duration="2.06" data-track-index="18">0,3</div>
-<div id="l3" class="nd leaf clip" style="left:880px;top:608px;width:160px" data-start="7.94" data-duration="2.06" data-track-index="19">Xanh, Xanh<br><small>= 0,12</small></div>
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+#root{position:absolute;inset:0;overflow:hidden;background:var(--bg);font-family:var(--ui);color:var(--ink);font-feature-settings:"cv11" 1;-webkit-font-smoothing:antialiased}
+#fig{position:absolute;inset:0}
+.meta{position:absolute;font-size:30px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);line-height:1}
+.eb{position:absolute;font-size:36px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);line-height:1}
+h1{position:absolute;font-family:var(--read);font-weight:600;line-height:1.16;color:var(--ink);text-wrap:balance;letter-spacing:-0.01em}
+h1 .kw{color:var(--accent)}
+.w{display:inline-block;white-space:pre}
+#rule{position:absolute;height:2px;background:var(--line);transform-origin:0 50%}
+.cap{position:absolute;font-size:42px;font-weight:500;line-height:1.3;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card{position:absolute;background:var(--surface);border:2px solid var(--line);border-left:6px solid var(--accent);border-radius:4px 12px 12px 4px;padding:22px 30px 24px;box-shadow:0 1px 2px rgb(28 27 26 / .04), 0 4px 14px rgb(28 27 26 / .05)}
+.card h3{font-size:40px;font-weight:600;color:var(--ink);line-height:1.25;margin-bottom:8px}
+.card p,.card .p{font-size:38px;line-height:1.4;color:var(--ink2)}
+.katex{font-size:1.06em}
+
+#tv{position:absolute;left:0;top:0}
+.nd{position:absolute;display:flex;align-items:center;justify-content:center;gap:14px;height:78px;padding:0 26px;border-radius:999px;font-size:44px;font-weight:600;white-space:nowrap;background:var(--surface);border:3px solid var(--line);color:var(--ink);box-shadow:0 1px 2px rgb(28 27 26 / .04), 0 4px 14px rgb(28 27 26 / .05)}
+.nd i{display:block;width:16px;height:16px;border-radius:50%}
+.nd.root{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.lf{position:absolute;display:flex;align-items:center;gap:18px;font-size:44px;font-weight:600;white-space:nowrap;height:54px}
+.lf i{display:block;width:18px;height:18px;border-radius:50%}
+.ppw{position:absolute;width:0;height:0;display:flex;align-items:center;justify-content:center;overflow:visible;z-index:2}
+.pp{flex:none;display:flex;align-items:center;justify-content:center;min-height:50px;min-width:70px;padding:4px 12px;border-radius:10px;font-size:38px;font-weight:700;background:var(--bg);color:var(--ink2);border:2px solid var(--line);font-variant-numeric:tabular-nums}
+.pp .katex,.rs .katex,.card .katex{font-size:1em}
+.rs{position:absolute;text-align:right;font-size:44px;white-space:nowrap;color:var(--ink3);font-variant-numeric:tabular-nums;height:54px;display:flex;align-items:center;justify-content:flex-end;gap:12px}
+.rs b{color:var(--ink);font-weight:700}
+.rh{position:absolute;font-size:30px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:right}
+.card .fr{font-size:44px;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:14px}
+.card .fr b{color:#6F42C1}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+<div id="hm" class="meta" style="left:120px;top:64px">Cây xác suất</div><div id="he" class="eb" style="left:120px;top:118px">Xác suất toàn phần</div><h1 id="tt" style="left:120px;top:168px;width:1680px;font-size:66px"><span class="w">Tiêu</span> <span class="w">đề</span> <span class="w">&lt;b&gt;x&lt;/b&gt;</span></h1>
+<div id="fig">
+<svg id="tv" width="1920" height="1080" viewBox="0 0 1920 1080"><path id="e0" d="M550,508.51 C678.72,508.51 678.72,400.76 807.44,400.76" fill="none" stroke="#6D645A" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="e1" d="M550,508.51 C678.72,508.51 678.72,616.26 807.44,616.26" fill="none" stroke="#6D645A" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="f0" d="M1003.44,400.76 C1132.16,400.76 1132.16,346.88 1260.88,346.88" fill="none" stroke="#6D645A" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="f1" d="M1003.44,400.76 C1132.16,400.76 1132.16,454.63 1260.88,454.63" fill="none" stroke="#6D645A" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="f2" d="M1003.44,616.26 C1132.16,616.26 1132.16,562.38 1260.88,562.38" fill="none" stroke="#6D645A" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="f3" d="M1003.44,616.26 C1132.16,616.26 1132.16,670.13 1260.88,670.13" fill="none" stroke="#6D645A" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="he0" d="M550,508.51 C678.72,508.51 678.72,400.76 807.44,400.76" fill="none" stroke="#1C1B1A" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="he1" d="M550,508.51 C678.72,508.51 678.72,616.26 807.44,616.26" fill="none" stroke="#1C1B1A" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="hf0" d="M1003.44,400.76 C1132.16,400.76 1132.16,346.88 1260.88,346.88" fill="none" stroke="#1C1B1A" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="hf1" d="M1003.44,400.76 C1132.16,400.76 1132.16,454.63 1260.88,454.63" fill="none" stroke="#1C1B1A" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="hf2" d="M1003.44,616.26 C1132.16,616.26 1132.16,562.38 1260.88,562.38" fill="none" stroke="#1C1B1A" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/><path id="hf3" d="M1003.44,616.26 C1132.16,616.26 1132.16,670.13 1260.88,670.13" fill="none" stroke="#1C1B1A" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>
+<div id="n0" class="nd root" style="left:120px;top:469.51px;width:430px">Tung 2 đồng xu</div>
+<div id="nb0" class="nd" style="left:807.44px;top:361.76px;width:196px"><i style="background:#0B7285"></i>Sấp</div>
+<div class="ppw" style="left:688.41px;top:446.58px"><div id="p0" class="pp"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div></div>
+<div id="nb1" class="nd" style="left:807.44px;top:577.26px;width:196px"><i style="background:#6F42C1"></i>Ngửa</div>
+<div class="ppw" style="left:688.41px;top:570.44px"><div id="p1" class="pp"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div></div>
+<div id="lf0" class="lf" style="left:1251.88px;top:319.88px;color:#0B7285"><i id="ld0" style="background:#0B7285"></i><span>Sấp</span></div>
+<div class="ppw" style="left:1197.03px;top:352.48px"><div id="q0" class="pp"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div></div>
+<div id="rs0" class="rs" style="right:120px;top:319.88px;width:309.12px"><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>×</span><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>=</span><b id="rv0"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></b></div>
+<div id="lf1" class="lf" style="left:1251.88px;top:427.63px;color:#6F42C1"><i id="ld1" style="background:#6F42C1"></i><span>Ngửa</span></div>
+<div class="ppw" style="left:1197.03px;top:449.03px"><div id="q1" class="pp"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div></div>
+<div id="rs1" class="rs" style="right:120px;top:427.63px;width:309.12px"><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>×</span><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>=</span><b id="rv1"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></b></div>
+<div id="lf2" class="lf" style="left:1251.88px;top:535.38px;color:#0B7285"><i id="ld2" style="background:#0B7285"></i><span>Sấp</span></div>
+<div class="ppw" style="left:1197.03px;top:567.98px"><div id="q2" class="pp"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div></div>
+<div id="rs2" class="rs" style="right:120px;top:535.38px;width:309.12px"><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>×</span><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>=</span><b id="rv2"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></b></div>
+<div id="lf3" class="lf" style="left:1251.88px;top:643.13px;color:#6F42C1"><i id="ld3" style="background:#6F42C1"></i><span>Ngửa</span></div>
+<div class="ppw" style="left:1197.03px;top:664.53px"><div id="q3" class="pp"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></div></div>
+<div id="rs3" class="rs" style="right:120px;top:643.13px;width:309.12px"><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>×</span><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>=</span><b id="rv3"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></b></div>
+<div id="rh" class="rh" style="right:120px;top:253px;width:469.12px">Xác suất nhánh</div>
+<div id="bx" class="card" style="left:120px;top:760px;height:140px;display:flex;align-items:center;gap:40px"><div class="fr"><span>P(<span style="color:#0B7285">Sấp</span>)</span><span>=</span><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>+</span><span><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">4</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span><span>=</span><b><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></b></div><div class="p" id="bk">Cộng xác suất các nhánh cùng dẫn tới một kết quả</div></div>
+</div>
+<div id="rule" style="left:120px;top:936px;width:1680px"></div>
 </div>
 <script>
 const tl = gsap.timeline({ paused: true });
-tl.fromTo("#nroot", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 0.4);
-tl.to("#e0s", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 1.66);
-tl.fromTo("#p0", { opacity: 0 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 1.66);
-tl.fromTo("#n0", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 1.66);
-tl.to("#e1s", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 2.91);
-tl.fromTo("#p1", { opacity: 0 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 2.91);
-tl.fromTo("#n1", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 2.91);
-tl.to("#f0s", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 4.17);
-tl.fromTo("#q0", { opacity: 0 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 4.17);
-tl.fromTo("#l0", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 4.17);
-tl.to("#f1s", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 5.43);
-tl.fromTo("#q1", { opacity: 0 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 5.43);
-tl.fromTo("#l1", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 5.43);
-tl.to("#f2s", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 6.69);
-tl.fromTo("#q2", { opacity: 0 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 6.69);
-tl.fromTo("#l2", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 6.69);
-tl.to("#f3s", { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 7.94);
-tl.fromTo("#q3", { opacity: 0 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 7.94);
-tl.fromTo("#l3", { opacity: 0, scale: 0.8 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.35, ease: "power3.out" }, 7.94);
+tl.fromTo("#hm", {"opacity":0}, {"opacity":1,"duration":0.6,"ease":"power1.out"}, 0.05);
+tl.fromTo("#he", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 0.15);
+tl.fromTo("#tt .w", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.7,"ease":"expo.out","stagger":0.06}, 0.3);
+tl.fromTo("#n0", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.6,"ease":"back.out(1.4)"}, 0.8);
+tl.fromTo("#rh", {"opacity":0}, {"opacity":1,"duration":0.6,"ease":"power1.out"}, 1.18);
+tl.fromTo("#e0", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.41,"ease":"power2.inOut"}, 1.55);
+tl.fromTo("#p0", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 1.85);
+tl.fromTo("#nb0", {"opacity":0,"x":-16}, {"opacity":1,"x":0,"duration":0.6,"ease":"expo.out"}, 2);
+tl.fromTo("#e1", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.41,"ease":"power2.inOut"}, 2.07);
+tl.fromTo("#p1", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 2.37);
+tl.fromTo("#nb1", {"opacity":0,"x":-16}, {"opacity":1,"x":0,"duration":0.6,"ease":"expo.out"}, 2.52);
+tl.fromTo("#nb0", {"borderColor":"#E6DECC"}, {"borderColor":"#0B7285","duration":0.4}, 2.57);
+tl.fromTo("#f0", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 2.57);
+tl.fromTo("#q0", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 2.87);
+tl.fromTo("#lf0", {"opacity":0,"x":-14}, {"opacity":1,"x":0,"duration":0.55,"ease":"expo.out"}, 3.02);
+tl.fromTo("#f1", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 2.91);
+tl.fromTo("#q1", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 3.21);
+tl.fromTo("#lf1", {"opacity":0,"x":-14}, {"opacity":1,"x":0,"duration":0.55,"ease":"expo.out"}, 3.36);
+tl.to("#nb0", {"borderColor":"#E6DECC","duration":0.4}, 3.26);
+tl.fromTo("#nb1", {"borderColor":"#E6DECC"}, {"borderColor":"#6F42C1","duration":0.4}, 3.6);
+tl.fromTo("#f2", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 3.6);
+tl.fromTo("#q2", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 3.9);
+tl.fromTo("#lf2", {"opacity":0,"x":-14}, {"opacity":1,"x":0,"duration":0.55,"ease":"expo.out"}, 4.05);
+tl.fromTo("#f3", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 3.94);
+tl.fromTo("#q3", {"opacity":0,"scale":0.82}, {"opacity":1,"scale":1,"duration":0.5,"ease":"back.out(1.4)"}, 4.24);
+tl.fromTo("#lf3", {"opacity":0,"x":-14}, {"opacity":1,"x":0,"duration":0.55,"ease":"expo.out"}, 4.39);
+tl.to("#nb1", {"borderColor":"#E6DECC","duration":0.4}, 4.29);
+tl.fromTo("#he0", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 4.62);
+tl.fromTo("#hf0", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 4.83);
+tl.fromTo("#rs0 > *", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.45,"ease":"expo.out","stagger":0.12}, 5);
+tl.to("#hf0", {"strokeDashoffset":1,"duration":0.4,"ease":"power2.in"}, 5.32);
+tl.fromTo("#he0", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 5.37);
+tl.fromTo("#hf1", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 5.58);
+tl.fromTo("#rs1 > *", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.45,"ease":"expo.out","stagger":0.12}, 5.75);
+tl.to("#he0", {"strokeDashoffset":1,"duration":0.4,"ease":"power2.in"}, 6.07);
+tl.to("#hf1", {"strokeDashoffset":1,"duration":0.4,"ease":"power2.in"}, 6.07);
+tl.fromTo("#he1", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 6.11);
+tl.fromTo("#hf2", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 6.32);
+tl.fromTo("#rs2 > *", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.45,"ease":"expo.out","stagger":0.12}, 6.49);
+tl.to("#hf2", {"strokeDashoffset":1,"duration":0.4,"ease":"power2.in"}, 6.81);
+tl.fromTo("#he1", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 6.86);
+tl.fromTo("#hf3", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.35,"ease":"power2.inOut"}, 7.07);
+tl.fromTo("#rs3 > *", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.45,"ease":"expo.out","stagger":0.12}, 7.24);
+tl.to("#he1", {"strokeDashoffset":1,"duration":0.4}, 7.6);
+tl.to("#hf3", {"strokeDashoffset":1,"duration":0.4}, 7.6);
+tl.to("#he0", {"strokeDashoffset":0,"duration":0.6}, 7.6);
+tl.to("#hf0", {"strokeDashoffset":0,"duration":0.6}, 7.9);
+tl.fromTo("#rv0", {"color":"#1C1B1A"}, {"color":"#6F42C1","duration":0.4}, 8);
+tl.fromTo("#rv1", {"color":"#1C1B1A"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.fromTo("#lf1 span", {"color":"#6F42C1"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.to("#ld1", {"opacity":0.45,"duration":0.6}, 7.6);
+tl.to("#he1", {"strokeDashoffset":0,"duration":0.6}, 7.6);
+tl.to("#hf2", {"strokeDashoffset":0,"duration":0.6}, 7.9);
+tl.fromTo("#rv2", {"color":"#1C1B1A"}, {"color":"#6F42C1","duration":0.4}, 8);
+tl.fromTo("#rv3", {"color":"#1C1B1A"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.fromTo("#lf3 span", {"color":"#6F42C1"}, {"color":"#6D645A","duration":0.6}, 7.6);
+tl.to("#ld3", {"opacity":0.45,"duration":0.6}, 7.6);
+tl.fromTo("#bx", {"opacity":0,"x":-36}, {"opacity":1,"x":0,"duration":0.8,"ease":"expo.out"}, 8.07);
+tl.fromTo("#bx .fr > *", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.45,"ease":"expo.out","stagger":0.1}, 8.27);
+tl.fromTo("#bk", {"opacity":0}, {"opacity":1,"duration":0.6,"ease":"power1.out"}, 8.53);
+tl.fromTo("#rule", {"scaleX":0}, {"scaleX":1,"duration":1.2,"ease":"power3.inOut"}, 0.2);
 
 window.__timelines["main"] = tl;
 tl.seek(0);
@@ -320,58 +416,121 @@ tl.seek(0);
 
 exports[`HTML HyperFrames — các mẫu mới (snapshot) > so_do_venn: dựng đủ, đúng thời lượng, escape chữ AI, khớp snapshot 1`] = `
 "<!doctype html>
-<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1280, height=720">
+<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=1920, height=1080">
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
 <link rel="stylesheet" href="assets/katex/katex.min.css">
-<style>
-@font-face{font-family:"Noto Sans";src:local("Noto Sans"),local("NotoSans-Regular")}
+<style>@font-face{font-family:"Inter";font-weight:400;font-style:normal;src:url("assets/fonts/Inter-Regular.ttf") format("truetype")}
+@font-face{font-family:"Inter";font-weight:600;font-style:normal;src:url("assets/fonts/Inter-SemiBold.ttf") format("truetype")}
+@font-face{font-family:"Inter";font-weight:700;font-style:normal;src:url("assets/fonts/Inter-Bold.ttf") format("truetype")}
+@font-face{font-family:"Source Serif 4";font-weight:400;font-style:normal;src:url("assets/fonts/SourceSerif4-Regular.ttf") format("truetype")}
+@font-face{font-family:"Source Serif 4";font-weight:600;font-style:normal;src:url("assets/fonts/SourceSerif4-SemiBold.ttf") format("truetype")}
+:root{--bg:#FDFCF9;--bgEdge:#FDFCF9;--surface:#FFFFFF;--sunken:#F5F2EA;--fill:#F5F2EA;--line:#E6DECC;--grid:#EEE8DC;--ink:#1C1B1A;--ink2:#3E3B37;--ink3:#6D645A;--accent:#2F5D8A;--accentSoft:#E8EEF5;--accentInk:#FFFFFF;--mark:#2F5D8A;--ok:#2B7A3B;--bad:#B42318;--p-lam:#2F5D8A;--p-lucLam:#0B7285;--p-xanhLa:#2B7A3B;--p-tim:#6F42C1;--p-doSon:#B42318;--p-vangDam:#8A6200;--p-hong:#B8336A;--p-cam:#B4530A;--ui:"Inter",sans-serif;--read:"Source Serif 4",serif}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:1280px;height:720px;overflow:hidden;background:#10142b}
-#root{position:absolute;inset:0;background:#10142b;font-family:"Noto Sans","DejaVu Sans",sans-serif;color:#f3f5ff}
-#tt{position:absolute;left:64px;right:64px;top:30px;font-size:38px;font-weight:700;color:#ffd166}
-.body{position:absolute;left:64px;right:64px;top:100px;bottom:48px;display:flex;flex-direction:column;justify-content:center;gap:18px}
-.line{font-size:36px;line-height:1.35;padding:12px 22px;border-left:6px solid #4f6bed;border-radius:6px;background:rgba(79,107,237,.12)}
-.flow{flex-direction:row;align-items:center;justify-content:center;gap:0}
-.box{width:180px;min-height:170px;padding:18px 14px;border-radius:14px;background:#1c2350;border:3px solid #4f6bed;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:10px}
-.box b{font-size:30px;color:#ffd166}.box span{font-size:22px;color:#c9d0ff}
-.arr{width:50px;height:40px;display:flex;align-items:center;justify-content:center}
-.row{display:grid;grid-template-columns:repeat(2,1fr);gap:0;font-size:30px;border-radius:8px;overflow:hidden}
-.row div{padding:14px 18px;border-bottom:1px solid #2c3470}
-.hd div{background:#4f6bed;font-weight:700;color:#fff}
-.rw div{background:rgba(79,107,237,.10)}
-.katex{font-size:1.05em}
-.vc{position:absolute;border-radius:50%}.vn{position:absolute;text-align:center;font-size:32px;font-weight:700}.vi{position:absolute;text-align:center;font-size:24px;line-height:1.2}</style></head><body>
-<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1280" data-height="720">
-<h1 id="tt" class="clip" data-start="0" data-duration="10" data-track-index="0">Tiêu đề &lt;b&gt;x&lt;/b&gt;</h1>
-<div id="ca" class="vc clip" style="left:265px;top:195px;width:410px;height:410px;background:rgba(86,180,233,.28);border:4px solid #56B4E9" data-start="0.4" data-duration="9.6" data-track-index="1"></div>
-<div id="cb" class="vc clip" style="left:605px;top:195px;width:410px;height:410px;background:rgba(230,159,0,.28);border:4px solid #E69F00" data-start="1.13" data-duration="8.87" data-track-index="2"></div>
-<div id="na" class="vn clip" style="left:320px;top:143px;width:300px;color:#56B4E9" data-start="1.87" data-duration="8.13" data-track-index="3">Số chẵn</div>
-<div id="nb" class="vn clip" style="left:660px;top:143px;width:300px;color:#E69F00" data-start="1.87" data-duration="8.13" data-track-index="4">Bội của 3</div>
-<div id="ng" class="vn clip" style="left:520px;top:617px;width:240px;color:#F0E442;font-size:26px" data-start="2.6" data-duration="7.4" data-track-index="5">Chia hết cho 6</div>
-<div id="ia0" class="vi clip" style="left:295px;width:200px;top:328px" data-start="3.33" data-duration="6.67" data-track-index="6">2</div>
-<div id="ia1" class="vi clip" style="left:295px;width:200px;top:380px" data-start="4.07" data-duration="5.93" data-track-index="7">4</div>
-<div id="ia2" class="vi clip" style="left:295px;width:200px;top:432px" data-start="4.8" data-duration="5.2" data-track-index="8">8</div>
-<div id="ib0" class="vi clip" style="left:785px;width:200px;top:328px" data-start="5.53" data-duration="4.47" data-track-index="9">3</div>
-<div id="ib1" class="vi clip" style="left:785px;width:200px;top:380px" data-start="6.27" data-duration="3.73" data-track-index="10">9</div>
-<div id="ib2" class="vi clip" style="left:785px;width:200px;top:432px" data-start="7" data-duration="3" data-track-index="11">15</div>
-<div id="ig0" class="vi clip" style="left:540px;width:200px;top:354px" data-start="7.73" data-duration="2.27" data-track-index="12">6</div>
-<div id="ig1" class="vi clip" style="left:540px;width:200px;top:406px" data-start="8.47" data-duration="1.53" data-track-index="13">12</div>
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+#root{position:absolute;inset:0;overflow:hidden;background:var(--bg);font-family:var(--ui);color:var(--ink);font-feature-settings:"cv11" 1;-webkit-font-smoothing:antialiased}
+#fig{position:absolute;inset:0}
+.meta{position:absolute;font-size:30px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);line-height:1}
+.eb{position:absolute;font-size:36px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);line-height:1}
+h1{position:absolute;font-family:var(--read);font-weight:600;line-height:1.16;color:var(--ink);text-wrap:balance;letter-spacing:-0.01em}
+h1 .kw{color:var(--accent)}
+.w{display:inline-block;white-space:pre}
+#rule{position:absolute;height:2px;background:var(--line);transform-origin:0 50%}
+.cap{position:absolute;font-size:42px;font-weight:500;line-height:1.3;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card{position:absolute;background:var(--surface);border:2px solid var(--line);border-left:6px solid var(--accent);border-radius:4px 12px 12px 4px;padding:22px 30px 24px;box-shadow:0 1px 2px rgb(28 27 26 / .04), 0 4px 14px rgb(28 27 26 / .05)}
+.card h3{font-size:40px;font-weight:600;color:var(--ink);line-height:1.25;margin-bottom:8px}
+.card p,.card .p{font-size:38px;line-height:1.4;color:var(--ink2)}
+.katex{font-size:1.06em}
+
+#vs{position:absolute;left:0;top:0;z-index:1}#vo{position:absolute;left:0;top:0;z-index:3}
+.vn{position:absolute;font-weight:600;line-height:1.15;white-space:nowrap;z-index:4}
+.vn .lt{font-family:var(--read);font-style:italic;font-weight:600;margin-right:14px}
+.vsub{position:absolute;z-index:4;white-space:nowrap;line-height:1.2;font-size:36px;font-weight:600;margin-top:8px;letter-spacing:.01em;color:#2B7A3B;padding-bottom:4px;background-image:linear-gradient(#2B7A3B,#2B7A3B);background-repeat:no-repeat;background-position:0 100%;background-size:0% 3px}
+.vi{position:absolute;z-index:2;text-align:center;font-size:36px;line-height:1.25;font-weight:500;color:var(--ink);text-wrap:balance}
+.vnum{position:absolute;z-index:4;font-size:48px;font-weight:700;text-align:center;width:200px;font-variant-numeric:tabular-nums}
+.vg{position:absolute;z-index:4;font-weight:600;color:#6F42C1;text-align:center;text-wrap:balance;line-height:1.2}
+.om{position:absolute;z-index:4;font-size:40px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
+.dr{display:flex;align-items:center;gap:18px;height:58px;font-size:40px;color:var(--ink)}
+.dr i{flex:none;width:14px;height:14px;border-radius:50%}
+.dr .katex{font-size:1em}
+.fx{display:flex;align-items:center;flex-wrap:wrap;column-gap:14px;row-gap:6px;font-size:48px;margin:8px 0 10px}
+.fx .katex{font-size:1em}
+#f3{display:inline-block;padding-bottom:6px;background-image:linear-gradient(#6F42C1,#6F42C1);background-repeat:no-repeat;background-position:0 100%;background-size:0% 3px}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+<div id="hm" class="meta" style="left:120px;top:64px">Sơ đồ Venn</div><div id="he" class="eb" style="left:120px;top:118px">Phần chung · phần riêng</div><h1 id="tt" style="left:120px;top:168px;width:686px;font-size:66px"><span class="w">Tiêu</span> <span class="w">đề</span> <span class="w">&lt;b&gt;x&lt;/b&gt;</span></h1>
+<div id="fig">
+<svg id="vs" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect id="om" x="972" y="150" width="828" height="750" rx="14" fill="#FFFFFF" stroke="#E6DECC" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+<circle id="caf" cx="1266" cy="545" r="200" fill="#2F5D8A" fill-opacity="0.12"/>
+<circle id="cbf" cx="1506" cy="545" r="200" fill="#2B7A3B" fill-opacity="0.12"/>
+<path id="lf" d="M1386,385 A200,200 0 0 1 1386,705 A200,200 0 0 1 1386,385 Z" fill="#6F42C1" fill-opacity="0.2"/>
+<circle id="ca" cx="1266" cy="545" r="200" fill="none" stroke="#2F5D8A" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 1266 545)"/>
+<circle id="cb" cx="1506" cy="545" r="200" fill="none" stroke="#2B7A3B" stroke-width="5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 1506 545)"/>
+<path id="ls" d="M1386,385 A200,200 0 0 1 1386,705 A200,200 0 0 1 1386,385 Z" fill="none" stroke="#6F42C1" stroke-width="5" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+<line id="gl" x1="1386" y1="715" x2="1386" y2="793" stroke="#6F42C1" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+</svg>
+<svg id="vo" width="1920" height="1080" viewBox="0 0 1920 1080">
+<path id="dim" fill-rule="evenodd" fill="#FFFFFF" fill-opacity="0.8" d="M974,152 h824 v746 h-824 Z M1306,545 a200,200 0 1 0 400,0 a200,200 0 1 0 -400,0 Z"/>
+<rect id="mo" x="972" y="150" width="828" height="750" rx="14" ry="14" fill="none" stroke="#2B7A3B" stroke-width="6"/>
+</svg>
+<div id="na" class="vn" style="right:558px;top:180px;font-size:44px;color:#2F5D8A;text-align:right;max-width:366px"><span class="lt">A</span><span style="color:var(--ink)">Số chẵn</span></div>
+<div id="nb" class="vn" style="left:1410px;top:180px;font-size:44px;color:#2B7A3B;max-width:366px"><span class="lt">B</span><span style="color:var(--ink)">Bội của 3</span></div>
+<div id="nbs" class="vsub"></div>
+<div id="ia0" class="vi" style="left:1086px;width:200px;top:470px">2</div>
+<div id="ia1" class="vi" style="left:1086px;width:200px;top:522px">4</div>
+<div id="ia2" class="vi" style="left:1086px;width:200px;top:574px">8</div>
+<div id="ib0" class="vi" style="left:1486px;width:200px;top:470px">3</div>
+<div id="ib1" class="vi" style="left:1486px;width:200px;top:522px">9</div>
+<div id="ib2" class="vi" style="left:1486px;width:200px;top:574px">15</div>
+<div id="ig0" class="vi" style="left:1318px;width:136px;top:496px">6</div>
+<div id="ig1" class="vi" style="left:1318px;width:136px;top:548px">12</div>
+<div id="ng" class="vg" style="left:1126px;width:520px;top:799px;font-size:40px">Chia hết cho 6</div>
+<div id="omg" class="om" style="left:1002px;top:172px;font-size:46px"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Ω</span></span></span></span></div>
+<div id="k1" class="card" style="left:120px;top:283px;width:686px"><h3>Các vùng</h3><div id="r0" class="dr"><i style="background:#2F5D8A"></i><span>Chỉ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span></span></div><div id="r1" class="dr"><i style="background:#2B7A3B"></i><span>Chỉ <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></span></div><div id="r2" class="dr"><i style="background:#6F42C1"></i><span>Cả hai</span></div></div>
+<div id="k2" class="card" style="left:120px;top:583px;width:686px;border-left-color:#6F42C1"><h3>Ý chính</h3><div class="fx"><span id="f1"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∩</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span> <span style="font-weight:600;color:#6F42C1">= { 6, 12 }</span></span></div><div id="f3" class="p">Phần chung thuộc cả <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span> và <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></div></div>
+</div>
+<div id="rule" style="left:120px;top:936px;width:1680px"></div>
 </div>
 <script>
 const tl = gsap.timeline({ paused: true });
-tl.fromTo("#ca", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 0.4);
-tl.fromTo("#cb", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 1.13);
-tl.fromTo("#na", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 1.87);
-tl.fromTo("#nb", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 1.87);
-tl.fromTo("#ng", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 2.6);
-tl.fromTo("#ia0", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 3.33);
-tl.fromTo("#ia1", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 4.07);
-tl.fromTo("#ia2", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 4.8);
-tl.fromTo("#ib0", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 5.53);
-tl.fromTo("#ib1", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 6.27);
-tl.fromTo("#ib2", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 7);
-tl.fromTo("#ig0", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 7.73);
-tl.fromTo("#ig1", { opacity: 0, scale: 0.9 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.45, ease: "power3.out" }, 8.47);
+tl.fromTo("#hm", {"opacity":0}, {"opacity":1,"duration":0.6,"ease":"power1.out"}, 0.05);
+tl.fromTo("#he", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 0.15);
+tl.fromTo("#tt .w", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.7,"ease":"expo.out","stagger":0.06}, 0.3);
+tl.fromTo("#om", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":1.02,"ease":"power2.inOut"}, 0.8);
+tl.fromTo("#omg", {"opacity":0}, {"opacity":1,"duration":0.6,"ease":"power1.out"}, 1.23);
+tl.fromTo("#k1", {"opacity":0,"y":18}, {"opacity":1,"y":0,"duration":0.7,"ease":"expo.out"}, 1.65);
+tl.fromTo("#mo", {"opacity":0}, {"opacity":0,"duration":0.01}, 0);
+tl.fromTo("#dim", {"opacity":0}, {"opacity":0,"duration":0.01}, 0);
+tl.fromTo("#nbs", {"opacity":0}, {"opacity":0,"duration":0.01}, 0);
+tl.fromTo("#ca", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.67,"ease":"power2.inOut"}, 2.08);
+tl.fromTo("#caf", {"opacity":0}, {"opacity":1,"duration":0.67}, 2.34);
+tl.fromTo("#na .w", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out","stagger":0.05}, 2.64);
+tl.fromTo("#na", {"opacity":0}, {"opacity":1,"duration":0.3}, 2.64);
+tl.fromTo("#r0", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 3.19);
+tl.fromTo("#ia0", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 3.19);
+tl.fromTo("#ia1", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 3.34);
+tl.fromTo("#ia2", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 3.49);
+tl.fromTo("#cb", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.67,"ease":"power2.inOut"}, 3.75);
+tl.fromTo("#cbf", {"opacity":0}, {"opacity":1,"duration":0.67}, 4.01);
+tl.fromTo("#nb", {"opacity":0,"y":12}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 4.31);
+tl.fromTo("#r1", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 4.86);
+tl.to("#r0", {"opacity":0.65,"duration":0.5}, 4.86);
+tl.fromTo("#ib0", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 4.86);
+tl.fromTo("#ib1", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 5.01);
+tl.fromTo("#ib2", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 5.16);
+tl.fromTo("#lf", {"opacity":0}, {"opacity":1,"duration":0.6}, 5.41);
+tl.fromTo("#ls", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.36,"ease":"power2.inOut"}, 5.41);
+tl.fromTo("#gl", {"strokeDashoffset":1}, {"strokeDashoffset":0,"duration":0.5,"ease":"power2.inOut"}, 5.86);
+tl.fromTo("#ng", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 6.11);
+tl.fromTo("#r2", {"opacity":0,"y":14}, {"opacity":1,"y":0,"duration":0.6,"ease":"expo.out"}, 6.31);
+tl.to("#r1", {"opacity":0.65,"duration":0.5}, 6.31);
+tl.fromTo("#ig0", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 6.31);
+tl.fromTo("#ig1", {"opacity":0,"y":10}, {"opacity":1,"y":0,"duration":0.5,"ease":"expo.out"}, 6.46);
+tl.fromTo("#ls", {"strokeWidth":5}, {"strokeWidth":9,"duration":0.6}, 7.21);
+tl.fromTo("#lf", {"fillOpacity":0.2}, {"fillOpacity":0.34,"duration":0.6}, 7.21);
+tl.fromTo("#k2", {"opacity":0,"x":-36}, {"opacity":1,"x":0,"duration":0.8,"ease":"expo.out"}, 7.81);
+tl.fromTo("#f3", {"opacity":0}, {"opacity":1,"duration":0.6}, 8.4);
+tl.fromTo("#rule", {"scaleX":0}, {"scaleX":1,"duration":1.2,"ease":"power3.inOut"}, 0.2);
 
 window.__timelines["main"] = tl;
 tl.seek(0);

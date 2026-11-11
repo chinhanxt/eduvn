@@ -7,6 +7,7 @@ import type { Db } from "../db/client";
 import { type BookBlock, type TutorCitation, tutorBookPages, tutorBooks } from "../db/schema";
 import { assertCan } from "../domain/authz";
 import { citedNumbers } from "../domain/tutorSearch";
+import { dedupeHeadings, headingsOf } from "../domain/bookBlocks";
 import { NotFoundError, ValidationError } from "../errors";
 import { type Ai, parseAiJson } from "../services/ai";
 import type { Actor, KbService } from "./kb";
@@ -97,7 +98,11 @@ export function createBookService(deps: { db: Db; ai: Ai; kb: KbService }) {
     const cites: TutorCitation[] = kb.toCitations(hits);
     const evidence = hits.map((h, i) => `[${i + 1}] (${h.doc}, trang ${h.page}) ${h.text}`).join("\n\n");
     const objectives = page.objectives.map((o) => `- ${o}`).join("\n") || "- (chưa nêu)";
-    const header = `Chương: ${page.title}\nTóm tắt: ${page.summary}\nMục tiêu:\n${objectives}`;
+    // chương trước đã học: đưa tóm tắt vào prompt để không giảng lại
+    const prev = await db.select({ idx: tutorBookPages.idx, title: tutorBookPages.title, summary: tutorBookPages.summary }).from(tutorBookPages).where(eq(tutorBookPages.bookId, book.id)).orderBy(asc(tutorBookPages.idx));
+    const before = prev.filter((p) => p.idx < page.idx).map((p) => `${p.idx + 1}. ${p.title}${p.summary ? ` — ${p.summary}` : ""}`).join("\n");
+    const after = prev.filter((p) => p.idx > page.idx).map((p) => `${p.idx + 1}. ${p.title}`).join("\n");
+    const header = `Chương: ${page.title}\nTóm tắt: ${page.summary}\nMục tiêu:\n${objectives}${before ? `\n\nCác chương TRƯỚC (em đã học — không giảng lại, chỉ nhắc một câu khi cần):\n${before}` : ""}${after ? `\n\nCác chương SAU (sẽ học — không giảng trước nội dung của chúng):\n${after}` : ""}`;
 
     let plan: Planned[];
     try {
@@ -115,8 +120,12 @@ export function createBookService(deps: { db: Db; ai: Ai; kb: KbService }) {
     if (!plan.length) plan = defaultPlan(page);
 
     const used = (md: string) => cites.filter((c) => citedNumbers(md).includes(c.n));
-    const write = async (b: Planned): Promise<BookBlock | null> => {
-      const user = `${header}\nTrọng tâm khối: ${b.focus}`;
+    // dàn ý cả trang: mỗi khối chỉ viết đúng phần của mình, không lặp ý/tiêu đề của khối khác
+    const outlineText = plan.map((x, i) => `${i + 1}. [${x.type}] ${x.focus}`).join("\n");
+    const usedHeadings: string[] = [];
+    const write = async (b: Planned, k: number): Promise<BookBlock | null> => {
+      const taken = usedHeadings.length ? `\nTiêu đề tiểu mục ĐÃ dùng ở các khối trước (không dùng lại, không giảng lại các ý đó): ${usedHeadings.map((h) => `"${h}"`).join(", ")}` : "";
+      const user = `${header}\n\nDàn ý trang (${plan.length} khối):\n${outlineText}\nBạn đang viết khối số ${k + 1}. Chỉ viết đúng trọng tâm của khối này; các khối khác đã/ sẽ lo phần còn lại — không lặp định nghĩa, công thức, ví dụ hay tiêu đề của khối khác.${taken}\nTrọng tâm khối: ${b.focus}`;
       const lead = b.transition ? `*${b.transition}*\n\n` : "";
       switch (b.type) {
         case "section": {
@@ -160,11 +169,15 @@ export function createBookService(deps: { db: Db; ai: Ai; kb: KbService }) {
     };
 
     // Viết lần lượt theo nhóm 3 để giữ thứ tự mà vẫn song song.
-    const blocks: BookBlock[] = [];
+    let blocks: BookBlock[] = [];
     for (let i = 0; i < plan.length; i += 3) {
-      const done = await Promise.all(plan.slice(i, i + 3).map((b) => write(b).catch(() => null)));
-      for (const d of done) if (d) blocks.push(d);
+      const done = await Promise.all(plan.slice(i, i + 3).map((b, j) => write(b, i + j).catch(() => null)));
+      for (const d of done) if (d) {
+        blocks.push(d);
+        if (d.markdown) usedHeadings.push(...headingsOf(d.markdown));
+      }
     }
+    blocks = dedupeHeadings(blocks, page.title).blocks;
     if (!blocks.some((b) => b.type === "section")) throw new ValidationError(["AI chưa viết được nội dung chương, hãy thử biên soạn lại"]);
     await db.update(tutorBookPages).set({ blocks, status: "ready", updatedAt: new Date() }).where(eq(tutorBookPages.id, page.id));
     await db.update(tutorBooks).set({ updatedAt: new Date() }).where(eq(tutorBooks.id, book.id));

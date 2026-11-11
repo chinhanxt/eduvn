@@ -158,12 +158,13 @@ td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middl
 .ail-opt.ok { background: #e7f7ee; border-color: #12b76a; }
 .ail-opt.bad { background: #fdecec; border-color: #f04438; }
 .ail-an { margin: 6px 0 0 12px; color: var(--muted); font-size: 13px; }
-.ail-sub { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); max-width: 88%; background: rgba(0,0,0,.62); color: #fff; padding: 5px 14px; border-radius: 8px; font-size: 16px; text-align: center; pointer-events: none; }
 .ail-ctrl { display: flex; align-items: center; gap: 8px; max-width: 1040px; margin: 12px 0; }
 .ail-cnt { color: var(--muted); font-size: 13px; }
 .ail-cc { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--muted); }
-.ail-thumbs { display: flex; gap: 8px; flex-wrap: wrap; max-width: 1040px; }
-.ail-th { display: grid; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 12px; min-width: 150px; max-width: 220px; font-size: 13px; }
+.ail-band { max-width: 1040px; min-height: calc(2 * 1.4em + 16px); margin-top: 8px; padding: 8px 18px; display: flex; align-items: center; justify-content: center; text-align: center; background: #0d1024; color: #fff; border-radius: 10px; font-size: 16px; line-height: 1.4; }
+.ail-thumbs { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; max-width: 1040px; padding: 2px 2px 8px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.ail-th { flex: 0 0 176px; display: grid; gap: 2px; align-content: start; text-align: left; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 8px 12px; font-size: 13px; scroll-snap-align: start; }
+.ail-q ul.bl { margin: 4px 0 4px 6px; padding-left: 1.2em; } .ail-q .tail { display: block; }
 .ail-th span { font-weight: 600; color: var(--brand); }
 .ail-th small { color: var(--muted); }
 .ail-th.on { border-color: var(--brand); box-shadow: 0 0 0 2px var(--blue-bg); }

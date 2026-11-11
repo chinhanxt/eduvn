@@ -186,7 +186,7 @@ describe.skipIf(!existsSync(MANIM) || process.env.EDUVN_SKIP_RENDER === "1")("d�
     expect(Date.now() - t1).toBeLessThan(first / 2);
   });
 
-  it.each(["vecto", "hinh_khong_gian_xoay", "bieu_do_so_lieu", "cay_xac_suat"])("mẫu mới %s dựng thật (thấp) đúng thời lượng", { timeout: 400_000 }, async (id) => {
+  it.each(["vecto", "hinh_khong_gian_xoay", "bieu_do_so_lieu", "cay_xac_suat", "do_thi_ham_so", "vong_tron_luong_giac"])("mẫu mới %s dựng thật (thấp) đúng thời lượng", { timeout: 400_000 }, async (id) => {
     const c = CATALOG.find((x) => x.id === id);
     const r = await real().render({ template: id, thoiLuong: 5, params: c?.viDu });
     expect(Math.abs(probe(r.file) - 5)).toBeLessThan(0.3);

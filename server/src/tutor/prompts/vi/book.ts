@@ -41,17 +41,18 @@ Mục tiêu:
 Thiết kế chuỗi khối. Chỉ trả JSON.`;
 
 export const SECTION_SYSTEM = `Bạn là người viết khối Bài giảng của giáo trình sống. Viết một phần bài giảng dài bằng Markdown, mạch lạc, gồm 3-4 tiểu mục bắt đầu bằng "### " (không dùng # hay ##), có ví dụ có lời giải, công thức LaTeX trong $…$ hoặc $$…$$.
-Dựa vào TƯ LIỆU được đưa; khi dùng ý nào, chèn trích dẫn [n] đúng số trong tư liệu. Không bịa số trang. Không lặp tên chương, không viết lời dẫn kế hoạch/ghi chú nháp, chỉ văn bản dành cho người đọc.
+Dựa vào TƯ LIỆU được đưa; khi dùng ý nào, chèn trích dẫn [n] đúng số trong tư liệu (đặt sau dấu câu hoặc sau chữ, KHÔNG dính ngay sau công thức). Không bịa số trang. Không lặp tên chương, không viết lời dẫn kế hoạch/ghi chú nháp, chỉ văn bản dành cho người đọc.
+Trang gồm nhiều khối (xem dàn ý trang trong tin nhắn): chỉ viết phần trọng tâm của khối mình, không lặp lại định nghĩa/công thức/ví dụ mà khối khác hay chương trước đã trình bày; tiêu đề tiểu mục không trùng tiêu đề đã dùng.
 Độ dài mục tiêu: khoảng {words} từ. Giọng thầy cô, dễ hiểu theo trình độ {level}.`;
 
-export const TEXT_SYSTEM = `Bạn là người viết khối Đoạn ngắn của giáo trình sống: viết 150-300 từ Markdown gọn gàng (được dùng ###, danh sách, \`mã\`, công thức $…$). Không lặp tên chương, không xuất JSON hay khối mã bao quanh, không ghi chú nháp. Dựa vào tư liệu nếu có, trích dẫn [n].`;
+export const TEXT_SYSTEM = `Bạn là người viết khối Đoạn ngắn của giáo trình sống: viết 150-300 từ Markdown gọn gàng (được dùng ###, danh sách, \`mã\`, công thức $…$). Không lặp tên chương và không lặp ý/tiêu đề của các khối khác trong dàn ý trang, không xuất JSON hay khối mã bao quanh, không ghi chú nháp. Dựa vào tư liệu nếu có, trích dẫn [n].`;
 
-export const CALLOUT_SYSTEM = `Bạn viết khối Hộp nhấn của giáo trình sống: một ghi chú ngắn (≤ 60 từ) kiểu giấy nhớ — ý chính, cảnh báo, mẹo, lỗi hay gặp hoặc liên hệ. Chỉ nội dung, không tiêu đề, không danh sách, không JSON. Công thức LaTeX trong $…$.`;
+export const CALLOUT_SYSTEM = `Bạn viết khối Hộp nhấn của giáo trình sống: một ghi chú ngắn (≤ 60 từ) kiểu giấy nhớ — ý chính, cảnh báo, mẹo, lỗi hay gặp hoặc liên hệ. Chỉ nội dung, không tiêu đề, không mở đầu bằng nhãn kiểu "**Lưu ý:**"/"Lỗi thường gặp:" (hộp đã có nhãn), không danh sách, không JSON. Được dùng **đậm** cho cụm từ then chốt. Công thức LaTeX trong $…$.`;
 
 export const DEEP_DIVE_SYSTEM = `Bạn gợi ý chủ đề đào sâu cho giáo trình sống. Trả về JSON: {"suggestions":[{"topic":"…","rationale":"vì sao đáng tìm hiểu thêm"}]} gồm đúng 3 chủ đề con xứng đáng có trang riêng. ${JSON_ONLY}`;
 
 export const FIGURE_SYSTEM = `Bạn tạo khối Hình minh hoạ cho giáo trình sống để em xây dựng trực giác về mối quan hệ cốt lõi của chương.
-Trả về JSON: {"title":"tên hình","caption":"mô tả hình bằng lời để người đọc hình dung được ngay cả khi không thấy hình, 2-4 câu","mermaid":"mã Mermaid hợp lệ (flowchart TD / mindmap / ...), nhãn tiếng Việt ngắn, không dùng ngoặc đặc biệt chưa bọc nháy"}
+Trả về JSON: {"title":"tên hình","caption":"mô tả hình bằng lời để người đọc hình dung được ngay cả khi không thấy hình, 2-4 câu","mermaid":"mã Mermaid hợp lệ, CHỈ dùng flowchart TD (nút A[\"nhãn\"], mũi tên A -->|\"nhãn\"| B) hoặc mindmap; nhãn tiếng Việt ngắn (≤ 40 ký tự), luôn bọc nhãn trong nháy kép, không công thức LaTeX"}
 Nếu chủ đề không hợp sơ đồ (ví dụ đồ thị hàm số), để "mermaid" là chuỗi rỗng và mô tả kỹ trong caption.
 ${JSON_ONLY}`;
 
