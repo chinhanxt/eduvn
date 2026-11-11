@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const user = { current: { access_token: "tok-gv", expired: false } as { access_token: string; expired: boolean } | null };
-vi.mock("../src/auth", () => ({ userManager: { getUser: async () => user.current, removeUser: async () => undefined } }));
+vi.mock("../src/auth", () => ({ userManager: { getUser: async () => user.current, removeUser: async () => undefined }, readStoredUser: () => null, getUserManager: async () => ({}) }));
 
 const store = new Map<string, string>();
 globalThis.localStorage = {
