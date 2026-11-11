@@ -18,7 +18,7 @@ export type El =
   | { t: "poly"; ids: string[]; pts: [number, number][] }
   | { t: "circle"; ids: string[]; cx: number; cy: number; r: number; fill?: boolean }
   | { t: "rect"; ids: string[]; x: number; y: number; w: number; h: number; rx: number }
-  | { t: "text"; ids: string[]; x: number; y: number; text: string; size: number; anchor?: "start" | "middle" | "end"; role?: "label" | "node" | "axis" };
+  | { t: "text"; ids: string[]; x: number; y: number; text: string; size: number; anchor?: "start" | "middle" | "end"; role?: "label" | "node" | "axis" | "point" };
 
 export type FigureModel = {
   viewBox: [number, number, number, number];
@@ -64,6 +64,8 @@ function solidModel(f: Extract<Figure, { kind: "solid3d" }>): FigureModel {
 /** Lớp tô sáng hình không gian: điểm "S", đoạn "S-A", mặt "S-B-C" (tên theo spec). Phần tử không có trên hình bị bỏ qua. */
 export function solidOverlay(scene: Scene, refs: string[]): El[] {
   const out: El[] = [];
+  const dots: El[] = [];
+  const named = new Set<string>(); // mỗi điểm chỉ một chấm + một nhãn dù nằm trong nhiều refs
   const P = (n: string) => scene.points.get(n) ?? scene.points.get(n.replace(/′/g, "'"));
   for (const ref of refs) {
     const names = ref.split("-").filter(Boolean);
@@ -73,13 +75,16 @@ export function solidOverlay(scene: Scene, refs: string[]): El[] {
     if (q.length >= 3) out.push({ t: "poly", ids: [ref], pts: q });
     else if (q.length === 2) out.push({ t: "line", ids: [ref], x1: q[0]![0], y1: q[0]![1], x2: q[1]![0], y2: q[1]![1] });
     for (const n of names) {
+      if (named.has(n)) continue;
+      named.add(n);
       const p = P(n)!;
-      out.push({ t: "circle", ids: [ref], cx: p[0], cy: p[1], r: 3.6, fill: true });
+      dots.push({ t: "circle", ids: [ref], cx: p[0], cy: p[1], r: 3.6, fill: true });
       const l = scene.labels.find((x) => x.kind === "point" && x.name === n);
-      if (l) out.push({ t: "text", ids: [ref], x: l.x, y: l.y + 17 * 0.34, text: l.text, size: 17, anchor: "middle", role: "label" });
+      if (l) dots.push({ t: "text", ids: [ref], x: l.x, y: l.y + 17 * 0.34, text: l.text, size: 17, anchor: "middle", role: "point" });
     }
   }
-  return out;
+  // nét/mặt trước, chấm + nhãn điểm sau (nhãn không bị nét tô sáng đè)
+  return [...out, ...dots];
 }
 
 // ——— đồ thị ———
@@ -354,7 +359,7 @@ function elSvg(e: El, h: "hl" | "dim" | null): string {
     case "rect":
       return `<rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" rx="${e.rx}" fill="${h === "hl" ? "#fff1e8" : "#ffffff"}" stroke="${stroke}" stroke-width="${sw(1.4)}"${op}/>`;
     case "text":
-      return `<text x="${e.x}" y="${e.y}" font-size="${e.size}" text-anchor="${e.anchor ?? "middle"}" font-family="${e.role === "label" || e.role === "axis" ? "'Source Serif 4', Georgia, serif" : "Inter, system-ui, sans-serif"}"${e.role === "label" || e.role === "axis" ? ' font-style="italic"' : ""} fill="${h === "hl" ? ACCENT : e.role === "axis" ? "#646c80" : INK}"${h === "hl" ? ' font-weight="700"' : ""}${op}>${xesc(e.text)}</text>`;
+      return `<text x="${e.x}" y="${e.y}" font-size="${e.size}" text-anchor="${e.anchor ?? "middle"}" font-family="${e.role === "point" ? "'Times New Roman', Times, serif" : e.role === "label" || e.role === "axis" ? "'Source Serif 4', Georgia, serif" : "Inter, system-ui, sans-serif"}"${e.role === "label" || e.role === "axis" ? ' font-style="italic"' : ""} fill="${h === "hl" ? ACCENT : e.role === "axis" ? "#646c80" : INK}"${h === "hl" ? ' font-weight="700"' : ""}${op}>${xesc(e.text)}</text>`;
   }
 }
 export { elSvg };

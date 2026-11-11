@@ -16,3 +16,25 @@ const N_CMDS = /^(?:ne|neq|nabla|natural|nu|ni|not|notin|neg|nexists|nleq|ngeq|n
 export function fixEscapes(s: string): string {
   return s.replace(/\\n/g, (m, at: number, all: string) => (all[at - 1] === "\\" || N_CMDS.test(all.slice(at + 1)) ? m : "\n"));
 }
+
+/** Công thức → chữ đọc được (thẻ meta/OG, mô tả, máy quét): $\frac{a}{b}$ → a/b, \sqrt{2} → √2, \int_1^e → ∫(1→e)… */
+export function texToText(s: string): string {
+  let t = fixEscapes(s).replace(/\$\$?([^$]*)\$\$?/g, (_, m: string) => {
+    let x = m;
+    for (let k = 0; k < 3; k++) x = x.replace(/\\[dt]?frac\{([^{}]*)\}\{([^{}]*)\}/g, "($1)/($2)").replace(/\\sqrt\{([^{}]*)\}/g, "√($1)");
+    return x
+      .replace(/\((\w+)\)\//g, "$1/")
+      .replace(/\/\((\w+)\)/g, "/$1")
+      .replace(/√\((\w+)\)/g, "√$1")
+      .replace(/\\int_\{?([^}\s^]+)\}?\^\{?([^}\s]+)\}?/g, "∫[$1→$2]")
+      .replace(/\\(displaystyle|left|right|limits|,|;|!|quad)/g, " ")
+      .replace(/\\cdot|\\times/g, "·")
+      .replace(/\\(le|leq)\b/g, "≤").replace(/\\(ge|geq)\b/g, "≥").replace(/\\(ne|neq)\b/g, "≠")
+      .replace(/\\perp/g, "⊥").replace(/\\pi/g, "π").replace(/\\infty/g, "∞").replace(/\\in\b/g, "∈")
+      .replace(/\\(ln|log|sin|cos|tan|int|lim)/g, "$1 ").replace(/\\circ/g, "°")
+      .replace(/\^\{?2\}?/g, "²").replace(/\^\{?3\}?/g, "³")
+      .replace(/\\[a-zA-Z]+/g, "").replace(/[{}]/g, "");
+  });
+  t = t.replace(/[*_#`>]/g, "").replace(/\s+/g, " ").trim();
+  return t.replace(/\s+([.,;:)])/g, "$1");
+}

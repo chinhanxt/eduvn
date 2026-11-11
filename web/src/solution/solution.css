@@ -3,7 +3,7 @@
    viền sợi tóc, bo nhỏ, màu tiết chế; một màu nhấn theo cổng (--sol-accent), một màu tô sáng hình (--fig-hl).
    Mọi luật nằm dưới tiền tố .sol-* để không đụng khung chung. */
 
-.sol-scope, .sol-viewer, .sol-sheet-wrap {
+.sol-scope, .sol-viewer, .sol-sheet-wrap, .sol-dlg-wrap, .sol-toast, .sol-chat-card, .sol-hs {
   --sol-ui: "Inter", "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
   --sol-read: "Source Serif 4", "Noto Serif", Georgia, serif;
   --sol-ink: #121826; --sol-ink-2: #4a5266; --sol-ink-3: #646c80;
@@ -17,7 +17,7 @@
 }
 .sol-hoc { --sol-accent: #0b7466; --sol-accent-bg: #e6f3f1; --sol-accent-line: #b5dcd6; }
 @media (prefers-reduced-motion: reduce) {
-  .sol-scope, .sol-viewer, .sol-sheet-wrap { --sol-d2: 1ms; --sol-d3: 1ms; --sol-d4: 1ms; }
+  .sol-scope, .sol-viewer, .sol-sheet-wrap, .sol-dlg-wrap { --sol-d2: 1ms; --sol-d3: 1ms; --sol-d4: 1ms; }
 }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -116,6 +116,8 @@
 .sol-svg text.label { font-family: var(--sol-read); font-style: italic; }
 .sol-svg text.axis { fill: var(--sol-ink-3); font-style: italic; font-family: var(--sol-read); }
 .sol-svg text.node { stroke: none; }
+/* nhãn điểm hình không gian: cùng phông với nét SGK bên dưới để phủ khít nhãn mờ */
+.sol-svg text.point { font-family: "Times New Roman", Times, serif; font-style: normal; }
 .sol-svg text.sol-el.hl { fill: var(--fig-hl); font-weight: 600; }
 /* lớp tô sáng hình không gian xuất hiện mượt khi đổi bước */
 .sol-solid ~ .sol-el { animation: sol-in var(--sol-d4) var(--sol-ease) both; }
@@ -269,6 +271,10 @@ h3 .sol-skel-line { display: inline-block; width: 40%; margin: 0; vertical-align
 .sol-card-meta .t { font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
 .sol-card h2 { margin: 8px 0 10px; font: 400 17px/27px var(--sol-read); color: var(--sol-ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: color var(--sol-d2); }
 .sol-card-foot { display: flex; align-items: center; gap: 12px; font: 13px/20px var(--sol-ui); color: var(--sol-ink-2); }
+.sol-card-foot .ans .sol-k { font-size: 15px; }
+/* thanh trên thư viện dính 56 px: hình dính ngay dưới nó */
+.sol-lib .sol-fig { top: 80px; }
+.sol-lib .sol-nums { top: 56px; }
 .sol-card-foot .ans { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sol-mini { display: inline-flex; align-items: center; gap: 4px; font: 600 12px/1 var(--sol-ui); }
 .sol-mini.sol-verified { color: var(--sol-ok); background: none; } .sol-mini.sol-mismatch { color: var(--sol-danger); background: none; } .sol-mini.sol-unchecked { color: var(--sol-ink-3); background: none; border: 0; }
@@ -278,6 +284,7 @@ h3 .sol-skel-line { display: inline-block; width: 40%; margin: 0; vertical-align
 .sol-crumb { display: inline-flex; align-items: center; gap: 4px; color: var(--sol-ink-2); text-decoration: none; font-size: 13px; margin-bottom: 20px; }
 .sol-crumb:hover { color: var(--sol-ink); }
 .sol-detail-foot { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--sol-line); display: flex; flex-wrap: wrap; gap: 8px 24px; color: var(--sol-ink-3); font-size: 13px; }
+@media (max-width: 900px) { .sol-lib .sol-fig { top: 56px; } }
 @media (max-width: 720px) {
   .sol-lib-main { padding-top: 24px; }
   .sol-lib-hero h1 { font-size: 28px; line-height: 36px; }

@@ -8,6 +8,7 @@ import { createSolutionService } from "../../services/solutions";
 import type { Tutor } from "../../tutor";
 import { parseOverrides, withTaskOverrides } from "../../tutor/tasks";
 import type { Actor } from "../../service";
+import { texToText } from "../../../../web/src/solution/context";
 
 export type SolutionRouteCtx = {
   db: Db;
@@ -62,7 +63,7 @@ const StepHint = z.object({
 
 const Id = (req: FastifyRequest) => z.uuid({ message: "Mã lời giải không hợp lệ" }).parse((req.params as { id: string }).id);
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-const plain = (s: string) => s.replace(/\$([^$]*)\$/g, "$1").replace(/[*_#`>]/g, "").replace(/\s+/g, " ").trim();
+const plain = texToText;
 
 export function registerSolutionRoutes(app: FastifyInstance, ctx: SolutionRouteCtx) {
   const svc = createSolutionService(ctx.db, withTaskOverrides(ctx.ai, parseOverrides(process.env.AI_TASK_OVERRIDES)));

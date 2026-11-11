@@ -2,7 +2,7 @@
 // (kiểm như test P10: khung chữ không chạm nhau và không đè nút), lời nhắn "Chưa hiểu bước này" đủ ngữ cảnh.
 import { describe, expect, it } from "vitest";
 import fixtures from "../../server/tests/fixtures/dung-hinh.json";
-import { fixEscapes, stuckMessage } from "../src/solution/context";
+import { fixEscapes, stuckMessage, texToText } from "../src/solution/context";
 import { compilePlain, plainNumber } from "../src/solution/expr";
 import { type Box, type FigureModel, boxesHit, buildFigureModel, dedupeAngleMarks, figureSvg, highlightOf, knownRefs, solidOverlay } from "../src/solution/figure";
 import type { Figure } from "../src/solution/types";
@@ -92,6 +92,9 @@ describe("tô sáng đúng refs của bước", () => {
     expect(knownRefs(m, ["S-C", "A-B-C-D", "S-Z", "Q"])).toEqual(["S-C", "A-B-C-D"]);
     const seg = solidOverlay(m.solid!.scene, ["S-C"]);
     expect(seg.map((e) => e.t)).toEqual(["line", "circle", "text", "circle", "text"]);
+    // điểm chung của nhiều refs chỉ một nhãn (không chồng nhãn C lên nhau)
+    const two = solidOverlay(m.solid!.scene, ["S-C", "A-C"]);
+    expect(two.filter((e) => e.t === "text").map((e) => (e.t === "text" ? e.text : ""))).toEqual(["S", "C", "A"]);
     expect(seg.filter((e) => e.t === "text").map((e) => (e.t === "text" ? e.text : ""))).toEqual(["S", "C"]);
     const face = solidOverlay(m.solid!.scene, ["A-B-C-D"]);
     expect(face[0]!.t).toBe("poly");
@@ -199,5 +202,14 @@ describe("sửa lỗi hay gặp ở lời giải AI thật (chạy thật 2026-1
     const m = buildFigureModel({ kind: "solid3d", spec });
     expect(m.solid!.scene.labels.filter((l) => l.kind === "angle")).toHaveLength(1);
     expectNoOverlap(m.labels, "chóp có góc");
+  });
+});
+
+describe("công thức → chữ cho thẻ meta/OG", () => {
+  it("tích phân, phân số, căn, nhân", () => {
+    expect(texToText("Tính tích phân $I = \\displaystyle\\int_1^e \\frac{\\ln x}{x}\\,dx$.")).toBe("Tính tích phân I = ∫[1→e] (ln x)/x dx.");
+    expect(texToText("Giải $4^x - 6\\cdot 2^x + 8 = 0$")).toBe("Giải 4^x - 6· 2^x + 8 = 0");
+    expect(texToText("$SA = a\\sqrt{2}$, $SA \\perp (ABC)$")).toBe("SA = a√2, SA ⊥ (ABC)");
+    expect(texToText("Đáp số **3/8**")).toBe("Đáp số 3/8");
   });
 });

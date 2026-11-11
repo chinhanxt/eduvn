@@ -5,6 +5,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import { errText } from "../api";
 import { useAuth } from "../auth";
 import { type PublicList, type PublicSolution, publicList, publicSolution, staffHint } from "./api";
+import { texToText } from "./context";
 import { ensureFonts } from "./fonts";
 import { TexText } from "./Rich";
 import { copyText, shareUrl, useToast } from "./SolutionDialog";
@@ -13,7 +14,7 @@ import { STATUS_TEXT, type VerifyStatus } from "./types";
 import "./solution.css";
 
 const vnNum = (n: number) => n.toLocaleString("vi-VN");
-const plain = (s: string) => s.replace(/\$([^$]*)\$/g, "$1").replace(/[*_#`>]/g, "").replace(/\s+/g, " ").trim();
+const plain = texToText;
 
 function Top() {
   return (
@@ -153,7 +154,7 @@ export function SolutionLibrary() {
                     <span className="t">{it.topic || it.subject}</span>
                     <span>{vnNum(it.views)} lượt xem</span>
                   </div>
-                  <h2>{plain(it.problem)}</h2>
+                  <h2><TexText value={it.problem} /></h2>
                   <div className="sol-card-foot">
                     <span className="ans">Đáp số: <TexText value={asTex(it.answer)} /></span>
                     <Mini s={it.status} />
