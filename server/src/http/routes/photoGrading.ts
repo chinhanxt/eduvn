@@ -14,6 +14,7 @@ export function registerPhotoGradingRoutes(app: FastifyInstance, { photo, authen
     return reply.code(204).send();
   });
   app.post<{ Params: { id: string } }>("/api/photo/results/:id/gradebook", async (req) => photo.toGradebook(await authenticate(req), req.params.id, req.body));
+  app.get<{ Params: { id: string } }>("/api/photo/classes/:id/roster", async (req) => photo.roster(await authenticate(req), req.params.id));
   app.post("/api/photo/omr", async (req, reply) => reply.code(201).send(await photo.saveOmr(await authenticate(req), req.body)));
   app.get<{ Params: { id: string } }>("/api/photo/exams/:id/essays", async (req) => photo.essaysOf(await authenticate(req), req.params.id));
   app.post("/api/photo/essay/transcribe", BIG, async (req) => photo.transcribe(await authenticate(req), req.body));

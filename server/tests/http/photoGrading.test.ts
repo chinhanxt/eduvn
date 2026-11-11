@@ -1,4 +1,6 @@
+import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { students } from "../../src/db/schema";
 import { normalizeEssay } from "../../src/domain/essay";
 import type { Ai, AiMessage } from "../../src/services/ai";
 import { testApp } from "../helpers/app";
@@ -78,6 +80,39 @@ describe("HTTP chấm từ ảnh", () => {
     const gb = (await call("GET", `/api/classes/${cls.id}/gradebook`)).json();
     expect(gb.students[0].scores.GK).toBe(1.4);
     expect((await call("POST", `/api/photo/results/${saved.id}/gradebook`, { classId: cls.id, studentId: sid, column: "XX" })).statusCode).toBe(400);
+  });
+
+  it("ghép phiếu với HS theo SBD = số thứ tự; không khớp → để GV chọn tay; ghi sổ điểm không cần chọn lại", async () => {
+    const { examId, codes } = await makeExam();
+    const cls = (await call("POST", "/api/classes", { name: "10A2", schoolYear: "2026-2027" })).json();
+    await call("POST", `/api/classes/${cls.id}/students`, { text: "Nguyễn Văn An\nTrần Thị Bình" });
+    const ids = ((await call("GET", `/api/classes/${cls.id}`)).json().students as { id: string }[]).map((s) => s.id);
+    await t.db.update(students).set({ seat: 1 }).where(eq(students.id, ids[0]!));
+    await t.db.update(students).set({ seat: 12 }).where(eq(students.id, ids[1]!));
+    const other = (await call("POST", "/api/classes", { name: "11B", schoolYear: "2026-2027" })).json();
+    await call("POST", `/api/classes/${other.id}/students`, { text: "Người Lớp Khác" });
+    const otherId = (await call("GET", `/api/classes/${other.id}`)).json().students[0].id;
+
+    const ro = (await call("GET", `/api/photo/classes/${cls.id}/roster`)).json();
+    expect(ro.students.map((s: { seat: number | null }) => s.seat)).toEqual([1, 12]);
+
+    const ok = (await call("POST", "/api/photo/omr", { examId, code: codes[0], classId: cls.id, student: "000012", responses: {} })).json();
+    expect(ok).toMatchObject({ match: "ok", student: { id: ids[1], fullName: "Trần Thị Bình", seat: 12 } });
+    const none = (await call("POST", "/api/photo/omr", { examId, code: codes[0], classId: cls.id, student: "000007", responses: {} })).json();
+    expect(none).toMatchObject({ match: "none", student: null });
+    const bad = (await call("POST", "/api/photo/omr", { examId, code: codes[0], classId: cls.id, student: "0?0001", responses: {} })).json();
+    expect(bad.match).toBe("unreadable");
+    const manual = (await call("POST", "/api/photo/omr", { examId, code: codes[0], classId: cls.id, studentId: ids[0], student: "000007", responses: {} })).json();
+    expect(manual).toMatchObject({ match: "ok", student: { id: ids[0] } });
+    expect((await call("POST", "/api/photo/omr", { examId, code: codes[0], classId: cls.id, studentId: otherId, responses: {} })).statusCode).toBe(400);
+
+    const list = (await call("GET", "/api/photo/results?kind=omr")).json();
+    expect(list.find((r: { id: string }) => r.id === ok.id)).toMatchObject({ student: "12 · Trần Thị Bình", body: { sbd: "000012", studentId: ids[1], classId: cls.id } });
+    const gb = await call("POST", `/api/photo/results/${ok.id}/gradebook`, { column: "GK" });
+    expect(gb.statusCode).toBe(200);
+    expect((await call("POST", `/api/photo/results/${none.id}/gradebook`, { column: "GK" })).statusCode).toBe(400);
+    const book = (await call("GET", `/api/classes/${cls.id}/gradebook`)).json();
+    expect(book.students.find((s: { id: string }) => s.id === ids[1]).scores.GK).toBe(0);
   });
 
   it("bài viết tay: phiên âm → chấm → GV sửa → lưu", async () => {

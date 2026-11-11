@@ -4,14 +4,16 @@
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import type { Db } from "../db/client";
-import { photoResults } from "../db/schema";
+import { photoResults, students } from "../db/schema";
 import { type Role, assertCan } from "../domain/authz";
 import { EssayGrading, TRANSCRIBE_SYSTEM, gradePrompt, normalizeEssay } from "../domain/essay";
 import { ResponseValue } from "../domain/scoring";
-import { AiUnavailableError, NotFoundError } from "../errors";
+import { type SeatMatch, matchSeat } from "../domain/seatMatch";
+import { AiUnavailableError, NotFoundError, ValidationError } from "../errors";
 import type { Service } from "../service";
 import type { ClassService } from "./classes";
 import { type Ai, parseAiJson } from "./ai";
+import { INK_TASK } from "./ink";
 
 type Actor = { userId: string; orgId: string; role: Role };
 const Uuid = z.uuid();
@@ -20,7 +22,11 @@ const IMG = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
 const OmrSave = z.object({
   examId: Uuid,
   code: z.string().min(1),
+  /** SBD đọc từ phiếu (GV có thể sửa). */
   student: z.string().trim().max(80).default(""),
+  /** Lớp để ghép SBD ↔ số thứ tự HS; `studentId` = GV chọn tay (thắng SBD). */
+  classId: Uuid.optional(),
+  studentId: Uuid.optional(),
   responses: z.record(z.string(), ResponseValue),
   /** Số ô nghi vấn máy đánh dấu / số ô GV đã sửa — để lưu vết. */
   doubts: z.number().int().min(0).default(0),
@@ -43,24 +49,42 @@ const EssaySave = z.object({
   grading: EssayGrading,
 });
 
-const ToGradebook = z.object({ classId: z.string().min(1), studentId: z.string().min(1), column: z.string().min(1), term: z.enum(["HK1", "HK2"]).default("HK1") });
+const ToGradebook = z.object({ classId: z.string().min(1).optional(), studentId: z.string().min(1).optional(), column: z.string().min(1), term: z.enum(["HK1", "HK2"]).default("HK1") });
 
 export function createPhotoGradingService(db: Db, service: Service, ai: Ai, classes: ClassService) {
+  /** Danh sách HS của lớp kèm số thứ tự (SBD) để ghép phiếu. */
+  async function roster(actor: Actor, classId: string) {
+    const cls = await classes.getClass(actor, classId);
+    const rows = await db.select({ id: students.id, fullName: students.fullName, seat: students.seat }).from(students).where(eq(students.classId, cls.id)).orderBy(students.position);
+    return { id: cls.id, name: cls.name, columns: cls.columns, students: rows };
+  }
+
   async function saveOmr(actor: Actor, raw: unknown) {
     assertCan(actor.role, "exam:grade");
     const b = OmrSave.parse(raw);
+    let match: SeatMatch | null = null;
+    if (b.classId) {
+      const ro = await roster(actor, b.classId);
+      if (b.studentId) {
+        const st = ro.students.find((s) => s.id === b.studentId);
+        if (!st) throw new ValidationError(["Học sinh không thuộc lớp đã chọn"]);
+        match = { status: "ok", student: st };
+      } else match = matchSeat(ro.students, b.student);
+    } else if (b.studentId) throw new ValidationError(["Chọn lớp trước khi chọn học sinh"]);
+    const st = match?.status === "ok" ? match.student : null;
     const r = await service.grade(actor, b.examId, b.code, b.responses);
+    const label = st ? `${st.seat ?? "—"} · ${st.fullName}` : b.student;
     const [row] = await db
       .insert(photoResults)
-      .values({ orgId: actor.orgId, ownerId: actor.userId, kind: "omr", examId: b.examId, student: b.student, title: `Mã đề ${b.code}`, total: r.total, max: r.autoMax, body: { code: b.code, responses: b.responses, doubts: b.doubts, edited: b.edited, items: r.items, pendingEssay: r.pendingEssay } })
+      .values({ orgId: actor.orgId, ownerId: actor.userId, kind: "omr", examId: b.examId, student: label, title: `Mã đề ${b.code}`, total: r.total, max: r.autoMax, body: { code: b.code, sbd: b.student, classId: b.classId ?? null, studentId: st?.id ?? null, responses: b.responses, doubts: b.doubts, edited: b.edited, items: r.items, pendingEssay: r.pendingEssay } })
       .returning();
-    return { id: row!.id, total: r.total, max: r.autoMax };
+    return { id: row!.id, total: r.total, max: r.autoMax, match: match?.status ?? null, student: st };
   }
 
   async function transcribe(actor: Actor, raw: unknown): Promise<{ text: string }> {
     assertCan(actor.role, "exam:grade");
     const b = Transcribe.parse(raw);
-    const text = await ai.chat("doc_anh_bai_lam", [
+    const text = await ai.chat(INK_TASK, [
       { role: "system", content: TRANSCRIBE_SYSTEM },
       { role: "user", content: [{ type: "text", text: b.hint ? `Gợi ý môn/đề: ${b.hint}` : "Phiên âm bài làm trong ảnh." }, ...b.images.map((url) => ({ type: "image_url" as const, image_url: { url } }))] },
     ]);
@@ -128,13 +152,17 @@ export function createPhotoGradingService(db: Db, service: Service, ai: Ai, clas
     const b = ToGradebook.parse(raw);
     const [row] = Uuid.safeParse(id).success ? await db.select().from(photoResults).where(and(eq(photoResults.id, id), eq(photoResults.orgId, actor.orgId))) : [];
     if (!row) throw new NotFoundError("Không tìm thấy kết quả");
+    // Phiếu đã ghép HS lúc lưu → không cần chọn lại.
+    const classId = b.classId ?? (row.body.classId as string | null | undefined) ?? undefined;
+    const studentId = b.studentId ?? (row.body.studentId as string | null | undefined) ?? undefined;
+    if (!classId || !studentId) throw new ValidationError(["Chọn lớp và học sinh để ghi điểm"]);
     const raw10 = row.max > 0 ? (row.total / row.max) * 10 : 0;
-    const cls = await classes.getClass(actor, b.classId);
+    const cls = await classes.getClass(actor, classId);
     const score = cls.scale === "TT27" ? Math.min(10, Math.max(1, Math.round(raw10))) : Math.round(raw10 * 10) / 10;
-    const r = await classes.enterScores(actor, b.classId, b.column, { [b.studentId]: score }, b.term);
+    const r = await classes.enterScores(actor, classId, b.column, { [studentId]: score }, b.term);
     return { score, term: r.term, column: r.column, class: cls.name };
   }
 
-  return { toGradebook, saveOmr, transcribe, gradeEssay, saveEssay, essaysOf, list, remove };
+  return { roster, toGradebook, saveOmr, transcribe, gradeEssay, saveEssay, essaysOf, list, remove };
 }
 export type PhotoGradingService = ReturnType<typeof createPhotoGradingService>;

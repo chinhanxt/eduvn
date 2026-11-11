@@ -416,7 +416,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   app.addHook("onClose", async () => live.dispose());
   registerLiveRoutes(app, { live, authenticate });
   registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
-  registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, deps.ai ?? disabledAi, classes), authenticate });
+  registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, geoAi, classes), authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
