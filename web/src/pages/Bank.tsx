@@ -1,86 +1,151 @@
-import { lazy, Suspense, useCallback, useEffect, useState, type FormEvent } from "react";
-import { ApiError, aiSkill, api, errText, type BankQuestion, type Question } from "../api";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { aiSkill, type BankQuestion, type Question } from "../api";
 import { blobToDataUrl, printSvg, svgToPngBlob } from "../geometry3d/figure";
 import { FigureBuilder } from "../geometry3d/FigureBuilder";
-import { Icon } from "../Icon";
 import { MathEditor } from "../math/MathEditor";
 import { MathText } from "../math/MathText";
+import { FilterBar, FormPane, get, post, SearchBox, statusOf, errorOf, useListView, useOpenParam, useRun, gradeVi } from "../portal/gv/kit";
 import { solutionStatus } from "../solution/api";
 import { STATUS_TEXT, type VerifyStatus } from "../solution/types";
+import { Icon } from "../ui/Icon";
+import { Button } from "../ui/components/Button";
+import { Badge, Chip, Segmented } from "../ui/components/Chip";
+import { Field, Input, Select } from "../ui/components/Field";
+import { Skeleton } from "../ui/components/Skeleton";
+import { type Column, Table } from "../ui/components/Table";
+import { invalidate, useQuery } from "../ui/data/query";
+import { useUrlState } from "../ui/data/urlState";
+import { usePageMeta } from "../ui/shell/AppShell";
+import { PageHead } from "../ui/shell/PageHead";
+import { useKeyN } from "./Classes";
 
 // P13: lời giải từng bước (tải lười trình xem + KaTeX khi mở)
 const SolutionDialog = lazy(() => import("../solution/SolutionDialog").then((m) => ({ default: m.SolutionDialog })));
 
 export const SUBJECT_DEFAULT = "Toán";
 const TYPE_LABEL: Record<Question["type"], string> = { mcq: "Trắc nghiệm", true_false: "Đúng/sai", short_answer: "Trả lời ngắn", essay: "Tự luận" };
+const TYPES = Object.keys(TYPE_LABEL) as Question["type"][];
+const LEVEL_VI = { NB: "Nhận biết", TH: "Thông hiểu", VD: "Vận dụng" } as const;
+const LVL_CLS = { NB: "l1", TH: "l2", VD: "l3" } as const;
+const LETTERS = "ABCD";
+export const bankKey = (subject: string, grade: number) => `gv/ngan-hang/${subject}/${grade}`;
+const GRADES = Array.from({ length: 16 }, (_, i) => i + 1);
 
+/** /ngan-hang — mockup gv/ngan-hang.html: tab dạng câu · thanh lọc (môn, lớp, chủ đề, mức — trên URL) · bảng | xem trước. */
 export function Bank() {
-  const [subject, setSubject] = useState(SUBJECT_DEFAULT);
-  const [grade, setGrade] = useState(10);
-  const [rows, setRows] = useState<Question[] | null>(null);
-  const [adding, setAdding] = useState(false);
-  const [aiOpen, setAiOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  usePageMeta("Ngân hàng câu hỏi");
+  const [subject, setSubject] = useUrlState<string>("mon", SUBJECT_DEFAULT);
+  const [grade, setGrade] = useUrlState<number>("lop", 10);
+  const [type, setType] = useUrlState<string>("dang", "tat-ca", { mode: "push" });
+  const [topics, setTopics] = useUrlState<string[]>("chu-de", []);
+  const [levels, setLevels] = useUrlState<string[]>("muc", []);
+  const [cur, setCur] = useUrlState<string>("cau", "");
+  const [adding, setAdding] = useOpenParam();
+  const [aiOpen, setAiOpen] = useOpenParam("ai");
+  const [subj, setSubj] = useState(subject);
+  useEffect(() => setSubj(subject), [subject]);
+  const q = useQuery(bankKey(subject, grade), get<BankQuestion[]>(`/api/questions?subject=${encodeURIComponent(subject.trim() || "x")}&grade=${grade}&limit=2000`));
+  const rows = q.data;
   const [solOf, setSolOf] = useState<Record<string, VerifyStatus>>({});
-  const [solFor, setSolFor] = useState<Question | null>(null);
-
+  const [solFor, setSolFor] = useState<BankQuestion | null>(null);
   useEffect(() => {
-    if (rows?.length) solutionStatus(rows.map((q) => q.id)).then(setSolOf).catch(() => setSolOf({}));
+    if (rows?.length) solutionStatus(rows.map((x) => x.id)).then(setSolOf).catch(() => setSolOf({}));
   }, [rows]);
+  useKeyN(() => setAdding(true));
 
-  const load = useCallback(() => {
-    setError(null);
-    api<Question[]>(`/api/questions?subject=${encodeURIComponent(subject.trim() || "x")}&grade=${grade}`)
-      .then(setRows)
-      .catch((e: unknown) => setError(e instanceof ApiError ? e.message : "Lỗi"));
-  }, [subject, grade]);
-  useEffect(load, [load]);
+  const byType = useMemo(() => {
+    const m: Record<string, number> = { "tat-ca": rows?.length ?? 0 };
+    for (const r of rows ?? []) m[r.type] = (m[r.type] ?? 0) + 1;
+    return m;
+  }, [rows]);
+  const allTopics = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const r of rows ?? []) m.set(r.topic, (m.get(r.topic) ?? 0) + 1);
+    return [...m].sort((a, b) => b[1] - a[1]);
+  }, [rows]);
+  const filter = useMemo(
+    () => (r: BankQuestion) => (type === "tat-ca" || r.type === type) && (!topics.length || topics.includes(r.topic)) && (!levels.length || levels.includes(r.level)),
+    [type, topics, levels],
+  );
+  const sorts = useMemo(() => ({ muc: (r: BankQuestion) => ({ NB: 1, TH: 2, VD: 3 })[r.level], "chu-de": (r: BankQuestion) => r.topic }), []);
+  const v = useListView(rows, { text: (r) => `${r.stem} ${r.topic} ${r.id.slice(0, 8)}`, sorts, filter, pageSize: 20 });
+  const sel = rows?.find((r) => r.id === cur) ?? v.rows[0] ?? null;
+  const filtered = !!(v.q || topics.length || levels.length || type !== "tat-ca");
+  const clear = () => (v.setQ(""), setTopics([]), setLevels([]), setType("tat-ca"));
+  const reload = () => invalidate(bankKey(subject, grade));
 
+  const cols: Column<BankQuestion>[] = [
+    { key: "ma", header: "Mã", hideSm: true, width: 84, cell: (r) => <span className="mono muted" data-cur={sel?.id === r.id ? "1" : undefined}>Q-{r.id.slice(0, 4).toUpperCase()}</span> },
+    {
+      key: "cau",
+      header: "Câu hỏi",
+      cell: (r) => (
+        <div className="q-cell">
+          <div className="stem"><MathText value={r.stem} /></div>
+          <span className="t-sub">{r.topic}{r.figure ? " · có hình" : ""}</span>
+        </div>
+      ),
+    },
+    { key: "muc", header: "Mức", sortable: true, width: 110, hideSm: true, cell: (r) => <span className={`lvl ${LVL_CLS[r.level]}`}>{LEVEL_VI[r.level]}</span> },
+    { key: "dang", header: "Dạng", hideSm: true, width: 120, cell: (r) => <span className="caption">{TYPE_LABEL[r.type]}</span> },
+    { key: "lg", header: "Lời giải", hideSm: true, width: 110, cell: (r) => (solOf[r.id] ? <Badge tone={solOf[r.id] === "verified" ? "ok" : solOf[r.id] === "mismatch" ? "warn" : "neutral"}>{solOf[r.id] === "verified" ? "Đã kiểm" : solOf[r.id] === "mismatch" ? "Lệch" : "Chưa kiểm"}</Badge> : <span className="muted">—</span>) },
+  ];
+  const tabs = (
+    <nav className="tabs" aria-label="Dạng câu">
+      {(["tat-ca", ...TYPES] as const).map((t) => (
+        <a key={t} href={`?dang=${t}`} aria-current={type === t ? "page" : undefined} onClick={(e) => (e.preventDefault(), setType(t))}>
+          {t === "tat-ca" ? "Tất cả" : TYPE_LABEL[t]}
+          {rows && <span className="count">{(byType[t] ?? 0).toLocaleString("vi-VN")}</span>}
+        </a>
+      ))}
+    </nav>
+  );
   return (
     <>
-      <h1>Ngân hàng câu hỏi</h1>
-      <div className="bar">
-        <input className="inp w-m" value={subject} onChange={(e) => setSubject(e.target.value)} aria-label="Môn" data-testid="f-subject" />
-        <input className="inp w-s" type="number" min={1} max={16} value={grade} onChange={(e) => setGrade(Number(e.target.value))} aria-label="Lớp" data-testid="f-grade" />
-        <span className="sp" />
-        <button className="btn ghost" onClick={() => setAiOpen((a) => !a)} data-testid="ai-q-open"><Icon name="spark" size={18} />AI tạo câu hỏi theo YCCĐ</button>
-        <button className="btn" onClick={() => setAdding((a) => !a)} data-testid="add-q"><Icon name="plus" size={18} />Thêm</button>
-      </div>
-      {error && <div className="err">{error}</div>}
-      {aiOpen && <AiQuestions subject={subject} grade={grade} onSaved={load} />}
-      {adding && (
-        <AddForm
-          subject={subject}
-          grade={grade}
-          onDone={() => {
-            load();
-          }}
-        />
-      )}
-      <div className="card">
-        {rows?.length === 0 ? (
-          <div className="empty">—</div>
-        ) : (
-          <table data-testid="q-table">
-            <thead><tr><th>Câu hỏi</th><th>Chủ đề</th><th>Mức</th><th>Loại</th><th>Lời giải</th></tr></thead>
-            <tbody>
-              {rows?.map((q) => (
-                <tr key={q.id}>
-                  <td><MathText value={q.stem} />{q.figure && <img className="q-fig sm" src={q.figure} alt="Hình vẽ" />}</td>
-                  <td>{q.topic}</td>
-                  <td><span className="tag green">{q.level}</span></td>
-                  <td><span className="tag violet">{TYPE_LABEL[q.type]}</span></td>
-                  <td>
-                    <button className="btn ghost sm" onClick={() => setSolFor(q)} data-testid="q-solution" title={solOf[q.id] ? `Lời giải: ${STATUS_TEXT[solOf[q.id]!]}` : "Tạo lời giải từng bước"}>
-                      <Icon name={solOf[q.id] === "verified" ? "checkc" : solOf[q.id] === "mismatch" ? "alert" : "spark"} size={16} />
-                      {solOf[q.id] ? STATUS_TEXT[solOf[q.id]!] : "Lời giải từng bước"}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      <PageHead title="Ngân hàng câu hỏi" tabs={tabs} primary={{ label: "Thêm câu", icon: "plus", kbd: "N", onClick: () => setAdding(true) }}>
+        <Button size="sm" icon="spark" onClick={() => setAiOpen(!aiOpen)} data-testid="ai-q-open"><span className="hide-sm">AI soạn</span></Button>
+      </PageHead>
+      {aiOpen && <AiQuestions subject={subject} grade={grade} onClose={() => setAiOpen(false)} onSaved={reload} />}
+      {adding && <AddForm subject={subject} grade={grade} topic={topics[0]} onClose={() => setAdding(false)} onDone={reload} />}
+      <div className="split bank" style={{ marginTop: 0 }}>
+        <section className="pane" aria-label="Danh sách câu hỏi">
+          <FilterBar>
+            <SearchBox value={v.q} onChange={v.setQ} placeholder="Tìm nội dung, mã câu…  /" label="Tìm câu hỏi" />
+            <Input className="sm-in" aria-label="Môn" value={subj} onChange={(e) => setSubj(e.target.value)} onBlur={() => subj.trim() && subj !== subject && setSubject(subj.trim())} onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()} data-testid="f-subject" style={{ width: 110 }} />
+            <Select aria-label="Lớp" value={grade} onChange={(e) => setGrade(Number(e.target.value))} data-testid="f-grade">
+              {GRADES.map((g) => <option key={g} value={g}>{gradeVi(g)}</option>)}
+            </Select>
+            {(["NB", "TH", "VD"] as const).map((l) => <Chip key={l} pressed={levels.includes(l)} onClick={() => setLevels(levels.includes(l) ? levels.filter((x) => x !== l) : [...levels, l])}>{l}</Chip>)}
+            <span className="grow" />
+            {filtered && <Button variant="ghost" size="sm" onClick={clear}>Xoá lọc</Button>}
+          </FilterBar>
+          {allTopics.length > 1 && (
+            <div className="fbar topics" aria-label="Chủ đề">
+              {allTopics.slice(0, 12).map(([t, n]) => <Chip key={t} pressed={topics.includes(t)} count={n} onClick={() => setTopics(topics.includes(t) ? topics.filter((x) => x !== t) : [...topics, t])}>{t}</Chip>)}
+            </div>
+          )}
+          <div data-testid="q-table">
+            <Table
+              label="Câu hỏi"
+              columns={cols}
+              rows={v.rows}
+              rowKey={(r) => r.id}
+              status={statusOf(q) === "ok" && v.total === 0 ? "trong" : statusOf(q)}
+              stale={q.stale}
+              sort={v.sort}
+              onSort={v.setSort}
+              page={v.pageProp}
+              onRowClick={(r) => setCur(r.id)}
+              onRetry={q.refetch}
+              error={errorOf(q.error)}
+              skeletonRows={8}
+              empty={rows?.length ? { icon: "search", title: "Không có câu nào khớp bộ lọc", text: "Thử bỏ bớt chủ đề hoặc mức độ.", action: <Button size="sm" onClick={clear}>Xoá lọc</Button> } : { icon: "bank", title: `Chưa có câu ${subject} ${gradeVi(grade).toLowerCase()}`, text: "Thêm câu thủ công hoặc để AI soạn theo yêu cầu cần đạt.", action: <Button size="sm" variant="primary" icon="spark" onClick={() => setAiOpen(true)}>AI soạn câu hỏi</Button> }}
+            />
+          </div>
+        </section>
+        <aside className="pane detail prev" aria-label="Xem trước">
+          {sel ? <Preview key={sel.id} q={sel} sol={solOf[sel.id]} onSolution={() => setSolFor(sel)} /> : q.data ? <div className="empty"><div className="art"><Icon name="eye" size="lg" /></div><h3>Chọn một câu</h3><p>Nội dung, đáp án và lời giải hiện ở đây.</p></div> : <PreviewSkel />}
+        </aside>
       </div>
       {solFor && (
         <Suspense fallback={null}>
@@ -91,57 +156,120 @@ export function Bank() {
   );
 }
 
-function AddForm({ subject, grade, onDone }: { subject: string; grade: number; onDone: () => void }) {
-  const [topic, setTopic] = useState("Mệnh đề");
-  const [level, setLevel] = useState("NB");
+function PreviewSkel() {
+  return (
+    <div aria-hidden="true">
+      <div className="dhd"><Skeleton w={120} h={10} /><Skeleton w="70%" h={16} style={{ marginTop: 8 }} /></div>
+      <div style={{ padding: "14px 16px", display: "grid", gap: 8 }}><Skeleton w="100%" h={14} /><Skeleton w="86%" h={14} /><Skeleton w="60%" h={14} /></div>
+      <div style={{ padding: "0 16px 14px", display: "grid", gap: 6 }}>{[0, 1, 2, 3].map((i) => <Skeleton key={i} w="100%" h={32} />)}</div>
+    </div>
+  );
+}
+
+function Preview({ q, sol, onSolution }: { q: BankQuestion; sol?: VerifyStatus; onSolution: () => void }) {
+  return (
+    <div style={{ animation: "rise var(--dur-2) var(--ease-out) both" }}>
+      <div className="dhd">
+        <span className="mono">Q-{q.id.slice(0, 4).toUpperCase()}</span> <Badge>{TYPE_LABEL[q.type]}</Badge>
+        <h2 style={{ marginTop: 6 }}>{q.topic}</h2>
+      </div>
+      <div className="stem-read"><MathText value={q.stem} /></div>
+      {q.figure && <img className="q-fig" src={q.figure} alt="Hình vẽ kèm câu hỏi" />}
+      {q.options && (
+        <ul className="opts">
+          {q.options.map((o, i) => (
+            <li key={i} className={q.answer === i ? "ok" : undefined}>
+              <b>{LETTERS[i]}</b><span><MathText value={o} /></span>{q.answer === i && <span className="pick"><Icon name="check" size="sm" />Đáp án</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+      {q.statements && (
+        <ul className="opts">
+          {q.statements.map((o, i) => {
+            const t = Array.isArray(q.answer) ? q.answer[i] : undefined;
+            return (
+              <li key={i} className={t ? "ok" : undefined}>
+                <b>{"abcd"[i]})</b><span><MathText value={o} /></span><span className="pick">{t ? "Đúng" : "Sai"}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {q.type === "short_answer" && <p className="note ok" style={{ margin: "0 16px 12px" }}>Đáp án: <MathText value={String(q.answer)} /></p>}
+      {q.type === "essay" && q.rubric && <p className="note" style={{ margin: "0 16px 12px" }}>Hướng chấm ({q.points ?? 1} điểm): <MathText value={q.rubric} /></p>}
+      <dl className="props" style={{ margin: 0, borderTop: "1px solid var(--line)" }}>
+        <dt>Mức độ</dt><dd><span className={`lvl ${LVL_CLS[q.level]}`}>{LEVEL_VI[q.level]}</span></dd>
+        <dt>Môn · lớp</dt><dd>{q.subject} · {gradeVi(q.grade)}</dd>
+        <dt>Lời giải</dt><dd>{sol ? STATUS_TEXT[sol] : "Chưa có"}</dd>
+        {q.explanation && <><dt>Giải thích</dt><dd><MathText value={q.explanation} /></dd></>}
+      </dl>
+      <div className="dact" style={{ flexDirection: "row", flexWrap: "wrap" }}>
+        <Button size="sm" variant="primary" icon={sol === "verified" ? "checkc" : "spark"} onClick={onSolution} data-testid="q-solution">{sol ? "Xem lời giải" : "Lời giải từng bước"}</Button>
+      </div>
+    </div>
+  );
+}
+
+function AddForm({ subject, grade, topic: topic0, onClose, onDone }: { subject: string; grade: number; topic?: string; onClose: () => void; onDone: () => void }) {
+  const run = useRun();
+  const [topic, setTopic] = useState(topic0 ?? "");
+  const [level, setLevel] = useState<"NB" | "TH" | "VD">("NB");
   const [formKey, setFormKey] = useState(0);
   const [stem, setStem] = useState("");
   const [options, setOptions] = useState(["", "", "", ""]);
   const [answer, setAnswer] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const [figure, setFigure] = useState<string | null>(null);
   const [figOpen, setFigOpen] = useState(false);
-
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await api("/api/questions", { method: "POST", body: { type: "mcq", subject, grade, topic, level, stem, options, answer, ...(figure ? { figure } : {}) } });
+  const [err, setErr] = useState<string | null>(null);
+  const save = () => {
+    if (!topic.trim() || !stem.trim() || options.some((o) => !o.trim())) return void setErr("Điền chủ đề, câu hỏi và đủ 4 phương án.");
+    setErr(null);
+    return run(async () => {
+      await post("/api/questions", { type: "mcq", subject, grade, topic: topic.trim(), level, stem, options, answer, ...(figure ? { figure } : {}) });
       setStem("");
       setFigure(null);
-      setFormKey((k) => k + 1);
       setOptions(["", "", "", ""]);
       setAnswer(0);
+      setFormKey((k) => k + 1);
       onDone();
-    } catch (err) {
-      setError(err instanceof ApiError ? "Điền đủ câu hỏi và 4 phương án" : "Lỗi");
-    } finally {
-      setBusy(false);
-    }
+    }, { title: "Đã thêm câu vào ngân hàng", msg: "Khung vẫn mở để thêm câu tiếp." });
   };
-
   return (
-    <form className="card" style={{ marginBottom: 16 }} onSubmit={(e) => void submit(e)}>
-      {error && <div className="err">{error}</div>}
-      <div className="formrow">
-        <label className="lbl">Chủ đề<input className="inp w-m" value={topic} onChange={(e) => setTopic(e.target.value)} data-testid="q-topic" /></label>
-        <label className="lbl">Mức
-          <select className="inp" value={level} onChange={(e) => setLevel(e.target.value)}>
-            <option value="NB">Nhận biết</option><option value="TH">Thông hiểu</option><option value="VD">Vận dụng</option>
-          </select>
-        </label>
+    <FormPane
+      title="Thêm câu trắc nghiệm"
+      sub={`${subject} · ${gradeVi(grade)}`}
+      onClose={onClose}
+      footer={<>{err && <span className="caption" style={{ color: "var(--danger)" }}>{err}</span>}<Button onClick={onClose}>Đóng</Button><Button variant="primary" icon="check" onClick={save} data-testid="q-save">Lưu câu</Button></>}
+    >
+      <div className="fgrid">
+        <Field label="Chủ đề"><Input value={topic} placeholder="Hàm số bậc hai" onChange={(e) => setTopic(e.target.value)} data-testid="q-topic" /></Field>
+        <div className="wide"><span className="lbl-sm">Mức độ</span><Segmented label="Mức độ" value={level} onChange={setLevel} options={(["NB", "TH", "VD"] as const).map((l) => ({ value: l, label: LEVEL_VI[l] }))} /></div>
       </div>
-      <MathEditor key={`stem-${formKey}`} value={stem} onChange={setStem} placeholder="Câu hỏi — gõ $ để chèn công thức" testId="q-stem" />
-      <div className="q-figrow">
-        <button type="button" className="btn ghost sm" onClick={() => setFigOpen(true)} data-testid="q-figure"><Icon name="box" size={16} />{figure ? "Dựng lại hình vẽ" : "Chèn hình không gian"}</button>
+      <div>
+        <span className="lbl-sm">Câu hỏi</span>
+        <MathEditor key={`stem-${formKey}`} value={stem} onChange={setStem} placeholder="Câu hỏi — gõ $ để chèn công thức" testId="q-stem" />
+      </div>
+      <div className="row wrap">
+        <Button size="sm" variant="ghost" icon="box" onClick={() => setFigOpen(true)} data-testid="q-figure">{figure ? "Dựng lại hình vẽ" : "Chèn hình không gian"}</Button>
         {figure && (
           <>
             <img className="q-fig" src={figure} alt="Hình vẽ kèm câu hỏi" data-testid="q-figure-img" />
-            <button type="button" className="btn ghost sm" onClick={() => setFigure(null)}>Bỏ hình</button>
+            <Button size="sm" variant="ghost" onClick={() => setFigure(null)}>Bỏ hình</Button>
           </>
         )}
+      </div>
+      <div className="opt-edit" role="radiogroup" aria-label="Phương án và đáp án đúng">
+        {options.map((o, i) => (
+          <label key={i} className={answer === i ? "on" : undefined}>
+            <input type="radio" name="ans" checked={answer === i} onChange={() => setAnswer(i)} aria-label={`Đáp án ${LETTERS[i]}`} />
+            <b>{LETTERS[i]}</b>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <MathEditor key={`opt-${i}-${formKey}`} value={o} onChange={(val) => setOptions((p) => p.map((x, j) => (j === i ? val : x)))} placeholder={`Phương án ${LETTERS[i]}`} testId={`q-opt-${i}`} />
+            </div>
+          </label>
+        ))}
+        <span className="caption">Chọn ô tròn bên trái phương án đúng.</span>
       </div>
       {figOpen && (
         <div className="fg-modal" onClick={() => setFigOpen(false)}>
@@ -160,101 +288,88 @@ function AddForm({ subject, grade, onDone }: { subject: string; grade: number; o
           </div>
         </div>
       )}
-      {options.map((o, i) => (
-        <div className="opt" key={i}>
-          <input type="radio" name="ans" checked={answer === i} onChange={() => setAnswer(i)} aria-label={`Đáp án ${"ABCD"[i]}`} />
-          <span className="letter">{"ABCD"[i]}</span>
-          <div style={{ flex: 1 }}>
-            <MathEditor key={`opt-${i}-${formKey}`} value={o} onChange={(v) => setOptions((prev) => prev.map((x, j) => (j === i ? v : x)))} placeholder={`Phương án ${"ABCD"[i]}`} testId={`q-opt-${i}`} />
-          </div>
-        </div>
-      ))}
-      <div style={{ marginTop: 14 }}>
-        <button className="btn" disabled={busy} data-testid="q-save"><Icon name="check" size={18} />Lưu</button>
-      </div>
-    </form>
+    </FormPane>
   );
 }
 
-const LETTERS = "ABCD";
-
 /** AI viết câu hỏi bám YCCĐ → xem trước → chọn câu → thêm vào ngân hàng. */
-function AiQuestions({ subject, grade, onSaved }: { subject: string; grade: number; onSaved: () => void }) {
+function AiQuestions({ subject, grade, onClose, onSaved }: { subject: string; grade: number; onClose: () => void; onSaved: () => void }) {
+  const run = useRun();
   const [f, setF] = useState({ topic: "", yccd: "", level: "TH", type: "mcq", count: 3 });
   const [drafts, setDrafts] = useState<BankQuestion[]>([]);
-  const [pick, setPick] = useState<boolean[]>([]);
+  const [pick, setPick] = useState<string[]>([]);
   const [rejected, setRejected] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ err?: string; ok?: string } | null>(null);
-  const gen = async () => {
+  const gen = () => {
     setBusy(true);
-    setMsg(null);
-    try {
+    return run(async () => {
       const r = await aiSkill<{ questions: BankQuestion[]; rejected: unknown[] }>("cau-hoi", { subject, grade, ...f, yccd: f.yccd.trim() || undefined });
       setDrafts(r.questions);
-      setPick(r.questions.map(() => true));
+      setPick(r.questions.map((_, i) => String(i)));
       setRejected(r.rejected.length);
-    } catch (e) {
-      setMsg({ err: errText(e) });
-    } finally {
-      setBusy(false);
-    }
+      return r;
+    }, (r) => ({ title: `AI đã viết ${r.questions.length} câu`, msg: r.rejected.length ? `${r.rejected.length} câu lỗi đã bị loại` : "Xem lại rồi chọn câu muốn thêm", kind: "info" })).finally(() => setBusy(false));
   };
-  const save = async () => {
-    setBusy(true);
-    try {
-      const chosen = drafts.filter((_, i) => pick[i]);
-      for (const q of chosen) await api("/api/questions", { method: "POST", body: q });
-      setMsg({ ok: `Đã thêm ${chosen.length} câu vào ngân hàng` });
+  const save = () =>
+    run(async () => {
+      const chosen = drafts.filter((_, i) => pick.includes(String(i)));
+      for (const q of chosen) await post("/api/questions", q);
       setDrafts([]);
       onSaved();
-    } catch (e) {
-      setMsg({ err: errText(e) });
-    } finally {
-      setBusy(false);
-    }
-  };
+      return chosen.length;
+    }, (n) => `Đã thêm ${n} câu vào ngân hàng`);
   return (
-    <div className="card" style={{ marginBottom: 16 }} data-testid="ai-q-form">
-      {msg?.err && <div className="err">{msg.err}</div>}
-      {msg?.ok && <div className="ok-box">{msg.ok}</div>}
-      <div className="formrow">
-        <label className="lbl">Chủ đề<input className="inp w-m" value={f.topic} onChange={(e) => setF({ ...f, topic: e.target.value })} data-testid="ai-q-topic" /></label>
-        <label className="lbl">Yêu cầu cần đạt<input className="inp" style={{ width: 300 }} placeholder="tuỳ chọn — AI tự lấy theo CT GDPT 2018" value={f.yccd} onChange={(e) => setF({ ...f, yccd: e.target.value })} /></label>
-        <label className="lbl">Mức
-          <select className="inp" value={f.level} onChange={(e) => setF({ ...f, level: e.target.value })}>
-            <option value="NB">Nhận biết</option><option value="TH">Thông hiểu</option><option value="VD">Vận dụng</option>
-          </select>
-        </label>
-        <label className="lbl">Dạng
-          <select className="inp" value={f.type} onChange={(e) => setF({ ...f, type: e.target.value })}>
-            {(Object.keys(TYPE_LABEL) as Question["type"][]).map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}
-            <option value="mix">Nhiều dạng</option>
-          </select>
-        </label>
-        <label className="lbl">Số câu<input className="inp w-s" type="number" min={1} max={10} value={f.count} onChange={(e) => setF({ ...f, count: Number(e.target.value) })} /></label>
-        <button className="btn" disabled={busy || !f.topic.trim()} onClick={() => void gen()} data-testid="ai-q-run"><Icon name="spark" size={18} />{busy && drafts.length === 0 ? "Đang viết…" : "Tạo"}</button>
+    <FormPane
+      title="AI soạn câu hỏi theo yêu cầu cần đạt"
+      sub={`${subject} · ${gradeVi(grade)}`}
+      onClose={onClose}
+      testId="ai-q-form"
+      footer={
+        drafts.length > 0 ? (
+          <>
+            {rejected > 0 && <span className="caption">{rejected} câu AI viết lỗi đã bị loại</span>}
+            <Button onClick={gen}>Viết lại</Button>
+            <Button variant="primary" icon="check" disabled={!pick.length} onClick={save} data-testid="ai-q-save">Thêm {pick.length} câu vào ngân hàng</Button>
+          </>
+        ) : (
+          <>
+            <span className="caption">Bỏ trống YCCĐ: AI tự lấy theo CT GDPT 2018</span>
+            <Button variant="primary" icon="spark" disabled={!f.topic.trim()} onClick={gen} data-testid="ai-q-run">Viết câu hỏi</Button>
+          </>
+        )
+      }
+    >
+      <div className="fgrid">
+        <Field label="Chủ đề"><Input value={f.topic} onChange={(e) => setF({ ...f, topic: e.target.value })} data-testid="ai-q-topic" /></Field>
+        <div className="wide"><Field label="Yêu cầu cần đạt"><Input placeholder="tuỳ chọn" value={f.yccd} onChange={(e) => setF({ ...f, yccd: e.target.value })} /></Field></div>
+        <Field label="Mức"><Select value={f.level} onChange={(e) => setF({ ...f, level: e.target.value })}>{(["NB", "TH", "VD"] as const).map((l) => <option key={l} value={l}>{LEVEL_VI[l]}</option>)}</Select></Field>
+        <Field label="Dạng"><Select value={f.type} onChange={(e) => setF({ ...f, type: e.target.value })}>{TYPES.map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}<option value="mix">Nhiều dạng</option></Select></Field>
+        <Field label="Số câu"><Input type="number" min={1} max={10} value={f.count} onChange={(e) => setF({ ...f, count: Math.max(1, Math.min(10, Number(e.target.value) || 1)) })} /></Field>
       </div>
-      {drafts.map((q, i) => (
-        <div key={i} className="item" style={{ alignItems: "flex-start" }} data-testid="ai-q-draft">
-          <input type="checkbox" checked={pick[i] ?? false} onChange={(e) => setPick(pick.map((v, j) => (j === i ? e.target.checked : v)))} aria-label={`Chọn câu ${i + 1}`} />
-          <div className="grow">
-            <span className="tag violet">{TYPE_LABEL[q.type]}</span> <span className="tag green">{q.level}</span>
-            <div><MathText value={q.stem} /></div>
-            {q.options?.map((o, j) => <div key={j} style={{ color: q.answer === j ? "#116b34" : undefined }}>{LETTERS[j]}. <MathText value={o} /></div>)}
-            {q.statements?.map((o, j) => <div key={j}>{"abcd"[j]}) <MathText value={o} /> — {(q.answer as boolean[])[j] ? "Đúng" : "Sai"}</div>)}
-            {q.type === "short_answer" && <div>Đáp án: <MathText value={String(q.answer)} /></div>}
-            {q.type === "essay" && <div>Thang chấm: <MathText value={q.rubric ?? ""} /> ({q.points} điểm)</div>}
-          </div>
-        </div>
-      ))}
-      {drafts.length > 0 && (
-        <div className="bar" style={{ marginBottom: 0, marginTop: 10 }}>
-          {rejected > 0 && <span className="tag amber">{rejected} câu AI viết lỗi đã bị loại</span>}
-          <span className="sp" />
-          <button className="btn" disabled={busy || !pick.some(Boolean)} onClick={() => void save()} data-testid="ai-q-save"><Icon name="check" size={18} />Thêm {pick.filter(Boolean).length} câu vào ngân hàng</button>
+      {busy && drafts.length === 0 && (
+        <div className="ai-run" aria-busy="true">
+          <div className="row"><Badge tone="accent" icon="spark">AI đang viết</Badge><span className="caption">{f.count} câu · thường 20–60 giây</span></div>
+          <div className="stream-bar" />
+          {Array.from({ length: Math.min(3, f.count) }, (_, i) => <Skeleton key={i} w={`${[86, 72, 64][i]}%`} h={12} />)}
         </div>
       )}
-    </div>
+      {drafts.length > 0 && (
+        <div className="pick-list">
+          {drafts.map((q, i) => (
+            <label key={i} className="pick" style={{ alignItems: "flex-start" }} data-testid="ai-q-draft">
+              <input type="checkbox" checked={pick.includes(String(i))} onChange={() => setPick(pick.includes(String(i)) ? pick.filter((x) => x !== String(i)) : [...pick, String(i)])} aria-label={`Chọn câu ${i + 1}`} style={{ marginTop: 3 }} />
+              <span className="g">
+                <span className="row" style={{ gap: 6, marginBottom: 4 }}><Badge>{TYPE_LABEL[q.type]}</Badge><span className={`lvl ${LVL_CLS[q.level]}`}>{q.level}</span></span>
+                <span style={{ display: "block" }}><MathText value={q.stem} /></span>
+                {q.options?.map((o, j) => <span key={j} style={{ display: "block", color: q.answer === j ? "var(--ok)" : undefined }}>{LETTERS[j]}. <MathText value={o} /></span>)}
+                {q.statements?.map((o, j) => <span key={j} style={{ display: "block" }}>{"abcd"[j]}) <MathText value={o} /> — {(q.answer as boolean[])[j] ? "Đúng" : "Sai"}</span>)}
+                {q.type === "short_answer" && <span style={{ display: "block" }}>Đáp án: <MathText value={String(q.answer)} /></span>}
+                {q.type === "essay" && <span style={{ display: "block" }}>Thang chấm: <MathText value={q.rubric ?? ""} /> ({q.points} điểm)</span>}
+              </span>
+            </label>
+          ))}
+        </div>
+      )}
+    </FormPane>
   );
 }
