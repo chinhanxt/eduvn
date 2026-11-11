@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { vn } from "../api";
 import { Icon } from "../Icon";
 import { MathText } from "../math/MathText";
 import { errMsg, hsJson, loadSession } from "./studentApi";
 import type { ReviewItem, StudentResult } from "./types";
+import { studentSolutions } from "../solution/api";
+import type { Solution } from "../solution/types";
+
+// P13: lời giải từng bước có hình (chỉ khi GV cho hiện lời giải) — tải lười trình xem
+const HsSolution = lazy(() => import("../solution/HsSolution").then((m) => ({ default: m.HsSolution })));
 
 const LETTERS = "ABCD";
 const LEVEL_VI = { full: "Lời giải: đã hiện", marks: "Lời giải: hiện sau hạn nộp", score: "Chỉ hiện điểm" } as const;
@@ -29,9 +34,15 @@ export function ResultPage() {
   const [r, setR] = useState<StudentResult | null>(null);
   const [open, setOpen] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [sols, setSols] = useState<Record<string, Solution>>({});
   useEffect(() => {
     hsJson<StudentResult>(`/api/student/submissions/${sid}`).then(setR).catch((e: unknown) => setErr(errMsg(e)));
   }, [sid]);
+  const full = r?.level === "full";
+  useEffect(() => {
+    const token = loadSession()?.token;
+    if (full && token) studentSolutions(sid, token).then(setSols).catch(() => setSols({}));
+  }, [sid, full]);
   if (err) return <main className="hs-main"><div className="hs-err">{err}</div></main>;
   if (!r) return <main className="hs-main hs-muted">…</main>;
   const name = loadSession()?.student.fullName.trim().split(/\s+/).pop() ?? "";
@@ -64,7 +75,7 @@ export function ResultPage() {
           <div key={it.no} className={`hs-card hs-rq${open === i ? " open" : ""}`} data-testid="hs-rq">
             <div className="rh" role="button" tabIndex={0} onClick={() => setOpen(open === i ? null : i)} onKeyDown={(e) => e.key === "Enter" && setOpen(open === i ? null : i)}>
               <span className={`rn ${v?.[0] ?? ""}`}>{v ? <Icon name={v[1]} /> : i + 1}</span>
-              <div className="g"><b>Câu {i + 1}</b>{v && <span className={`hs-chip ${v[2]}`}>{v[3]}</span>}</div>
+              <div className="g"><b>Câu {i + 1}</b>{v && <span className={`hs-chip ${v[2]}`}>{v[3]}</span>}{sols[String(it.no)] && <span className="hs-chip"><Icon name="spark" />Lời giải từng bước</span>}</div>
               {it.points !== null && <span className="pts">{vn(it.points)} / {vn(it.maxPoints)}</span>}
               <span className="chev"><Icon name="chev" /></span>
             </div>
@@ -72,7 +83,13 @@ export function ResultPage() {
               <div className="rb">
                 <div className="qt"><MathText value={it.stem} /></div>
                 <Answer it={it} />
-                {it.explanation && <div className="hs-sol"><div className="st"><Icon name="spark" />Lời giải</div><MathText value={it.explanation} /></div>}
+                {sols[String(it.no)] ? (
+                  <Suspense fallback={<div className="hs-muted">…</div>}>
+                    <HsSolution solution={sols[String(it.no)]!} token={loadSession()?.token ?? null} />
+                  </Suspense>
+                ) : (
+                  it.explanation && <div className="hs-sol"><div className="st"><Icon name="spark" />Lời giải</div><MathText value={it.explanation} /></div>
+                )}
               </div>
             )}
           </div>

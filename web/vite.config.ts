@@ -32,6 +32,6 @@ export default defineConfig({
       input: { index: resolve(here, "index.html"), gv: resolve(here, "gv.html"), hoc: resolve(here, "hoc.html") },
     },
   },
-  server: { port: Number(process.env.WEB_PORT ?? 5173), strictPort: true, proxy: { "/api": api, "/dl": api, "/mcp": api, "/vendor": api } },
-  preview: { proxy: { "/api": api, "/dl": api, "/mcp": api, "/vendor": api } },
+  server: { port: Number(process.env.WEB_PORT ?? 5173), strictPort: true, proxy: { "/api": api, "/dl": api, "/mcp": api, "/vendor": api, "/chia-se": api } },
+  preview: { proxy: { "/api": api, "/dl": api, "/mcp": api, "/vendor": api, "/chia-se": api } },
 });

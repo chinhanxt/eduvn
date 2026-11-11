@@ -9,6 +9,7 @@ import type { GameBody } from "../domain/games";
 import type { BoardDoc } from "../domain/board";
 import type { DiagramDoc } from "../domain/diagram";
 import type { SlideDeck } from "../domain/slides";
+import type { Solution } from "../domain/solution";
 import type { ExamMatrix } from "../domain/matrix";
 import type { QuestionInput, QuestionType } from "../domain/question";
 import type { PointRules } from "../domain/scoring";
@@ -700,4 +701,29 @@ export const photoResults = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index("photo_results_org_idx").on(t.orgId, t.kind)],
+);
+
+/** P13 — lời giải từng bước. Gắn với câu trong ngân hàng (question_id) hoặc đứng riêng; `slug` có khi GV chia sẻ công khai. */
+export const solutions = pgTable(
+  "solutions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id),
+    questionId: uuid("question_id").references(() => questions.id, { onDelete: "set null" }),
+    subject: text("subject").notNull(),
+    topic: text("topic").notNull().default(""),
+    status: text("status", { enum: ["verified", "mismatch", "unchecked"] }).notNull(),
+    body: jsonb("body").$type<Solution>().notNull(),
+    slug: text("slug").unique(),
+    views: integer("views").notNull().default(0),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("solutions_org_idx").on(t.orgId), uniqueIndex("solutions_question_idx").on(t.questionId), index("solutions_public_idx").on(t.publishedAt)],
 );

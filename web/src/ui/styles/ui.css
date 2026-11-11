@@ -489,3 +489,6 @@ main.bare { min-height: 100dvh; }
 .caret-end > :last-child::after, .caret-end > :last-child > :last-child::after { content: ""; display: inline-block; width: 2px; height: 1.05em; margin-left: 2px; vertical-align: -0.15em; background: var(--accent); animation: blink 1s steps(2) infinite; }
 .caret-end > :last-child:has(> :last-child)::after { content: none; }
 @media (prefers-reduced-motion: reduce) { .caret-end > :last-child::after, .caret-end > :last-child > :last-child::after { animation: none; } }
+/* P13 lời giải: màu nhấn theo cổng (GV chàm, Học lục lam) + theo sáng/tối — ghi đè --sol-accent của solution.css.
+   Thư viện công khai /loi-giai (entry gốc, không có data-portal) giữ lục lam qua lớp .sol-hoc của trang. */
+[data-portal] :is(.sol-scope, .sol-viewer, .sol-sheet-wrap, .sol-dlg-wrap, .sol-toast, .sol-chat-card, .sol-hs) { --sol-accent: var(--accent); --sol-accent-bg: var(--accent-bg); --sol-accent-line: var(--accent-line); }

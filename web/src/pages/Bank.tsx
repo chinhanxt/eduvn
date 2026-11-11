@@ -1,10 +1,15 @@
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState, type FormEvent } from "react";
 import { ApiError, aiSkill, api, errText, type BankQuestion, type Question } from "../api";
 import { blobToDataUrl, printSvg, svgToPngBlob } from "../geometry3d/figure";
 import { FigureBuilder } from "../geometry3d/FigureBuilder";
 import { Icon } from "../Icon";
 import { MathEditor } from "../math/MathEditor";
 import { MathText } from "../math/MathText";
+import { solutionStatus } from "../solution/api";
+import { STATUS_TEXT, type VerifyStatus } from "../solution/types";
+
+// P13: lời giải từng bước (tải lười trình xem + KaTeX khi mở)
+const SolutionDialog = lazy(() => import("../solution/SolutionDialog").then((m) => ({ default: m.SolutionDialog })));
 
 export const SUBJECT_DEFAULT = "Toán";
 const TYPE_LABEL: Record<Question["type"], string> = { mcq: "Trắc nghiệm", true_false: "Đúng/sai", short_answer: "Trả lời ngắn", essay: "Tự luận" };
@@ -16,6 +21,12 @@ export function Bank() {
   const [adding, setAdding] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [solOf, setSolOf] = useState<Record<string, VerifyStatus>>({});
+  const [solFor, setSolFor] = useState<Question | null>(null);
+
+  useEffect(() => {
+    if (rows?.length) solutionStatus(rows.map((q) => q.id)).then(setSolOf).catch(() => setSolOf({}));
+  }, [rows]);
 
   const load = useCallback(() => {
     setError(null);
@@ -51,7 +62,7 @@ export function Bank() {
           <div className="empty">—</div>
         ) : (
           <table data-testid="q-table">
-            <thead><tr><th>Câu hỏi</th><th>Chủ đề</th><th>Mức</th><th>Loại</th></tr></thead>
+            <thead><tr><th>Câu hỏi</th><th>Chủ đề</th><th>Mức</th><th>Loại</th><th>Lời giải</th></tr></thead>
             <tbody>
               {rows?.map((q) => (
                 <tr key={q.id}>
@@ -59,12 +70,23 @@ export function Bank() {
                   <td>{q.topic}</td>
                   <td><span className="tag green">{q.level}</span></td>
                   <td><span className="tag violet">{TYPE_LABEL[q.type]}</span></td>
+                  <td>
+                    <button className="btn ghost sm" onClick={() => setSolFor(q)} data-testid="q-solution" title={solOf[q.id] ? `Lời giải: ${STATUS_TEXT[solOf[q.id]!]}` : "Tạo lời giải từng bước"}>
+                      <Icon name={solOf[q.id] === "verified" ? "checkc" : solOf[q.id] === "mismatch" ? "alert" : "spark"} size={16} />
+                      {solOf[q.id] ? STATUS_TEXT[solOf[q.id]!] : "Lời giải từng bước"}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+      {solFor && (
+        <Suspense fallback={null}>
+          <SolutionDialog question={{ id: solFor.id, stem: solFor.stem }} onClose={() => setSolFor(null)} onStatus={(id, st) => setSolOf((m) => ({ ...m, [id]: st }))} />
+        </Suspense>
+      )}
     </>
   );
 }

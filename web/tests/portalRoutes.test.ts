@@ -34,7 +34,7 @@ describe("bản đồ chuyển hướng đường cũ → cổng mới", () => {
   });
 
   it("đường mới, /choi, / và đường gần giống không bị chuyển", () => {
-    for (const p of ["/", "/choi", "/callback", "/gv", "/gv/ngan-hang", "/hoc", "/hoc/gia-su", "/hoc/hs/bai/1", "/ngan-hang-x", "/hsx", "/gvx"]) expect(legacyRedirect(p)).toBeNull();
+    for (const p of ["/", "/choi", "/loi-giai", "/loi-giai/tam-thuc-bac-hai", "/callback", "/gv", "/gv/ngan-hang", "/hoc", "/hoc/gia-su", "/hoc/hs/bai/1", "/ngan-hang-x", "/hsx", "/gvx"]) expect(legacyRedirect(p)).toBeNull();
   });
 
   it("đường mới đều thuộc đúng entry", () => {

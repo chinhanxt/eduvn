@@ -8,6 +8,9 @@ import { legacyRedirect, portalForRole } from "./entries";
 import { GoTo } from "./Redirect";
 
 const Play = lazy(() => import("../live/Play").then((m) => ({ default: m.Play })));
+// P13 — thư viện lời giải công khai (không cần đăng nhập; meta/OG đặt trong trang, bản cho máy quét ở /chia-se/loi-giai/:slug của server)
+const SolutionLibrary = lazy(() => import("../solution/SolutionLibrary").then((m) => ({ default: m.SolutionLibrary })));
+const SolutionPublicPage = lazy(() => import("../solution/SolutionLibrary").then((m) => ({ default: m.SolutionPublicPage })));
 
 /** "/": đăng nhập Keycloak → theo vai trò (GV/owner/admin/assistant → /gv, còn lại → /hoc); chỉ có phiên HS P9a → /hoc/hs; chưa có → Đăng nhập. */
 function Landing() {
@@ -54,13 +57,15 @@ function Fallback() {
   return <GoTo here="index.html" to={to ? `${to}${search}${hash}` : "/"} />;
 }
 
-/** Entry gốc index.html: đăng nhập, /callback, /choi (công khai, P11) và chuyển hướng đường cũ. */
+/** Entry gốc index.html: đăng nhập, /callback, trang công khai (/choi P11, /loi-giai P13) và chuyển hướng đường cũ. */
 export function RootApp() {
   return (
     <Suspense fallback={<div className="center">…</div>}>
       <Routes>
         <Route path="/callback" element={<Callback />} />
         <Route path="/choi" element={<Play />} />
+        <Route path="/loi-giai" element={<SolutionLibrary />} />
+        <Route path="/loi-giai/:slug" element={<SolutionPublicPage />} />
         <Route index element={<Landing />} />
         <Route path="*" element={<Fallback />} />
       </Routes>

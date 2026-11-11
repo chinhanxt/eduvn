@@ -1,6 +1,6 @@
 /**
  * Bản đồ đường dẫn của 3 entry Vite (thuần, không DOM — dùng cả trong vite.config.ts và test).
- * index.html: đăng nhập + chuyển theo vai trò + /choi (công khai) + chuyển hướng đường cũ.
+ * index.html: đăng nhập + chuyển theo vai trò + trang công khai (/choi, /loi-giai) + chuyển hướng đường cũ.
  * gv.html: cổng giáo viên /gv/*. hoc.html: cổng học sinh /hoc/* (Keycloak + phiên HS P9a ở /hoc/hs/*).
  */
 export type Entry = "index.html" | "gv.html" | "hoc.html";
