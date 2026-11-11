@@ -1,0 +1,6 @@
+/* /hoc/tro-ly (G6): một cột đọc 780px, khung soạn dính đáy. */
+.tro-ly { display: flex; flex-direction: column; min-height: calc(100dvh - var(--top-h) - var(--s-6)); }
+.tro-ly-main { flex: 1; width: 100%; max-width: 780px; margin: 0 auto; padding: var(--s-2) 0 var(--s-6); }
+.tro-ly-composer { position: sticky; bottom: 0; z-index: var(--z-sticky); width: 100%; max-width: 780px; margin: 0 auto; padding: var(--s-3) 0 var(--s-5); background: linear-gradient(transparent, var(--bg) 35%); }
+.tro-ly-starters { display: flex; flex-wrap: wrap; gap: var(--s-2); justify-content: center; max-width: 560px; }
+@media (max-width: 720px) { .tro-ly-composer { padding-bottom: calc(var(--tab-h) + var(--s-2)); } }

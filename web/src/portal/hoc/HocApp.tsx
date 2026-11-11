@@ -21,6 +21,7 @@ const P = {
   practice: p6(() => import("../../hoc/Practice"), (m) => m.Practice),
   paths: p6(() => import("../../hoc/Paths"), (m) => m.Paths),
   books: p6(() => import("../../hoc/Books"), (m) => m.Books),
+  troLy: pick(() => import("../../hoc/TroLy"), (m) => m.TroLy),
 };
 
 registerPreload([
@@ -39,6 +40,7 @@ registerPreload([
   { path: "/hoc/luyen-tap", preload: P.practice.preload },
   { path: "/hoc/lo-trinh", preload: P.paths.preload },
   { path: "/hoc/giao-trinh", preload: P.books.preload },
+  { path: "/hoc/tro-ly", preload: P.troLy.preload },
 ]);
 
 // Mở thẳng /hoc: tải code + dữ liệu Hôm nay ngay khi entry chạy.
@@ -66,6 +68,18 @@ function NeedUser({ children }: { children: ReactNode }) {
   return <L>{children}</L>;
 }
 
+/** Trang v2 cần tài khoản Keycloak (như NeedUser nhưng không bọc .legacy). */
+function NeedAccount({ children }: { children: ReactNode }) {
+  const { user, ready } = useAuth();
+  const { session } = useLearner();
+  useEffect(() => {
+    if (ready && !user && !session) goLogin();
+  }, [ready, user, session]);
+  if (ready && !user && session) return <Navigate to="/hoc/hs" replace />;
+  if (!ready || !user) return <PageSkeleton />;
+  return <>{children}</>;
+}
+
 const Legacy = lazy(() => import("./LegacyHoc").then((m) => ({ default: m.LegacyHoc })));
 
 /** Cổng học sinh /hoc: Hôm nay + P6 (gia sư, luyện tập, lộ trình, giáo trình) cho tài khoản, P9a (/hoc/hs/…) cho cả phiên mã lớp. */
@@ -76,6 +90,7 @@ export function HocApp() {
   const Pr = P.practice.Component;
   const Pa = P.paths.Component;
   const B = P.books.Component;
+  const TL = P.troLy.Component;
   return (
     <ToastProvider>
       <Routes>
@@ -86,6 +101,7 @@ export function HocApp() {
           <Route path="/hoc/luyen-tap" element={<NeedUser><Pr /></NeedUser>} />
           <Route path="/hoc/lo-trinh" element={<NeedUser><Pa /></NeedUser>} />
           <Route path="/hoc/giao-trinh" element={<NeedUser><B /></NeedUser>} />
+          <Route path="/hoc/tro-ly" element={<NeedAccount><TL /></NeedAccount>} />
         </Route>
         <Route path="*" element={<Suspense fallback={<PageSkeleton />}><Legacy /></Suspense>} />
       </Routes>
