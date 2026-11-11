@@ -11,9 +11,9 @@ export const esc = (s: unknown) => String(s ?? "").replace(/&/g, "&amp;").replac
 const cq = (px: number) => `${Math.round((px / 10) * 1000) / 1000}cqw`;
 const css = (c: unknown, fb = "#333333") => (typeof c === "string" && /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|[a-z]+)$/i.test(c.trim()) ? c.trim() : fb);
 
-/** HTML của ProseMirror: bỏ thẻ/thuộc tính nguy hiểm, đổi px → cqw. */
+/** HTML của ProseMirror: bỏ thẻ/thuộc tính nguy hiểm, đổi px → cqw; gạch đầu dòng viết liền trong đoạn thành danh sách thật. */
 export function safeRich(html: string): string {
-  return html
+  return listifyHtml(html)
     .replace(/<\s*(script|style|iframe|object|embed|link|meta)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
     .replace(/<\s*(script|style|iframe|object|embed|link|meta)[^>]*\/?>/gi, "")
     .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
@@ -134,7 +134,7 @@ function bgCss(c: Canvas): string {
   return css(bg?.color ?? c.theme?.backgroundColor, "#ffffff");
 }
 
-export const BASE_CSS = `*{box-sizing:border-box}html,body{margin:0;height:100%;background:#fff}body{font-family:${FONT_STACK}}p{margin:0}ul,ol{margin:0;padding-left:1.4em}.stage{container-type:inline-size;position:relative;width:100%;aspect-ratio:1000/562.5;overflow:hidden}.sub{position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:90cqw;bottom:2.2cqw;text-align:center;color:#fff;background:rgba(0,0,0,.62);padding:.6cqw 1.6cqw;border-radius:.8cqw;font-size:2.6cqw;line-height:1.35;z-index:20}.spot{position:absolute;border-radius:.8cqw;box-shadow:0 0 0 200cqw rgba(0,0,0,.55);outline:.3cqw solid #ffd24d;z-index:10;pointer-events:none}.laser{position:absolute;width:3cqw;height:3cqw;margin:-1.5cqw 0 0 -1.5cqw;border-radius:50%;background:radial-gradient(circle,#ff2a2a 0 35%,rgba(255,42,42,.35) 36% 100%);z-index:10;pointer-events:none}`;
+export const BASE_CSS = `*{box-sizing:border-box}html,body{margin:0;height:100%;background:#fff}body{font-family:${FONT_STACK}}p{margin:0}ul,ol{margin:0;padding-left:1.4em}.lead,.tail{display:block}ul.bl{margin:.15em 0}.stage{container-type:inline-size;position:relative;width:100%;aspect-ratio:1000/562.5;overflow:hidden}.sub{position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:90cqw;bottom:2.2cqw;text-align:center;color:#fff;background:rgba(0,0,0,.62);padding:.6cqw 1.6cqw;border-radius:.8cqw;font-size:2.6cqw;line-height:1.35;z-index:20}.spot{position:absolute;border-radius:.8cqw;box-shadow:0 0 0 200cqw rgba(0,0,0,.55);outline:.3cqw solid #ffd24d;z-index:10;pointer-events:none}.laser{position:absolute;width:3cqw;height:3cqw;margin:-1.5cqw 0 0 -1.5cqw;border-radius:50%;background:radial-gradient(circle,#ff2a2a 0 35%,rgba(255,42,42,.35) 36% 100%);z-index:10;pointer-events:none}`;
 
 export function overlayHtml(canvas: Canvas, opts: Pick<HtmlOpts, "focusId" | "effect">): string {
   const f = opts.focusId ? canvas.elements.find((x) => x.id === opts.focusId) : undefined;
@@ -158,14 +158,22 @@ export function slideHtml(canvas: Canvas, o: HtmlOpts): string {
 // Chữ thuần có công thức viết kiểu máy ("(2x - 3y)^2", "4x^2 - 12xy + 9y^2") → bọc thành LaTeX để dựng bằng KaTeX như trên slide.
 const MT = String.raw`(?:\([^()]*\)|[A-Za-z0-9.]+)(?:\^(?:\{[^}]*\}|[A-Za-z0-9]+))?`;
 const MATH_RUN = new RegExp(`(?<![\\p{L}\\p{N}_])${MT}(?:\\s*[-+*/=×]\\s*${MT}|\\s*\\([^()]*\\)(?:\\^[A-Za-z0-9]+)?)*`, "gu");
-/** Chữ → HTML: $…$ dựng KaTeX; nếu không có $ thì tự nhận các đoạn biểu thức (có ^ = + * / hoặc " - ") và dựng KaTeX. */
+const MATH_FN = new Set(["sin", "cos", "tan", "cot", "log", "ln", "lim", "sqrt", "max", "min", "exp"]);
+/** Đoạn bắt được chỉ là toán khi có mẫu rõ: mũ ^, dấu =, nhân * ×, hoặc + / " - " giữa các số hạng có biến; có chữ thường của câu (≥ 3 chữ cái, chữ có dấu) thì là văn bản. */
+function clearMath(run: string): boolean {
+  if (/[^\x00-\x7f×]/.test(run)) return false;
+  for (const w of run.match(/[A-Za-z]{3,}/g) ?? []) if (!MATH_FN.has(w.toLowerCase())) return false;
+  if (/[\^=*×]/.test(run)) return true;
+  return /\+|\s-\s/.test(run) && /[A-Za-z]/.test(run);
+}
+/** Chữ → HTML: $…$ dựng KaTeX; nếu không có $ thì chỉ dựng KaTeX cho đoạn có mẫu toán rõ ("(2x - 3y)^2", "x + 1 = 0"); "0,10 (hay 1/10)" giữ là chữ. */
 export function mathInline(s: string, latex: (t: string) => string): string {
   if (s.includes("$")) return esc(s).replace(/\$([^$]+)\$/g, (_x, t: string) => latex(t));
   let out = "";
   let last = 0;
   for (const m of s.matchAll(MATH_RUN)) {
     const run = m[0];
-    if (!/[\^=+*/×]|\s-\s/.test(run)) continue;
+    if (!clearMath(run)) continue;
     const at = m.index ?? 0;
     out += esc(s.slice(last, at)) + latex(run.replace(/\s*\*\s*/g, " \\cdot ").replace(/×/g, "\\times "));
     last = at + run.length;
@@ -175,9 +183,74 @@ export function mathInline(s: string, latex: (t: string) => string): string {
 
 export type QuizQ = { id?: string; type: string; question: string; options?: { value: string; label: string }[]; answer?: string[]; analysis?: string };
 
+/** Vị trí gạch đầu dòng viết liền ("… - Nam: … - Nữ: …"): dấu -/–/• đứng sau khoảng trắng và trước một từ viết hoa; bỏ qua phần trong $…$. */
+function inlineBullets(s: string): number[] {
+  const at: number[] = [];
+  let inMath = false;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === "$" && s[i - 1] !== "\\") inMath = !inMath;
+    if (inMath || !"-–•".includes(s[i] as string)) continue;
+    if (i > 0 && !/\s/.test(s[i - 1] as string)) continue;
+    if (/^\s+\p{Lu}[\p{Ll}\p{M}]/u.test(s.slice(i + 1, i + 5).normalize("NFC"))) at.push(i);
+  }
+  return at;
+}
+
+/** Tách gạch đầu dòng (xuống dòng "\n- …" hoặc viết liền ≥ 2 mục) thành phần mở đầu + các mục + phần sau; không có thì null. */
+export function splitBullets(s: string): { lead: string; items: string[]; tail: string } | null {
+  const lines = s.split(/\n/);
+  const isItem = (l: string) => /^\s*[-–•*]\s+\S/.test(l);
+  if (lines.filter(isItem).length >= 2) {
+    const first = lines.findIndex(isItem);
+    let last = first;
+    while (last + 1 < lines.length && isItem(lines[last + 1] as string)) last++;
+    return { lead: lines.slice(0, first).join(" ").trim(), items: lines.slice(first, last + 1).map((l) => l.replace(/^\s*[-–•*]\s+/, "").trim()), tail: lines.slice(last + 1).join(" ").trim() };
+  }
+  const at = inlineBullets(s);
+  if (at.length < 2) return null;
+  const items = at.map((p, k) => s.slice(p + 1, at[k + 1] ?? s.length).trim());
+  // mục cuối: câu hỏi viết tiếp sau danh sách ("… 12 bạn không thích. Chọn ngẫu nhiên…") tách thành phần sau
+  const lastItem = items[items.length - 1] as string;
+  const cut = /[.;]\s+(?=\p{Lu})/u.exec(lastItem);
+  let tail = "";
+  if (cut) {
+    items[items.length - 1] = lastItem.slice(0, cut.index + 1).trim();
+    tail = lastItem.slice(cut.index + 1).trim();
+  }
+  return { lead: s.slice(0, at[0]).trim(), items, tail };
+}
+
+/** Chữ của câu hỏi/phương án → HTML: công thức như mathInline, gạch đầu dòng thành <ul> thật. */
+export function richInline(s: string, latex: (t: string) => string): string {
+  const b = splitBullets(s);
+  if (!b) return mathInline(s, latex);
+  const m = (t: string) => mathInline(t, latex);
+  return `${b.lead ? `<span class="lead">${m(b.lead)}</span>` : ""}<ul class="bl">${b.items.map((t) => `<li>${m(t)}</li>`).join("")}</ul>${b.tail ? `<span class="tail">${m(b.tail)}</span>` : ""}`;
+}
+
+/** Mỗi thẻ mở trong đoạn HTML đều được đóng trong chính đoạn đó (để tách đoạn không làm vỡ thẻ). */
+function balanced(h: string): boolean {
+  const open = (h.match(/<(?!\/|br\b|img\b|hr\b)[a-z][^>]*>/gi) ?? []).filter((t) => !t.endsWith("/>")).length;
+  return open === (h.match(/<\/[a-z][^>]*>/gi) ?? []).length;
+}
+
+/** Trong HTML slide: đoạn <p> chứa gạch đầu dòng viết liền, hoặc chuỗi đoạn "<p>- …</p>", thành danh sách <ul>. */
+export function listifyHtml(html: string): string {
+  const one = html.replace(/<p([^>]*)>((?:(?!<\/?p[\s>])[\s\S])*?)<\/p>/gi, (m, attrs: string, inner: string) => {
+    if (/<(ul|ol|li|div|table)[\s>]/i.test(inner)) return m;
+    const b = splitBullets(inner);
+    if (!b || ![b.lead, ...b.items, b.tail].every(balanced)) return m;
+    return `${b.lead ? `<p${attrs}>${b.lead}</p>` : ""}<ul>${b.items.map((t) => `<li>${t}</li>`).join("")}</ul>${b.tail ? `<p${attrs}>${b.tail}</p>` : ""}`;
+  });
+  return one.replace(/(?:<p[^>]*>\s*(?:<[^>]+>\s*)*[-–•]\s+(?:(?!<\/?p[\s>])[\s\S])*?<\/p>\s*){2,}/gi, (run) => {
+    const items = [...run.matchAll(/<p[^>]*>((?:(?!<\/?p[\s>])[\s\S])*?)<\/p>/gi)].map((x) => (x[1] as string).replace(/^((?:\s*<[^>]+>)*)\s*[-–•]\s+/, "$1"));
+    return `<ul>${items.map((t) => `<li>${t}</li>`).join("")}</ul>`;
+  });
+}
+
 /** Khung cho cảnh quiz: danh sách câu hỏi (có thể kèm đáp án). */
 export function quizHtml(title: string, questions: QuizQ[], o: { latex: (t: string) => string; reveal?: boolean; subtitle?: string; extraHead?: string }): string {
-  const m = (s: string) => mathInline(s, o.latex);
+  const m = (s: string) => richInline(s, o.latex);
   const qs = questions
     .map((q, i) => `<div style="margin:0 0 ${cq(14)}"><div style="font-weight:600">Câu ${i + 1}. ${m(q.question)}</div>${(q.options ?? []).map((op) => `<div style="margin-left:${cq(20)};${o.reveal && q.answer?.includes(op.value) ? "color:#0a8a4a;font-weight:700" : ""}">${esc(op.value)}. ${m(op.label)}</div>`).join("")}${o.reveal && q.analysis ? `<div style="margin-left:${cq(20)};color:#5b6290;font-size:${cq(15)}">${m(q.analysis)}</div>` : ""}</div>`)
     .join("");
@@ -198,7 +271,7 @@ function textOn(bg: string): string {
 
 /** Một câu hỏi trên một khung (video): câu + phương án lớn, dễ đọc ở 720p; `reveal` tô xanh đáp án đúng, làm mờ các phương án sai. */
 export function quizQuestionHtml(title: string, q: QuizQ, index: number, total: number, o: { latex: (t: string) => string; reveal?: boolean; extraHead?: string }): string {
-  const m = (t: string) => mathInline(t, o.latex);
+  const m = (t: string) => richInline(t, o.latex);
   const right = (v: string) => !!q.answer?.includes(v);
   const opts = (q.options ?? [])
     .map((op) => {

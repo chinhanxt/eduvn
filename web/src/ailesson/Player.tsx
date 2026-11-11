@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "../Icon";
-import { BASE, type Action, type Scene, blobFetch, estimateMs, gradeQuestion, sceneHtml, splitCues } from "./lib";
+import { interactiveDoc } from "../../../server/src/export/interactiveHtml";
+import { richInline } from "../../../server/src/export/slideHtml";
+import { BASE, type Action, type Scene, blobFetch, estimateMs, gradeQuestion, latex, sceneHtml, splitCues } from "./lib";
 
 type Focus = { id: string; effect: "spotlight" | "laser" } | null;
 
@@ -196,7 +198,14 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
     setChecked(false);
   }, [idx]);
 
-  const html = useMemo(() => (scene && scene.type !== "interactive" && scene.type !== "quiz" ? sceneHtml(scene, { focusId: focus?.id, effect: focus?.effect, subtitle: showSub ? sub : "" }) : ""), [scene, focus, sub, showSub]);
+  // phụ đề nằm ở dải riêng dưới khung (như video), không phủ lên slide/hoạt hình
+  const html = useMemo(() => (scene && scene.type !== "interactive" && scene.type !== "quiz" ? sceneHtml(scene, { focusId: focus?.id, effect: focus?.effect }) : ""), [scene, focus]);
+  const thumbs = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const on = thumbs.current?.querySelector<HTMLElement>(".ail-th.on");
+    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    on?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
+  }, [idx]);
   if (!scene) return <div className="empty">Bài giảng chưa có cảnh nào</div>;
 
   const qs = scene.content.questions ?? [];
@@ -211,7 +220,7 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
               const res = checked ? gradeQuestion(q, sel) : null;
               return (
                 <div key={q.id ?? qi} className="ail-q">
-                  <b>Câu {qi + 1}.</b> <span dangerouslySetInnerHTML={{ __html: sceneHtmlInline(q.question) }} />
+                  <b>Câu {qi + 1}.</b> <span dangerouslySetInnerHTML={{ __html: richInline(q.question, latex) }} />
                   {q.type === "short_answer" ? (
                     <input className="inp w-l" placeholder="Nhập câu trả lời" value={sel[0] ?? ""} onChange={(e) => setPicked({ ...picked, [q.id ?? String(qi)]: [e.target.value] })} />
                   ) : (
@@ -224,7 +233,7 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
                           disabled={checked}
                           onChange={(e) => setPicked({ ...picked, [q.id ?? String(qi)]: q.type === "multiple" ? (e.target.checked ? [...sel, o.value] : sel.filter((x) => x !== o.value)) : [o.value] })}
                         />
-                        {o.value}. <span dangerouslySetInnerHTML={{ __html: sceneHtmlInline(o.label) }} />
+                        {o.value}. <span dangerouslySetInnerHTML={{ __html: richInline(o.label, latex) }} />
                       </label>
                     ))
                   )}
@@ -238,23 +247,21 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
               );
             })}
             <button className="btn" onClick={() => setChecked(true)} disabled={checked} data-testid="ail-check"><Icon name="check" size={18} />Kiểm tra</button>
-            {showSub && sub && <div className="ail-sub">{sub}</div>}
           </div>
         ) : scene.type === "interactive" ? (
           <>
-            <iframe className="ail-frame" title={scene.title} sandbox="allow-scripts" srcDoc={scene.content.html ?? ""} data-testid="ail-interactive" />
-            {showSub && sub && <div className="ail-sub">{sub}</div>}
+            <iframe className="ail-frame" title={scene.title} sandbox="allow-scripts" srcDoc={interactiveDoc(scene.content.html ?? "")} data-testid="ail-interactive" />
           </>
         ) : animHash ? (
           <>
             {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
             <video ref={video} className="ail-frame ail-anim" src={animUrl ?? undefined} muted playsInline data-testid="ail-anim" />
-            {showSub && sub && <div className="ail-sub">{sub}</div>}
           </>
         ) : (
           <iframe className="ail-frame" title={scene.title} sandbox="" srcDoc={html} data-testid="ail-slide" />
         )}
       </div>
+      {showSub && <div className="ail-band" aria-live="polite" data-testid="ail-sub">{sub}</div>}
       <div className="ail-ctrl">
         <button className="btn ghost sm" onClick={() => go(idx - 1)} disabled={idx === 0} aria-label="Cảnh trước"><Icon name="left" size={16} /></button>
         <button className="btn sm" onClick={toggle} data-testid="ail-play"><Icon name={playing ? "pause" : "play"} size={16} />{playing ? "Tạm dừng" : "Phát"}</button>
@@ -263,7 +270,7 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
         <span className="sp" style={{ flex: 1 }} />
         <label className="ail-cc"><input type="checkbox" checked={showSub} onChange={(e) => setShowSub(e.target.checked)} />Phụ đề</label>
       </div>
-      <div className="ail-thumbs">
+      <div className="ail-thumbs" ref={thumbs}>
         {scenes.map((s, i) => (
           <button key={s.id} className={`ail-th${i === idx ? " on" : ""}`} onClick={() => go(i)} data-testid="ail-scene-btn">
             <span>{i + 1}</span>
@@ -276,8 +283,3 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
   );
 }
 
-import { latex } from "./lib";
-function sceneHtmlInline(s: string): string {
-  const e = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  return e.replace(/\$([^$]+)\$/g, (_m, t: string) => latex(t));
-}

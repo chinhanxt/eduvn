@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { coerceField, cqwToPx, gradeQuestion, splitCues } from "../src/ailesson/pure";
-import { elementHtml, quizHtml, slideHtml } from "../../server/src/export/slideHtml";
+import { interactiveDoc } from "../../server/src/export/interactiveHtml";
+import { elementHtml, listifyHtml, mathInline, quizHtml, richInline, slideHtml } from "../../server/src/export/slideHtml";
 
 const latex = (t: string) => `<i>${t}</i>`;
 
@@ -38,5 +39,36 @@ describe("form thư viện hoạt hình", () => {
     expect(coerceField(true, false)).toBe(false);
     expect(coerceField([], "[[1,2],[3,4]]")).toEqual([[1, 2], [3, 4]]);
     expect(() => coerceField({}, "{sai")).toThrow();
+  });
+});
+
+describe("sửa demo 11/11 — chữ quiz/slide", () => {
+  it("'0,10 (hay 1/10)' là chữ, không bị KaTeX bắt; công thức rõ vẫn dựng", () => {
+    expect(mathInline("0,10 (hay 1/10)", latex)).toBe("0,10 (hay 1/10)");
+    expect(mathInline("Xác suất 5/8 và 3/8", latex)).toBe("Xác suất 5/8 và 3/8");
+    expect(mathInline("Giải x + 1 = 0 nhé", latex)).toBe("Giải <i>x + 1 = 0</i> nhé");
+    expect(mathInline("(2x - 3y)^2", latex)).toBe("<i>(2x - 3y)^2</i>");
+  });
+  it("gạch đầu dòng viết liền thành danh sách thật; dấu trừ trong công thức không bị tách", () => {
+    const q = "Kết quả khảo sát: - Nam: 18 bạn thích, 6 bạn không thích. - Nữ: 4 bạn thích, 12 bạn không thích. Chọn ngẫu nhiên một bạn. Biết bạn đó là nữ, tính xác suất?";
+    const h = richInline(q, latex);
+    expect(h).toContain('<ul class="bl"><li>Nam: 18 bạn thích, 6 bạn không thích.</li><li>Nữ: 4 bạn thích, 12 bạn không thích.</li></ul>');
+    expect(h).toContain('<span class="lead">Kết quả khảo sát:</span>');
+    expect(h).toContain('<span class="tail">Chọn ngẫu nhiên một bạn. Biết bạn đó là nữ, tính xác suất?</span>');
+    expect(richInline("Tính $a - B$ và x - Y", latex)).not.toContain("<ul");
+    expect(richInline("Dòng đầu\n- Một\n- Hai", latex)).toContain("<li>Một</li><li>Hai</li>");
+  });
+  it("slide: đoạn <p> có gạch đầu dòng viết liền / chuỗi <p>- …</p> thành <ul>", () => {
+    expect(listifyHtml("<p>Ví dụ: - Nam: 18 - Nữ: 4</p>")).toBe("<p>Ví dụ:</p><ul><li>Nam: 18</li><li>Nữ: 4</li></ul>");
+    expect(listifyHtml("<p>- Một ý</p><p>- Hai ý</p><p>Kết</p>")).toBe("<ul><li>Một ý</li><li>Hai ý</li></ul><p>Kết</p>");
+    expect(listifyHtml('<p><span style="x">Có: - Nam: 1 - Nữ: 2</span></p>')).toBe('<p><span style="x">Có: - Nam: 1 - Nữ: 2</span></p>');
+    const html = slideHtml({ elements: [{ id: "t", type: "text", left: 0, top: 0, width: 500, height: 80, content: "<p>Lớp: - Nam: 18 - Nữ: 4</p>" }] }, { latex });
+    expect(html).toContain("<ul><li>Nam: 18</li><li>Nữ: 4</li></ul>");
+  });
+  it("cảnh tương tác: shim bộ nhớ chèn đầu <head>, trước mọi script của AI", () => {
+    const d = interactiveDoc("<!DOCTYPE html><html><head><script>localStorage.setItem('a','1')</script></head><body></body></html>");
+    expect(d.indexOf("data-eduvn-shim")).toBeLessThan(d.indexOf("localStorage.setItem"));
+    expect(interactiveDoc(d)).toBe(d);
+    expect(interactiveDoc("<div>x</div>").startsWith("<script data-eduvn-shim>")).toBe(true);
   });
 });
