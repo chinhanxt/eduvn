@@ -26,8 +26,8 @@ export type Timeline = { title: string; segments: Segment[]; totalMs: number; di
 
 const SILENT_MS = 4000;
 const REVEAL_MS = 4000;
-/** Thời gian nghĩ sau khi đọc xong câu hỏi, và nghỉ sau lời giải. */
-const THINK_MS = 2500;
+/** Thời gian nghĩ sau khi đọc xong câu hỏi (phương án vẫn trên màn hình), và nghỉ sau lời giải. */
+const THINK_MS = 3000;
 const AFTER_REVEAL_MS = 800;
 const MAX_CUE = 140;
 
@@ -90,18 +90,29 @@ export function plainText(t: string): string {
     .trim();
 }
 
-/** Lời đọc cho từng câu quiz trong video: câu hỏi + các phương án, rồi đáp án + 1–2 câu lời giải (≤ ~260 ký tự). */
+/** Câu lời giải đọc kèm đáp án: câu đầu có nội dung của phần giải thích (bỏ câu dẫn kết thúc bằng ":"; tách cả gạch đầu dòng), ≤ ~220 ký tự. */
+export function oneLineExplain(analysis: string | undefined): string {
+  const parts = (analysis ?? "")
+    .replace(/\s*\n\s*[-•*]\s+|\s+[-•]\s+(?=\p{Lu})/gu, "\n")
+    .split(/\n|(?<=[.!?])\s+/)
+    .map((x) => x.replace(/\s+/g, " ").trim())
+    .filter((x) => x && !x.endsWith(":"));
+  let first = parts[0] ?? "";
+  if (first.length > 220) {
+    const cut = first.slice(0, 220);
+    const at = Math.max(cut.lastIndexOf(", "), cut.lastIndexOf("; "));
+    first = `${cut.slice(0, at > 80 ? at : cut.lastIndexOf(" "))}.`;
+  }
+  return first;
+}
+
+/** Lời đọc cho từng câu quiz trong video: chỉ đọc câu hỏi (phương án hiện trên màn hình, không đọc), rồi đáp án + 1 câu lời giải. */
 export function quizVoiceLines(qs: QuizQ[], sceneId: string): QuizVoice[] {
   return qs.map((q, i) => {
-    const opts = (q.options ?? []).map((o) => `Phương án ${o.value}: ${o.label.trim()}`).join(". ");
-    const ask = `Câu ${i + 1}. ${q.question.trim()}${opts ? ` ${opts}.` : ""}`.replace(/([.?!:])\./g, "$1");
+    const ask = `Câu ${i + 1}. ${q.question.trim()}`;
     const ans = q.answer ?? [];
     const head = ans.length ? `Đáp án đúng: ${ans.length > 1 ? `${ans.slice(0, -1).join(", ")} và ${ans[ans.length - 1]}` : ans[0]}.` : "Các em so với lời giải nhé.";
-    let body = "";
-    for (const sent of (q.analysis ?? "").replace(/\s+/g, " ").trim().split(/(?<=[.!?])\s+/)) {
-      if (!sent || (body + sent).length > 260) break;
-      body += `${body ? " " : ""}${sent}`;
-    }
+    const body = oneLineExplain(q.analysis);
     return { q: { id: `qv_${sceneId}_${i}_q`, text: ask }, a: { id: `qv_${sceneId}_${i}_a`, text: `${head}${body ? ` ${body}` : ""}` } };
   });
 }
@@ -162,7 +173,7 @@ export function compileTimeline(title: string, scenes: StoredScene[]): Timeline 
       }
     }
     if (kind === "quiz" && qs.length > 0) {
-      // mỗi câu hỏi hai đoạn, thời lượng theo nội dung: đọc câu hỏi + phương án rồi chờ nghĩ; đọc đáp án + lời giải ngắn.
+      // mỗi câu hỏi hai đoạn, thời lượng theo nội dung: đọc câu hỏi (không đọc phương án) rồi chờ 3 s nghĩ; đọc đáp án + 1 câu lời giải.
       // Có giọng đọc (quizVoice) thì theo đúng độ dài tiếng; chưa có thì ước lượng theo số chữ.
       const voice = sc.quizVoice ?? quizVoiceLines(qs, sc.id);
       qs.forEach((q, qi) => {

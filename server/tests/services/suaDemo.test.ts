@@ -4,7 +4,7 @@ import { chromium } from "playwright-core";
 import { describe, expect, it } from "vitest";
 import { dedupeHeadings } from "../../src/domain/bookBlocks";
 import { curriculumNote, derivable, fixGradeRefs, foreignNumbers, lessonFacts, numbersIn, wrongGradeRefs } from "../../src/domain/lessonFacts";
-import { compileTimeline, plainText, quizVoiceLines, toSrt } from "../../src/export/aiLessonTimeline";
+import { compileTimeline, oneLineExplain, plainText, quizVoiceLines, toSrt } from "../../src/export/aiLessonTimeline";
 import { framed, frameServer, settleInteractive } from "../../src/export/aiLessonVideo";
 import { interactiveDoc } from "../../src/export/interactiveHtml";
 import { hyperframesHtml } from "../../src/services/anim/hfHtml";
@@ -71,20 +71,22 @@ describe("cảnh quiz trong video: thời lượng theo nội dung", () => {
   const scene = (voice?: boolean) =>
     ({ id: "s", outlineId: "o", type: "quiz", title: "Củng cố", order: 1, stageId: "x", content: { type: "quiz", questions: QS }, actions: [{ id: "a", type: "speech", text: "Củng cố nhé.", durationMs: 3000 }], ...(voice && { quizVoice: quizVoiceLines(QS, "s").map((v, i) => ({ q: { ...v.q, audioFile: `q${i}.mp3`, durationMs: 9000 }, a: { ...v.a, audioFile: `a${i}.mp3`, durationMs: 6000 } })) }) }) as unknown as StoredScene;
 
-  it("lời đọc câu hỏi gồm câu + các phương án; lời đáp án gồm đáp án + lời giải ngắn", () => {
+  it("chỉ đọc câu hỏi (không đọc phương án); đáp án + đúng 1 câu lời giải (bỏ câu dẫn kết thúc bằng ':')", () => {
     const [v1, v2] = quizVoiceLines(QS, "s");
-    expect(v1?.q.text).toBe("Câu 1. Biết học sinh là nữ, xác suất thích bóng đá? Phương án A: 0,10 (hay 1/10). Phương án B: 0,25 (hay 1/4). Phương án C: 0,45. Phương án D: 0,55.");
-    expect(v1?.a.text).toBe("Đáp án đúng: B. Có 16 bạn nữ, 4 bạn thích nên $P = \\frac{4}{16} = \\frac14$. Chọn B.");
-    expect(v2?.a.text.startsWith("Đáp án đúng: A và B.")).toBe(true);
+    expect(v1?.q.text).toBe("Câu 1. Biết học sinh là nữ, xác suất thích bóng đá?");
+    expect(v1?.a.text).toBe("Đáp án đúng: B. Có 16 bạn nữ, 4 bạn thích nên $P = \\frac{4}{16} = \\frac14$.");
+    expect(v2?.a.text).toBe("Đáp án đúng: A và B. Theo cây xác suất.");
+    expect(oneLineExplain("Phân tích các nhận định dựa trên sơ đồ cây: - Phương án A đúng vì P(T|B) = 0,95. - Phương án B đúng.")).toBe("Phương án A đúng vì P(T|B) = 0,95.");
+    expect(oneLineExplain(`${"Rất dài, ".repeat(40)}hết.`).length).toBeLessThanOrEqual(221);
     expect(plainText("$P(B\\cap T) = \\frac{5}{8}\\cdot\\frac47$")).toBe("P(B∩T) = 5/8·4/7");
   });
-  it("có giọng đọc: mỗi câu = tiếng đọc câu hỏi + 2,5 s nghĩ, đáp án = tiếng đọc + 0,8 s; không còn đoạn câm cố định", () => {
+  it("có giọng đọc: mỗi câu = tiếng đọc câu hỏi + 3 s nghĩ, đáp án = tiếng đọc + 0,8 s; không còn đoạn câm cố định", () => {
     const tl = compileTimeline("Bài", [scene(true)]);
     expect(tl.segments.map((x) => [x.quizIndex, x.reveal ?? false, x.audioFile ?? null, x.durationMs])).toEqual([
       [0, false, null, 3000],
-      [0, false, "q0.mp3", 11500],
+      [0, false, "q0.mp3", 12000],
       [0, true, "a0.mp3", 6800],
-      [1, false, "q1.mp3", 11500],
+      [1, false, "q1.mp3", 12000],
       [1, true, "a1.mp3", 6800],
     ]);
     // mỗi đoạn: các mốc phụ đề phủ kín thời lượng (để khung hình khớp tiếng)
@@ -92,10 +94,10 @@ describe("cảnh quiz trong video: thời lượng theo nội dung", () => {
     expect(toSrt(tl)).not.toMatch(/\n\n\n|-->.*\n\n/);
     expect(toSrt(tl)).not.toContain("$");
   });
-  it("chưa có giọng đọc: thời lượng ước lượng theo số chữ của câu hỏi + phương án (dài hơn 5 s cố định cũ)", () => {
+  it("chưa có giọng đọc: thời lượng ước lượng theo số chữ của câu hỏi + 3 s nghĩ", () => {
     const tl = compileTimeline("Bài", [scene(false)]);
     const ask = tl.segments.find((x) => x.quizIndex === 0 && !x.reveal && x.cues.length > 1);
-    expect(ask?.durationMs).toBeGreaterThan(12_000);
+    expect(ask?.durationMs).toBe(3000 + Math.round(("Câu 1. " + QS[0]!.question).length / 14 * 1000));
     expect(tl.diagnostics.some((d) => d.includes("chưa có giọng đọc"))).toBe(true);
   });
 });

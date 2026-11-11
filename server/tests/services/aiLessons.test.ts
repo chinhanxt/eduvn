@@ -243,7 +243,7 @@ describe("sinh bài giảng AI", () => {
     const qs = (quiz.content as unknown as { questions: { analysis: string }[] }).questions;
     expect(qs[0]?.analysis).toBe("Xem SGK Toán 8, áp dụng hằng đẳng thức.");
     expect(quiz.quizVoice).toHaveLength(2);
-    expect(quiz.quizVoice?.[0]?.q.text.startsWith("Câu 1. Khai triển $(x+1)^2$ bằng Phương án A:")).toBe(true);
+    expect(quiz.quizVoice?.[0]?.q.text).toBe("Câu 1. Khai triển $(x+1)^2$ bằng"); // chỉ đọc câu hỏi, phương án hiện trên màn hình
     expect(quiz.quizVoice?.[0]?.q).toMatchObject({ durationMs: 2000 }); // đã đọc giọng cùng lượt với lời giảng
     expect(quiz.quizVoice?.[0]?.a.text.startsWith("Đáp án đúng: B.")).toBe(true);
   });
@@ -501,7 +501,7 @@ describe("dòng thời gian video (IR) và phụ đề", () => {
   it("quiz: mỗi câu hai đoạn (câu hỏi rồi đáp án), lời giải ngắn nằm ở phụ đề; lời giảng đầu hiện câu 1", () => {
     const quiz = { id: "q", outlineId: "s2", type: "quiz", title: "Luyện tập", order: 1, stageId: "x", content: { type: "quiz", questions: QUIZ }, actions: [{ id: "1", type: "speech", text: "Làm thử nhé.", durationMs: 3000 }] } as unknown as StoredScene;
     const tl = compileTimeline("Bài", [quiz]);
-    // thời lượng theo nội dung (đọc câu hỏi + phương án + 2,5 s nghĩ; đáp án + lời giải), không cố định 5 s/4 s
+    // thời lượng theo nội dung (đọc câu hỏi + 3 s nghĩ; đáp án + 1 câu lời giải), không cố định 5 s/4 s
     expect(tl.segments.map((x) => [x.quizIndex, x.reveal ?? false])).toEqual([[0, false], [0, false], [0, true], [1, false], [1, true]]);
     expect(tl.segments[1]?.durationMs).toBeGreaterThan(5000);
     const cue = tl.segments[2]?.cues[0]?.text ?? "";
@@ -577,7 +577,7 @@ describe.skipIf(!existsSync(CHROME))("xuất MP4 (Chrome + FFmpeg thật)", () =
     expect(readFileSync(r.srt, "utf8")).toContain("Công thức bình phương");
     // mỗi câu quiz: đoạn đọc câu hỏi + nghĩ, đoạn đáp án — thời lượng theo nội dung; hình và tiếng dài đúng bằng dòng thời gian
     expect(r.totalMs).toBe(compileTimeline("Thử", sc).totalMs);
-    expect(r.totalMs).toBeGreaterThan(1500 + 2 * (2500 + 3200));
+    expect(r.totalMs).toBeGreaterThan(1500 + 2 * (3000 + 3200));
     const dur = Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", r.video]).toString()) * 1000;
     expect(Math.abs(dur - r.totalMs)).toBeLessThan(400);
   });
