@@ -275,3 +275,10 @@
 @media (prefers-reduced-motion: reduce) { [data-portal="gv"] .cm-t tr.ai-wait .textarea { animation: none; } }
 @media (min-width: 721px) { [data-portal="gv"] .page-head.bar .head-tabs { flex: 1; min-width: 0; } }
 @media (max-width: 720px) { [data-portal="gv"] .page-head.bar .acts { flex-wrap: wrap; } [data-portal="gv"] .cm-t th:nth-child(2), [data-portal="gv"] .cm-t td:nth-child(2) { min-width: 120px; } }
+
+/* Đọc tài liệu: mục lục dính trái + giấy */
+[data-portal="gv"] .work.toc-l { grid-template-columns: 220px minmax(0, 1fr); }
+[data-portal="gv"] .paper [id] { scroll-margin-top: calc(var(--top-h) + 16px); }
+[data-portal="gv"] .ai-run .steps { flex-direction: row; flex-wrap: wrap; gap: 2px 18px; }
+[data-portal="gv"] .ai-run .steps li { height: 24px; font-size: 12px; }
+@media (max-width: 1180px) { [data-portal="gv"] .work.toc-l { grid-template-columns: minmax(0, 1fr); } [data-portal="gv"] .work.toc-l > aside { display: none; } }
