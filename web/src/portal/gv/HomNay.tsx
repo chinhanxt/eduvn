@@ -160,9 +160,19 @@ export function HomNay() {
     if (narrow()) open(list[i] ?? null);
   };
   useEffect(() => {
+    let lastG = 0;
     const key = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target) || document.querySelector(".cmdk")) return;
       const k = e.key.toLowerCase();
+      // "G rồi chữ" là phím tắt điều hướng của khung (G C = Chấm bài) — không hiểu nhầm thành phím của màn
+      if (k === "g") {
+        lastG = Date.now();
+        return;
+      }
+      if (Date.now() - lastG < 1200) {
+        lastG = 0;
+        return;
+      }
       if (k === "j" || k === "k") {
         e.preventDefault();
         setSel((s) => Math.max(0, Math.min(list.length - 1, s + (k === "j" ? 1 : -1))));

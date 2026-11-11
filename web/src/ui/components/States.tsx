@@ -1,7 +1,28 @@
 import type { ReactNode } from "react";
 import { Icon } from "../Icon";
-import { Button } from "./Button";
+import { useState } from "react";
 import { SkeletonRows } from "./Skeleton";
+
+/** Nút "Thử lại" gọn (không kéo cả Button vào JS lần đầu): khoá trong lúc thử, chống bấm lặp. */
+function RetryButton({ onRetry, icon }: { onRetry: () => unknown; icon?: boolean }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      type="button"
+      className="btn sm"
+      aria-busy={busy || undefined}
+      disabled={busy}
+      onClick={() => {
+        if (busy) return;
+        setBusy(true);
+        void Promise.resolve(onRetry()).finally(() => setBusy(false));
+      }}
+    >
+      {icon && <Icon name="refresh" size="sm" />}
+      <span>Thử lại</span>
+    </button>
+  );
+}
 
 /** Trống / lọc không ra: một câu chuyện gì xảy ra + một việc làm tiếp. */
 export function EmptyState({ icon = "inbox", title, text, action }: { icon?: string; title: ReactNode; text?: ReactNode; action?: ReactNode }) {
@@ -28,9 +49,7 @@ export function ErrorState({ title = "Không tải được", text, status, onRe
       <p>{text ?? `Máy chủ không phản hồi${status ? ` (mã ${status})` : ""}. Dữ liệu khác trên trang vẫn dùng được.`}</p>
       {onRetry && (
         <div className="acts">
-          <Button size="sm" icon="refresh" onClick={onRetry}>
-            Thử lại
-          </Button>
+          <RetryButton onRetry={onRetry} icon />
         </div>
       )}
     </div>
@@ -47,9 +66,7 @@ export function OfflineBanner({ savedAt, onRetry }: { savedAt?: Date | null; onR
         <b>Mất kết nối.</b> {t ? `Đang hiện dữ liệu đã lưu lúc ${t}; ` : ""}thay đổi sẽ tự gửi khi có mạng.
       </span>
       {onRetry && (
-        <Button size="sm" onClick={onRetry}>
-          Thử lại
-        </Button>
+        <RetryButton onRetry={onRetry} />
       )}
     </div>
   );

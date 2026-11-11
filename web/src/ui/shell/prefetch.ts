@@ -1,6 +1,7 @@
+import type { NavItem } from "./nav";
 import { preloadPath } from "./routes";
 
-// Nạp lúc trình duyệt rảnh (AppShell) — không nằm trong JS lần đầu.
+// Hành vi phụ của khung, nạp lúc trình duyệt rảnh (AppShell) — không nằm trong JS lần đầu.
 /** Tải trước code (và dữ liệu) của trang khi rê chuột/tiêu điểm vào link nội bộ ≥ 80 ms. */
 export function installPrefetch(base: string): () => void {
   let timer = 0;
@@ -32,4 +33,28 @@ export function installPrefetch(base: string): () => void {
     document.removeEventListener("focusin", over);
     document.removeEventListener("pointerout", out);
   };
+}
+
+/** Phím tắt "G rồi chữ" (cổng GV): G H Hôm nay, G L Lớp… — bỏ qua khi đang gõ trong ô nhập. */
+export function installGoKeys(items: () => readonly NavItem[], navigate: (to: string) => void): () => void {
+  let armed = 0;
+  const key = (e: KeyboardEvent) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = e.target as HTMLElement | null;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    const k = e.key.toUpperCase();
+    if (armed && Date.now() - armed < 1200) {
+      armed = 0;
+      const hit = items().find((n) => n.kbd === `G ${k}`);
+      if (hit) {
+        e.preventDefault();
+        if (hit.href) window.location.assign(hit.href);
+        else navigate(hit.to);
+      }
+      return;
+    }
+    if (k === "G") armed = Date.now();
+  };
+  window.addEventListener("keydown", key);
+  return () => window.removeEventListener("keydown", key);
 }

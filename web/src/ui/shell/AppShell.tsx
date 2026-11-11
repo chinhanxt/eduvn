@@ -13,6 +13,7 @@ import { toggleTheme, useTheme } from "./theme";
 // Bảng lệnh tải riêng (không nằm trong JS lần đầu): tải trước lúc rảnh, mở bằng Ctrl K hoặc ô Tìm nhanh.
 const loadCmdk = () => import("../components/CommandPalette").then((m) => ({ default: m.CommandPalette }));
 const CommandPalette = lazy(loadCmdk);
+const PopPanel = lazy(() => import("./ShellMenus").then((m) => ({ default: m.PopPanel })));
 const NoticeList = lazy(() => import("./ShellMenus").then((m) => ({ default: m.NoticeList })));
 const AccountMenu = lazy(() => import("./ShellMenus").then((m) => ({ default: m.AccountMenu })));
 const OfflineBanner = lazy(() => import("../components/States").then((m) => ({ default: m.OfflineBanner })));
@@ -54,27 +55,10 @@ export function usePageMeta(title: string | null, crumbs?: Crumb[]): void {
   }, [sig]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-function useDismiss(open: boolean, close: () => void, box: React.RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    if (!open) return;
-    const down = (e: PointerEvent) => {
-      if (box.current && !box.current.contains(e.target as Node)) close();
-    };
-    const key = (e: KeyboardEvent) => e.key === "Escape" && close();
-    document.addEventListener("pointerdown", down);
-    document.addEventListener("keydown", key);
-    return () => {
-      document.removeEventListener("pointerdown", down);
-      document.removeEventListener("keydown", key);
-    };
-  }, [open, close, box]);
-}
-
 function Pop({ icon, label, badge, children, wide }: { icon: ReactNode; label: string; badge?: boolean; children: (close: () => void) => ReactNode; wide?: boolean }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
-  useDismiss(open, close, box);
   const { pathname } = useLocation();
   useEffect(close, [pathname, close]);
   return (
@@ -83,7 +67,13 @@ function Pop({ icon, label, badge, children, wide }: { icon: ReactNode; label: s
         {icon}
         {badge && <i className="dot-badge" />}
       </button>
-      {open && <div className={wide ? "menu-pop wide" : "menu-pop"} role="menu">{children(close)}</div>}
+      {open && (
+        <Suspense fallback={null}>
+          <PopPanel box={box} close={close} wide={wide}>
+            {children(close)}
+          </PopPanel>
+        </Suspense>
+      )}
     </div>
   );
 }
@@ -135,33 +125,6 @@ function usePageMotion(main: React.RefObject<HTMLElement | null>, pathname: stri
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-/** Phím tắt "G rồi chữ" (cổng GV): G H Hôm nay, G L Lớp… — bỏ qua khi đang gõ trong ô nhập. */
-function useGoKeys(items: readonly NavItem[]) {
-  const navigate = useNavigate();
-  useEffect(() => {
-    let armed = 0;
-    const key = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
-      const t = e.target as HTMLElement | null;
-      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-      const k = e.key.toUpperCase();
-      if (armed && Date.now() - armed < 1200) {
-        armed = 0;
-        const hit = items.find((n) => n.kbd === `G ${k}`);
-        if (hit) {
-          e.preventDefault();
-          if (hit.href) window.location.assign(hit.href);
-          else navigate(hit.to);
-        }
-        return;
-      }
-      if (k === "G") armed = Date.now();
-    };
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
-  }, [items, navigate]);
-}
-
 export type AppShellProps = {
   portal: "gv" | "hoc";
   /** basename của router ("/gv" cho cổng GV, "" cho cổng Học). */
@@ -186,6 +149,8 @@ export type AppShellProps = {
 export function AppShell(p: AppShellProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const navRef = useRef(navigate);
+  navRef.current = navigate;
   const online = useOnline();
   const theme = useTheme();
   const [mini, setMini] = useState(() => window.localStorage.getItem("eduvn-side") === "mini");
@@ -221,8 +186,6 @@ export function AppShell(p: AppShellProps) {
 
   usePageMotion(main, pathname);
   // Link nội bộ của cổng → chuyển trang có View Transition (bắt ở pha capture, trước Link của React Router).
-  const navRef = useRef(navigate);
-  navRef.current = navigate;
   useEffect(() => {
     const scope = p.base ? new RegExp(`^${p.base}(/|$)`) : /^\/hoc(\/|$)/;
     const click = (e: MouseEvent) => {
@@ -248,7 +211,19 @@ export function AppShell(p: AppShellProps) {
       off?.();
     };
   }, [p.base]);
-  useGoKeys(items);
+  // Phím tắt "G rồi chữ" (G H Hôm nay, G L Lớp…): gắn lúc rảnh, đọc danh sách mục mới nhất qua ref.
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+  useEffect(() => {
+    let off: (() => void) | null = null;
+    let live = true;
+    const stop = onIdle(() => void import("./prefetch").then((m) => live && (off = m.installGoKeys(() => itemsRef.current, (to) => navRef.current(to)))));
+    return () => {
+      live = false;
+      stop();
+      off?.();
+    };
+  }, []);
   useEffect(() => setDrawer(false), [pathname]);
   useEffect(() => {
     if (online) setSavedAt(new Date());

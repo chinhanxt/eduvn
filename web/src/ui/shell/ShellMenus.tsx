@@ -1,3 +1,4 @@
+import { type ReactNode, type RefObject, useEffect } from "react";
 import { Link } from "react-router";
 import { Icon } from "../Icon";
 import type { MenuItem, Notice } from "./nav";
@@ -68,5 +69,32 @@ export function AccountMenu({ user, items, close }: { user: { name: string; sub:
       </div>
       <MenuList items={items} close={close} />
     </>
+  );
+}
+
+function useDismiss(open: boolean, close: () => void, box: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    if (!open) return;
+    const down = (e: PointerEvent) => {
+      if (box.current && !box.current.contains(e.target as Node)) close();
+    };
+    const key = (e: KeyboardEvent) => e.key === "Escape" && close();
+    document.addEventListener("pointerdown", down);
+    document.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("pointerdown", down);
+      document.removeEventListener("keydown", key);
+    };
+  }, [open, close, box]);
+}
+
+
+/** Khung menu bật: đóng khi bấm ra ngoài hoặc Esc. */
+export function PopPanel({ box, close, wide, children }: { box: RefObject<HTMLElement | null>; close: () => void; wide?: boolean; children: ReactNode }) {
+  useDismiss(true, close, box);
+  return (
+    <div className={wide ? "menu-pop wide" : "menu-pop"} role="menu">
+      {children}
+    </div>
   );
 }
