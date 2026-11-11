@@ -1,0 +1,4 @@
+{
+  "description": "Tác vụ cổng AI của gói G1 (nhà cung cấp phụ: giọng, nhận dạng giọng nói, đọc tài liệu). Mỗi gói thêm task trong tasks.d/<gói>.json của mình, không sửa tasks.json.",
+  "tasks": {}
+}
