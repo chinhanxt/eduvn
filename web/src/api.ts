@@ -14,7 +14,8 @@ export class ApiError extends Error {
   }
 }
 
-export async function api<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+/** Header đăng nhập Keycloak + tổ chức đang chọn; hết phiên → ApiError 401. Dùng chung cho api() và lớp dữ liệu ui/data. */
+export async function authHeaders(): Promise<Record<string, string>> {
   const user = await userManager.getUser();
   if (!user || user.expired) {
     void userManager.removeUser();
@@ -23,6 +24,12 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
   const headers: Record<string, string> = { authorization: `Bearer ${user.access_token}` };
   const org = getOrgId();
   if (org) headers["x-org-id"] = org;
+  return headers;
+}
+
+export async function api<T>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+  const headers = await authHeaders();
+  const org = headers["x-org-id"];
   if (init.body !== undefined) headers["content-type"] = "application/json";
   const res = await fetch(path, { method: init.method ?? "GET", headers, body: init.body === undefined ? undefined : JSON.stringify(init.body) });
   const text = await res.text();

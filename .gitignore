@@ -4,4 +4,6 @@ node_modules/
 dist/
 coverage/
 .superpowers/
-data/
+/data/
+/server/data/
+/gateway/data/
