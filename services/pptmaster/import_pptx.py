@@ -50,6 +50,7 @@ class Ctx:
         self.n = 0
         self.colors: dict[str, str] = {}
         self.images = 0
+        self.best: tuple[float, str] = (0.0, "")
 
     def nid(self, p: str = "el") -> str:
         self.n += 1
@@ -469,8 +470,11 @@ def table_el(ctx: Ctx, shape, box: dict) -> dict:
 
 def iter_shapes(shapes):
     """Như python-pptx `shapes` nhưng không bỏ sót hình bọc trong mc:AlternateContent (công thức Office Math, hình PowerPoint 2010+)."""
-    from pptx.shapes.shapetree import BaseShapeFactory  # noqa: PLC0415
+    from pptx.shapes import shapetree as st  # noqa: PLC0415
 
+    kind = type(shapes).__name__
+    factory = st.SlideShapeFactory if kind in ("SlideShapes", "GroupShapes") else getattr(st, "_LayoutShapeFactory", st.BaseShapeFactory) if kind == "LayoutShapes" else getattr(st, "_MasterShapeFactory", st.BaseShapeFactory) if kind == "MasterShapes" else st.BaseShapeFactory
+    BaseShapeFactory = factory  # noqa: N806
     tree = shapes._spTree
     for child in tree.iterchildren():
         tag = etree.QName(child).localname
@@ -574,6 +578,8 @@ def emit(ctx: Ctx, sh, slide, tf, els: list, texts: list) -> None:
     prst = prst_el.get("prst") if prst_el is not None else ("rect" if sppr is not None and sppr.find(f"{A}custGeom") is None else "rect")
     if plain:
         texts.append(plain)
+        if max_px > ctx.best[0]:
+            ctx.best = (max_px, plain)
     body_pr = txbody.find(f"{A}bodyPr") if txbody is not None else None
     anchor = body_pr.get("anchor") if body_pr is not None and body_pr.get("anchor") else None
     try:
@@ -648,6 +654,22 @@ def show_master_shapes(holder) -> bool:
     return v not in ("0", "false")
 
 
+TURNING = {"fade": "fade", "push": "slideX", "cover": "slideX", "pull": "slideX", "wipe": "slideX", "split": "slideY", "zoom": "scale", "morph": "fade", "dissolve": "fade", "randomBar": "random", "random": "random", "cut": "no"}
+
+
+def turning_mode(slide) -> str | None:
+    """Kiểu chuyển trang của slide (p:transition, kể cả trong mc:AlternateContent) → turningMode của OpenMAIC."""
+    root = slide._element
+    for tr in root.iter("{%s}transition" % NSM["p"]):
+        for ch in tr:
+            name = etree.QName(ch).localname
+            if name in ("sndAc", "extLst"):
+                continue
+            return TURNING.get(name, "fade")
+        return None
+    return None
+
+
 def cmd_import(path: str, _args: list[str]) -> int:
     prs = Presentation(path)
     ctx = Ctx(prs)
@@ -665,6 +687,7 @@ def cmd_import(path: str, _args: list[str]) -> int:
             walk(ctx, master.shapes, slide, base, els, [], True)
         if show_master_shapes(slide):
             walk(ctx, layout.shapes, slide, base, els, [], True)
+        ctx.best = (0.0, "")
         walk(ctx, slide.shapes, slide, base, els, texts, False)
         title = ""
         try:
@@ -673,7 +696,8 @@ def cmd_import(path: str, _args: list[str]) -> int:
         except Exception:  # noqa: BLE001
             title = ""
         if not title:
-            title = next((t.split("\n")[0].strip() for t in texts if t.strip()), f"Trang {i + 1}")
+            # không có placeholder tiêu đề: lấy dòng chữ cỡ lớn nhất của trang
+            title = ctx.best[1].split("\n")[0].strip() or next((t.split("\n")[0].strip() for t in texts if t.strip()), f"Trang {i + 1}")
         title = re.sub(r"\s+", " ", title)[:120]
         if i == 0:
             title_guess = title
@@ -681,6 +705,6 @@ def cmd_import(path: str, _args: list[str]) -> int:
         if slide.has_notes_slide:
             notes = (slide.notes_slide.notes_text_frame.text if slide.notes_slide.notes_text_frame is not None else "").strip()
         hidden = slide._element.get("show") in ("0", "false")
-        slides.append({"title": title, "elements": els, "background": bg, "notes": notes, "text": "\n".join(texts)[:4000], "hidden": hidden})
+        slides.append({"title": title, "elements": els, "background": bg, "notes": notes, "text": "\n".join(texts)[:4000], "hidden": hidden, "turningMode": turning_mode(slide)})
     out({"ok": True, "title": title_guess, "width": prs.slide_width, "height": prs.slide_height, "images": ctx.images, "slides": slides})
     return 0

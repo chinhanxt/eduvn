@@ -442,7 +442,7 @@ export function createXuatBanService(db: Db, ai: Ai | undefined, cfg: XuatBanCfg
         type: "slide",
         title: s.title,
         order: i + 1,
-        content: { type: "slide", canvas: { id: randomUUID(), viewportSize: 1000, viewportRatio: 0.5625, theme: { backgroundColor: "#ffffff", themeColors: PAPER_STYLE.palette, fontColor: "#1f2428", fontName: "" }, elements: textMath(s.elements), background: s.background } },
+        content: { type: "slide", canvas: { id: randomUUID(), viewportSize: 1000, viewportRatio: 0.5625, ...(s.turningMode ? { turningMode: s.turningMode } : {}), theme: { backgroundColor: "#ffffff", themeColors: PAPER_STYLE.palette, fontColor: "#1f2428", fontName: "" }, elements: textMath(s.elements), background: s.background } },
         actions: speech,
       } as unknown as StoredScene;
     });

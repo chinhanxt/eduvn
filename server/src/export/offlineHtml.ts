@@ -76,6 +76,12 @@ export async function inlineInteractive(html: string): Promise<string> {
   return out;
 }
 
+const unesc = (t: string) => t.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+/** Công thức $…$ nằm trong chữ của slide (AI hay viết vậy) → KaTeX dựng sẵn; chỉ thay trong phần chữ, không đụng thuộc tính thẻ. */
+export function mathInText(html: string): string {
+  return html.replace(/>([^<]*)</g, (whole, text: string) => (text.includes("$") ? `>${text.replace(/\$([^$]{1,300})\$/g, (_m, t: string) => latexHtml(unesc(t)))}<` : whole));
+}
+
 type Seg = { kind: "speech"; text: string; ms: number; audio?: number } | { kind: "focus"; el: string; effect: "spotlight" | "laser" };
 type PScene = { type: string; title: string; html?: string; boxes?: Record<string, [number, number, number, number]>; questions?: unknown[]; srcdoc?: string; clip?: number; segs: Seg[] };
 
@@ -119,7 +125,7 @@ export async function renderOfflineHtml(meta: { title: string; subject?: string;
         const b64 = await fileB64(`${sc.animation.hash}.mp4`, o.animDir, files);
         if (b64 !== null) clip = addMedia("video/mp4", b64, `anim/${sc.animation.hash}.mp4`);
       }
-      out.push({ type: "slide", title: sc.title, html: slideBody(canvas, { latex: latexHtml }), boxes, segs, ...(clip !== undefined ? { clip } : {}) });
+      out.push({ type: "slide", title: sc.title, html: mathInText(slideBody(canvas, { latex: latexHtml })), boxes, segs, ...(clip !== undefined ? { clip } : {}) });
     } else if (sc.type === "quiz") {
       const qs = ((sc.content as { questions?: { type: string; question: string; options?: { value: string; label: string }[]; answer?: string[]; analysis?: string }[] }).questions ?? []).map((q) => ({
         type: q.type,

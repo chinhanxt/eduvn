@@ -85,7 +85,7 @@ export async function analyzeTemplate(file: string, cfg?: SidecarCfg): Promise<T
   return r;
 }
 
-export type ImportedSlide = { title: string; elements: Record<string, unknown>[]; background: Record<string, unknown>; notes: string; text: string; hidden: boolean };
+export type ImportedSlide = { title: string; elements: Record<string, unknown>[]; background: Record<string, unknown>; notes: string; text: string; hidden: boolean; turningMode?: string | null };
 export type ImportedDeck = { title: string; width: number; height: number; images: number; slides: ImportedSlide[] };
 
 export async function importPptxFile(file: string, cfg?: SidecarCfg): Promise<ImportedDeck> {

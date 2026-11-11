@@ -10,7 +10,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
 import { aiLessons, memberships, users } from "../../src/db/schema";
 import { readLessonBundle } from "../../src/export/lessonBundle";
 import { renderScriptMd } from "../../src/export/lessonScript";
-import { inlineInteractive, renderOfflineHtml } from "../../src/export/offlineHtml";
+import { inlineInteractive, mathInText, renderOfflineHtml } from "../../src/export/offlineHtml";
 import { audioDirOf } from "../../src/services/aiLessons/generate";
 import type { StoredScene } from "../../src/services/aiLessons/types";
 import { buildPptx } from "../../src/services/pptx/build";
@@ -242,7 +242,7 @@ describe("HTML ngoại tuyến + gói .zip + kịch bản (thuần/tệp)", () =
     silentMp3(path.join(dir, "a1.mp3"), 1);
     const html = await renderOfflineHtml({ title: "Bài thử" }, SCENES(["a1.mp3", "khong-co.mp3"]), { mode: "kem-loi-giang", audioDir: dir });
     expect(html).toContain('data-mime="audio/mpeg"');
-    expect(html).toContain('class="katex"');
+    expect(html).toContain("katex-html"); // công thức dựng sẵn bằng KaTeX
     expect(html).toMatch(/font\/woff2;base64,/);
     expect(html).not.toMatch(/(src|href)="\/vendor\//);
     expect(html).not.toMatch(/url\(fonts\//);
@@ -250,6 +250,13 @@ describe("HTML ngoại tuyến + gói .zip + kịch bản (thuần/tệp)", () =
     expect(lite).not.toContain('data-mime="audio/mpeg"');
     expect(await inlineInteractive('<script src="/vendor/interactive/chart.js@4.4.8/dist/chart.umd.js"></script>')).toMatch(/src="data:text\/javascript;base64,/);
     await expect(renderOfflineHtml({ title: "x" }, SCENES(["a1.mp3"]), { mode: "kem-loi-giang", audioDir: dir, maxBytes: 100 })).rejects.toThrow(/Gói bài giảng/);
+  });
+
+  it("công thức $…$ trong chữ slide được dựng KaTeX, không đụng thuộc tính thẻ", () => {
+    const h = mathInText('<p title="$x$">Ta có $a^2 &lt; b$ và 5 $</p>');
+    expect(h).toContain('title="$x$"');
+    expect(h).toContain("katex-html");
+    expect(h).not.toContain("$a^2");
   });
 
   it("kịch bản .md có lời giảng từng cảnh + đáp án", () => {
