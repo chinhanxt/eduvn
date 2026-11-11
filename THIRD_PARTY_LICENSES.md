@@ -230,3 +230,10 @@ authors nor the names of their institutions may be used to endorse or promote pr
 this software without specific prior written permission. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT
 WARRANTY OF ANY KIND; see the full license text at the URL above.
 ```
+
+## Nhà cung cấp phụ (P14 G1) — chạy như tiến trình ngoài, không nhúng mã nguồn
+
+- **faster-whisper** (SYSTRAN, MIT) + model CTranslate2 `Systran/faster-whisper-small` (MIT, từ OpenAI Whisper — MIT): nhận dạng giọng nói, gọi qua `server/src/providers/asr/whisper_transcribe.py`. https://github.com/SYSTRAN/faster-whisper
+- **OmniVoice** (k2-fsa, Apache License 2.0): nhân giọng theo file mẫu, gọi qua `server/src/providers/tts/omnivoice_say.py`. https://github.com/k2-fsa/OmniVoice. Bước "dư âm phòng" cho chữ cuối câu viết lại theo `youtube_AI/bin/voice_room.py` của video-studio (cùng chủ sở hữu).
+- **LibreOffice** (Mozilla Public License 2.0): chuyển DOC/PPT/PPTX/XLS/ODF/RTF sang PDF bằng `soffice --headless`. https://www.libreoffice.org
+- **Poppler** (`pdftotext`, `pdftoppm` — GPL-2.0, dùng như lệnh ngoài): đã dùng từ P6/P12.

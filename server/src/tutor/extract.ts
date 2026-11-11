@@ -1,100 +1,25 @@
-// Tách chữ theo trang từ PDF / DOCX / TXT / MD.
-// Port ý tưởng từ DeepTutor deeptutor/services/parsing (Apache-2.0), đã sửa: PDF dùng `pdftotext`
-// (poppler) thay vì MinerU/docling; DOCX đọc trực tiếp word/document.xml; trang PDF không có lớp chữ → OCR bằng LLM-vision (ocr.ts).
-import { execFile } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { promisify } from "node:util";
-import JSZip from "jszip";
+// Tách chữ theo trang từ tài liệu GV/HS tải lên. Đã chuyển sang registry parse của G1 (providers/parse/*):
+// PDF/DOCX/TXT/MD như cũ + DOC/PPT/PPTX/XLS/ODT/ODP/ODS/RTF (LibreOffice), XLSX/CSV/TSV (bảng Markdown), ảnh (OCR vision). Giữ API cũ.
 import type { LessonPlan } from "../domain/lesson";
-import { ValidationError } from "../errors";
 import type { Ai } from "../services/ai";
-import { type OcrProgress, ocrPdfPages } from "./ocr";
+import { type ExtractOpts, paginateText, pdfPages } from "../providers/parse/basic";
+import { MAX_FILE_BYTES, parseDocument, registerDefaultParsers } from "../providers/parse";
+import { ProviderRegistry } from "../providers/registry";
 
-const run = promisify(execFile);
-export type ExtractOpts = { ai?: Ai; onProgress?: (p: OcrProgress) => void };
-export const MAX_FILE_BYTES = 20 * 1024 * 1024;
-const PSEUDO_PAGE_CHARS = 2500;
+export { MAX_FILE_BYTES, paginateText, pdfPages, type ExtractOpts };
 
-/** Gom đoạn văn thành "trang" giả khoảng 2500 ký tự (TXT/MD/DOCX không có trang thật). */
-export function paginateText(text: string, pageChars = PSEUDO_PAGE_CHARS): string[] {
-  const paras = text.normalize("NFC").replace(/\r\n?/g, "\n").split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-  const pages: string[] = [];
-  let cur = "";
-  for (const p of paras) {
-    if (cur && cur.length + p.length > pageChars) {
-      pages.push(cur);
-      cur = "";
-    }
-    cur = cur ? `${cur}\n\n${p}` : p;
-  }
-  if (cur) pages.push(cur);
-  return pages;
-}
-
-/** Chữ theo trang; trang không có lớp chữ (PDF scan) được OCR nếu có `opts.ai`. */
-export async function pdfPages(buf: Buffer, opts: ExtractOpts = {}): Promise<string[]> {
-  const dir = await mkdtemp(join(tmpdir(), "eduvn-pdf-"));
-  try {
-    const file = join(dir, "in.pdf");
-    await writeFile(file, buf);
-    let out: string;
-    try {
-      ({ stdout: out } = await run("pdftotext", ["-enc", "UTF-8", file, "-"], { maxBuffer: 64 * 1024 * 1024, timeout: 120_000 }));
-    } catch (e) {
-      if ((e as { code?: string }).code === "ENOENT") throw new ValidationError(["Máy chủ chưa cài pdftotext (poppler-utils) nên chưa đọc được PDF"]);
-      throw new ValidationError(["Không đọc được file PDF (file hỏng hoặc có mật khẩu)"]);
-    }
-    const pages = out.split("\f");
-    if (pages.length && pages[pages.length - 1]!.trim() === "") pages.pop();
-    const blank = pages.flatMap((p, i) => (p.trim() ? [] : [i + 1]));
-    if (blank.length && opts.ai) {
-      const texts = await ocrPdfPages(buf, blank, opts.ai, opts.onProgress);
-      for (const [n, t] of texts) pages[n - 1] = t;
-    }
-    return pages;
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-}
-
-const XML_ENT: Record<string, string> = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&apos;": "'" };
-
-async function docxPages(buf: Buffer): Promise<string[]> {
-  let xml: string | undefined;
-  try {
-    xml = await (await JSZip.loadAsync(buf)).file("word/document.xml")?.async("string");
-  } catch {
-    throw new ValidationError(["Không đọc được file DOCX"]);
-  }
-  if (!xml) throw new ValidationError(["File DOCX không có nội dung (thiếu word/document.xml)"]);
-  const pages: string[] = [];
-  let cur: string[] = [];
-  for (const m of xml.matchAll(/<w:p[ >][\s\S]*?<\/w:p>/g)) {
-    const para = m[0];
-    const text = [...para.matchAll(/<w:t[^>]*>([\s\S]*?)<\/w:t>|<w:tab\/>/g)].map((t) => (t[1] === undefined ? " " : t[1])).join("").replace(/&(amp|lt|gt|quot|apos);/g, (e) => XML_ENT[e]!);
-    if (text.trim()) cur.push(text.trim());
-    if (/<w:br[^>]*w:type="page"/.test(para) || para.includes("<w:lastRenderedPageBreak/>")) {
-      if (cur.length) pages.push(cur.join("\n\n"));
-      cur = [];
-    }
-  }
-  if (cur.length) pages.push(cur.join("\n\n"));
-  // Không có ngắt trang thật → chia trang giả.
-  return pages.length > 1 ? pages : paginateText(pages.join("\n\n"));
+const cache = new WeakMap<Ai, ProviderRegistry>();
+let noAi: ProviderRegistry | undefined;
+/** Registry parse mặc định theo cổng AI (OCR cần AI); tạo một lần. */
+export function parsersFor(ai?: Ai): ProviderRegistry {
+  if (!ai) return (noAi ??= registerDefaultParsers(new ProviderRegistry()));
+  let r = cache.get(ai);
+  if (!r) cache.set(ai, (r = registerDefaultParsers(new ProviderRegistry(), { ai })));
+  return r;
 }
 
 export async function extractPages(name: string, buf: Buffer, opts: ExtractOpts = {}): Promise<string[]> {
-  if (buf.length > MAX_FILE_BYTES) throw new ValidationError(["File quá lớn (tối đa 20 MB)"]);
-  const ext = name.toLowerCase().split(".").pop() ?? "";
-  let pages: string[];
-  if (ext === "pdf") pages = await pdfPages(buf, opts);
-  else if (ext === "docx") pages = await docxPages(buf);
-  else if (["txt", "md", "markdown"].includes(ext)) pages = paginateText(buf.toString("utf8"));
-  else throw new ValidationError([`Chưa hỗ trợ định dạng .${ext || "?"} (nhận PDF, DOCX, TXT, MD)`]);
-  if (!pages.some((p) => p.trim().length > 0)) throw new ValidationError(["Tài liệu không có chữ để đọc (PDF scan chưa đọc được bằng OCR)"]);
-  return pages;
+  return (await parseDocument(parsersFor(opts.ai), name, buf, { onProgress: opts.onProgress })).pages;
 }
 
 /** Giáo án EDUVN → chữ thường, mỗi hoạt động một trang. */
