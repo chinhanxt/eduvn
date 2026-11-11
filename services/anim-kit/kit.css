@@ -1,0 +1,162 @@
+/* EDUVN anim-kit v1 — lớp + biến cho bài HyperFrames do AI viết. Biến màu/chữ sinh từ services/video-theme/tokens.json
+   (test server/tests/services/animStudio/kit.test.ts giữ đồng bộ). Hợp đồng: docs/anim-studio/kit-api.md */
+:root{
+  --bg:#FDFCF9;
+  --surface:#FFFFFF;
+  --sunken:#F5F2EA;
+  --fill:#F5F2EA;
+  --line:#E6DECC;
+  --grid:#EEE8DC;
+  --ink:#1C1B1A;
+  --ink2:#3E3B37;
+  --ink3:#6D645A;
+  --accent:#2F5D8A;
+  --accent-soft:#E8EEF5;
+  --accent-ink:#FFFFFF;
+  --ok:#2B7A3B;
+  --bad:#B42318;
+  --c-lam:#2F5D8A;
+  --c-lucLam:#0B7285;
+  --c-xanhLa:#2B7A3B;
+  --c-tim:#6F42C1;
+  --c-doSon:#B42318;
+  --c-vangDam:#8A6200;
+  --c-hong:#B8336A;
+  --c-cam:#B4530A;
+  --mark:rgba(47,93,138,0.13);
+  --ui:"Inter",sans-serif;
+  --read:"Source Serif 4",serif;
+  --shadow:0 1px 2px rgb(28 27 26 / .04), 0 4px 14px rgb(28 27 26 / .05);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+#root{position:absolute;inset:0;overflow:hidden;background:var(--bg);font-family:var(--ui);color:var(--ink);font-feature-settings:"cv11" 1;-webkit-font-smoothing:antialiased}
+#root>*,.ek-world>*,.ek-stage>*,[class*="ek-col-"],.ek-place,.ek-place-dot,.ek-node,.ek-edges,.ek-edge-label,.ek-strike,.ek-mark-svg{position:absolute}
+#root svg text,#root svg tspan{font-family:var(--ui)}
+.ek-world,.ek-stage{inset:0}
+.ek-world{transform-origin:50% 50%}
+.ek-col-1{left:120px}
+.ek-col-2{left:262px}
+.ek-col-3{left:404px}
+.ek-col-4{left:546px}
+.ek-col-5{left:688px}
+.ek-col-6{left:830px}
+.ek-col-7{left:972px}
+.ek-col-8{left:1114px}
+.ek-col-9{left:1256px}
+.ek-col-10{left:1398px}
+.ek-col-11{left:1540px}
+.ek-col-12{left:1682px}
+.ek-span-1{width:118px}
+.ek-span-2{width:260px}
+.ek-span-3{width:402px}
+.ek-span-4{width:544px}
+.ek-span-5{width:686px}
+.ek-span-6{width:828px}
+.ek-span-7{width:970px}
+.ek-span-8{width:1112px}
+.ek-span-9{width:1254px}
+.ek-span-10{width:1396px}
+.ek-span-11{width:1538px}
+.ek-span-12{width:1680px}
+.ek-meta{font-family:var(--ui);font-weight:600;font-size:30px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);line-height:1}
+.ek-eyebrow{font-family:var(--ui);font-weight:700;font-size:36px;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);line-height:1}
+.ek-title{font-family:var(--read);font-weight:600;font-size:66px;line-height:1.16;color:var(--ink);text-wrap:balance;letter-spacing:-0.01em}
+.ek-title .kw{color:var(--accent)}
+.ek-lead{font-family:var(--ui);font-weight:400;font-size:40px;line-height:1.5;color:var(--ink2)}
+.ek-body{font-family:var(--ui);font-weight:400;font-size:40px;line-height:1.4;color:var(--ink)}
+.ek-read{font-family:var(--read);font-weight:400;font-size:46px;line-height:1.42;color:var(--ink)}
+.ek-label{font-family:var(--ui);font-weight:600;font-size:44px;line-height:1.2;color:var(--ink);white-space:nowrap}
+.ek-note{font-family:var(--ui);font-weight:500;font-size:38px;line-height:1.4;color:var(--ink2)}
+.ek-num{font-family:var(--ui);font-weight:700;font-size:96px;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+.ek-math{font-size:52px;line-height:1.3;color:var(--ink)}
+.ek-math-big{font-size:68px;line-height:1.3;color:var(--ink)}
+.ek-card{background:var(--surface);border:2px solid var(--line);border-left:6px solid var(--accent);border-radius:4px 12px 12px 4px;padding:22px 30px 24px;box-shadow:var(--shadow)}
+.ek-card h3{font-size:40px;font-weight:600;color:var(--ink);line-height:1.25;margin-bottom:8px}
+.ek-card p{font-size:38px;line-height:1.4;color:var(--ink2)}
+.ek-w{display:inline-block;white-space:pre}
+.ek-hidden{opacity:0}
+.ek-line{fill:none;stroke:var(--ink);stroke-width:4px;stroke-linecap:round;stroke-linejoin:round}
+.ek-line-bold{fill:none;stroke:var(--ink);stroke-width:6px;stroke-linecap:round;stroke-linejoin:round}
+.ek-leader{fill:none;stroke:var(--ink3);stroke-width:2px}
+.katex{font-size:1.06em}
+.ek-c-lam{color:var(--c-lam)}
+.ek-c-lucLam{color:var(--c-lucLam)}
+.ek-c-xanhLa{color:var(--c-xanhLa)}
+.ek-c-tim{color:var(--c-tim)}
+.ek-c-doSon{color:var(--c-doSon)}
+.ek-c-vangDam{color:var(--c-vangDam)}
+.ek-c-hong{color:var(--c-hong)}
+.ek-c-cam{color:var(--c-cam)}
+.ek-c-accent{color:var(--accent)}
+.ek-c-ink{color:var(--ink)}
+.ek-c-ink3{color:var(--ink3)}
+.ek-fill-lam{fill:var(--c-lam)}
+.ek-fill-lucLam{fill:var(--c-lucLam)}
+.ek-fill-xanhLa{fill:var(--c-xanhLa)}
+.ek-fill-tim{fill:var(--c-tim)}
+.ek-fill-doSon{fill:var(--c-doSon)}
+.ek-fill-vangDam{fill:var(--c-vangDam)}
+.ek-fill-hong{fill:var(--c-hong)}
+.ek-fill-cam{fill:var(--c-cam)}
+.ek-fill-accent{fill:var(--accent)}
+.ek-fill-ink{fill:var(--ink)}
+.ek-fill-ink3{fill:var(--ink3)}
+.ek-stroke-lam{stroke:var(--c-lam)}
+.ek-stroke-lucLam{stroke:var(--c-lucLam)}
+.ek-stroke-xanhLa{stroke:var(--c-xanhLa)}
+.ek-stroke-tim{stroke:var(--c-tim)}
+.ek-stroke-doSon{stroke:var(--c-doSon)}
+.ek-stroke-vangDam{stroke:var(--c-vangDam)}
+.ek-stroke-hong{stroke:var(--c-hong)}
+.ek-stroke-cam{stroke:var(--c-cam)}
+.ek-stroke-accent{stroke:var(--accent)}
+.ek-stroke-ink{stroke:var(--ink)}
+.ek-stroke-ink3{stroke:var(--ink3)}
+.ek-soft-lam{background-color:rgba(47,93,138,0.12);fill:rgba(47,93,138,0.12)}
+.ek-soft-lucLam{background-color:rgba(11,114,133,0.12);fill:rgba(11,114,133,0.12)}
+.ek-soft-xanhLa{background-color:rgba(43,122,59,0.12);fill:rgba(43,122,59,0.12)}
+.ek-soft-tim{background-color:rgba(111,66,193,0.12);fill:rgba(111,66,193,0.12)}
+.ek-soft-doSon{background-color:rgba(180,35,24,0.12);fill:rgba(180,35,24,0.12)}
+.ek-soft-vangDam{background-color:rgba(138,98,0,0.12);fill:rgba(138,98,0,0.12)}
+.ek-soft-hong{background-color:rgba(184,51,106,0.12);fill:rgba(184,51,106,0.12)}
+.ek-soft-cam{background-color:rgba(180,83,10,0.12);fill:rgba(180,83,10,0.12)}
+.ek-soft-accent{background-color:rgba(47,93,138,0.12);fill:rgba(47,93,138,0.12)}
+.ek-soft-ink{background-color:rgba(28,27,26,0.12);fill:rgba(28,27,26,0.12)}
+.ek-soft-ink3{background-color:rgba(109,100,90,0.12);fill:rgba(109,100,90,0.12)}
+/* Sinh bởi tiền xử lý (data-ek-*) */
+.ek-axis line,.ek-axis path{stroke:var(--ink3);stroke-width:2px;fill:none}
+.ek-axis .ek-axis-x,.ek-axis .ek-axis-y{stroke:var(--ink);stroke-width:3px}
+.ek-gridline{stroke:var(--grid);stroke-width:2px}
+.ek-tick-label,.ek-cat,.ek-val,.ek-unit{font-family:var(--ui);font-size:36px;fill:var(--ink2)}
+.ek-unit{fill:var(--ink3)}
+.ek-val{font-weight:600;fill:var(--ink)}
+.ek-curve{fill:none;stroke-width:6px;stroke-linecap:round;stroke-linejoin:round}
+.ek-dot{stroke:var(--surface);stroke-width:3px}
+.ek-point-label,.ek-series-label{font-family:var(--ui);font-size:38px;font-weight:600;fill:var(--ink)}
+.ek-season{fill:var(--accent-soft)}
+.ek-season-label{font-family:var(--ui);font-size:36px;font-weight:600;fill:var(--accent)}
+.ek-slice{fill:none;stroke-width:90px}
+.ek-era{opacity:1}
+.ek-era-label{font-family:var(--ui);font-size:36px;font-weight:600}
+.ek-event-year{font-family:var(--ui);font-size:38px;font-weight:700;fill:var(--ink)}
+.ek-event-label{font-family:var(--ui);font-size:36px;fill:var(--ink2)}
+.ek-node{background:var(--surface);border:3px solid var(--accent);border-radius:12px;padding:10px 22px;font-size:38px;font-weight:600;color:var(--ink);white-space:nowrap;text-align:center;line-height:1.2;box-shadow:var(--shadow)}
+.ek-edges{overflow:visible}
+.ek-edge{fill:none;stroke:var(--ink3);stroke-width:4px}
+.ek-edge-head{fill:var(--ink3)}
+.ek-edge-label{font-size:36px;color:var(--ink2);background:var(--bg);padding:0 8px;white-space:nowrap}
+.ek-region{fill:var(--sunken);stroke:var(--surface);stroke-width:1.2px}
+.ek-region.ek-on{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2px}
+.ek-land{fill:var(--sunken);stroke:var(--line);stroke-width:1.2px}
+.ek-coast{fill:none;stroke:var(--ink3);stroke-width:2px}
+.ek-sea-label{font-family:var(--read);font-style:italic;font-size:36px;fill:var(--accent)}
+.ek-islands{fill:var(--ink3)}
+.ek-island-label{font-family:var(--ui);font-size:36px;font-weight:600;fill:var(--ink2)}
+.ek-place{font-size:38px;font-weight:600;color:var(--ink);white-space:nowrap;transform:translate(18px,-50%)}
+.ek-place-dot{width:18px;height:18px;border-radius:50%;background:var(--c-doSon);border:3px solid var(--surface);transform:translate(-50%,-50%)}
+.ek-arrow{fill:none;stroke:var(--c-doSon);stroke-width:8px;stroke-linecap:round}
+.ek-arrow-head{fill:var(--c-doSon)}
+.ek-strike{height:5px;background:var(--bad);top:52%;left:-4px;right:-4px;transform-origin:0 50%}
+.ek-mark-svg{overflow:visible;pointer-events:none}
+.ek-mark-svg ellipse,.ek-mark-svg rect{fill:none;stroke-width:5px}
