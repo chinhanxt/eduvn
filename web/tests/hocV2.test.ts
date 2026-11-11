@@ -138,3 +138,28 @@ describe("linh vật Mầm", () => {
     expect(givenName(null)).toBe("");
   });
 });
+
+import { againIn, canSubmit, clockText, levelOf, markOf, optState, sessionDots } from "../src/hoc/practice";
+describe("luyện tập", () => {
+  it("mức độ, trạng thái phương án, đủ điều kiện nộp", () => {
+    expect(levelOf("th")).toEqual(["Thông hiểu", 2]);
+    expect(levelOf("VDC")).toEqual(["Vận dụng cao", 4]);
+    expect(levelOf("khác")).toEqual(["khác", 2]);
+    expect([0, 1, 2].map((i) => optState(i, 2, 1, true))).toEqual(["dim", "right", "wrong"]);
+    expect([0, 1].map((i) => optState(i, 1, undefined, false))).toEqual(["", "on"]);
+    expect(canSubmit({ type: "mcq" }, 0)).toBe(true);
+    expect(canSubmit({ type: "mcq" }, null)).toBe(false);
+    expect(canSubmit({ type: "true_false", statements: ["a", "b"] }, [true, null])).toBe(false);
+    expect(canSubmit({ type: "true_false", statements: ["a", "b"] }, [true, false])).toBe(true);
+    expect(canSubmit({ type: "short_answer" }, "  ")).toBe(false);
+  });
+  it("chấm phiên, hẹn ôn lại, đồng hồ", () => {
+    expect(markOf({ correct: false, partial: true })).toBe("part");
+    expect(sessionDots(["ok", "bad"], 3, true)).toEqual(["ok", "bad", "cur", "", "", "", "", ""]);
+    expect(sessionDots([], 0, false)).toHaveLength(8);
+    expect(againIn(10 / 1440)).toBe("sau 10 phút");
+    expect(againIn(0.5)).toBe("trong hôm nay");
+    expect(againIn(3.2)).toBe("sau 3 ngày");
+    expect(clockText(160)).toBe("2′40″");
+  });
+});
