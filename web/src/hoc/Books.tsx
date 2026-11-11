@@ -143,7 +143,7 @@ export function Books() {
     <div className="stack">
       <button className="back" onClick={() => { setBook(null); void load(); }}><Icon name="left" size={16} />Các giáo trình</button>
       {error && <div className="err">{error}</div>}
-      <div className="read">
+      <div className="book-read">
         <div className="card toc">
           <h2>{book.title}</h2>
           <small style={{ color: "var(--muted)" }}>{book.description}</small>

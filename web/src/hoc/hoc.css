@@ -66,10 +66,12 @@
 .meter { height: 8px; border-radius: 999px; background: var(--bg); overflow: hidden; } .meter i { display: block; height: 100%; background: var(--green); }
 .pt { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
 .pt .grow { flex: 1; }
-.read { display: grid; grid-template-columns: 240px 1fr 340px; gap: 16px; align-items: start; }
-.read .toc button { display: block; width: 100%; text-align: left; border: 0; background: transparent; padding: 8px 10px; border-radius: 10px; color: var(--ink); }
-.read .toc button.on { background: var(--blue-bg); color: var(--blue); font-weight: 500; }
-.page-body { max-width: 760px; line-height: 1.75; }
+/* "book-read" (không dùng "read": trùng lớp đo dòng đọc của UI v2 → cột nội dung bị ép hẹp) */
+.book-read { display: grid; grid-template-columns: 240px minmax(0, 1fr) minmax(300px, 340px); gap: 16px; align-items: start; }
+@media (max-width: 1280px) { .book-read { grid-template-columns: 220px minmax(0, 1fr); } .book-read > :last-child { grid-column: 1 / -1; } }
+.book-read .toc button { display: block; width: 100%; text-align: left; border: 0; background: transparent; padding: 8px 10px; border-radius: 10px; color: var(--ink); }
+.book-read .toc button.on { background: var(--blue-bg); color: var(--blue); font-weight: 500; }
+.page-body { max-width: 760px; min-width: 0; line-height: 1.75; }
 .blk { margin-bottom: 18px; }
 .callout-label { display: block; margin-bottom: 4px; font-size: 13px; letter-spacing: .02em; }
 .fig-diagram { margin: 12px auto 8px; } .fig-scroll { overflow-x: auto; } .fig-diagram.sk { height: 220px; border-radius: 12px; background: var(--bg); }
