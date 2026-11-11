@@ -49,6 +49,10 @@ Hoạt hình toán (`do_thi_ham_so`, `bien_doi_cong_thuc`, `hinh_hoc_dien_tich`,
 
 Hoạt hình HTML (`dien_giai_tung_buoc`, `so_do_quy_trinh`, `so_sanh_bang`): mẫu cố định dựng HTML + GSAP, render bằng `npx hyperframes render`. GSAP chạy theo giấy phép của chính nó (gói kèm HyperFrames); KaTeX (MIT) cho công thức.
 
+## Phông chữ video: Inter, Source Serif 4 (SIL Open Font License 1.1)
+
+`services/video-theme/fonts/`: bản tĩnh (400/600/700; serif 400/600) cắt từ phông biến thiên của google/fonts (Inter 4.001, Source Serif 4 4.004), chỉ giữ Latin + tiếng Việt + ký hiệu toán; tự host cho HyperFrames (`@font-face`) và Manim (`manimpango.register_font`). Giấy phép kèm: `OFL-Inter.txt`, `OFL-SourceSerif4.txt`.
+
 ## DeepTutor v1.7.2 (HKUDS/DeepTutor, commit 60fb3bd) — Apache License 2.0
 
 EDUVN port sang TypeScript (đã sửa, không dùng nguyên mã Python) các phần sau; mỗi file port ghi rõ "Port từ DeepTutor <đường dẫn> (Apache-2.0), đã sửa":
