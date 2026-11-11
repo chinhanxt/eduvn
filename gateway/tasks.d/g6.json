@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "tro_ly_tac_tu": {
+      "model": ["claude-sonnet-5-5-low", "claude-sonnet-4-6", "gemini-3.8-flash-low"],
+      "priority": "interactive",
+      "timeoutMs": 90000,
+      "description": "Trợ lý AI dạng tác tử (G6): mỗi lượt gọi là một bước theo giao thức nhãn THINK/TOOL/ANSWER do server/src/agent đặt trong tin system; không dùng tool-calling gốc"
+    }
+  }
+}

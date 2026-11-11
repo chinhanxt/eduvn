@@ -52,6 +52,7 @@ import { createTodayService } from "../services/today";
 import { registerPhotoGradingRoutes } from "./routes/photoGrading";
 import { createPhotoGradingService } from "../services/photoGrading";
 import { registerSolutionRoutes } from "./routes/solutions";
+import { registerTutorAgentRoutes } from "./routes/tutorAgent";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -422,6 +423,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerLiveRoutes(app, { live, authenticate });
   const tutor = createTutor(deps.db, deps.ai);
   registerTutorRoutes(app, { tutor, authenticate });
+  registerTutorAgentRoutes(app, { db: deps.db, ai: deps.ai, tutor, authenticate });
   registerTodayRoutes(app, { db: deps.db, today: createTodayService(deps.db, { now }), authenticate, studentAuth });
   registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, geoAi, classes), authenticate });
   registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate, tutor, student: (req) => studentAuth.verifySession(bearer(req)).catch(() => Promise.reject(new UnauthorizedError("Phiên đã hết, em đăng nhập lại nhé"))) });
