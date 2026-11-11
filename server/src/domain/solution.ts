@@ -179,20 +179,7 @@ export function partialSteps(text: string): { done: unknown[]; current?: { title
   for (;;) {
     while (i < text.length && /[\s,]/.test(text[i]!)) i++;
     if (i >= text.length || text[i] !== "{") return { done };
-    // tìm dấu } khớp (bỏ qua ngoặc trong chuỗi)
-    let depth = 0, inStr = false, j = i;
-    for (; j < text.length; j++) {
-      const c = text[j]!;
-      if (inStr) {
-        if (c === "\\") j++;
-        else if (c === '"') inStr = false;
-      } else if (c === '"') inStr = true;
-      else if (c === "{" || c === "[") depth++;
-      else if (c === "}" || c === "]") {
-        depth--;
-        if (depth === 0) break;
-      }
-    }
+    const j = closeOf(text, i);
     if (j >= text.length) return { done, current: { title: partialField(text.slice(i), "title"), body: partialField(text.slice(i), "body") } };
     try {
       done.push(JSON.parse(text.slice(i, j + 1)));
@@ -211,5 +198,41 @@ function partialField(obj: string, key: string): string {
     return JSON.parse(`"${raw}"`) as string;
   } catch {
     return raw;
+  }
+}
+
+/** Vị trí dấu } / ] khớp với dấu mở tại i (bỏ qua ngoặc trong chuỗi); chưa đóng → text.length. */
+function closeOf(text: string, i: number): number {
+  let depth = 0, inStr = false, j = i;
+  for (; j < text.length; j++) {
+    const c = text[j]!;
+    if (inStr) {
+      if (c === "\\") j++;
+      else if (c === '"') inStr = false;
+    } else if (c === '"') inStr = true;
+    else if (c === "{" || c === "[") depth++;
+    else if (c === "}" || c === "]") {
+      depth--;
+      if (depth === 0) return j;
+    }
+  }
+  return text.length;
+}
+
+/** Hình trong JSON đang stream (AI viết "figure" trước "steps"): undefined = chưa viết xong; null = bài không có hình / hình hỏng. */
+export function partialFigure(text: string): Figure | null | undefined {
+  const m = /"figure"\s*:\s*/.exec(text);
+  if (!m) return /"(steps|buoc|cac_buoc)"\s*:/.test(text) ? null : undefined;
+  const i = m.index + m[0].length;
+  if (i >= text.length) return undefined;
+  if (text[i] !== "{") return /^null/.test(text.slice(i)) ? null : text.length - i < 4 ? undefined : null;
+  const j = closeOf(text, i);
+  if (j >= text.length) return undefined;
+  try {
+    const o = (unwrapSolution({ problem: "x", answer: "x", steps: [], figure: JSON.parse(text.slice(i, j + 1)) }) as { figure: unknown }).figure;
+    const r = FigureSchema.safeParse(o);
+    return r.success ? r.data : null;
+  } catch {
+    return null;
   }
 }

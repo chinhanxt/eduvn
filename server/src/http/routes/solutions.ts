@@ -1,13 +1,55 @@
 // server/src/http/routes/solutions.ts — P13: giải từng bước (SSE), lời giải theo câu ngân hàng, chia sẻ công khai, thư viện /loi-giai.
-import type { FastifyInstance, FastifyRequest } from "fastify";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
+import type { StudentActor } from "../../auth/student";
 import type { Db } from "../../db/client";
 import type { Ai } from "../../services/ai";
 import { createSolutionService } from "../../services/solutions";
+import type { Tutor } from "../../tutor";
 import { parseOverrides, withTaskOverrides } from "../../tutor/tasks";
 import type { Actor } from "../../service";
 
-export type SolutionRouteCtx = { db: Db; ai: Ai; publicUrl: string; webUrl?: string; authenticate: (req: FastifyRequest) => Promise<Actor> };
+export type SolutionRouteCtx = {
+  db: Db;
+  ai: Ai;
+  publicUrl: string;
+  webUrl?: string;
+  authenticate: (req: FastifyRequest) => Promise<Actor>;
+  /** phiên HS cổng /hs (mã/thẻ/QR) — cho kết quả bài làm + "Chưa hiểu bước này" */
+  student?: (req: FastifyRequest) => Promise<StudentActor>;
+  tutor?: Tutor;
+};
+
+/** Ghi sinh sự kiện thành SSE. Lỗi trước sự kiện đầu (sai dữ liệu, không thấy câu, cổng AI tắt) vẫn trả mã HTTP đúng. */
+async function pipeSse(req: FastifyRequest, reply: FastifyReply, start: (signal: AbortSignal) => AsyncGenerator<unknown, void, void>, fail: { busy: string; other: string; log: string }) {
+  void req;
+  const ac = new AbortController();
+  reply.raw.on("close", () => {
+    if (!reply.raw.writableEnded) ac.abort();
+  });
+  const it = start(ac.signal);
+  const first = await it.next();
+  reply.hijack();
+  reply.raw.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-cache, no-transform", connection: "keep-alive", "x-accel-buffering": "no" });
+  const send = (e: unknown) => reply.raw.write(`data: ${JSON.stringify(e)}\n\n`);
+  try {
+    if (!first.done) send(first.value);
+    for (let r = first.done ? first : await it.next(); !r.done; r = await it.next()) send(r.value);
+    send({ type: "end" });
+  } catch (e) {
+    const name = (e as Error).name;
+    if (!ac.signal.aborted) send({ type: "error", message: name === "AiUnavailableError" ? (e as Error).message || fail.busy : fail.other });
+    if (name !== "AiUnavailableError" && !ac.signal.aborted) console.error(fail.log, e);
+  } finally {
+    reply.raw.end();
+  }
+}
+
+const StepHint = z.object({
+  sessionId: z.uuid().optional(),
+  message: z.string().trim().min(1).max(4000),
+  hintLevel: z.number().int().min(1).max(3).default(1),
+});
 
 const Id = (req: FastifyRequest) => z.uuid({ message: "Mã lời giải không hợp lệ" }).parse((req.params as { id: string }).id);
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -19,27 +61,7 @@ export function registerSolutionRoutes(app: FastifyInstance, ctx: SolutionRouteC
 
   app.post("/api/solutions/solve", async (req, reply) => {
     const actor = await authenticate(req);
-    const ac = new AbortController();
-    reply.raw.on("close", () => {
-      if (!reply.raw.writableEnded) ac.abort();
-    });
-    const it = svc.solve(actor, req.body, ac.signal);
-    // lỗi trước sự kiện đầu (sai dữ liệu, không thấy câu, cổng AI tắt) vẫn trả mã HTTP đúng
-    const first = await it.next();
-    reply.hijack();
-    reply.raw.writeHead(200, { "content-type": "text/event-stream; charset=utf-8", "cache-control": "no-cache, no-transform", connection: "keep-alive", "x-accel-buffering": "no" });
-    const send = (e: unknown) => reply.raw.write(`data: ${JSON.stringify(e)}\n\n`);
-    try {
-      if (!first.done) send(first.value);
-      for (let r = first.done ? first : await it.next(); !r.done; r = await it.next()) send(r.value);
-      send({ type: "end" });
-    } catch (e) {
-      const name = (e as Error).name;
-      if (!ac.signal.aborted) send({ type: "error", message: name === "AiUnavailableError" ? (e as Error).message || "AI đang bận, thử lại sau ít giây." : "Giải bài gặp lỗi, thử lại nhé." });
-      if (name !== "AiUnavailableError" && !ac.signal.aborted) console.error("solutions solve", e);
-    } finally {
-      reply.raw.end();
-    }
+    await pipeSse(req, reply, (signal) => svc.solve(actor, req.body, signal), { busy: "AI đang bận, thử lại sau ít giây.", other: "Giải bài gặp lỗi, thử lại nhé.", log: "solutions solve" });
   });
 
   app.get("/api/solutions/:id", async (req) => svc.get(await authenticate(req), Id(req)));
@@ -53,6 +75,22 @@ export function registerSolutionRoutes(app: FastifyInstance, ctx: SolutionRouteC
   });
   app.get<{ Params: { qid: string } }>("/api/questions/:qid/solution", async (req) => ({ solution: await svc.forQuestion(await authenticate(req), z.uuid().parse(req.params.qid)) }));
   app.post("/api/solutions/status", async (req) => svc.statusFor(await authenticate(req), z.object({ ids: z.array(z.uuid()).max(500) }).parse(req.body).ids));
+
+  // ——— HS cổng /hs ———
+  if (ctx.student) {
+    const student = ctx.student;
+    app.get<{ Params: { id: string } }>("/api/student/submissions/:id/solutions", async (req) => ({ solutions: await svc.forSubmission(await student(req), z.uuid({ message: "Mã bài làm không hợp lệ" }).parse(req.params.id)) }));
+    /** "Chưa hiểu bước này": gia sư P6 ở chế độ gợi ý từng bước, phiên riêng của HS (learnerKey hs:<id>). */
+    if (ctx.tutor) {
+      const tutor = ctx.tutor;
+      app.post("/api/student/tutor/step", async (req, reply) => {
+        const sa = await student(req);
+        const b = StepHint.parse(req.body);
+        const learner = { orgId: sa.orgId, learnerKey: `hs:${sa.studentId}`, classId: sa.classId };
+        await pipeSse(req, reply, (signal) => tutor.chat.stream(learner, { sessionId: b.sessionId, message: b.message, mode: "hint", hintLevel: b.hintLevel }, signal), { busy: "AI đang bận, em thử lại sau ít giây nhé.", other: "Gia sư gặp lỗi, em thử lại nhé.", log: "student step tutor" });
+      });
+    }
+  }
 
   // ——— công khai ———
   app.get<{ Querystring: { topic?: string; q?: string; page?: string } }>("/api/public/solutions", async (req, reply) => {

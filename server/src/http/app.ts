@@ -16,7 +16,7 @@ import { createAssignmentService } from "../services/assignments";
 import { createCredentialService } from "../services/credentials";
 import { createSubmissionService } from "../services/submissions";
 import { registerClassroomRoutes } from "./classroom";
-import { registerStudentRoutes } from "./student";
+import { bearer, registerStudentRoutes } from "./student";
 import { type Ai, disabledAi } from "../services/ai";
 import { createDiagramService } from "../services/diagrams";
 import { buildFigure } from "../services/geometry";
@@ -414,8 +414,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const live = createLiveService({ db: deps.db, ai: deps.ai ?? disabledAi, classes, games, secret: deps.downloadSecret });
   app.addHook("onClose", async () => live.dispose());
   registerLiveRoutes(app, { live, authenticate });
-  registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
-  registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate });
+  const tutor = createTutor(deps.db, deps.ai);
+  registerTutorRoutes(app, { tutor, authenticate });
+  registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate, tutor, student: (req) => studentAuth.verifySession(bearer(req)).catch(() => Promise.reject(new UnauthorizedError("Phiên đã hết, em đăng nhập lại nhé"))) });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

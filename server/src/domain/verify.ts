@@ -169,8 +169,18 @@ export function measure3d(g: Geo, m: Measure3d): { kind: "length" | "angle" | "a
   }
 }
 
-const fmtMeasured = (kind: string, v: number) => (kind === "angle" ? fmtAngle(v) : kind === "length" ? fmtLen(v) : kind === "area" ? fmtLen(v, "a²") : kind === "volume" ? fmtLen(v, "a³") : fmtRatio(v));
-const fmtNum = (v: number) => (Number.isFinite(v) ? fmtRatio(v) : "không xác định");
+const fmtMeasured = (kind: string, v: number) => (kind === "angle" ? fmtAngle(v) : kind === "length" ? fmtLen(v) : kind === "area" ? fmtLen(v, "a²") : kind === "volume" ? fmtLen(v, "a³") : fmtNum(v));
+/** Số đo/tính lại: phân số mẫu ≤ 1000 khi đúng là số hữu tỉ (xác suất 3/8, 0,032 → 4/125), không thì dạng căn/thập phân. */
+function fmtNum(v: number): string {
+  if (!Number.isFinite(v)) return "không xác định";
+  const r = Math.round(v);
+  if (Math.abs(v - r) < 1e-9 * Math.max(1, Math.abs(v))) return String(r).replace("-", "−");
+  for (let q = 2; q <= 1000; q++) {
+    const p = Math.round(v * q);
+    if (Math.abs(p / q - v) < 1e-10 * Math.max(1, Math.abs(v))) return `${p < 0 ? "−" : ""}${Math.abs(p)}/${q}`;
+  }
+  return fmtRatio(v);
+}
 
 // ——— đại số / giải tích ———
 const at = (f: Ast, x: number) => evalAst(f, x, 1);

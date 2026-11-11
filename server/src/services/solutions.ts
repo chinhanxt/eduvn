@@ -1,11 +1,13 @@
 // server/src/services/solutions.ts — P13 "Lời giải thông minh": đề → AI (giai_bai_tung_buoc, stream) → lời giải từng bước
 // → tự kiểm đáp số (domain/verify) → lệch thì AI sửa đúng 1 lần với số đo thật → lưu bảng solutions; thư viện công khai.
-import { and, desc, eq, ilike, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
+import type { StudentActor } from "../auth/student";
 import { z } from "zod";
 import type { Db } from "../db/client";
-import { questions, solutions } from "../db/schema";
-import { type Role, assertCan } from "../domain/authz";
-import { type Solution, parseSolution, partialSteps } from "../domain/solution";
+import { assignments, questions, solutions, submissions } from "../db/schema";
+import { resultLevel, variantByCode } from "../domain/assignment";
+import { type Role, assertCan, can } from "../domain/authz";
+import { type Figure, type Solution, parseSolution, partialFigure, partialSteps } from "../domain/solution";
 import { foldVi } from "../domain/tutorSearch";
 import { mismatchNote, verifySolution } from "../domain/verify";
 import { AiUnavailableError, NotFoundError, ValidationError } from "../errors";
@@ -58,6 +60,7 @@ const SolveReq = z.object({
 });
 
 export type SolveEvent =
+  | { type: "figure"; figure: Figure | null }
   | { type: "step"; index: number; step: unknown }
   | { type: "partial"; index: number; title: string; body: string }
   | { type: "status"; message: string }
@@ -142,8 +145,16 @@ export function createSolutionService(db: Db, ai: Ai, opts: { now?: () => Date; 
     let text = "";
     let sent = 0;
     let lastPartial = "";
+    let figureSent = false;
     for await (const t of ai.stream(SOLUTION_TASK, messages, { json: true, signal })) {
       text += t;
+      if (!figureSent) {
+        const f = partialFigure(text);
+        if (f !== undefined) {
+          figureSent = true;
+          yield { type: "figure", figure: f };
+        }
+      }
       const p = partialSteps(text);
       for (; sent < p.done.length; sent++) yield { type: "step", index: sent, step: p.done[sent] };
       if (p.current && (p.current.title || p.current.body)) {
@@ -186,7 +197,8 @@ export function createSolutionService(db: Db, ai: Ai, opts: { now?: () => Date; 
     }
     yield { type: "verified", verification: sol.verification, corrected };
     let id: string | null = null;
-    if (req.save) id = await store(actor, sol, req.questionId);
+    // HS dùng gia sư "Lời giải đầy đủ": chỉ xem, không ghi vào kho lời giải của tổ chức
+    if (req.save && can(actor.role, "question:write")) id = await store(actor, sol, req.questionId);
     yield { type: "done", id, solution: sol };
   }
 
@@ -242,6 +254,20 @@ export function createSolutionService(db: Db, ai: Ai, opts: { now?: () => Date; 
       assertCan(actor.role, "question:write");
       await own(actor, id);
       await db.delete(solutions).where(eq(solutions.id, id));
+    },
+
+    /** Kết quả bài làm của HS: lời giải từng bước theo số câu `no`, chỉ khi cài đặt "hiện lời giải" của bài cho phép (mức full). */
+    async forSubmission(sa: StudentActor, submissionId: string): Promise<Record<string, Solution>> {
+      const [s] = await db.select().from(submissions).where(and(eq(submissions.id, submissionId), eq(submissions.studentId, sa.studentId), ne(submissions.status, "in_progress")));
+      if (!s) throw new NotFoundError("Không tìm thấy bài làm");
+      const [a] = await db.select().from(assignments).where(eq(assignments.id, s.assignmentId));
+      if (!a || resultLevel(a.showSolution, a.dueAt, now()) !== "full") return {};
+      const items = variantByCode(a.variants, s.variantCode).items;
+      const ids = [...new Set(items.map((i) => i.questionId))];
+      if (!ids.length) return {};
+      const rows = await db.select({ q: solutions.questionId, body: solutions.body }).from(solutions).where(and(eq(solutions.orgId, a.orgId), inArray(solutions.questionId, ids)));
+      const byQ = new Map(rows.map((r) => [r.q!, r.body]));
+      return Object.fromEntries(items.filter((i) => byQ.has(i.questionId)).map((i) => [String(i.no), byQ.get(i.questionId)!]));
     },
 
     // ——— thư viện công khai (không đăng nhập, không lộ tổ chức/người soạn) ———

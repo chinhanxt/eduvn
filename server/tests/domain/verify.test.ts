@@ -178,8 +178,22 @@ describe("đọc dần JSON đang stream", () => {
     const cut = full.slice(0, full.indexOf("$x^2") + 3);
     const r = partialSteps(cut);
     expect(r.done).toEqual([{ title: "Đặt ẩn", body: 'Gọi x {là} "số"', refs: ["A"] }]);
-    expect(r.current).toEqual({ title: "Giải", body: "Ta có $x" });
+    expect(r.current).toEqual({ title: "Giải", body: "Ta có $x^" });
     expect(partialSteps(full).done).toHaveLength(2);
     expect(partialSteps('{"problem": "x"').done).toEqual([]);
+  });
+});
+
+describe("hình trong JSON đang stream", () => {
+  it("chưa xong → undefined; xong → hình đã kiểm zod; null/không có → null", async () => {
+    const { partialFigure } = await import("../../src/domain/solution");
+    const fig = { kind: "graph", spec: { expr: "x^3-3x+1", points: [{ id: "CD", x: "-1", y: "3" }] } };
+    const full = JSON.stringify({ problem: "Đề", answer: "3", figure: fig, steps: [{ title: "B1", body: "…" }] });
+    expect(partialFigure(full.slice(0, full.indexOf('"points"')))).toBeUndefined();
+    expect(partialFigure(full)).toMatchObject({ kind: "graph", spec: { expr: "x^3-3x+1" } });
+    expect(partialFigure('{"answer": "x", "figure": null, "steps": [')).toBeNull();
+    expect(partialFigure('{"answer": "x", "steps": [')).toBeNull();
+    expect(partialFigure('{"answer": "x", "figure": {"kind": "la", "spec": {}}, "steps"')).toBeNull();
+    expect(partialFigure('{"answer": "x"')).toBeUndefined();
   });
 });
