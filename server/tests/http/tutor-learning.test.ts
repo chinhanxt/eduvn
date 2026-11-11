@@ -175,6 +175,10 @@ describe("giáo trình sống", () => {
   it("biên soạn trang sau: prompt có dàn ý trang + tóm tắt chương trước; tiêu đề lặp giữa các khối bị bỏ; callout không còn nhãn thừa", async () => {
     const { kb } = await makeKb(t);
     const book = (await t.call("POST", "/api/tutor/books", { kbId: kb.id, intent: "Giáo trình hằng đẳng thức cho lớp 8" })).json();
+    expect((await t.call("POST", `/api/tutor/books/${book.id}/pages/0/compile`)).statusCode).toBe(200);
+    const sec0 = t.fake.calls.find((c) => typeof c.messages[0]?.content === "string" && c.messages[0].content.startsWith("Bạn là người viết khối Bài giảng"));
+    expect(String(sec0?.messages[1]?.content)).toContain("Các chương SAU (sẽ học — không giảng trước nội dung của chúng):\n2. Hiệu hai bình phương");
+    t.fake.calls.length = 0;
     const page = await t.call("POST", `/api/tutor/books/${book.id}/pages/1/compile`);
     expect(page.statusCode).toBe(200);
     const sec = t.fake.calls.find((c) => typeof c.messages[0]?.content === "string" && c.messages[0].content.startsWith("Bạn là người viết khối Bài giảng"));

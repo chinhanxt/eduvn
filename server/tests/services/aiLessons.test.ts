@@ -298,6 +298,15 @@ describe("sinh bài giảng AI", () => {
     ai.opts.animNums = "once";
     expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).statusCode).toBe(202);
     await new Promise((r) => setTimeout(r, 200));
+    await call("DELETE", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`);
+    // số chỉ xuất hiện ở cảnh SAU (lời giải quiz) vẫn là số của bài → không bị từ chối (chạy thật: cảnh 1 dùng 5/7, 2/7 của cảnh sau)
+    const scenes = (await call("GET", `/api/ai-lessons/${id}`)).json().scenes as StoredScene[];
+    const quiz = scenes.find((s) => s.type === "quiz") as StoredScene & { content: { questions: { analysis: string }[] } };
+    quiz.content.questions[0]!.analysis = "Ví dụ khác: 37 và 59.";
+    await call("PUT", `/api/ai-lessons/${id}`, { scenes });
+    ai.opts.animNums = "always";
+    expect((await call("POST", `/api/ai-lessons/${id}/canh/${slide.id}/hoat-hinh`, {})).statusCode).toBe(202);
+    await new Promise((r) => setTimeout(r, 200));
   });
 
   it("lưu quiz vào ngân hàng: trắc nghiệm 4 phương án lưu, nhiều đáp án bị bỏ qua có lý do", async () => {

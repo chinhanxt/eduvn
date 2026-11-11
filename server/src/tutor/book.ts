@@ -101,7 +101,8 @@ export function createBookService(deps: { db: Db; ai: Ai; kb: KbService }) {
     // chương trước đã học: đưa tóm tắt vào prompt để không giảng lại
     const prev = await db.select({ idx: tutorBookPages.idx, title: tutorBookPages.title, summary: tutorBookPages.summary }).from(tutorBookPages).where(eq(tutorBookPages.bookId, book.id)).orderBy(asc(tutorBookPages.idx));
     const before = prev.filter((p) => p.idx < page.idx).map((p) => `${p.idx + 1}. ${p.title}${p.summary ? ` — ${p.summary}` : ""}`).join("\n");
-    const header = `Chương: ${page.title}\nTóm tắt: ${page.summary}\nMục tiêu:\n${objectives}${before ? `\n\nCác chương TRƯỚC (em đã học — không giảng lại, chỉ nhắc một câu khi cần):\n${before}` : ""}`;
+    const after = prev.filter((p) => p.idx > page.idx).map((p) => `${p.idx + 1}. ${p.title}`).join("\n");
+    const header = `Chương: ${page.title}\nTóm tắt: ${page.summary}\nMục tiêu:\n${objectives}${before ? `\n\nCác chương TRƯỚC (em đã học — không giảng lại, chỉ nhắc một câu khi cần):\n${before}` : ""}${after ? `\n\nCác chương SAU (sẽ học — không giảng trước nội dung của chúng):\n${after}` : ""}`;
 
     let plan: Planned[];
     try {

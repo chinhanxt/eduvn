@@ -9,7 +9,7 @@ import { type Role, assertCan } from "../../domain/authz";
 import { type StoredQuestion, QuestionInput } from "../../domain/question";
 import { AiUnavailableError, NotFoundError, ValidationError } from "../../errors";
 import { type Ai, disabledAi, parseAiJson } from "../ai";
-import { foreignNumbers, lessonFacts, slideText as factSlideText } from "../../domain/lessonFacts";
+import { foreignNumbers, lessonFacts, slideText as factSlideText, speechText } from "../../domain/lessonFacts";
 import { quizVoiceLines } from "../../export/aiLessonTimeline";
 import type { QuizQ } from "../../export/slideHtml";
 import { type GenDeps, audioDirOf, buildScene, fillMissingAudio, generateLesson } from "./generate";
@@ -139,7 +139,7 @@ export function createAiLessonService(db: Db, ai: Ai | undefined, cfg: AiLessons
 
   /** AI chọn hoạt hình: bước 1 lọc sơ bộ tất định (môn, lớp, từ khoá) còn ≤6 mẫu → bước 2 hỏi AI kèm dữ kiện của cả bài.
    *  Độ tin cậy < 0,6 hoặc sai zod → thử lại kèm lý do; số trong tham số không có trong bài (không suy ra được) → chọn lại 1 lần, vẫn lệch thì bỏ. */
-  async function proposeAnim(sc: StoredScene, seconds: number, subject: string, grade: number | null, all: StoredScene[] = [sc]): Promise<{ spec: Record<string, unknown>; reason?: string; confidence?: number }> {
+  async function proposeAnim(sc: StoredScene, seconds: number, subject: string, grade: number | null, all: StoredScene[] = [sc], requirement = ""): Promise<{ spec: Record<string, unknown>; reason?: string; confidence?: number }> {
     if (!ai) throw new AiUnavailableError("Chưa bật cổng AI");
     const task = cfg.taskOverrides?.hoat_hinh_toan ?? "hoat_hinh_toan";
     const speech = (sc.actions ?? []).flatMap((a) => (a.type === "speech" ? [a.text] : [])).join(" ").slice(0, 2500);
@@ -147,7 +147,8 @@ export function createAiLessonService(db: Db, ai: Ai | undefined, cfg: AiLessons
     if (cands.length === 0) throw new ValidationError(["Cảnh này chưa có mẫu hoạt hình nào hợp (không trúng từ khoá môn/chủ đề). Bạn có thể chọn mẫu thủ công."]);
     const list = cands.map(({ entry: e }) => `### ${e.id} — ${e.ten}\nDùng khi: ${e.dungKhi}\nKhông dùng khi: ${e.khongDungKhi}\nThamSo: ${e.thamSo}\nVí dụ params: ${JSON.stringify(e.viDu)}`).join("\n\n");
     const facts = lessonFacts(all, sc.order);
-    const lessonText = [facts, slideText(sc), speech].join("\n");
+    // kiểm số trên TOÀN bài (đề bài + mọi cảnh: chữ slide, lời giảng, lời giải quiz) — cảnh đầu cũng được dùng số của các cảnh sau
+    const lessonText = [requirement, ...all.map((x) => `${factSlideText(x.content)} ${speechText(x)} ${x.type === "quiz" ? JSON.stringify((x.content as { questions?: unknown }).questions ?? []) : ""}`)].join("\n");
     const base = `Môn: ${subject || "?"}${grade ? `, lớp ${grade}` : ""}\nCảnh: ${sc.title}\nNội dung slide: ${slideText(sc)}\nLời giảng: ${speech}\nThời lượng lời giảng: ${seconds} giây (đặt thoiLuong = ${seconds}).${facts ? `\n\nDữ kiện và số liệu của bài (các cảnh trước) — tham số PHẢI dùng đúng các số này, không tự đặt đề/số khác:\n${facts}` : ""}\n\nQuy tắc số liệu: mọi con số trong params phải lấy từ nội dung bài ở trên hoặc tính ra từ đó; xác suất ghi dạng phân số chuỗi như trong bài (vd "5/8", "4/7"), không đổi sang số thập phân. "Ví dụ params" bên dưới chỉ minh hoạ cú pháp — KHÔNG dùng số trong ví dụ.\n\nCác mẫu được phép (chỉ chọn trong danh sách này):\n${list}`;
     const allowed = new Set<string>(cands.map((c) => c.entry.id));
     let feedback = "";
@@ -264,7 +265,7 @@ export function createAiLessonService(db: Db, ai: Ai | undefined, cfg: AiLessons
     if (sc.animation?.status === "dang_dung") return sc;
     const seconds = Math.min(60, Math.max(3, Math.round(speechMs(sc) / 1000)));
     const given = z.object({ spec: z.record(z.string(), z.unknown()).optional() }).parse(body ?? {}).spec;
-    const picked = given ? { spec: { ...given, thoiLuong: seconds } as Record<string, unknown>, reason: undefined, confidence: undefined } : await proposeAnim(sc, seconds, r.subject, r.grade, r.scenes as StoredScene[]);
+    const picked = given ? { spec: { ...given, thoiLuong: seconds } as Record<string, unknown>, reason: undefined, confidence: undefined } : await proposeAnim(sc, seconds, r.subject, r.grade, r.scenes as StoredScene[], r.request.requirement);
     const spec = picked.spec;
     let prepared: ReturnType<AnimService["prepare"]>;
     try {
