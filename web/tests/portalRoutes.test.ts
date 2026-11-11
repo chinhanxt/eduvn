@@ -6,6 +6,7 @@ describe("bản đồ chuyển hướng đường cũ → cổng mới", () => {
     ["/ngan-hang", "/gv/ngan-hang"],
     ["/de-thi", "/gv/de-thi"],
     ["/cham-bai", "/gv/cham-bai"],
+    ["/cham-anh", "/gv/cham-anh"],
     ["/lop-hoc", "/gv/lop-hoc"],
     ["/lop-hoc/abc-123", "/gv/lop-hoc/abc-123"],
     ["/so-diem", "/gv/so-diem"],

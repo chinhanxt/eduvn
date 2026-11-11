@@ -6,6 +6,7 @@ export function gvNav(counts: { classes?: number; grading?: number } = {}): NavE
     { to: "/", label: "Hôm nay", icon: "home", kbd: "G H", end: true },
     { to: "/lop-hoc", label: "Lớp học", icon: "users", kbd: "G L", count: counts.classes },
     { to: "/cham-bai", label: "Chấm bài", icon: "inbox", kbd: "G C", count: counts.grading, hot: true },
+    { to: "/cham-anh", label: "Chấm từ ảnh", icon: "camera", kbd: "G A" },
     { to: "/so-diem", label: "Sổ điểm", icon: "chart", kbd: "G S" },
     { group: "Soạn" },
     { to: "/ngan-hang", label: "Ngân hàng câu hỏi", icon: "bank", kbd: "G N" },

@@ -43,7 +43,7 @@ describe("điều hướng khung cổng", () => {
   });
   it("cổng GV có đủ trang hiện có + phím tắt G không trùng", () => {
     const to = [...items, ...GV_FOOT].map((n) => n.to);
-    for (const p of ["/", "/lop-hoc", "/cham-bai", "/so-diem", "/ngan-hang", "/de-thi", "/bai-giang-ai", "/giao-an", "/bang-giang", "/so-do", "/slide", "/de-cuong", "/tro-choi", "/dau-truong", "/giao-trinh", "/kho-tri-thuc", "/van-ban", "/ket-noi"]) expect(to).toContain(p);
+    for (const p of ["/", "/lop-hoc", "/cham-bai", "/cham-anh", "/so-diem", "/ngan-hang", "/de-thi", "/bai-giang-ai", "/giao-an", "/bang-giang", "/so-do", "/slide", "/de-cuong", "/tro-choi", "/dau-truong", "/giao-trinh", "/kho-tri-thuc", "/van-ban", "/ket-noi"]) expect(to).toContain(p);
     const keys = items.map((n) => n.kbd).filter(Boolean);
     expect(new Set(keys).size).toBe(keys.length);
   });

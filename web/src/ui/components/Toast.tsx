@@ -97,7 +97,7 @@ function ToastView({ t, onClose, onGone }: { t: Item; onClose: () => void; onGon
   const kind = t.kind ?? "ok";
   const act = t.undo ? { label: "Hoàn tác", run: t.undo } : t.action;
   return (
-    <div className={["toast", kind !== "ok" && kind, t.out && "out"].filter(Boolean).join(" ")} title={t.msg ? `${t.title} — ${t.msg}` : t.title} onMouseEnter={pause} onMouseLeave={arm} onFocus={pause} onBlur={arm}>
+    <div data-testid="toast" className={["toast", kind !== "ok" && kind, t.out && "out"].filter(Boolean).join(" ")} title={t.msg ? `${t.title} — ${t.msg}` : t.title} onMouseEnter={pause} onMouseLeave={arm} onFocus={pause} onBlur={arm}>
       <Icon name={kind} />
       <div className="msg">
         <b>{t.title}</b>

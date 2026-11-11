@@ -13,7 +13,7 @@ export function entryFor(pathname: string): Entry {
 
 /** Đường cũ của cổng GV (trước UI v2), phục vụ ở gốc. */
 export const GV_LEGACY = [
-  "ngan-hang", "de-thi", "cham-bai", "lop-hoc", "so-diem", "giao-an", "de-cuong", "slide", "bai-giang-ai",
+  "ngan-hang", "de-thi", "cham-bai", "cham-anh", "lop-hoc", "so-diem", "giao-an", "de-cuong", "slide", "bai-giang-ai",
   "bang-giang", "so-do", "tro-choi", "dau-truong", "van-ban", "ket-noi", "kho-tri-thuc", "to-chuc", "video",
 ] as const;
 const GV_RE = new RegExp(`^/(${GV_LEGACY.join("|")})(/.*)?$`);

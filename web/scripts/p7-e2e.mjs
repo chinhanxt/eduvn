@@ -63,7 +63,7 @@ page.on("pageerror", (e) => console.log("pageerror", e.message));
 const posts = [];
 page.on("request", (r) => { if (r.method() === "POST" && r.url().includes("/api/photo/omr")) posts.push(r.url()); });
 
-await page.goto(`${BASE}/cham-anh?de=${exam.examId}&lop=${cls.id}`);
+await page.goto(`${BASE}/gv/cham-anh?de=${exam.examId}&lop=${cls.id}`);
 await page.getByTestId("s-drop").waitFor();
 await page.waitForTimeout(600);
 await page.screenshot({ path: "/tmp/p7-1-quet-trong.png" });
@@ -106,7 +106,7 @@ const saveAll = page.getByTestId("s-save-all");
 await saveAll.click();
 await saveAll.click({ force: true }).catch(() => {});
 await saveAll.click({ force: true }).catch(() => {});
-await page.getByTestId("pg-toast").first().waitFor();
+await page.getByTestId("toast").first().waitFor();
 await page.waitForTimeout(500);
 assert(posts.length === 2, `bấm "Lưu" 3 lần chỉ gửi 2 phiếu (${posts.length} request)`);
 await page.screenshot({ path: "/tmp/p7-5-da-luu.png", fullPage: true });
@@ -131,7 +131,7 @@ assert(wrong === 0, `đáp án đã lưu khớp đáp án tô (${groups} nhóm �
 await page.getByTestId("gb-open").first().click();
 await page.getByTestId("gb-go").waitFor();
 await page.getByTestId("gb-go").click();
-await page.waitForFunction(() => [...document.querySelectorAll('[data-testid="pg-toast"]')].some((t) => t.textContent.includes("Đã ghi")));
+await page.waitForFunction(() => [...document.querySelectorAll('[data-testid="toast"]')].some((t) => t.textContent.includes("Đã ghi")));
 await page.screenshot({ path: "/tmp/p7-6-ghi-so-diem.png" });
 
 // ---------- Bài viết tay qua cổng AI thật ----------
@@ -172,7 +172,7 @@ out.aiTotal = await page.getByTestId("e-total").textContent();
 await page.getByTestId("e-save").scrollIntoViewIfNeeded();
 await page.screenshot({ path: "/tmp/p7-9-cham-rubric.png", fullPage: true });
 await page.getByTestId("e-save").click();
-await page.waitForFunction(() => [...document.querySelectorAll('[data-testid="pg-toast"]')].some((t) => t.textContent.includes("Đã lưu")));
+await page.waitForFunction(() => [...document.querySelectorAll('[data-testid="toast"]')].some((t) => t.textContent.includes("Đã lưu")));
 const essays = await call("GET", "/api/photo/results?kind=essay");
 out.essay = { student: essays[0]?.student, total: essays[0]?.total, max: essays[0]?.max, criteria: essays[0]?.body.criteria };
 assert(essays[0]?.student.includes("Trần Thị Bình"), "bài viết tay lưu đúng HS");

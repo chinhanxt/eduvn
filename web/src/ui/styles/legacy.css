@@ -187,3 +187,14 @@
 }
 /* P9a (hs.css) đặt màu nhấn đậm cố định → theo cổng */
 .legacy .hs { --brand-d: var(--accent-hover); --hs-muted: var(--ink-3); --gray-bg: var(--bg-sunken); background: transparent; min-height: 0; }
+/* P7 Chấm từ ảnh: phiếu in A4 (chép từ styles.css) */
+.legacy .omr-page { margin: 0 auto 16px; max-width: 560px; background: #fff; box-shadow: var(--shadow); }
+.legacy .omr-page svg { width: 100%; height: auto; display: block; }
+@media print {
+  body * { visibility: hidden; }
+  .omr-print, .omr-print * { visibility: visible; }
+  .omr-print { position: absolute; left: 0; top: 0; width: 210mm; }
+  .omr-page { max-width: none; width: 210mm; margin: 0; box-shadow: none; break-after: page; }
+  .omr-page svg { width: 210mm; height: 297mm; }
+  @page { size: A4; margin: 0; }
+}
