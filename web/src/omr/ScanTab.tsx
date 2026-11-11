@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { type ClassSummary, type ExamSummary, type KeyEntry, api } from "../api";
-import { Icon } from "../Icon";
+import { Icon } from "../ui/Icon";
 import { type GroupRead, PX_MM, type Resp, type Warped, assemble, loadCv, readGroups, warpPage } from "./decode";
 import { fileToImageData } from "./image";
 import { SavedList, useSaved } from "./Saved";
@@ -365,7 +365,7 @@ function SheetCard({ i, sheet, roster, onChange, onRemove, onSave, onSaved }: { 
             return (
               <div key={g.id} className={`pg-doubt${fixed ? " fixed" : ""}`} data-testid="s-doubt">
                 <div className="h">
-                  <Icon name={fixed ? "check" : "alert"} size={14} />{groupName(g)}
+                  <Icon name={fixed ? "check" : "alert"} size="sm" />{groupName(g)}
                   <span className="pg-sp" />
                   <span className={`pg-tag ${fixed ? "" : "is-warn"}`}>{fixed ? "đã sửa" : read.reason}</span>
                 </div>

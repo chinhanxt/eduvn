@@ -1,84 +1,81 @@
-// web/src/pages/Boards.tsx
-import { type FormEvent, useCallback, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { api, type BoardSummary, errText, gradeLabel } from "../api";
-import { Icon } from "../Icon";
-import { SUBJECT_DEFAULT } from "./Bank";
+// web/src/pages/Boards.tsx — danh sách bảng giảng (UI v2)
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
+import type { BoardSummary } from "../api";
+import { DocList } from "../portal/gv/DocList";
+import { GRADE_OPTS, SUBJECT_DEFAULT, dateVi, del, FormPane, get, gradeVi, post, useKeyN, useOpenParam, useRun } from "../portal/gv/kit";
+import { Button, IconButton } from "../ui/components/Button";
+import { ConfirmDialog } from "../ui/components/Dialog";
+import { Field, Input, Select } from "../ui/components/Field";
+import type { Column } from "../ui/components/Table";
+import { invalidate, useQuery } from "../ui/data/query";
+import { usePageMeta } from "../ui/shell/AppShell";
 
+const KEY = "gv/bang-giang";
+
+/** /bang-giang — bài giảng trên bảng (mở toàn màn hình): bảng v2, lọc môn, tạo trong trang, xoá có xác nhận. */
 export function Boards() {
+  usePageMeta("Bảng giảng");
   const nav = useNavigate();
-  const [rows, setRows] = useState<BoardSummary[] | null>(null);
-  const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ title: "", subject: SUBJECT_DEFAULT, grade: "10", topic: "" });
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const load = useCallback(() => {
-    api<BoardSummary[]>("/api/boards").then(setRows).catch((e: unknown) => setError(errText(e)));
-  }, []);
-  useEffect(load, [load]);
-
-  const create = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    const title = form.title.trim();
-    if (!title) {
-      setError("Nhập tên bài");
-      return;
-    }
-    setBusy(true);
-    try {
-      const b = await api<BoardSummary>("/api/boards", { method: "POST", body: { ...form, title, grade: Math.min(16, Math.max(1, Math.round(Number(form.grade)) || 10)) } });
-      nav(`/bang-giang/${b.id}`);
-    } catch (err) {
-      setError(errText(err));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const remove = async (b: BoardSummary) => {
-    if (!confirm(`Xoá bài giảng "${b.title}"?`)) return;
-    setError(null);
-    try {
-      await api(`/api/boards/${b.id}`, { method: "DELETE" });
-      load();
-    } catch (e) {
-      setError(errText(e));
-    }
-  };
-
+  const q = useQuery(KEY, get<BoardSummary[]>("/api/boards"));
+  const [open, setOpen] = useOpenParam();
+  const [toDel, setToDel] = useState<BoardSummary | null>(null);
+  const run = useRun();
+  useKeyN(() => setOpen(true));
+  const sorts = useMemo(() => ({ ten: (b: BoardSummary) => b.title, trang: (b: BoardSummary) => b.pageCount, sua: (b: BoardSummary) => b.updatedAt }), []);
+  const cols: Column<BoardSummary>[] = [
+    { key: "ten", header: "Bài giảng", sortable: true, cell: (b) => <span><span className="t-title">{b.title}</span><span className="t-sub">{b.topic || "—"}</span></span> },
+    { key: "mon", header: "Môn · lớp", hideSm: true, cell: (b) => <span className="caption">{b.subject} · {gradeVi(b.grade)}</span> },
+    { key: "trang", header: "Trang", numeric: true, sortable: true, cell: (b) => b.pageCount },
+    { key: "sua", header: "Sửa lần cuối", numeric: true, sortable: true, hideSm: true, cell: (b) => dateVi(b.updatedAt) },
+    { key: "act", header: "", numeric: true, cell: (b) => <span className="t-acts" onClick={(e) => e.stopPropagation()}><IconButton size="sm" icon="trash" label={`Xoá ${b.title}`} onClick={() => setToDel(b)} /></span> },
+  ];
   return (
     <>
-      <h1>Bảng giảng</h1>
-      <div className="bar">
-        <span className="sp" />
-        <button className="btn" onClick={() => setAdding((a) => !a)} data-testid="bg-new"><Icon name="plus" size={18} />Tạo</button>
-      </div>
-      {error && <div className="err">{error}</div>}
-      {adding && (
-        <form className="card" style={{ marginBottom: 16 }} onSubmit={(e) => void create(e)}>
-          <div className="formrow">
-            <label className="lbl">Tên bài<input className="inp" style={{ width: 280 }} required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} data-testid="bg-title" /></label>
-            <label className="lbl">Môn<input className="inp w-m" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} /></label>
-            <label className="lbl">Lớp<input className="inp w-s" type="number" min={1} max={16} value={form.grade} onChange={(e) => setForm({ ...form, grade: e.target.value })} /></label>
-            <label className="lbl">Chủ đề<input className="inp w-m" value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} data-testid="bg-topic" /></label>
-            <button className="btn" disabled={busy} data-testid="bg-create"><Icon name="check" size={18} />Tạo</button>
-          </div>
-        </form>
-      )}
-      {rows?.length === 0 && <div className="card empty">Chưa có bài giảng</div>}
-      <div className="cards">
-        {rows?.map((b) => (
-          <div className="cls" key={b.id} data-testid="bg-card">
-            <Link to={`/bang-giang/${b.id}`} style={{ textDecoration: "none" }}>
-              <div className="ic violet" style={{ marginBottom: 10 }}><Icon name="board" /></div>
-              <div style={{ fontWeight: 600 }}>{b.title}</div>
-              <div className="meta">{b.subject} · {gradeLabel(b.grade)}{b.topic ? ` · ${b.topic}` : ""}</div>
-            </Link>
-            <div className="cnt">{b.pageCount} trang<span style={{ flex: 1 }} /><button className="xbtn" onClick={() => void remove(b)} aria-label="Xoá"><Icon name="trash" size={16} /></button></div>
-          </div>
-        ))}
-      </div>
+      <DocList
+        title="Bảng giảng"
+        caption={`${q.data?.length ?? 0} bài · mở toàn màn hình để giảng`}
+        q={q}
+        columns={cols}
+        rowKey={(b) => b.id}
+        text={(b) => `${b.title} ${b.topic} ${b.subject}`}
+        sorts={sorts}
+        defSort="-sua"
+        facet={{ key: "mon", label: "Môn", of: (b) => b.subject }}
+        primary={{ label: "Tạo bài giảng", icon: "plus", kbd: "N", onClick: () => setOpen(true) }}
+        form={open && <NewBoard onClose={() => setOpen(false)} onDone={(id) => nav(`/bang-giang/${id}`)} />}
+        onRowClick={(b) => nav(`/bang-giang/${b.id}`)}
+        searchHint="Tìm tên bài, chủ đề…"
+        empty={{ icon: "board", title: "Chưa có bài giảng", text: "Bảng giảng: viết tay, chèn công thức, hình không gian, câu hỏi từ ngân hàng — chiếu lên lớp.", action: <Button size="sm" variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo bài giảng</Button> }}
+      />
+      <ConfirmDialog open={!!toDel} title={`Xoá bài giảng “${toDel?.title ?? ""}”?`} text="Mọi trang trên bảng của bài này sẽ mất. Không hoàn tác được." confirmLabel="Xoá" onClose={() => setToDel(null)} onConfirm={() => toDel && run(async () => { await del(`/api/boards/${toDel.id}`); invalidate(KEY); }, "Đã xoá bài giảng")} />
     </>
+  );
+}
+
+function NewBoard({ onClose, onDone }: { onClose: () => void; onDone: (id: string) => void }) {
+  const run = useRun();
+  const [f, setF] = useState({ title: "", subject: SUBJECT_DEFAULT, grade: 10, topic: "" });
+  const [err, setErr] = useState<string | null>(null);
+  const save = () => {
+    if (!f.title.trim()) return void setErr("Nhập tên bài");
+    setErr(null);
+    return run(async () => {
+      const b = await post<BoardSummary>("/api/boards", { ...f, title: f.title.trim() });
+      invalidate(KEY);
+      onDone(b.id);
+      return b;
+    }, `Đã tạo “${f.title.trim()}”`);
+  };
+  return (
+    <FormPane title="Tạo bài giảng" onClose={onClose} footer={<><Button onClick={onClose}>Huỷ</Button><Button variant="primary" icon="check" onClick={save} data-testid="bg-create">Tạo và mở bảng</Button></>}>
+      <form className="fgrid" onSubmit={(e) => (e.preventDefault(), void save())}>
+        <div className="wide"><Field label="Tên bài" error={err}><Input autoFocus value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="bg-title" /></Field></div>
+        <Field label="Môn"><Input value={f.subject} onChange={(e) => setF({ ...f, subject: e.target.value })} /></Field>
+        <Field label="Lớp"><Select value={f.grade} onChange={(e) => setF({ ...f, grade: Number(e.target.value) })}>{GRADE_OPTS}</Select></Field>
+        <div className="wide"><Field label="Chủ đề"><Input value={f.topic} onChange={(e) => setF({ ...f, topic: e.target.value })} data-testid="bg-topic" /></Field></div>
+        <button type="submit" hidden />
+      </form>
+    </FormPane>
   );
 }

@@ -1,84 +1,91 @@
-import { useCallback, useEffect, useState } from "react";
-import { api, errText, exportSlide, type DeckSummary, type LessonSummary } from "../api";
-import { Icon } from "../Icon";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router";
+import type { DeckSummary } from "../api";
+import { DocList } from "../portal/gv/DocList";
+import { fetchLessons, LESSONS_KEY, dateVi, del, FormPane, get, gradeVi, openLink, post, useKeyN, useOpenParam, useRun } from "../portal/gv/kit";
+import { Button, IconButton } from "../ui/components/Button";
+import { Badge } from "../ui/components/Chip";
+import { ConfirmDialog } from "../ui/components/Dialog";
+import { Field, Select } from "../ui/components/Field";
+import type { Column } from "../ui/components/Table";
+import { invalidate, useQuery } from "../ui/data/query";
+import { usePageMeta } from "../ui/shell/AppShell";
 
+const KEY = "gv/slide";
+
+/** /slide — bộ slide (.pptx) tạo từ giáo án: bảng v2, tạo trong trang, tải busy + toast, xoá có xác nhận. */
 export function Slides() {
-  const [rows, setRows] = useState<DeckSummary[] | null>(null);
-  const [lessons, setLessons] = useState<LessonSummary[]>([]);
-  const [picking, setPicking] = useState(false);
-  const [lessonId, setLessonId] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const load = useCallback(() => {
-    api<DeckSummary[]>("/api/slides").then(setRows).catch((e: unknown) => setError(errText(e)));
-  }, []);
-  useEffect(load, [load]);
-  useEffect(() => {
-    api<LessonSummary[]>("/api/lessons").then((l) => {
-      setLessons(l);
-      setLessonId(l[0]?.id ?? "");
-    }).catch(() => setLessons([]));
-  }, []);
-
-  const create = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      await api("/api/slides", { method: "POST", body: { lessonPlanId: lessonId } });
-      setPicking(false);
-      load();
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const remove = async (id: string) => {
-    if (!confirm("Xoá bộ slide này?")) return;
-    await api(`/api/slides/${id}`, { method: "DELETE" }).catch((e: unknown) => setError(errText(e)));
-    load();
-  };
-
+  usePageMeta("Slide");
+  const q = useQuery(KEY, get<DeckSummary[]>("/api/slides"));
+  const [open, setOpen] = useOpenParam();
+  const [toDel, setToDel] = useState<DeckSummary | null>(null);
+  const run = useRun();
+  useKeyN(() => setOpen(true));
+  const cols: Column<DeckSummary>[] = [
+    { key: "ten", header: "Bộ slide", sortable: true, cell: (d) => <span><span className="t-title">{d.title}</span><span className="t-sub">{[d.subject, gradeVi(d.grade)].filter(Boolean).join(" · ") || "—"}</span></span> },
+    { key: "so", header: "Số slide", numeric: true, sortable: true, cell: (d) => d.slideCount },
+    { key: "nguon", header: "Nguồn", hideSm: true, cell: (d) => (d.sourceLessonPlanId ? <Link className="link" to={`/giao-an/${d.sourceLessonPlanId}`} onClick={(e) => e.stopPropagation()}>Từ giáo án</Link> : <Badge>Tự soạn</Badge>) },
+    { key: "sua", header: "Sửa lần cuối", numeric: true, sortable: true, hideSm: true, cell: (d) => dateVi(d.updatedAt) },
+    {
+      key: "act",
+      header: "",
+      numeric: true,
+      cell: (d) => (
+        <span className="t-acts">
+          <Button size="sm" icon="down" onClick={() => run(() => openLink(`/api/slides/${d.id}/export`), `Đang tải “${d.title}” .pptx`)} data-testid="slide-download">Tải .pptx</Button>
+          <IconButton size="sm" icon="trash" label={`Xoá ${d.title}`} onClick={() => setToDel(d)} />
+        </span>
+      ),
+    },
+  ];
+  const sorts = useMemo(() => ({ ten: (d: DeckSummary) => d.title, so: (d: DeckSummary) => d.slideCount, sua: (d: DeckSummary) => d.updatedAt }), []);
   return (
     <>
-      <h1>Slide</h1>
-      <div className="bar">
-        <span className="sp" />
-        <button className="btn" onClick={() => setPicking((p) => !p)} data-testid="slide-from-lesson"><Icon name="pen" size={18} />Từ giáo án</button>
-      </div>
-      {error && <div className="err">{error}</div>}
-      {picking && (
-        <div className="card" style={{ marginBottom: 16 }} data-testid="slide-pick">
-          {lessons.length === 0 ? (
-            <div className="empty">—</div>
-          ) : (
-            <div className="formrow" style={{ marginBottom: 0 }}>
-              <label className="lbl">Giáo án
-                <select className="inp" style={{ minWidth: 280 }} value={lessonId} onChange={(e) => setLessonId(e.target.value)} data-testid="slide-lesson">
-                  {lessons.map((l) => <option key={l.id} value={l.id}>{l.title} · {l.subject} {l.grade}</option>)}
-                </select>
-              </label>
-              <button className="btn" disabled={busy || !lessonId} onClick={() => void create()} data-testid="slide-create"><Icon name="check" size={18} />Tạo slide</button>
-            </div>
-          )}
-        </div>
-      )}
-      {rows?.length === 0 && <div className="card"><div className="empty">—</div></div>}
-      {rows && rows.length > 0 && (
-        <div className="card" data-testid="slide-list">
-          {rows.map((d) => (
-            <div key={d.id} className="item" data-testid="slide-row">
-              <div className="ic violet" style={{ margin: 0, width: 38, height: 38 }}><Icon name="slide" /></div>
-              <div className="grow">
-                {d.title}
-                <small>{d.slideCount} slide{d.subject ? ` · ${d.subject}${d.grade ? ` ${d.grade}` : ""}` : ""}{d.sourceLessonPlanId ? " · từ giáo án" : ""} · {new Date(d.updatedAt).toLocaleDateString("vi-VN")}</small>
-              </div>
-              <button className="btn" onClick={() => void exportSlide(d.id)} data-testid="slide-download"><Icon name="down" size={18} />Tải .pptx</button>
-              <button className="btn ghost sm" onClick={() => void remove(d.id)} aria-label="Xoá"><Icon name="trash" size={16} /></button>
-            </div>
-          ))}
-        </div>
-      )}
+      <DocList
+        title="Slide"
+        caption={`${q.data?.length ?? 0} bộ slide`}
+        q={q}
+        columns={cols}
+        rowKey={(d) => d.id}
+        text={(d) => `${d.title} ${d.subject ?? ""}`}
+        sorts={sorts}
+        defSort="-sua"
+        primary={{ label: "Từ giáo án", icon: "plus", kbd: "N", onClick: () => setOpen(true) }}
+        form={open && <FromLesson onClose={() => setOpen(false)} />}
+        searchHint="Tìm tên bộ slide…"
+        testId="slide-list"
+        empty={{ icon: "slide", title: "Chưa có bộ slide", text: "Chọn một giáo án — hệ thống dựng slide theo 4 hoạt động, tải về PowerPoint để chỉnh.", action: <Button size="sm" variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo từ giáo án</Button> }}
+      />
+      <ConfirmDialog open={!!toDel} title={`Xoá bộ slide “${toDel?.title ?? ""}”?`} text="Tệp .pptx đã tải về máy không bị ảnh hưởng. Không hoàn tác được." confirmLabel="Xoá" onClose={() => setToDel(null)} onConfirm={() => toDel && run(async () => { await del(`/api/slides/${toDel.id}`); invalidate(KEY); }, "Đã xoá bộ slide")} />
     </>
+  );
+}
+
+function FromLesson({ onClose }: { onClose: () => void }) {
+  const lessons = useQuery(LESSONS_KEY, fetchLessons);
+  const [id, setId] = useState("");
+  const run = useRun();
+  useEffect(() => {
+    if (!id && lessons.data?.[0]) setId(lessons.data[0].id);
+  }, [lessons.data, id]);
+  const l = lessons.data?.find((x) => x.id === id);
+  return (
+    <FormPane
+      title="Tạo slide từ giáo án"
+      onClose={onClose}
+      testId="slide-pick"
+      footer={<><Button onClick={onClose}>Huỷ</Button><Button variant="primary" icon="check" disabled={!id} onClick={() => run(async () => { await post("/api/slides", { lessonPlanId: id }); invalidate(KEY); onClose(); }, `Đã tạo slide “${l?.title ?? ""}”`)} data-testid="slide-create">Tạo slide</Button></>}
+    >
+      {lessons.data?.length === 0 ? (
+        <p className="note">Chưa có giáo án. <Link className="link" to="/giao-an?tao=1">Soạn giáo án</Link> trước rồi quay lại.</p>
+      ) : (
+        <Field label="Giáo án" hint={l ? `${l.subject} · ${gradeVi(l.grade)} · ${l.periods} tiết` : undefined}>
+          <Select value={id} onChange={(e) => setId(e.target.value)} disabled={!lessons.data} data-testid="slide-lesson">
+            {!lessons.data && <option>Đang tải…</option>}
+            {lessons.data?.map((x) => <option key={x.id} value={x.id}>{x.title} · {x.subject} {x.grade}</option>)}
+          </Select>
+        </Field>
+      )}
+    </FormPane>
   );
 }

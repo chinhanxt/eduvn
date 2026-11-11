@@ -1,130 +1,125 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { api, errText, exportGame, type ExamSummary, type GameSummary } from "../api";
-import { Icon } from "../Icon";
+import { exportGame, type GameSummary } from "../api";
+import { DocList } from "../portal/gv/DocList";
+import { dateVi, del, EXAMS_KEY, fetchExams, FormPane, get, GRADE_OPTS, post, SUBJECT_DEFAULT, useKeyN, useOpenParam, useRun } from "../portal/gv/kit";
+import { Icon } from "../ui/Icon";
+import { Button, IconButton } from "../ui/components/Button";
+import { Badge, Segmented } from "../ui/components/Chip";
+import { ConfirmDialog } from "../ui/components/Dialog";
+import { Field, Input, Select } from "../ui/components/Field";
+import type { Column } from "../ui/components/Table";
+import { invalidate, useQuery } from "../ui/data/query";
+import { useUrlState } from "../ui/data/urlState";
+import { usePageMeta } from "../ui/shell/AppShell";
 
+const KEY = "gv/tro-choi";
 const KIND = { quiz: "Đố vui", flashcards: "Thẻ lật" } as const;
-const TYPES = [["", "Mọi loại"], ["mcq", "Trắc nghiệm"], ["true_false", "Đúng/sai"], ["short_answer", "Trả lời ngắn"]] as const;
+const TYPES = [["", "Mọi dạng"], ["mcq", "Trắc nghiệm"], ["true_false", "Đúng/sai"], ["short_answer", "Trả lời ngắn"]] as const;
 
+/** /tro-choi — trò chơi ôn tập từ ngân hàng/đề: bảng v2, lọc loại, chơi trực tiếp (Đấu trường), mở, tải .html. */
 export function Games() {
-  const [rows, setRows] = useState<GameSummary[] | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const load = useCallback(() => {
-    api<GameSummary[]>("/api/games").then(setRows).catch((e: unknown) => setError(errText(e)));
-  }, []);
-  useEffect(load, [load]);
-  const remove = async (id: string) => {
-    if (!confirm("Xoá trò chơi này?")) return;
-    await api(`/api/games/${id}`, { method: "DELETE" }).catch((e: unknown) => setError(errText(e)));
-    load();
-  };
+  usePageMeta("Trò chơi ôn tập");
+  const q = useQuery(KEY, get<GameSummary[]>("/api/games"));
+  const [open, setOpen] = useOpenParam();
+  const [toDel, setToDel] = useState<GameSummary | null>(null);
+  const run = useRun();
+  useKeyN(() => setOpen(true));
+  const sorts = useMemo(() => ({ ten: (g: GameSummary) => g.title, cau: (g: GameSummary) => g.questionCount, sua: (g: GameSummary) => g.updatedAt }), []);
+  const cols: Column<GameSummary>[] = [
+    { key: "ten", header: "Trò chơi", sortable: true, cell: (g) => <span><span className="t-title">{g.title}</span><span className="t-sub">{g.source}</span></span> },
+    { key: "loai", header: "Loại", hideSm: true, cell: (g) => <Badge tone={g.kind === "quiz" ? "accent" : "outline"} icon={g.kind === "quiz" ? "timer" : "layers"}>{KIND[g.kind]}{g.kind === "quiz" && g.timerSeconds ? ` · ${g.timerSeconds}s` : ""}</Badge> },
+    { key: "cau", header: "Câu", numeric: true, sortable: true, cell: (g) => g.questionCount },
+    { key: "sua", header: "Tạo", numeric: true, sortable: true, hideSm: true, cell: (g) => dateVi(g.updatedAt) },
+    {
+      key: "act",
+      header: "",
+      numeric: true,
+      cell: (g) => (
+        <span className="t-acts">
+          <Link className="btn primary sm" to={`/dau-truong?game=${g.id}`} data-testid="game-live"><Icon name="game" size="sm" /><span>Chơi trực tiếp</span></Link>
+          <Button size="sm" icon="ext" onClick={() => run(() => exportGame(g.id, true))} data-testid="game-open">Mở</Button>
+          <IconButton size="sm" icon="down" label="Tải .html" onClick={() => run(() => exportGame(g.id), "Đang tải trò chơi .html")} data-testid="game-download" />
+          <IconButton size="sm" icon="trash" label={`Xoá ${g.title}`} onClick={() => setToDel(g)} />
+        </span>
+      ),
+    },
+  ];
   return (
     <>
-      <h1>Trò chơi</h1>
-      <div className="bar">
-        <span className="sp" />
-        <button className="btn" onClick={() => setCreating((c) => !c)} data-testid="new-game"><Icon name="plus" size={18} />Tạo trò chơi</button>
-      </div>
-      {error && <div className="err">{error}</div>}
-      {creating && <Create onCreated={() => { setCreating(false); load(); }} />}
-      {rows?.length === 0 && <div className="card"><div className="empty">—</div></div>}
-      {rows && rows.length > 0 && (
-        <div className="card" data-testid="game-list">
-          {rows.map((g) => (
-            <div key={g.id} className="item" data-testid="game-row">
-              <div className="ic amber" style={{ margin: 0, width: 38, height: 38 }}><Icon name="spark" /></div>
-              <div className="grow">
-                {g.title}
-                <small>{KIND[g.kind]} · {g.questionCount} câu{g.timerSeconds ? ` · ${g.timerSeconds} giây/câu` : ""} · {g.source}</small>
-              </div>
-              <Link className="btn" to={`/dau-truong?game=${g.id}`} data-testid="game-live"><Icon name="game" size={18} />Chơi trực tiếp</Link>
-              <button className="btn ghost" onClick={() => void exportGame(g.id, true)} data-testid="game-open"><Icon name="check" size={18} />Mở</button>
-              <button className="btn ghost" onClick={() => void exportGame(g.id)} data-testid="game-download"><Icon name="down" size={18} />Tải .html</button>
-              <button className="btn ghost sm" onClick={() => void remove(g.id)} aria-label="Xoá"><Icon name="trash" size={16} /></button>
-            </div>
-          ))}
-        </div>
-      )}
+      <DocList
+        title="Trò chơi ôn tập"
+        caption={`${q.data?.length ?? 0} trò chơi`}
+        q={q}
+        columns={cols}
+        rowKey={(g) => g.id}
+        text={(g) => `${g.title} ${g.source}`}
+        sorts={sorts}
+        defSort="-sua"
+        facet={{ key: "loai", label: "Loại", of: (g) => g.kind, name: (k) => KIND[k as keyof typeof KIND] ?? k }}
+        primary={{ label: "Tạo trò chơi", icon: "plus", kbd: "N", onClick: () => setOpen(true) }}
+        form={open && <Create onClose={() => setOpen(false)} />}
+        searchHint="Tìm tên trò chơi…"
+        testId="game-list"
+        empty={{ icon: "game", title: "Chưa có trò chơi", text: "Lấy câu từ ngân hàng hoặc một đề — chơi đố vui tính giờ cả lớp, hoặc thẻ lật ôn bài.", action: <Button size="sm" variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo trò chơi</Button> }}
+      />
+      <ConfirmDialog open={!!toDel} title={`Xoá trò chơi “${toDel?.title ?? ""}”?`} text="Tệp .html đã tải về vẫn chơi được. Không hoàn tác được." confirmLabel="Xoá" onClose={() => setToDel(null)} onConfirm={() => toDel && run(async () => { await del(`/api/games/${toDel.id}`); invalidate(KEY); }, "Đã xoá trò chơi")} />
     </>
   );
 }
 
-function Create({ onCreated }: { onCreated: () => void }) {
-  const [exams, setExams] = useState<ExamSummary[]>([]);
-  const [src, setSrc] = useState<"bank" | "exam">("bank");
+function Create({ onClose }: { onClose: () => void }) {
+  const run = useRun();
+  const exams = useQuery(EXAMS_KEY, fetchExams);
+  const [de] = useUrlState<string>("de", "");
+  const [src, setSrc] = useState<"bank" | "exam">(de ? "exam" : "bank");
   const [kind, setKind] = useState<"quiz" | "flashcards">("quiz");
-  const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState("Toán");
-  const [grade, setGrade] = useState(10);
-  const [topic, setTopic] = useState("");
-  const [type, setType] = useState("");
-  const [limit, setLimit] = useState(20);
-  const [examId, setExamId] = useState("");
-  const [timer, setTimer] = useState(0);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [f, setF] = useState({ title: "", subject: SUBJECT_DEFAULT, grade: 10, topic: "", type: "", limit: 20, timer: 20, examId: de });
   useEffect(() => {
-    api<ExamSummary[]>("/api/exams").then((e) => {
-      setExams(e);
-      setExamId(e[0]?.id ?? "");
-    }).catch(() => setExams([]));
-  }, []);
-
-  const submit = async () => {
-    setBusy(true);
-    setError(null);
-    const source = src === "exam" ? { examId } : { subject, grade, ...(topic.trim() ? { topic: topic.trim() } : {}), ...(type ? { type } : {}), limit };
-    try {
-      await api("/api/games", { method: "POST", body: { title, kind, source, ...(kind === "quiz" ? { timerSeconds: timer } : {}) } });
-      onCreated();
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-
+    if (!f.examId && exams.data?.[0]) setF((x) => ({ ...x, examId: exams.data![0]!.id }));
+  }, [exams.data, f.examId]);
+  const exam = exams.data?.find((e) => e.id === f.examId);
+  const title = f.title.trim() || (src === "exam" && exam ? `Ôn tập · ${exam.title}` : "");
+  const save = () =>
+    run(async () => {
+      const source = src === "exam" ? { examId: f.examId } : { subject: f.subject, grade: f.grade, ...(f.topic.trim() ? { topic: f.topic.trim() } : {}), ...(f.type ? { type: f.type } : {}), limit: f.limit };
+      await post("/api/games", { title, kind, source, ...(kind === "quiz" ? { timerSeconds: f.timer } : {}) });
+      invalidate(KEY);
+      onClose();
+    }, `Đã tạo trò chơi “${title}”`);
   return (
-    <div className="card" style={{ marginBottom: 16 }} data-testid="game-form">
-      {error && <div className="err" data-testid="game-error">{error}</div>}
-      <div className="formrow">
-        <label className="lbl">Tên trò chơi<input className="inp" style={{ width: 240 }} value={title} onChange={(e) => setTitle(e.target.value)} data-testid="g-title" /></label>
-        <label className="lbl">Loại
-          <select className="inp" value={kind} onChange={(e) => setKind(e.target.value as "quiz" | "flashcards")} data-testid="g-kind">
-            <option value="quiz">Đố vui có điểm</option><option value="flashcards">Thẻ lật</option>
-          </select>
-        </label>
-        {kind === "quiz" && <label className="lbl">Giây/câu<input className="inp w-s" type="number" min={0} max={300} value={timer} onChange={(e) => setTimer(Number(e.target.value))} data-testid="g-timer" placeholder="0 = tắt" /></label>}
-        <label className="lbl">Nguồn
-          <select className="inp" value={src} onChange={(e) => setSrc(e.target.value as "bank" | "exam")} data-testid="g-src">
-            <option value="bank">Ngân hàng câu hỏi</option><option value="exam">Một đề thi</option>
-          </select>
-        </label>
+    <FormPane
+      title="Tạo trò chơi ôn tập"
+      onClose={onClose}
+      testId="game-form"
+      footer={<><Button onClick={onClose}>Huỷ</Button><Button variant="primary" icon="check" disabled={!title || (src === "exam" && !f.examId)} onClick={save} data-testid="g-create">Tạo trò chơi</Button></>}
+    >
+      <div className="row wrap" style={{ gap: 16 }}>
+        <div><span className="lbl-sm">Loại</span><Segmented label="Loại trò chơi" value={kind} onChange={setKind} options={[{ value: "quiz", label: "Đố vui có điểm" }, { value: "flashcards", label: "Thẻ lật" }]} /></div>
+        <div><span className="lbl-sm">Nguồn câu hỏi</span><Segmented label="Nguồn" value={src} onChange={setSrc} options={[{ value: "bank", label: "Ngân hàng" }, { value: "exam", label: "Một đề" }]} /></div>
       </div>
-      {src === "bank" ? (
-        <div className="formrow">
-          <label className="lbl">Môn<input className="inp w-m" value={subject} onChange={(e) => setSubject(e.target.value)} data-testid="g-subject" /></label>
-          <label className="lbl">Lớp<input className="inp w-s" type="number" min={1} max={16} value={grade} onChange={(e) => setGrade(Number(e.target.value))} data-testid="g-grade" /></label>
-          <label className="lbl">Chủ đề<input className="inp w-m" placeholder="tất cả" value={topic} onChange={(e) => setTopic(e.target.value)} data-testid="g-topic" /></label>
-          <label className="lbl">Dạng câu
-            <select className="inp" value={type} onChange={(e) => setType(e.target.value)}>{TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>
-          </label>
-          <label className="lbl">Tối đa<input className="inp w-s" type="number" min={1} max={200} value={limit} onChange={(e) => setLimit(Number(e.target.value))} /></label>
-        </div>
-      ) : (
-        <div className="formrow">
-          <label className="lbl">Đề thi
-            <select className="inp" style={{ minWidth: 280 }} value={examId} onChange={(e) => setExamId(e.target.value)} data-testid="g-exam">
-              {exams.map((x) => <option key={x.id} value={x.id}>{x.title} · {x.subject} {x.grade}</option>)}
-            </select>
-          </label>
-        </div>
-      )}
-      <div className="bar" style={{ marginBottom: 0 }}>
-        <span className="sp" />
-        <button className="btn" disabled={busy || !title.trim() || (src === "exam" && !examId)} onClick={() => void submit()} data-testid="g-create"><Icon name="check" size={18} />Tạo</button>
+      <div className="fgrid">
+        <div className="wide"><Field label="Tên trò chơi"><Input autoFocus value={f.title} placeholder={src === "exam" && exam ? `Ôn tập · ${exam.title}` : "Đua về đích · Hàm số bậc hai"} onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="g-title" /></Field></div>
+        {kind === "quiz" && <Field label="Giây mỗi câu" hint="0 = không tính giờ"><Input type="number" min={0} max={300} value={f.timer} onChange={(e) => setF({ ...f, timer: Math.max(0, Math.min(300, Number(e.target.value) || 0)) })} data-testid="g-timer" /></Field>}
+        {src === "bank" ? (
+          <>
+            <Field label="Môn"><Input value={f.subject} onChange={(e) => setF({ ...f, subject: e.target.value })} data-testid="g-subject" /></Field>
+            <Field label="Lớp"><Select value={f.grade} onChange={(e) => setF({ ...f, grade: Number(e.target.value) })} data-testid="g-grade">{GRADE_OPTS}</Select></Field>
+            <Field label="Chủ đề"><Input placeholder="tất cả" value={f.topic} onChange={(e) => setF({ ...f, topic: e.target.value })} data-testid="g-topic" /></Field>
+            <Field label="Dạng câu"><Select value={f.type} onChange={(e) => setF({ ...f, type: e.target.value })}>{TYPES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</Select></Field>
+            <Field label="Tối đa"><Input type="number" min={1} max={200} value={f.limit} onChange={(e) => setF({ ...f, limit: Math.max(1, Math.min(200, Number(e.target.value) || 1)) })} /></Field>
+          </>
+        ) : (
+          <div className="wide">
+            <Field label="Đề thi">
+              <Select value={f.examId} onChange={(e) => setF({ ...f, examId: e.target.value })} disabled={!exams.data?.length} data-testid="g-exam">
+                {!exams.data && <option>Đang tải…</option>}
+                {exams.data?.map((x) => <option key={x.id} value={x.id}>{x.title} · {x.subject} {x.grade}</option>)}
+              </Select>
+            </Field>
+          </div>
+        )}
       </div>
-    </div>
+    </FormPane>
   );
 }

@@ -1,37 +1,21 @@
 // web/src/omr/ui.tsx — mảnh giao diện dùng trong trang /cham-anh: toast, nút khoá theo promise, vùng thả ảnh.
 // Theo hệ thiết kế v2 (Toast: góc phải dưới, tối đa 2, 4 s; Nút: aria-busy, giữ bề rộng, bấm lặp không gửi thêm).
-import { type ReactNode, createContext, useCallback, useContext, useRef, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
+import { useToast as useUiToast } from "../ui/components/Toast";
 import { errText } from "../api";
-import { Icon } from "../Icon";
+import { Icon } from "../ui/Icon";
+import { Button } from "../ui/components/Button";
 
 type ToastKind = "ok" | "err" | "info";
-type ToastItem = { id: number; kind: ToastKind; text: string };
 type ToastFn = (kind: ToastKind, text: string) => void;
-const ToastCtx = createContext<ToastFn>(() => {});
-export const useToast = () => useContext(ToastCtx);
-
+/** Toast của trang dùng gói ui/ chung (một vùng toast cho cả cổng GV: tối đa 2, 4 s; lỗi 6 s). */
+export function useToast(): ToastFn {
+  const toast = useUiToast();
+  return useCallback<ToastFn>((kind, text) => toast({ title: text, kind, life: kind === "err" ? 6000 : undefined }), [toast]);
+}
+/** Giữ API cũ của trang: vùng toast nay do ToastProvider của cổng GV dựng. */
 export function ToastHost({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<ToastItem[]>([]);
-  const seq = useRef(0);
-  const push = useCallback<ToastFn>((kind, text) => {
-    const id = ++seq.current;
-    setItems((l) => [...l, { id, kind, text }].slice(-2));
-    setTimeout(() => setItems((l) => l.filter((t) => t.id !== id)), kind === "err" ? 6000 : 4000);
-  }, []);
-  return (
-    <ToastCtx.Provider value={push}>
-      {children}
-      <div className="pg-toasts" aria-live="polite" role="status">
-        {items.map((t) => (
-          <div key={t.id} className={`pg-toast ${t.kind}`} data-testid="pg-toast">
-            <Icon name={t.kind === "ok" ? "checkc" : t.kind === "err" ? "alert" : "spark"} size={16} />
-            <span>{t.text}</span>
-            <button className="pg-btn quiet icon sm" aria-label="Đóng" onClick={() => setItems((l) => l.filter((x) => x.id !== t.id))}><Icon name="x" size={14} /></button>
-          </div>
-        ))}
-      </div>
-    </ToastCtx.Provider>
-  );
+  return <>{children}</>;
 }
 
 /** Khoá theo promise: đang chạy thì bấm thêm bị bỏ qua (chặn gửi lặp). Lỗi → toast. */
@@ -58,12 +42,20 @@ export function useLock() {
   return [run, busy] as const;
 }
 
-export function Btn({ busy, kind, children, ...p }: { busy?: boolean; kind?: "pri" | "quiet" | "sm" | string; children: ReactNode } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+/** Nút của trang chấm = Button v2 (khoá khi đang xử lý, giữ bề rộng, vòng quay). kind: "pri" | "quiet" | "icon" (ghép bằng dấu cách; mọi nút cao 30 px như skin B). */
+export function Btn({ busy, kind = "", children, className, onClick, ...p }: { busy?: boolean; kind?: string; children: ReactNode; onClick?: (e: React.MouseEvent<HTMLButtonElement>) => unknown } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick">) {
+  const k = kind.split(/\s+/);
   return (
-    <button {...p} className={`pg-btn ${kind ?? ""} ${p.className ?? ""}`} aria-busy={busy || undefined} disabled={p.disabled || busy}>
-      {busy && <i className="pg-spin" aria-hidden="true" />}
+    <Button
+      {...p}
+      onClick={onClick}
+      busy={busy}
+      variant={k.includes("pri") ? "primary" : k.includes("quiet") ? "ghost" : "default"}
+      size="sm"
+      className={[k.includes("icon") && "icon", className].filter(Boolean).join(" ") || undefined}
+    >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -85,12 +77,12 @@ export function Dropzone({ title, hint, onFiles, compact, capture, testId }: { t
       <span className="ic"><Icon name="camera" /></span>
       <div><b>{title}</b><p>{hint}</p></div>
       <div className="acts">
-        <label className="pg-btn pri">
+        <label className="btn primary sm">
           <Icon name="upload" />Chọn ảnh
           <input type="file" accept="image/*" multiple hidden onChange={(e) => { pick(e.target.files); e.target.value = ""; }} data-testid={`${testId}-file`} />
         </label>
         {capture && (
-          <label className="pg-btn">
+          <label className="btn sm">
             <Icon name="camera" />Chụp
             <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { pick(e.target.files); e.target.value = ""; }} />
           </label>

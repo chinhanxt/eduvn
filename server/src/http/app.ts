@@ -16,7 +16,7 @@ import { createAssignmentService } from "../services/assignments";
 import { createCredentialService } from "../services/credentials";
 import { createSubmissionService } from "../services/submissions";
 import { registerClassroomRoutes } from "./classroom";
-import { registerStudentRoutes } from "./student";
+import { bearer, registerStudentRoutes } from "./student";
 import { type Ai, disabledAi } from "../services/ai";
 import { createDiagramService } from "../services/diagrams";
 import { buildFigure } from "../services/geometry";
@@ -46,8 +46,12 @@ import { StudentItem } from "../domain/roster";
 import { createTutor } from "../tutor";
 import { registerInkRoutes } from "./routes/ink";
 import { registerTutorRoutes } from "./routes/tutor";
+import { registerTodayRoutes } from "./routes/today";
+import { registerIdempotency } from "./idempotency";
+import { createTodayService } from "../services/today";
 import { registerPhotoGradingRoutes } from "./routes/photoGrading";
 import { createPhotoGradingService } from "../services/photoGrading";
+import { registerSolutionRoutes } from "./routes/solutions";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -179,6 +183,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const slug = (s: string, fallback: string) => s.normalize("NFD").replace(/\p{M}/gu, "").replace(/đ/gi, "d").replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase().slice(0, 50) || fallback;
 
   app.get("/health", async () => ({ ok: true }));
+  registerIdempotency(app);
 
   registerStudentRoutes(app, { auth: studentAuth, verify: deps.verify, credentials, submissions: submissionsSvc, rateLimit: deps.studentRateLimit ?? { max: 60, timeWindow: 60_000 } });
   registerClassroomRoutes(app, { authenticate, credentials, assignments: assignmentsSvc });
@@ -415,8 +420,11 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   const live = createLiveService({ db: deps.db, ai: deps.ai ?? disabledAi, classes, games, secret: deps.downloadSecret });
   app.addHook("onClose", async () => live.dispose());
   registerLiveRoutes(app, { live, authenticate });
-  registerTutorRoutes(app, { tutor: createTutor(deps.db, deps.ai), authenticate });
+  const tutor = createTutor(deps.db, deps.ai);
+  registerTutorRoutes(app, { tutor, authenticate });
+  registerTodayRoutes(app, { db: deps.db, today: createTodayService(deps.db, { now }), authenticate, studentAuth });
   registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, geoAi, classes), authenticate });
+  registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate, tutor, student: (req) => studentAuth.verifySession(bearer(req)).catch(() => Promise.reject(new UnauthorizedError("Phiên đã hết, em đăng nhập lại nhé"))) });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

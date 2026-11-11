@@ -1,0 +1,24 @@
+/* Trang xem thử thành phần (chỉ dev): bố cục chép từ web/mockup/v2/thanh-phan.html để so ảnh cạnh nhau. */
+
+  body { background: #fff; }
+  .wrap { max-width: 1440px; margin: 0 auto; padding: var(--s-10) var(--page-x) var(--s-16); }
+  header.ph h1 { font-family: var(--font-read); font-size: 34px; line-height: 42px; }
+  header.ph p { color: var(--ink-2); margin-top: 8px; max-width: 80ch; }
+  .heads { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 180px 1fr 1fr; gap: var(--s-4); background: #fff; padding: var(--s-3) 0; border-bottom: 1px solid var(--line-2); margin-top: var(--s-6); }
+  .heads b { font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .heads b i { width: 10px; height: 10px; border-radius: 3px; }
+  .sec { display: grid; grid-template-columns: 180px 1fr 1fr; gap: var(--s-4); padding: var(--s-6) 0; border-bottom: 1px solid var(--line); }
+  .sec > h2 { font-size: 15px; line-height: 22px; }
+  .sec > h2 small { display: block; font-weight: 400; color: var(--ink-3); font-size: 12px; line-height: 18px; margin-top: 4px; }
+  .skin { padding: var(--s-5); border-radius: 12px; background: var(--bg); border: 1px solid var(--line); min-width: 0; display: flex; flex-direction: column; gap: var(--s-4); }
+  [data-portal="hoc"].skin { border-radius: 20px; }
+  .row-d { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .lbl-s { font-size: 11px; color: var(--ink-3); width: 100%; margin-bottom: -2px; }
+  .static-toasts .toast { animation: none; }
+  .dialog.static, .cmdk.static { animation: none; box-shadow: var(--shadow-2); width: 100%; }
+  .is-focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-bg); }
+  .tok { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .tok td { padding: 4px 6px; border-bottom: 1px solid var(--line); } .tok td:first-child { color: var(--ink-3); font-family: var(--font-mono); }
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 2px; grid-column: 2 / -1; }
+  .icons div { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border-radius: 6px; font-size: 11px; color: var(--ink-3); }
+  @media (max-width: 1100px) { .heads { display: none; } .sec { grid-template-columns: minmax(0, 1fr); } .skin::before { content: attr(data-name); font: 700 11px/1 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); } .icons { grid-column: auto; } }

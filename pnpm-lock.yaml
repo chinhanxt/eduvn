@@ -120,6 +120,12 @@ importers:
       '@cortex-js/compute-engine':
         specifier: ^0.181.1
         version: 0.181.1
+      '@fontsource-variable/inter':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/source-serif-4':
+        specifier: ^5.3.1
+        version: 5.3.1
       '@techstark/opencv-js':
         specifier: 5.0.0-release.1
         version: 5.0.0-release.1
@@ -689,6 +695,12 @@ packages:
 
   '@fastify/under-pressure@9.2.1':
     resolution: {integrity: sha512-eScrraL3PXJwWAfnpYVVDkctvl/RiQCnRahmsBS+ZhcQ6fy54beMc9Kom4NhlU4aYNgsl3J3ps4KBTndzHUkLQ==}
+
+  '@fontsource-variable/inter@5.3.0':
+    resolution: {integrity: sha512-OupL48va4JNofb97w6NYeF9S7W/kHNKM0Er8Dem5nqi4jeOLrVJDoE8tZEpnMJmtkvNbB1EIPPwHcdkF6b1oUA==}
+
+  '@fontsource-variable/source-serif-4@5.3.1':
+    resolution: {integrity: sha512-4Rtay22SC4lMvw11r/+9kxANB6P3M0X8s1NudBC2v0J1KU2y3DcMoNcT3lBoZ/CqLirzf+StlO6UlJilyrvaUg==}
 
   '@hono/node-server@2.1.6':
     resolution: {integrity: sha512-p/KH9MnfNcsm3sR6x4lNgm5j+QN4Et8srKredl9DZfXiyZ1UQ3aQ2YVpFLbqktYN5JI+DB+VZFKM2PqE5hLKjQ==}
@@ -3179,6 +3191,10 @@ snapshots:
     dependencies:
       '@fastify/error': 4.2.1
       fastify-plugin: 6.0.1
+
+  '@fontsource-variable/inter@5.3.0': {}
+
+  '@fontsource-variable/source-serif-4@5.3.1': {}
 
   '@hono/node-server@2.1.6(hono@4.13.17)':
     dependencies:

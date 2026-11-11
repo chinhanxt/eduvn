@@ -2,27 +2,8 @@ import type { ServerClock } from "./clock";
 import type { SendResult, Sender } from "./syncQueue";
 import type { Answers, StudentSession } from "./types";
 
-const KEY = "eduvn.hs";
-export type StoredSession = StudentSession & { expiresAt: number };
-
-export const isSessionValid = (s: StoredSession | null, now = Date.now()): s is StoredSession => !!s && s.expiresAt - 60_000 > now;
-
-export function loadSession(): StoredSession | null {
-  try {
-    const s = JSON.parse(globalThis.localStorage?.getItem(KEY) ?? "null") as StoredSession | null;
-    if (isSessionValid(s)) return s;
-    if (s) globalThis.localStorage?.removeItem(KEY);
-    return null;
-  } catch {
-    return null;
-  }
-}
-export function saveSession(s: StudentSession, now = Date.now()): StoredSession {
-  const stored = { ...s, expiresAt: now + s.expiresInSeconds * 1000 };
-  globalThis.localStorage?.setItem(KEY, JSON.stringify(stored));
-  return stored;
-}
-export const clearSession = (): void => globalThis.localStorage?.removeItem(KEY);
+export { clearSession, isSessionValid, loadSession, saveSession, SESSION_EVENT, type StoredSession } from "./session";
+import { type StoredSession, loadSession, clearSession } from "./session";
 
 export class StudentApiError extends Error {
   constructor(
