@@ -113,6 +113,25 @@ export async function buildGateway(cfg: GatewayConfig, over: { agentOptions?: (s
     }, 60_000),
     setInterval(() => cleanWorkDir(cfg.WORK_DIR, 6 * 3600_000), 3600_000),
   ];
+  // Proxy do cổng quản có thể bị tắt từ ngoài (vd. cổng cũ đang đóng tắt nhầm proxy khi cổng mới vừa bật) → tự bật lại.
+  let closed = false;
+  let watching = false;
+  const watchProxy = async () => {
+    if (!cfg.AGY_MANAGE_PROXY || closed || watching) return;
+    watching = true;
+    try {
+      if ((await ensureProxy({ port: cfg.AGY_PROXY_PORT, pidFile, bin: cfg.AGY_SWITCH_BIN })) === "started") {
+        proxyStarted = true;
+        if (closed) await stopProxy(); // cổng đóng trong lúc đang bật lại → không để sót proxy
+        else logWarn(`Cổng AI: proxy agy :${cfg.AGY_PROXY_PORT} đã tắt — đã bật lại.`);
+      }
+    } catch (e) {
+      logWarn(`Cổng AI: không bật lại được proxy agy :${cfg.AGY_PROXY_PORT}: ${(e as Error).message}`);
+    } finally {
+      watching = false;
+    }
+  };
+  timers.push(setInterval(() => void watchProxy(), cfg.PROXY_WATCH_MS));
   timers.forEach((t) => t.unref());
   return {
     app,
@@ -120,6 +139,7 @@ export async function buildGateway(cfg: GatewayConfig, over: { agentOptions?: (s
     llm,
     jobs,
     close: async () => {
+      closed = true;
       timers.forEach(clearInterval);
       app.abortAll(); // cắt các stream đang chạy để đóng nhanh
       await app.close();
