@@ -52,6 +52,7 @@ import { createTodayService } from "../services/today";
 import { registerPhotoGradingRoutes } from "./routes/photoGrading";
 import { createPhotoGradingService } from "../services/photoGrading";
 import { registerSolutionRoutes } from "./routes/solutions";
+import { registerSinhRoutes } from "../subjects/sinh/routes";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -425,6 +426,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerTodayRoutes(app, { db: deps.db, today: createTodayService(deps.db, { now }), authenticate, studentAuth });
   registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, geoAi, classes), authenticate });
   registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate, tutor, student: (req) => studentAuth.verifySession(bearer(req)).catch(() => Promise.reject(new UnauthorizedError("Phiên đã hết, em đăng nhập lại nhé"))) });
+  registerSinhRoutes(app, { ai: deps.ai, authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);
