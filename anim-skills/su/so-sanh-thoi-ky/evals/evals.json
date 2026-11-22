@@ -1,0 +1,81 @@
+{
+  "skill": "so-sanh-thoi-ky",
+  "evals": [
+    {
+      "id": "so-sanh-phap-my",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "So sánh Kháng chiến chống Pháp (1945–1954) và Kháng chiến chống Mỹ (1954–1975)",
+        "slideText": "Thời gian: 9 năm vs 21 năm · Trận quyết chiến: Điện Biên Phủ (1954) vs Đại thắng mùa Xuân (1975) · Điểm chung: chiến tranh nhân dân.",
+        "speech": [
+          { "text": "Đặt cạnh nhau hai cuộc kháng chiến: chống thực dân Pháp giai đoạn 1945 đến 1954 và chống Mỹ giai đoạn 1954 đến 1975.", "durationMs": 4500 },
+          { "text": "Kháng chiến chống Pháp diễn ra 9 năm trong thế bao vây ban đầu, còn kháng chiến chống Mỹ kéo dài 21 năm trên hai miền Nam Bắc.", "durationMs": 4600 },
+          { "text": "Đỉnh cao chống Pháp là Chiến thắng Điện Biên Phủ năm 1954, còn chống Mỹ kết thúc bằng Đại thắng mùa Xuân năm 1975.", "durationMs": 4500 },
+          { "text": "Điểm chung cốt lõi của cả hai thời kỳ là đường lối chiến tranh nhân dân và kết hợp đấu tranh quân sự, chính trị, ngoại giao.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["Hai cột đối chiếu thẳng hàng từng tiêu chí", "Điểm chung tách rõ thành dải kết luận cuối"]
+    },
+    {
+      "id": "so-sanh-phan-boi-chau-phan-chau-trinh",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 9,
+        "title": "So sánh khuynh hướng cứu nước đầu thế kỷ XX (1904–1908)",
+        "slideText": "Phan Bội Châu: bạo động, Đông Du (1905) · Phan Châu Trinh: cải cách, Duy Tân (1906) · Điểm chung: mục tiêu cứu nước dân chủ tư sản.",
+        "speech": [
+          { "text": "Đầu thế kỷ XX xuất hiện hai khuynh hướng cứu nước tiêu biểu của Phan Bội Châu năm 1905 và Phan Châu Trinh năm 1906.", "durationMs": 5000 },
+          { "text": "Phan Bội Châu chủ trương bạo động vũ trang và phong trào Đông Du, còn Phan Châu Trinh chủ trương cải cách khai dân trí.", "durationMs": 5200 },
+          { "text": "Cả hai đều mang tinh thần yêu nước sâu sắc và mở rộng con đường cứu nước theo khuynh hướng dân chủ tư sản.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["Phân tách rõ điểm khác về phương pháp và điểm chung về mục tiêu"]
+    },
+    {
+      "id": "so-sanh-cmt8-1945-va-xuan-1975",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "So sánh Cách mạng tháng Tám 1945 và Tổng tiến công mùa Xuân 1975",
+        "slideText": "1945: Tổng khởi nghĩa toàn dân trong 15 ngày · 1975: Tổng tiến công quân sự quy mô lớn 55 ngày · Điểm chung: nghệ thuật chớp thời cơ.",
+        "speech": [
+          { "text": "So sánh Cách mạng tháng Tám năm 1945 và cuộc Tổng tiến công mùa Xuân năm 1975 cho thấy nghệ thuật chớp thời cơ chiến lược.", "durationMs": 5200 },
+          { "text": "Năm 1945 lấy lực lượng chính trị làm chủ yếu giành chính quyền trong 15 ngày, còn năm 1975 lấy các binh đoàn chủ lực làm đòn quyết định.", "durationMs": 5400 }
+        ]
+      },
+      "tieuChi": ["Hai cột đối chiếu gọn, không lệch hàng"]
+    },
+    {
+      "id": "khong-chon-mot-su-kien-nhan-qua",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 6,
+        "title": "Nguyên nhân và ý nghĩa Chiến thắng Bạch Đằng 938",
+        "slideText": "Nguyên nhân → Diễn biến → Kết quả → Ý nghĩa của trận Bạch Đằng năm 938.",
+        "speech": [
+          { "text": "Trận Bạch Đằng năm 938 diễn ra do quân Nam Hán xâm lược và kết thúc bằng kỷ nguyên độc lập tự chủ.", "durationMs": 5200 }
+        ]
+      },
+      "tieuChi": ["Không chọn: chỉ có 1 sự kiện nhân quả, dùng nguyen-nhan-ket-qua"]
+    },
+    {
+      "id": "khong-chon-ban-do-1975",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Hướng tiến quân của 5 cánh quân trong Chiến dịch Hồ Chí Minh",
+        "slideText": "Từ Xuân Lộc, Củ Chi, Long An tiến vào Dinh Độc Lập.",
+        "speech": [
+          { "text": "Năm cánh quân từ Xuân Lộc và Củ Chi đồng loạt tiến công hợp vây trung tâm Sài Gòn ngày 30 tháng 4 năm 1975.", "durationMs": 5400 }
+        ]
+      },
+      "tieuChi": ["Không chọn: là bản đồ mũi tên tiến công, dùng ban-do-chien-dich"]
+    }
+  ]
+}

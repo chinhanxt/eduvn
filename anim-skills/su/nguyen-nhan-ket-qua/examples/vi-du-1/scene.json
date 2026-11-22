@@ -1,0 +1,24 @@
+{
+  "subject": "su",
+  "grade": 6,
+  "title": "Chiến thắng Bạch Đằng năm 938: Nguyên nhân đến Ý nghĩa",
+  "slideText": "Nguyên nhân: Năm 938, quân Nam Hán do Hoằng Tháo chỉ huy kéo thuỷ quân xâm lược. Diễn biến: Ngô Quyền đóng cọc gỗ đầu bịt sắt, lợi dụng thuỷ triều sông Bạch Đằng. Kết quả: Đánh tan thuỷ quân Nam Hán, Hoằng Tháo tử trận. Ý nghĩa: Chấm dứt hơn 1.000 năm Bắc thuộc, mở ra kỷ nguyên độc lập tự chủ lâu dài.",
+  "speech": [
+    {
+      "text": "Nguyên nhân trực tiếp năm 938 là nhà Nam Hán cử Lưu Hoằng Tháo đưa thuỷ quân sang xâm lược nước ta.",
+      "durationMs": 4500
+    },
+    {
+      "text": "Ngô Quyền bố trí bãi cọc gỗ đầu bịt sắt dưới lòng sông Bạch Đằng, nhử địch vào khi triều lên rồi phản công lúc triều rút.",
+      "durationMs": 4700
+    },
+    {
+      "text": "Kết quả, đoàn thuyền chiến Nam Hán tan rã hoàn toàn, tướng Hoằng Tháo tử trận ngay trên cửa sông.",
+      "durationMs": 4400
+    },
+    {
+      "text": "Ý nghĩa lịch sử to lớn là chấm dứt hơn 1.000 năm Bắc thuộc, mở ra kỷ nguyên độc lập tự chủ lâu dài cho dân tộc.",
+      "durationMs": 4400
+    }
+  ]
+}

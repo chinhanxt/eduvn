@@ -1,0 +1,60 @@
+{
+  "skills": [
+    { "id": "ban-do-chien-dich", "vaiTro": "chinh" }
+  ],
+  "confidence": 0.96,
+  "lyDo": "Lời giảng trình bày diễn biến 3 đợt tiến công của Chiến dịch Điện Biên Phủ (1954) gắn với 8 địa danh lịch sử đã xác thực.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.6,
+      "cau": [0],
+      "cue": "kw:Điện Biên Phủ",
+      "viec": "Hiện bản đồ lòng chảo Điện Biên Phủ kèm ô định vị Việt Nam (đủ Hoàng Sa, Trường Sa) và các địa danh chính",
+      "skill": "ban-do-chien-dich",
+      "duLieu": { "places": ["dien-bien-phu", "tuan-giao", "muong-phang", "him-lam", "doi-doc-lap", "doi-a1", "muong-thanh", "ham-de-castries", "hong-cum"] }
+    },
+    {
+      "i": 1,
+      "t0": 4.6,
+      "t1": 10.0,
+      "cau": [1],
+      "cue": "kw:Đợt 1",
+      "viec": "Vẽ mũi tên tiến công Đợt 1 vào Him Lam và Đồi Độc Lập, hiện thẻ Đợt 1",
+      "skill": "ban-do-chien-dich",
+      "duLieu": { "arrows": [{ "from": "tuan-giao", "to": "him-lam" }, { "from": "muong-phang", "to": "doi-doc-lap" }] }
+    },
+    {
+      "i": 2,
+      "t0": 10.0,
+      "t1": 15.4,
+      "cau": [2],
+      "cue": "kw:Đợt 2",
+      "viec": "Vẽ mũi tên Đợt 2 tiến công Đồi A1 và bao vây cắt sân bay Mường Thanh",
+      "skill": "ban-do-chien-dich",
+      "duLieu": { "arrows": [{ "from": "him-lam", "to": "doi-a1" }, { "from": "doi-doc-lap", "to": "muong-thanh" }] }
+    },
+    {
+      "i": 3,
+      "t0": 15.4,
+      "t1": 20.4,
+      "cau": [3],
+      "cue": "kw:Đợt 3",
+      "viec": "Vẽ mũi tổng công kích đánh Hầm Đờ Cát, bao vây Hồng Cúm và tô vùng giải phóng",
+      "skill": "ban-do-chien-dich",
+      "duLieu": { "arrows": [{ "from": "doi-a1", "to": "ham-de-castries" }, { "from": "ham-de-castries", "to": "hong-cum" }] }
+    },
+    {
+      "i": 4,
+      "t0": 20.4,
+      "t1": 24.0,
+      "cau": [4],
+      "cue": "kw:56 ngày đêm",
+      "viec": "Hiện thẻ kết luận chiến thắng 56 ngày đêm và Hiệp định Giơ-ne-vơ 1954",
+      "skill": "ban-do-chien-dich",
+      "duLieu": { "ngay": 56, "nam": 1954 }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

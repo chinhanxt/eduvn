@@ -1,0 +1,77 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">LỊCH SỬ 6 · SƠ ĐỒ NHÂN QUẢ LỊCH SỬ</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:104px">Chiến thắng <span class="kw">Bạch Đằng năm 938</span></h1>
+
+  <div class="ek-stage">
+    <svg id="flow-edges" width="1920" height="1080" viewBox="0 0 1920 1080" style="left:0;top:0;pointer-events:none">
+      <path id="e-1" class="ek-line-bold ek-stroke-lam" d="M 902 390 L 1018 390"/>
+      <polygon id="eh-1" class="ek-fill-lam ek-hidden" points="1018,390 998,378 998,402"/>
+      <path id="e-2" class="ek-line-bold ek-stroke-doSon" d="M 1400 532 L 1400 572 L 510 572 L 510 606"/>
+      <polygon id="eh-2" class="ek-fill-doSon ek-hidden" points="510,606 498,586 522,586"/>
+      <path id="e-3" class="ek-line-bold ek-stroke-xanhLa" d="M 902 746 L 1018 746"/>
+      <polygon id="eh-3" class="ek-fill-xanhLa ek-hidden" points="1018,746 998,734 998,758"/>
+    </svg>
+
+    <div id="box-nn" class="ek-card ek-col-1 ek-span-5 chain-card c-nn ek-hidden" style="top:256px;width:780px;height:268px" data-ek-beat="0">
+      <div class="step-tag ek-c-lam">01 · NGUYÊN NHÂN</div>
+      <h3>Quân Nam Hán xâm lược (938)</h3>
+      <p>Nhà Nam Hán cử Hoằng Tháo đưa thuỷ quân tiến vào cửa sông Bạch Đằng.</p>
+    </div>
+
+    <div id="box-db" class="ek-card ek-col-7 ek-span-5 chain-card c-db ek-hidden" style="left:1020px;top:256px;width:780px;height:268px" data-ek-beat="1">
+      <div class="step-tag ek-c-doSon">02 · DIỄN BIẾN CHÍNH</div>
+      <h3>Bãi cọc gỗ lợi dụng thuỷ triều</h3>
+      <p>Ngô Quyền đóng cọc gỗ đầu bịt sắt, nhử địch khi triều lên rồi phản công lúc triều rút.</p>
+    </div>
+
+    <div id="box-kq" class="ek-card ek-col-1 ek-span-5 chain-card c-kq ek-hidden" style="top:612px;width:780px;height:268px" data-ek-beat="2">
+      <div class="step-tag ek-c-xanhLa">03 · KẾT QUẢ</div>
+      <h3>Đánh tan thuỷ quân Nam Hán</h3>
+      <p>Thuyền giặc va cọc vỡ đắm, Hoằng Tháo tử trận, mộng xâm lược bị đập tan.</p>
+    </div>
+
+    <div id="box-yn" class="ek-card ek-col-7 ek-span-5 chain-card c-yn ek-hidden" style="left:1020px;top:612px;width:780px;height:268px" data-ek-beat="3">
+      <div class="step-tag ek-c-tim">04 · Ý NGHĨA LỊCH SỬ</div>
+      <h3>Mở kỷ nguyên độc lập tự chủ</h3>
+      <p><span id="kw-yn">Chấm dứt hơn 1.000 năm Bắc thuộc</span>, khẳng định chủ quyền lâu dài của dân tộc.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .chain-card {
+    padding: 24px 30px;
+  }
+  .c-nn { border-left-color: var(--c-lam); }
+  .c-db { border-left-color: var(--c-doSon); }
+  .c-kq { border-left-color: var(--c-xanhLa); }
+  .c-yn { border-left-color: var(--c-tim); }
+  .step-tag {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+</style>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+
+EK.enter(tl, "#tt", 0, { from: "up", dur: 0.7 });
+EK.enter(tl, "#box-nn", EK.cue(0), { from: "up", dur: 0.75 });
+
+EK.draw(tl, "#e-1", EK.cue(1) - 0.25, 0.65);
+EK.enter(tl, "#eh-1", EK.cue(1) + 0.25, { from: "fade", dur: 0.2 });
+EK.enter(tl, "#box-db", EK.cue(1), { from: "left", dur: 0.75 });
+
+EK.draw(tl, "#e-2", EK.cue(2) - 0.3, 0.9);
+EK.enter(tl, "#eh-2", EK.cue(2) + 0.45, { from: "fade", dur: 0.2 });
+EK.enter(tl, "#box-kq", EK.cue(2), { from: "up", dur: 0.75 });
+
+EK.draw(tl, "#e-3", EK.cue(3) - 0.25, 0.65);
+EK.enter(tl, "#eh-3", EK.cue(3) + 0.25, { from: "fade", dur: 0.2 });
+EK.enter(tl, "#box-yn", EK.cue(3), { from: "left", dur: 0.75 });
+EK.mark(tl, "#kw-yn", EK.cue(3) + 1.0, "highlight", { color: "tim", dur: 0.9 });
+
+window.__timelines["main"] = tl;
+</script>

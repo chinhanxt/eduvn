@@ -1,0 +1,50 @@
+{
+  "skills": [
+    { "id": "chan-dung-nhan-vat", "vaiTro": "chinh" }
+  ],
+  "confidence": 0.96,
+  "lyDo": "Lời giảng giới thiệu tiểu sử, niên đại 1911–2013 và ba mốc sự nghiệp tiêu biểu của Đại tướng Võ Nguyên Giáp.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.0,
+      "cau": [0],
+      "cue": "kw:Võ Nguyên Giáp",
+      "viec": "Hiện khung chân dung/huy hiệu chữ lồng (kèm ghi nguồn minh bạch), tên và năm sinh–mất 1911–2013",
+      "skill": "chan-dung-nhan-vat",
+      "duLieu": { "sinh": 1911, "mat": 2013 }
+    },
+    {
+      "i": 1,
+      "t0": 4.0,
+      "t1": 8.0,
+      "cau": [1],
+      "cue": "kw:1944",
+      "viec": "Hiện mốc 22/12/1944 thành lập Đội Việt Nam Tuyên truyền Giải phóng quân",
+      "skill": "chan-dung-nhan-vat",
+      "duLieu": { "nam": 1944, "places": ["cao-bang"] }
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.2,
+      "cau": [2],
+      "cue": "kw:1954",
+      "viec": "Hiện mốc 1954 chỉ huy Chiến dịch Điện Biên Phủ và nhấn cụm từ đánh chắc tiến chắc",
+      "skill": "chan-dung-nhan-vat",
+      "duLieu": { "nam": 1954, "places": ["dien-bien-phu"] }
+    },
+    {
+      "i": 3,
+      "t0": 12.2,
+      "t1": 16.0,
+      "cau": [3],
+      "cue": "kw:1975",
+      "viec": "Hiện mốc 1975 và câu trích dẫn phương châm lịch sử",
+      "skill": "chan-dung-nhan-vat",
+      "duLieu": { "nam": 1975 }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

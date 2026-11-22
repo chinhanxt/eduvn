@@ -1,0 +1,81 @@
+{
+  "skill": "chan-dung-nhan-vat",
+  "evals": [
+    {
+      "id": "vo-nguyen-giap",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Đại tướng Võ Nguyên Giáp (1911–2013)",
+        "slideText": "Đại tướng Võ Nguyên Giáp (1911–2013): 1944 thành lập Đội VNTTGPQ · 1954 chỉ huy Chiến dịch Điện Biên Phủ · 1975 chỉ đạo Đại thắng mùa Xuân.",
+        "speech": [
+          { "text": "Đại tướng Võ Nguyên Giáp sinh năm 1911, mất năm 2013, là Tổng Tư lệnh đầu tiên của Quân đội nhân dân Việt Nam.", "durationMs": 4000 },
+          { "text": "Ngày 22 tháng 12 năm 1944, ông được giao nhiệm vụ thành lập Đội Việt Nam Tuyên truyền Giải phóng quân.", "durationMs": 4000 },
+          { "text": "Năm 1954, tại Điện Biên Phủ, ông đưa ra quyết định chuyển từ đánh nhanh thắng nhanh sang đánh chắc tiến chắc.", "durationMs": 4200 },
+          { "text": "Mùa Xuân năm 1975, ông cùng Bộ Chính trị chỉ đạo thắng lợi Chiến dịch Hồ Chí Minh thống nhất đất nước.", "durationMs": 3800 }
+        ]
+      },
+      "tieuChi": ["Có khung chân dung/huy hiệu kèm dòng ghi nguồn minh bạch", "Đủ năm sinh–mất 1911–2013 và 3 mốc sự nghiệp"]
+    },
+    {
+      "id": "tran-hung-dao",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 7,
+        "title": "Quốc công Tiết chế Trần Hưng Đạo (1228–1300)",
+        "slideText": "Trần Quốc Tuấn (1228–1300) · Hịch tướng sĩ (1285) · Chiến thắng Bạch Đằng (1288) · Khoan thư sức dân.",
+        "speech": [
+          { "text": "Trần Quốc Tuấn, tức Trần Hưng Đạo, sinh năm 1228 mất năm 1300, là vị danh tướng kiệt xuất thời Trần.", "durationMs": 4500 },
+          { "text": "Ông viết Hịch tướng sĩ năm 1285 và tổng chỉ huy chiến thắng Bạch Đằng năm 1288 đánh bại quân Nguyên.", "durationMs": 4800 },
+          { "text": "Lời dặn khoan thư sức dân làm kế sâu rễ bền gốc vẫn còn nguyên giá trị lịch sử.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["Không dùng ảnh không rõ bản quyền (dùng huy hiệu chữ lồng)", "Nổi bật câu nói và niên đại 1228–1300"]
+    },
+    {
+      "id": "nguyen-trai",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 11,
+        "title": "Nguyễn Trãi (1380–1442) — Anh hùng dân tộc, Danh nhân văn hoá",
+        "slideText": "Nguyễn Trãi (1380–1442): Bình Ngô sách, tham mưu khởi nghĩa Lam Sơn (1418–1427), tác giả Bình Ngô đại cáo (1428).",
+        "speech": [
+          { "text": "Nguyễn Trãi sinh năm 1380 mất năm 1442, là nhà chính trị, quân sự và văn hoá lớn thế kỷ XV.", "durationMs": 4600 },
+          { "text": "Trong khởi nghĩa Lam Sơn 1418 đến 1427, ông dâng Bình Ngô sách và thay Lê Lợi soạn Bình Ngô đại cáo năm 1428.", "durationMs": 5000 }
+        ]
+      },
+      "tieuChi": ["Ghi rõ năm sinh–mất 1380–1442", "Hiển thị trích dẫn tư tưởng nhân nghĩa"]
+    },
+    {
+      "id": "khong-chon-nien-bieu-nhieu-thoi-ky",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Các mốc chính của cách mạng Việt Nam 1930–1986",
+        "slideText": "1930 · 1945 · 1954 · 1975 · 1986.",
+        "speech": [
+          { "text": "Năm mốc lớn của lịch sử hiện đại Việt Nam là 1930, 1945, 1954, 1975 và 1986.", "durationMs": 5000 }
+        ]
+      },
+      "tieuChi": ["Không chọn: dòng thời gian nhiều giai đoạn, dùng dong-thoi-gian-su-kien"]
+    },
+    {
+      "id": "khong-chon-lanh-tho-bien-dong",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 11,
+        "title": "Mở rộng lãnh thổ Đại Việt thế kỷ X–XIX",
+        "slideText": "Hoa Lư → Thăng Long → Phú Xuân → Gia Định và chủ quyền Hoàng Sa, Trường Sa.",
+        "speech": [
+          { "text": "Từ thế kỷ X đến XIX, không gian lãnh thổ Việt Nam mở rộng từ Bắc vào Nam và khẳng định chủ quyền Hoàng Sa, Trường Sa.", "durationMs": 5400 }
+        ]
+      },
+      "tieuChi": ["Không chọn: là biến đổi lãnh thổ trên bản đồ, dùng bien-doi-lanh-tho"]
+    }
+  ]
+}

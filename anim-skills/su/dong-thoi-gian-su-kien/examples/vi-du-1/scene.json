@@ -1,0 +1,24 @@
+{
+  "subject": "su",
+  "grade": 12,
+  "title": "Tiến trình cách mạng Việt Nam 1945–1975",
+  "slideText": "1945–1954 (9 năm): Kháng chiến chống Pháp · 1954–1975 (21 năm): Kháng chiến chống Mỹ. Mốc chính: 1945 Cách mạng tháng Tám (2/9/1945), 1954 Điện Biên Phủ, 1968 Mậu Thân, 1975 Đại thắng mùa Xuân (30/4/1975).",
+  "speech": [
+    {
+      "text": "Giai đoạn 1945 đến 1975 kéo dài 30 năm gồm hai thời kỳ lớn trên trục năm đúng tỉ lệ: 9 năm chống Pháp và 21 năm chống Mỹ.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Mốc 1945 mở đầu bằng Cách mạng tháng Tám và Tuyên ngôn Độc lập ngày 2 tháng 9 tại Quảng trường Ba Đình.",
+      "durationMs": 4400
+    },
+    {
+      "text": "Năm 1954, Chiến thắng Điện Biên Phủ kết thúc kháng chiến chống Pháp, chuyển sang 21 năm kháng chiến chống Mỹ.",
+      "durationMs": 4600
+    },
+    {
+      "text": "Sau bước ngoặt Xuân Mậu Thân 1968, Đại thắng mùa Xuân ngày 30 tháng 4 năm 1975 thống nhất hoàn toàn đất nước.",
+      "durationMs": 4800
+    }
+  ]
+}

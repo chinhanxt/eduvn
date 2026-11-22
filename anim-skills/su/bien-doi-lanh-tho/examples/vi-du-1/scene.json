@@ -1,0 +1,24 @@
+{
+  "subject": "su",
+  "grade": 11,
+  "title": "Không gian lãnh thổ và chủ quyền biển đảo Việt Nam (thế kỷ X – XIX)",
+  "slideText": "Thế kỷ X–XI: Hoa Lư (968), Thăng Long (1010) ở Bắc Bộ và Bắc Trung Bộ · Thế kỷ XV–XVI: mở rộng qua Thuận Hoá, Phú Xuân, Hội An · Thế kỷ XVII–XVIII: mở cõi vào Gia Định (1698), lập đội Hoàng Sa và đội Bắc Hải thực thi chủ quyền Hoàng Sa, Trường Sa · Đầu thế kỷ XIX: thống nhất dải đất liền và đo đạc, cắm mốc 1816–1836.",
+  "speech": [
+    {
+      "text": "Từ thế kỷ X đến XI, nhà nước Đại Cồ Việt định đô ở Hoa Lư năm 968 và Đại Việt ở Thăng Long năm 1010 phát triển trên vùng Bắc Bộ và Bắc Trung Bộ.",
+      "durationMs": 5000
+    },
+    {
+      "text": "Giai đoạn thế kỷ XV đến XVI, không gian lãnh thổ mở rộng xuống miền Trung với vùng Thuận Hoá, Phú Xuân và thương cảng Hội An.",
+      "durationMs": 5000
+    },
+    {
+      "text": "Thế kỷ XVII đến XVIII, quá trình mở cõi tiến tới Gia Định năm 1698, đồng thời chúa Nguyễn lập đội Hoàng Sa và đội Bắc Hải thực thi chủ quyền trên Hoàng Sa và Trường Sa.",
+      "durationMs": 5200
+    },
+    {
+      "text": "Đầu thế kỷ XIX, lãnh thổ thống nhất từ Bắc vào Nam cùng hoạt động đo đạc, cắm mốc năm 1816 và 1836 khẳng định chủ quyền liên tục trên Biển Đông.",
+      "durationMs": 4800
+    }
+  ]
+}

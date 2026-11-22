@@ -1,0 +1,49 @@
+{
+  "skills": [
+    { "id": "nguyen-nhan-ket-qua", "vaiTro": "chinh" }
+  ],
+  "confidence": 0.95,
+  "lyDo": "Lời giảng phân tích trọn chuỗi 4 mắt xích Nguyên nhân → Diễn biến → Kết quả → Ý nghĩa của Chiến thắng Bạch Đằng 938.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.5,
+      "cau": [0],
+      "cue": "kw:Nguyên nhân",
+      "viec": "Hiện khối Nguyên nhân: Quân Nam Hán kéo thuỷ quân xâm lược năm 938",
+      "skill": "nguyen-nhan-ket-qua",
+      "duLieu": { "nam": 938 }
+    },
+    {
+      "i": 1,
+      "t0": 4.5,
+      "t1": 9.2,
+      "cau": [1],
+      "cue": "kw:Ngô Quyền",
+      "viec": "Vẽ mũi tên nối sang khối Diễn biến: bãi cọc gỗ bịt sắt lợi dụng thuỷ triều",
+      "skill": "nguyen-nhan-ket-qua",
+      "duLieu": { "places": ["bach-dang"] }
+    },
+    {
+      "i": 2,
+      "t0": 9.2,
+      "t1": 13.6,
+      "cau": [2],
+      "cue": "kw:Kết quả",
+      "viec": "Vẽ mũi tên nối sang khối Kết quả: đánh tan thuỷ quân Nam Hán",
+      "skill": "nguyen-nhan-ket-qua"
+    },
+    {
+      "i": 3,
+      "t0": 13.6,
+      "t1": 18.0,
+      "cau": [3],
+      "cue": "kw:Ý nghĩa",
+      "viec": "Vẽ mũi tên nối sang khối Ý nghĩa: chấm dứt hơn 1.000 năm Bắc thuộc",
+      "skill": "nguyen-nhan-ket-qua",
+      "duLieu": { "bacThuocNam": 1000 }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

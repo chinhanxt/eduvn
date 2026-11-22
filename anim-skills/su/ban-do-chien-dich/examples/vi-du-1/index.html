@@ -1,0 +1,192 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="24" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-7" style="top:46px">LỊCH SỬ 12 · KHÁNG CHIẾN CHỐNG PHÁP (1945–1954)</div>
+  <h1 id="tt" class="ek-title ek-col-8 ek-span-5" style="top:44px;font-size:58px">Chiến dịch <span class="kw">Điện Biên Phủ</span> 1954</h1>
+
+  <div class="ek-stage">
+    <div id="map-wrap" class="ek-col-1 ek-span-7 map-box ek-hidden" style="top:102px;height:804px" data-ek-beat="0">
+      <svg id="map-dbp" width="970" height="804" viewBox="0 0 970 804"
+           data-ek-map="vn63" data-ek-view="102.93,21.24,103.38,21.70" data-ek-inset="vn">
+        <ellipse id="zone-bac" class="zone-lib ek-hidden" cx="255" cy="485" rx="115" ry="58"/>
+        <ellipse id="zone-all" class="zone-lib ek-hidden" cx="265" cy="545" rx="205" ry="185"/>
+        <path id="arr-1a" data-ek-arrow="from:tuan-giao;to:him-lam" data-ek-bend="-0.16"/>
+        <path id="arr-1b" data-ek-arrow="from:muong-phang;to:doi-doc-lap" data-ek-bend="0.22"/>
+        <path id="arr-2a" data-ek-arrow="from:him-lam;to:doi-a1" data-ek-bend="-0.24"/>
+        <path id="arr-2b" class="arr-siege" data-ek-arrow="from:doi-doc-lap;to:muong-thanh" data-ek-bend="0.16"/>
+        <path id="arr-3a" data-ek-arrow="from:doi-a1;to:ham-de-castries" data-ek-bend="-0.24"/>
+        <path id="arr-3b" class="arr-siege" data-ek-arrow="from:ham-de-castries;to:hong-cum" data-ek-bend="0.18"/>
+      </svg>
+
+      <div id="p-tg" class="place-cmd" data-ek-place="tuan-giao">Tuần Giáo</div>
+      <div id="p-mp" class="place-cmd" data-ek-place="muong-phang">Mường Phăng</div>
+      <div id="p-hl" data-ek-place="him-lam">Him Lam</div>
+      <div id="p-dl" data-ek-place="doi-doc-lap">Độc Lập</div>
+      <div id="p-mt" data-ek-place="muong-thanh">Mường Thanh</div>
+      <div id="p-a1" data-ek-place="doi-a1">Đồi A1</div>
+      <div id="p-dc" data-ek-place="ham-de-castries">Hầm Đờ Cát</div>
+      <div id="p-hc" data-ek-place="hong-cum">Hồng Cúm</div>
+
+      <div id="legend" class="map-legend">
+        <span class="leg-i"><i class="leg-atk"></i>Tiến công</span>
+        <span class="leg-i"><i class="leg-siege"></i>Bao vây</span>
+        <span class="leg-i"><i class="leg-lib"></i>Giải phóng</span>
+      </div>
+    </div>
+
+    <div id="card-1" class="ek-card ek-col-8 ek-span-5 phase-card ek-hidden" style="top:198px" data-ek-beat="1">
+      <div class="phase-tag ek-c-doSon">ĐỢT 1 · 13/3 – 17/3/1954</div>
+      <p>Mở màn từ Tuần Giáo, hạ cứ điểm Him Lam và Độc Lập.</p>
+    </div>
+
+    <div id="card-2" class="ek-card ek-col-8 ek-span-5 phase-card phase-2 ek-hidden" style="top:426px" data-ek-beat="2">
+      <div class="phase-tag ek-c-tim">ĐỢT 2 · 30/3 – 26/4/1954</div>
+      <p>Đánh cao điểm Đồi A1, cắt đứt sân bay Mường Thanh.</p>
+    </div>
+
+    <div id="card-3" class="ek-card ek-col-8 ek-span-5 phase-card phase-3 ek-hidden" style="top:654px" data-ek-beat="3">
+      <div class="phase-tag ek-c-xanhLa">ĐỢT 3 · 1/5 – 7/5/1954</div>
+      <p>Tổng công kích Hầm Đờ Cát, giải phóng hoàn toàn 7/5.</p>
+    </div>
+
+    <div id="card-end" class="ek-card ek-col-8 ek-span-5 sum-card ek-hidden" style="top:220px" data-ek-beat="4">
+      <div class="phase-tag ek-c-accent">KẾT QUẢ · 56 NGÀY ĐÊM</div>
+      <h3>Toàn thắng ngày 7/5/1954</h3>
+      <p>Đập tan Kế hoạch Na-va, mở đường ký <span id="kw-gv">Hiệp định Giơ-ne-vơ 1954</span>.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .map-box {
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .zone-lib {
+    fill: var(--c-xanhLa);
+    fill-opacity: 0.14;
+    stroke: var(--c-xanhLa);
+    stroke-width: 3px;
+    stroke-dasharray: 10 8;
+  }
+  .ek-arrow {
+    visibility: hidden;
+  }
+  .arr-siege {
+    stroke: var(--c-tim);
+    stroke-dasharray: 14 10;
+  }
+  .arr-siege + .ek-arrow-head {
+    fill: var(--c-tim);
+  }
+  .place-cmd .ek-place-dot {
+    background: var(--c-xanhLa);
+  }
+  .map-legend {
+    position: absolute;
+    left: 20px;
+    bottom: 18px;
+    display: flex;
+    gap: 20px;
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--ink2);
+  }
+  .leg-i {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .leg-atk {
+    display: inline-block;
+    width: 28px;
+    height: 6px;
+    background: var(--c-doSon);
+    border-radius: 3px;
+  }
+  .leg-siege {
+    display: inline-block;
+    width: 28px;
+    height: 0;
+    border-top: 5px dashed var(--c-tim);
+  }
+  .leg-lib {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background: var(--accent-soft);
+    border: 2px dashed var(--c-xanhLa);
+    border-radius: 5px;
+  }
+  .phase-card {
+    border-left-color: var(--c-doSon);
+    padding: 16px 24px;
+  }
+  .phase-card p {
+    font-size: 36px;
+    line-height: 1.35;
+  }
+  .phase-2 {
+    border-left-color: var(--c-tim);
+  }
+  .phase-3 {
+    border-left-color: var(--c-xanhLa);
+  }
+  .sum-card {
+    border-left-color: var(--accent);
+    padding: 28px 32px;
+  }
+  .phase-tag {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 6px;
+  }
+</style>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+
+EK.enter(tl, "#tt", 0, { from: "up", dur: 0.7 });
+EK.enter(tl, "#map-wrap", EK.cue(0), { from: "fade", dur: 0.8 });
+EK.enter(tl, ".ek-place", EK.cue(0) + 0.5, { from: "up", dur: 0.5, stagger: 0.14 });
+
+// Đợt 1 (13/3 – 17/3/1954)
+EK.enter(tl, "#card-1", EK.cue(1), { from: "right", dur: 0.7 });
+tl.set("#arr-1a", { visibility: "visible" }, EK.cue(1) + 0.3);
+EK.arrow(tl, "#arr-1a", EK.cue(1) + 0.3, 1.3);
+tl.set("#arr-1b", { visibility: "visible" }, EK.cue(1) + 1.5);
+EK.arrow(tl, "#arr-1b", EK.cue(1) + 1.5, 1.3);
+EK.enter(tl, "#zone-bac", EK.cue(1) + 3.0, { from: "fade", dur: 0.7 });
+
+// Đợt 2 (30/3 – 26/4/1954)
+tl.to("#card-1", { opacity: 0.45, duration: 0.5, ease: "power2.out" }, EK.cue(2));
+tl.to("#arr-1a, #arr-1b", { opacity: 0.45, duration: 0.5, ease: "power2.out" }, EK.cue(2));
+EK.enter(tl, "#card-2", EK.cue(2), { from: "right", dur: 0.7 });
+tl.set("#arr-2a", { visibility: "visible" }, EK.cue(2) + 0.3);
+EK.arrow(tl, "#arr-2a", EK.cue(2) + 0.3, 1.3);
+tl.set("#arr-2b", { visibility: "visible" }, EK.cue(2) + 1.6);
+EK.arrow(tl, "#arr-2b", EK.cue(2) + 1.6, 1.3);
+
+// Đợt 3 (1/5 – 7/5/1954)
+tl.to("#card-2", { opacity: 0.45, duration: 0.5, ease: "power2.out" }, EK.cue(3));
+tl.to("#arr-2a, #arr-2b", { opacity: 0.45, duration: 0.5, ease: "power2.out" }, EK.cue(3));
+EK.enter(tl, "#card-3", EK.cue(3), { from: "right", dur: 0.7 });
+tl.set("#arr-3a", { visibility: "visible" }, EK.cue(3) + 0.3);
+EK.arrow(tl, "#arr-3a", EK.cue(3) + 0.3, 1.2);
+tl.set("#arr-3b", { visibility: "visible" }, EK.cue(3) + 1.4);
+EK.arrow(tl, "#arr-3b", EK.cue(3) + 1.4, 1.2);
+EK.enter(tl, "#zone-all", EK.cue(3) + 2.5, { from: "fade", dur: 0.9 });
+
+// Kết luận: ẩn hẳn 3 thẻ đợt trước rồi mới hiện thẻ kết luận (không chồng đè)
+EK.exit(tl, "#card-1, #card-2, #card-3", EK.cue(4) - 0.85, { dur: 0.35, to: "up" });
+EK.enter(tl, "#card-end", EK.cue(4) - 0.4, { from: "up", dur: 0.65 });
+EK.mark(tl, "#kw-gv", EK.cue(4) + 0.5, "highlight", { color: "accent", dur: 0.8 });
+
+window.__timelines["main"] = tl;
+</script>

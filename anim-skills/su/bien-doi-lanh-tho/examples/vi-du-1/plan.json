@@ -1,0 +1,50 @@
+{
+  "skills": [
+    { "id": "bien-doi-lanh-tho", "vaiTro": "chinh" }
+  ],
+  "confidence": 0.95,
+  "lyDo": "Lời giảng trình bày sự mở rộng không gian lãnh thổ Việt Nam từ thế kỷ X đến XIX cùng quá trình xác lập chủ quyền Hoàng Sa, Trường Sa.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 5.0,
+      "cau": [0],
+      "cue": "kw:Thăng Long",
+      "viec": "Hiện bản đồ toàn vẹn Việt Nam (_vnm, đủ Hoàng Sa, Trường Sa) và đánh dấu vùng Bắc Bộ thế kỷ X–XI (Hoa Lư 968, Thăng Long 1010)",
+      "skill": "bien-doi-lanh-tho",
+      "duLieu": { "places": ["hoa-lu", "thang-long-ha-noi"], "nam": [968, 1010] }
+    },
+    {
+      "i": 1,
+      "t0": 5.0,
+      "t1": 10.0,
+      "cau": [1],
+      "cue": "kw:thế kỷ XV",
+      "viec": "Mở rộng vùng miền Trung thế kỷ XV–XVI qua Phú Xuân và thương cảng Hội An",
+      "skill": "bien-doi-lanh-tho",
+      "duLieu": { "places": ["phu-xuan-hue", "hoi-an"] }
+    },
+    {
+      "i": 2,
+      "t0": 10.0,
+      "t1": 15.2,
+      "cau": [2],
+      "cue": "kw:Gia Định",
+      "viec": "Mở cõi tới Gia Định (1698) và vẽ tuyến hải trình đội Hoàng Sa, đội Bắc Hải ra QĐ. Hoàng Sa và QĐ. Trường Sa",
+      "skill": "bien-doi-lanh-tho",
+      "duLieu": { "places": ["gia-dinh-sai-gon", "hoang-sa", "truong-sa"], "nam": 1698 }
+    },
+    {
+      "i": 3,
+      "t0": 15.2,
+      "t1": 20.0,
+      "cau": [3],
+      "cue": "kw:thế kỷ XIX",
+      "viec": "Hoàn thiện dải lãnh thổ thống nhất và nhấn hoạt động đo đạc, cắm mốc 1816–1836 trên Biển Đông",
+      "skill": "bien-doi-lanh-tho",
+      "duLieu": { "nam": [1816, 1836] }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

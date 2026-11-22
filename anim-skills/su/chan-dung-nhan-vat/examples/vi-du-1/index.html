@@ -1,0 +1,118 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">LỊCH SỬ 12 · HỒ SƠ NHÂN VẬT LỊCH SỬ</div>
+
+  <div class="ek-stage">
+    <div id="portrait-card" class="ek-card ek-col-1 ek-span-4 bio-left ek-hidden" style="top:116px;height:772px" data-ek-beat="0">
+      <div class="monogram-box">
+        <div class="monogram-letters">VG</div>
+        <div class="monogram-years">1911 – 2013</div>
+      </div>
+      <h1 class="bio-name">Võ Nguyên Giáp</h1>
+      <p class="bio-role">Đại tướng · Tổng Tư lệnh Quân đội nhân dân Việt Nam</p>
+      <div class="ek-meta bio-credit">HUY HIỆU HỌC THUẬT EDUVN (CC0) · HỒ SƠ WIKIDATA Q179910</div>
+    </div>
+
+    <div id="ms-1" class="ek-card ek-col-6 ek-span-7 ms-card ek-hidden" style="top:116px" data-ek-beat="1">
+      <div class="ms-year ek-c-lam">22/12/1944 · CAO BẰNG</div>
+      <p>Thành lập Đội Việt Nam Tuyên truyền Giải phóng quân, tiền thân Quân đội nhân dân Việt Nam.</p>
+    </div>
+
+    <div id="ms-2" class="ek-card ek-col-6 ek-span-7 ms-card ms-dbp ek-hidden" style="top:340px" data-ek-beat="2">
+      <div class="ms-year ek-c-doSon">1954 · ĐIỆN BIÊN PHỦ</div>
+      <p>Tổng chỉ huy chiến dịch với quyết định lịch sử chuyển sang <span id="kw-dc">đánh chắc, tiến chắc</span>.</p>
+    </div>
+
+    <div id="ms-3" class="ek-card ek-col-6 ek-span-7 ms-card ms-75 ek-hidden" style="top:564px" data-ek-beat="3">
+      <div class="ms-year ek-c-xanhLa">1975 · ĐẠI THẮNG MÙA XUÂN</div>
+      <p>Cùng Bộ Chính trị chỉ đạo Chiến dịch Hồ Chí Minh, giải phóng hoàn toàn miền Nam.</p>
+      <div id="quote-txt" class="ek-read bio-quote" data-ek-words>“Chuyển sang đánh chắc, tiến chắc để bảo đảm chắc thắng.”</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bio-left {
+    border-left-color: var(--accent);
+    padding: 28px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .monogram-box {
+    background: var(--sunken);
+    border: 3px solid var(--accent);
+    border-radius: 14px;
+    height: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .monogram-letters {
+    font-family: var(--read);
+    font-size: 132px;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+  .monogram-years {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--ink2);
+    font-variant-numeric: tabular-nums;
+  }
+  .bio-name {
+    font-family: var(--read);
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--ink);
+  }
+  .bio-role {
+    font-size: 38px;
+    line-height: 1.38;
+    color: var(--ink2);
+  }
+  .bio-credit {
+    margin-top: auto;
+    line-height: 1.35;
+  }
+  .ms-card {
+    padding: 20px 30px;
+    border-left-color: var(--c-lam);
+  }
+  .ms-dbp { border-left-color: var(--c-doSon); }
+  .ms-75 { border-left-color: var(--c-xanhLa); }
+  .ms-year {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .bio-quote {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 2px solid var(--line);
+    color: var(--accent);
+    font-size: 40px;
+  }
+</style>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+
+EK.enter(tl, "#portrait-card", EK.cue(0), { from: "left", dur: 0.75 });
+EK.enter(tl, "#ms-1", EK.cue(1), { from: "up", dur: 0.7 });
+
+tl.to("#ms-1", { opacity: 0.6, duration: 0.45, ease: "power2.out" }, EK.cue(2));
+EK.enter(tl, "#ms-2", EK.cue(2), { from: "up", dur: 0.7 });
+EK.mark(tl, "#kw-dc", EK.cue(2) + 0.8, "highlight", { color: "doSon", dur: 0.8 });
+
+tl.to("#ms-1, #ms-2", { opacity: 0.65, duration: 0.45, ease: "power2.out" }, EK.cue(3));
+EK.enter(tl, "#ms-3", EK.cue(3), { from: "up", dur: 0.7 });
+EK.words(tl, "#quote-txt", { t: EK.cue(3) + 0.55, per: 0.16 });
+
+window.__timelines["main"] = tl;
+</script>

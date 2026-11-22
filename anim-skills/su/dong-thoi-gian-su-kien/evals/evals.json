@@ -1,0 +1,82 @@
+{
+  "skill": "dong-thoi-gian-su-kien",
+  "evals": [
+    {
+      "id": "tien-trinh-1945-1975",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Tiến trình cách mạng Việt Nam 1945–1975",
+        "slideText": "1945: Cách mạng tháng Tám · 1954: Điện Biên Phủ · 1968: Xuân Mậu Thân · 1975: Đại thắng mùa Xuân.",
+        "speech": [
+          { "text": "Ba mươi năm từ 1945 đến 1975 gồm hai thời kỳ lớn: kháng chiến chống Pháp và kháng chiến chống Mỹ.", "durationMs": 4500 },
+          { "text": "Năm 1945, Cách mạng tháng Tám thành công, khai sinh nước Việt Nam Dân chủ Cộng hoà.", "durationMs": 4500 },
+          { "text": "Năm 1954, Chiến thắng Điện Biên Phủ khép lại cuộc kháng chiến chống thực dân Pháp.", "durationMs": 4500 },
+          { "text": "Qua bước ngoặt Mậu Thân 1968, đến năm 1975 Đại thắng mùa Xuân thống nhất đất nước.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["Trục năm 1945–1975 đúng tỉ lệ thật", "2 dải thời kỳ rõ màu", "4 mốc bật đúng nhịp lời"]
+    },
+    {
+      "id": "cac-trieu-dai-dai-viet",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 7,
+        "title": "Các triều đại phong kiến độc lập từ thế kỷ X đến XV",
+        "slideText": "939: Nhà Ngô · 968: Nhà Đinh · 1009: Nhà Lý · 1226: Nhà Trần · 1428: Nhà Lê sơ.",
+        "speech": [
+          { "text": "Từ năm 939 đến thế kỷ XV, quốc gia độc lập trải qua các triều đại Ngô, Đinh, Tiền Lê, Lý, Trần, Lê sơ.", "durationMs": 5500 },
+          { "text": "Năm 1009 nhà Lý thành lập, mở thời kỳ xây dựng Đại Việt hưng thịnh ở Thăng Long.", "durationMs": 4800 },
+          { "text": "Năm 1226 nhà Trần tiếp nối ba lần đánh thắng Nguyên – Mông, đến năm 1428 nhà Lê sơ ra đời.", "durationMs": 5200 }
+        ]
+      },
+      "tieuChi": ["Khoảng cách 939–1009, 1009–1226, 1226–1428 đúng tỉ lệ", "Không chồng nhãn năm"]
+    },
+    {
+      "id": "doi-moi-hoi-nhap",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Các mốc Đổi mới và hội nhập quốc tế của Việt Nam",
+        "slideText": "1986: Đại hội VI khởi xướng Đổi mới · 1995: Gia nhập ASEAN · 2007: Gia nhập WTO.",
+        "speech": [
+          { "text": "Năm 1986, Đại hội VI mở đầu công cuộc Đổi mới toàn diện đất nước.", "durationMs": 4500 },
+          { "text": "Năm 1995, Việt Nam chính thức gia nhập ASEAN và bình thường hoá quan hệ với Hoa Kỳ.", "durationMs": 4800 },
+          { "text": "Năm 2007, Việt Nam trở thành thành viên chính thức của Tổ chức Thương mại Thế giới WTO.", "durationMs": 4700 }
+        ]
+      },
+      "tieuChi": ["Trục 1986–2010 tỉ lệ chuẩn", "3 mốc bật đúng cue lời giảng"]
+    },
+    {
+      "id": "khong-chon-dien-bien-ban-do",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Mũi tiến công đánh Him Lam và Đồi A1",
+        "slideText": "Từ Tuần Giáo đánh Him Lam, từ Đồi A1 tiến thẳng vào Hầm Đờ Cát.",
+        "speech": [
+          { "text": "Quân ta triển khai mũi tiến công từ Tuần Giáo vào Him Lam rồi đánh chiếm Đồi A1 và Hầm Đờ Cát.", "durationMs": 5500 }
+        ]
+      },
+      "tieuChi": ["Không chọn: cảnh diễn biến không gian chiến dịch, nên dùng ban-do-chien-dich"]
+    },
+    {
+      "id": "khong-chon-dinh-nghia-su-lieu",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 10,
+        "title": "Phân loại các nguồn sử liệu",
+        "slideText": "Sử liệu chữ viết, sử liệu hiện vật, sử liệu lời nói, sử liệu hình ảnh.",
+        "speech": [
+          { "text": "Các nguồn sử liệu cơ bản gồm sử liệu chữ viết, hiện vật, truyền miệng và hình ảnh.", "durationMs": 5000 }
+        ]
+      },
+      "tieuChi": ["Không chọn: không có mốc năm hay tiến trình thời gian"]
+    }
+  ]
+}
