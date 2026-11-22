@@ -234,3 +234,13 @@ authors nor the names of their institutions may be used to endorse or promote pr
 this software without specific prior written permission. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT
 WARRANTY OF ANY KIND; see the full license text at the URL above.
 ```
+
+
+## Gói môn Hoá học (`mon-hoa`): smilesDrawer (MIT) & Dữ liệu tuần hoàn IUPAC/PubChem
+
+- **smiles-drawer** (`reymond-group/smilesDrawer`, `smiles-drawer@2.4.2`) — **MIT License**. Dùng để dựng công thức cấu tạo 2D từ SMILES trong phòng thí nghiệm Hoá học (`/hoc/hoa/phong-thi-nghiem`) và skill hoạt hình `anim-skills/hoa/cau-truc-phan-tu/`.
+  - Nguồn: Probst, D., & Reymond, J.-L. (2018). SmilesDrawer: Parsing and Drawing SMILES-Encoded Molecular Structures Using Client-Side JavaScript. *J. Chem. Inf. Model.*, 58(1), 1–7. https://github.com/reymond-group/smilesDrawer
+- **Dữ liệu Bảng tuần hoàn 118 nguyên tố** (`server/src/subjects/hoa/periodicTable.ts`):
+  - Nguyên tử khối chuẩn: IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW), *Standard Atomic Weights of the Elements 2021*, Pure Appl. Chem. 2022, 94, 573–600 (dữ liệu khoa học công cộng).
+  - Độ âm điện Pauling, bán kính nguyên tử, năng lượng ion hoá thứ nhất: PubChem Periodic Table (NCBI/NIH, public domain) & NIST Atomic Spectra Database (cấu hình electron thực nghiệm).
+  - Danh pháp tiếng Việt chuẩn hoá theo Chương trình GDPT 2018 (Bộ GD&ĐT).
