@@ -1,0 +1,80 @@
+{
+  "skill": "he-co-quan",
+  "evals": [
+    {
+      "id": "hai-vong-tuan-hoan-lop-8",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 8,
+        "title": "Hai vòng tuần hoàn máu ở người",
+        "slideText": "Tim 4 ngăn: Tâm nhĩ phải, Tâm thất phải, Tâm nhĩ trái, Tâm thất trái. Vòng nhỏ: qua phổi trao đổi khí. Vòng lớn: đưa máu giàu O2 nuôi cơ quan.",
+        "speech": [
+          { "text": "Tim người gồm bốn ngăn tách biệt: hai tâm nhĩ ở phía trên và hai tâm thất ở phía dưới.", "durationMs": 4200 },
+          { "text": "Ở vòng tuần hoàn nhỏ, máu giàu CO2 từ tâm thất phải lên phổi trao đổi khí thành máu giàu O2 rồi về tâm nhĩ trái.", "durationMs": 5000 },
+          { "text": "Ở vòng tuần hoàn lớn, máu giàu O2 từ tâm thất trái đi nuôi mọi cơ quan rồi mang CO2 trở về tâm nhĩ phải.", "durationMs": 5000 },
+          { "text": "Hai vòng tuần hoàn khép kín giúp máu luôn chảy một chiều và không bị pha trộn.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["sơ đồ nét học thuật tim 4 ngăn đúng vị trí trái-phải giải phẫu", "chấm chảy đúng chiều 2 vòng tuần hoàn"]
+    },
+    {
+      "id": "he-tieu-hoa-lop-8",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 8,
+        "title": "Con đường tiêu hoá thức ăn ở người",
+        "slideText": "Khoang miệng -> Thực quản -> Dạ dày -> Ruột non (hấp thụ chất dinh dưỡng) -> Ruột già.",
+        "speech": [
+          { "text": "Thức ăn được nghiền nhỏ tại khoang miệng, đẩy qua thực quản xuống dạ dày co bóp và tiêu hoá protein.", "durationMs": 4600 },
+          { "text": "Tại ruột non, chất dinh dưỡng được phân giải hoàn toàn và hấp thụ vào máu, phần bã chuyển qua ruột già.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["sơ đồ nét ống tiêu hoá sạch", "chấm đi theo đúng thứ tự 5 cơ quan"]
+    },
+    {
+      "id": "tuan-hoan-kep-sinh-11",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 11,
+        "title": "Hệ tuần hoàn kép ở thú và chim",
+        "slideText": "Tim 4 ngăn hoàn chỉnh, áp lực máu lớn trong vòng đại tuần hoàn giúp trao đổi chất mạnh.",
+        "speech": [
+          { "text": "Ở thú và chim, tim có bốn ngăn hoàn chỉnh ngăn cách tuyệt đối máu giàu oxi và máu nghèo oxi.", "durationMs": 4400 },
+          { "text": "Máu đi qua tim hai lần trong một chu kì, tạo áp lực cao đưa máu nhanh tới mọi tế bào.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["sơ đồ hệ tuần hoàn kép chuẩn Sinh 11", "nêu rõ 2 vòng tiểu và đại tuần hoàn"]
+    },
+    {
+      "id": "khong-chon-te-bao-thuc-vat",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 6,
+        "title": "Cấu tạo tế bào thực vật",
+        "slideText": "Thành tế bào, màng tế bào, nhân, không bào lớn và lục lạp.",
+        "speech": [
+          { "text": "Tế bào thực vật có lục lạp màu xanh giúp thực hiện quang hợp tạo chất hữu cơ.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là cấu tạo tế bào, chọn cau-tao-te-bao"]
+    },
+    {
+      "id": "khong-chon-krebs",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Chu trình Krebs",
+        "slideText": "Acetyl-CoA đi vào chu trình Krebs trong chất nền ti thể tạo CO2, NADH, FADH2, ATP.",
+        "speech": [
+          { "text": "Chu trình Krebs oxi hoá hoàn toàn phân tử hai carbon thành CO2 và tích năng lượng trong NADH.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là chu trình sinh hoá, chọn chu-trinh-sinh-hoc"]
+    }
+  ]
+}

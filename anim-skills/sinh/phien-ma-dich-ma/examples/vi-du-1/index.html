@@ -1,0 +1,105 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">SINH HỌC 12 · CƠ CHẾ BIỂU HIỆN GEN</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:96px">Phiên mã và dịch mã: <span class="kw">ADN → mARN → Axit amin</span></h1>
+
+  <div class="ek-stage">
+    <!-- Dải 1: Mạch khuôn ADN 3' -> 5' (Beat 0) -->
+    <div id="row-dna" class="pm-row ek-col-1 ek-span-12" style="top:216px" data-ek-beat="0">
+      <div class="pm-row-lbl ek-c-lam">ADN khuôn 3′→5′</div>
+      <div class="pm-strip">
+        <div id="dna-0" class="dna-codon pm-box ek-soft-lam ek-c-lam">TAC</div>
+        <div id="dna-1" class="dna-codon pm-box ek-soft-lam ek-c-lam">AAA</div>
+        <div id="dna-2" class="dna-codon pm-box ek-soft-lam ek-c-lam">GGG</div>
+        <div id="dna-3" class="dna-codon pm-box ek-soft-lam ek-c-lam">ATT</div>
+      </div>
+    </div>
+
+    <!-- Dải 2: mARN 5' -> 3' + Khung ribôxôm trượt (Beat 1) -->
+    <div id="row-mrna" class="pm-row ek-col-1 ek-span-12 ek-hidden" style="top:392px" data-ek-beat="1">
+      <div class="pm-row-lbl ek-c-tim">mARN 5′→3′</div>
+      <div class="pm-strip pm-strip-rel">
+        <div id="ribo-frame" class="pm-ribo ek-hidden"></div>
+        <div id="mrna-0" class="mrna-codon pm-box ek-soft-tim ek-c-tim">AUG</div>
+        <div id="mrna-1" class="mrna-codon pm-box ek-soft-tim ek-c-tim">UUU</div>
+        <div id="mrna-2" class="mrna-codon pm-box ek-soft-tim ek-c-tim">CCC</div>
+        <div id="mrna-3" class="mrna-codon pm-box ek-soft-doSon ek-c-doSon">UAA</div>
+      </div>
+    </div>
+
+    <!-- Dải 3: Chuỗi axit amin (Beat 2) -->
+    <div id="row-aa" class="pm-row ek-col-1 ek-span-12 ek-hidden" style="top:572px" data-ek-beat="2">
+      <div class="pm-row-lbl ek-c-xanhLa">Chuỗi axit amin</div>
+      <div class="pm-strip">
+        <div id="aa-0" class="aa-bead pm-aa ek-soft-xanhLa ek-c-xanhLa ek-hidden">Met</div>
+        <div id="aa-1" class="aa-bead pm-aa ek-soft-xanhLa ek-c-xanhLa ek-hidden">Phe</div>
+        <div id="aa-2" class="aa-bead pm-aa ek-soft-xanhLa ek-c-xanhLa ek-hidden">Pro</div>
+        <div id="aa-stop" class="pm-stop ek-soft-doSon ek-c-doSon ek-hidden">Dừng (Stop)</div>
+      </div>
+    </div>
+
+    <!-- Thẻ tổng kết định lượng (Beat 3) -->
+    <div id="pm-summary" class="ek-card pm-sum ek-col-1 ek-span-12 ek-hidden" style="top:736px" data-ek-beat="3">
+      <div class="pm-sum-grid">
+        <div class="pm-sum-txt">
+          <h3>Kết quả dịch mã chuẩn bảng mã di truyền</h3>
+          <p>AUG mở đầu (Met) → UUU (Phe) → CCC (Pro); UAA là mã kết thúc không mã hoá axit amin.</p>
+        </div>
+        <div class="pm-sum-nums">
+          <div class="pm-kpi"><span id="pm-cnt-aa" class="ek-num pm-n ek-c-xanhLa">0</span><span class="pm-k">axit amin</span></div>
+          <div class="pm-kpi"><span id="pm-cnt-pep" class="ek-num pm-n ek-c-lam">0</span><span class="pm-k">liên kết peptit</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pm-row { display: flex; align-items: center; gap: 28px; }
+  .pm-row-lbl { width: 350px; font-size: 40px; font-weight: 700; flex: none; }
+  .pm-strip { display: grid; grid-template-columns: repeat(4, 300px); gap: 32px; }
+  .pm-strip-rel { position: relative; }
+  .pm-box { height: 112px; border: 3px solid var(--line); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 52px; font-weight: 700; letter-spacing: 0.14em; }
+  .pm-aa { height: 112px; border: 4px solid var(--c-xanhLa); border-radius: 56px; display: flex; align-items: center; justify-content: center; font-size: 46px; font-weight: 700; }
+  .pm-stop { height: 112px; border: 3px dashed var(--c-doSon); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; }
+  .pm-ribo { position: absolute; left: -12px; top: -12px; width: 324px; height: 136px; border: 5px solid var(--accent); border-radius: 22px; pointer-events: none; }
+  .pm-sum { padding: 20px 28px; }
+  .pm-sum-grid { display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+  .pm-sum-txt h3 { font-size: 38px; margin-bottom: 6px; }
+  .pm-sum-txt p { font-size: 36px; line-height: 1.3; }
+  .pm-sum-nums { display: flex; gap: 20px; flex: none; }
+  .pm-kpi { background: var(--sunken); border-radius: 12px; padding: 12px 22px; text-align: center; min-width: 195px; }
+  .pm-n { display: block; font-size: 54px; }
+  .pm-k { font-size: 36px; font-weight: 600; color: var(--ink2); }
+</style>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  // Beat 0 (0 - 4.4s): Nhấn từng bộ ba ADN khuôn
+  EK.enter(tl, ".dna-codon", 0.3, { from: "up", stagger: 0.35 });
+  EK.mark(tl, "#tt .kw", 2.2, "highlight", { color: "lam" });
+
+  // Beat 1 (4.4 - 9.0s): Phiên mã tạo mARN bổ sung từng bộ ba
+  EK.enter(tl, "#row-mrna", EK.cue(1), { from: "down", dur: 0.55 });
+  EK.enter(tl, ".mrna-codon", 4.9, { from: "down", stagger: 0.45 });
+  EK.mark(tl, "#mrna-0", 7.2, "box", { color: "tim" });
+
+  // Beat 2 (9.0 - 13.8s): Ribôxôm trượt lần lượt qua AUG -> UUU -> CCC lắp Met - Phe - Pro
+  EK.enter(tl, "#row-aa", EK.cue(2), { from: "fade", dur: 0.4 });
+  EK.enter(tl, "#ribo-frame", 9.1, { from: "scale", dur: 0.4 });
+  EK.enter(tl, "#aa-0", 9.5, { from: "scale", dur: 0.5 });
+  tl.to("#ribo-frame", { x: 332, duration: 0.85, ease: "power3.inOut" }, 10.4);
+  EK.enter(tl, "#aa-1", 11.1, { from: "scale", dur: 0.5 });
+  tl.to("#ribo-frame", { x: 664, duration: 0.85, ease: "power3.inOut" }, 12.0);
+  EK.enter(tl, "#aa-2", 12.7, { from: "scale", dur: 0.5 });
+
+  // Beat 3 (13.8 - 18.0s): Trượt tới UAA -> Dừng dịch mã + đếm 3 axit amin & 2 liên kết peptit
+  tl.to("#ribo-frame", { x: 996, duration: 0.8, ease: "power3.inOut" }, 13.8);
+  EK.enter(tl, "#aa-stop", 14.5, { from: "scale", dur: 0.5 });
+  EK.enter(tl, "#pm-summary", EK.cue(3), { from: "up", dur: 0.55 });
+  EK.count(tl, "#pm-cnt-aa", 0, 3, 14.8, 0.9, { decimals: 0 });
+  EK.count(tl, "#pm-cnt-pep", 0, 2, 15.2, 0.9, { decimals: 0 });
+  EK.mark(tl, "#pm-summary h3", 16.0, "highlight", { color: "xanhLa" });
+
+  window.__timelines["main"] = tl;
+</script>

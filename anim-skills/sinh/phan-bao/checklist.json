@@ -1,0 +1,15 @@
+{
+  "requires": [
+    { "selector": "svg#cell-svg", "min": 1 },
+    { "selector": "#cell-membrane", "min": 1 },
+    { "selector": "#cnt-nst", "min": 1 },
+    { "selector": "#cnt-cro", "min": 1 },
+    { "selector": "#cnt-td", "min": 1 }
+  ],
+  "motion": [
+    { "kind": "staysInFrame", "selector": ".ek-label" },
+    { "kind": "keepsMoving", "maxStaticSec": 4 }
+  ],
+  "limits": { "cameraMoves": 0, "labels": 12, "minFontPx": 36 },
+  "data": { "placesFromGazetteer": false, "numbersFromSpeech": true }
+}

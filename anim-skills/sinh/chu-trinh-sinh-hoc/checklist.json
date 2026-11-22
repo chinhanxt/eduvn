@@ -1,0 +1,13 @@
+{
+  "requires": [
+    { "selector": "svg#cycle-svg", "min": 1 },
+    { "selector": ".cycle-node", "min": 3, "max": 6 },
+    { "selector": "#cycle-dot", "min": 1 }
+  ],
+  "motion": [
+    { "kind": "staysInFrame", "selector": ".ek-label" },
+    { "kind": "keepsMoving", "maxStaticSec": 4 }
+  ],
+  "limits": { "cameraMoves": 0, "labels": 14, "minFontPx": 36 },
+  "data": { "placesFromGazetteer": false, "numbersFromSpeech": true }
+}

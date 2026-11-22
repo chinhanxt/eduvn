@@ -1,0 +1,149 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">SINH HỌC 10 · HÔ HẤP TẾ BÀO TRONG TI THỂ</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:96px">Chu trình <span class="kw">Krebs</span> (1 phân tử Acetyl-CoA)</h1>
+
+  <div class="ek-stage">
+    <!-- Cột 1-7: Vòng chu trình Krebs với chấm chạy quanh vòng bằng EK.follow -->
+    <div id="cycle-wrap" class="cy-box ek-col-1 ek-span-7" style="top:200px;height:690px" data-ek-beat="0">
+      <svg id="cycle-svg" viewBox="0 0 970 690" width="970" height="690">
+        <!-- Mũi tên đầu vào Acetyl-CoA (2C) từ trên -->
+        <path id="in-path" class="cy-in-line" d="M485,32 L485,112" />
+        <polygon points="485,124 473,104 497,104" class="ek-fill-doSon" />
+        <text x="510" y="76" class="cy-tag ek-fill-doSon">Acetyl-CoA (2C)</text>
+
+        <!-- Đường tròn chu trình khép kín (4 cung rời để chấm chạy từng chặng mượt) -->
+        <path id="arc-full" class="cy-ring" d="M485,145 A225,225 0 1,1 484.9,145 Z" />
+        <path id="arc-1" class="cy-arc ek-stroke-lam" d="M485,145 A225,225 0 0,1 710,370" />
+        <path id="arc-2" class="cy-arc ek-stroke-tim" d="M710,370 A225,225 0 0,1 485,595" />
+        <path id="arc-3" class="cy-arc ek-stroke-lucLam" d="M485,595 A225,225 0 0,1 260,370" />
+        <path id="arc-4" class="cy-arc ek-stroke-xanhLa" d="M260,370 A225,225 0 0,1 372,175" />
+
+        <!-- Nhánh rẽ sản phẩm ra ngoài vòng -->
+        <path id="out-1" class="cy-branch ek-stroke-tim" d="M685,265 Q745,230 785,225" />
+        <text id="lbl-out-1" x="795" y="216" class="cy-out ek-fill-tim ek-hidden">CO₂</text>
+        <text id="lbl-out-1b" x="795" y="260" class="cy-out ek-fill-tim ek-hidden">NADH</text>
+
+        <path id="out-2" class="cy-branch ek-stroke-lucLam" d="M665,515 Q725,555 770,560" />
+        <text id="lbl-out-2" x="780" y="552" class="cy-out ek-fill-lucLam ek-hidden">CO₂ · ATP</text>
+        <text id="lbl-out-2b" x="780" y="596" class="cy-out ek-fill-lucLam ek-hidden">NADH</text>
+
+        <path id="out-3" class="cy-branch ek-stroke-xanhLa" d="M290,505 Q225,545 185,550" />
+        <text id="lbl-out-3" x="30" y="544" class="cy-out ek-fill-xanhLa ek-hidden">FADH₂</text>
+        <text id="lbl-out-3b" x="30" y="588" class="cy-out ek-fill-xanhLa ek-hidden">NADH</text>
+
+        <!-- Chấm chuyển hoá chạy quanh vòng bằng EK.follow (đặt dưới lớp pill chữ để không bao giờ che chữ) -->
+        <circle id="cycle-dot" cx="485" cy="145" r="15" class="ek-fill-doSon cy-dot" />
+
+        <!-- 4 nút chặng trên vòng -->
+        <g id="node-6c" class="cycle-node">
+          <rect x="360" y="114" width="250" height="66" rx="33" class="cy-pill ek-stroke-lam" />
+          <text x="485" y="159" text-anchor="middle" class="cy-node-txt">Citrate (6C)</text>
+        </g>
+        <g id="node-5c" class="cycle-node ek-hidden">
+          <rect x="615" y="337" width="240" height="66" rx="33" class="cy-pill ek-stroke-tim" />
+          <text x="735" y="382" text-anchor="middle" class="cy-node-txt">Chất 5C</text>
+        </g>
+        <g id="node-4c" class="cycle-node ek-hidden">
+          <rect x="355" y="562" width="260" height="66" rx="33" class="cy-pill ek-stroke-lucLam" />
+          <text x="485" y="607" text-anchor="middle" class="cy-node-txt">Chất 4C (mới)</text>
+        </g>
+        <g id="node-oa" class="cycle-node">
+          <rect x="75" y="337" width="275" height="66" rx="33" class="cy-pill ek-stroke-xanhLa" />
+          <text x="212" y="382" text-anchor="middle" class="cy-node-txt">Chất nhận 4C</text>
+        </g>
+
+        <!-- Nhãn giữa vòng -->
+        <text x="485" y="356" text-anchor="middle" class="cy-center">CHẤT NỀN</text>
+        <text x="485" y="402" text-anchor="middle" class="cy-center-sub">TI THỂ</text>
+      </svg>
+    </div>
+
+    <!-- Cột 8-12: Flex stack 3 thẻ có khoảng hở sạch -->
+    <div class="cy-stack ek-col-8 ek-span-5" style="top:200px">
+      <div id="step-1" class="ek-card cy-card ek-hidden" data-ek-beat="1">
+        <h3>Chặng 1 · 6C → 5C</h3>
+        <p>Oxi hoá tách 1 CO₂ và tạo 1 NADH.</p>
+      </div>
+
+      <div id="step-2" class="ek-card cy-card ek-hidden" data-ek-beat="2">
+        <h3>Chặng 2 · 5C → 4C</h3>
+        <p>Tách CO₂, tạo ATP, FADH₂ và tái sinh 4C.</p>
+      </div>
+
+      <div id="prod-card" class="ek-card cy-prod ek-hidden" data-ek-beat="3">
+        <h3>Sản phẩm 1 vòng Krebs</h3>
+        <div class="cy-grid">
+          <div class="cy-metric"><span id="c-co2" class="ek-num cy-n ek-c-ink">0</span><span class="cy-u">CO₂</span></div>
+          <div class="cy-metric"><span id="c-nadh" class="ek-num cy-n ek-c-tim">0</span><span class="cy-u">NADH</span></div>
+          <div class="cy-metric"><span id="c-fadh" class="ek-num cy-n ek-c-xanhLa">0</span><span class="cy-u">FADH₂</span></div>
+          <div class="cy-metric"><span id="c-atp" class="ek-num cy-n ek-c-doSon">0</span><span class="cy-u">ATP</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cy-box { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+  .cy-in-line { fill: none; stroke: var(--c-doSon); stroke-width: 6px; stroke-linecap: round; }
+  .cy-ring { fill: none; stroke: var(--grid); stroke-width: 10px; }
+  .cy-arc { fill: none; stroke-width: 8px; stroke-linecap: round; }
+  .cy-branch { fill: none; stroke-width: 4px; stroke-linecap: round; }
+  .cy-pill { fill: var(--surface); stroke-width: 4px; }
+  .cy-node-txt { font-size: 36px; font-weight: 700; fill: var(--ink); }
+  .cy-tag { font-size: 36px; font-weight: 700; }
+  .cy-out { font-size: 36px; font-weight: 600; }
+  .cy-center { font-size: 40px; font-weight: 700; fill: var(--accent); letter-spacing: 0.04em; }
+  .cy-center-sub { font-size: 38px; font-weight: 600; fill: var(--ink2); }
+  .cy-dot { stroke: var(--surface); stroke-width: 4px; }
+  .cy-stack { display: flex; flex-direction: column; gap: 18px; }
+  .cy-card { padding: 18px 26px; }
+  .cy-card h3 { font-size: 38px; margin-bottom: 6px; }
+  .cy-card p { font-size: 36px; line-height: 1.3; }
+  .cy-prod { padding: 20px 26px; }
+  .cy-prod h3 { font-size: 38px; margin-bottom: 14px; }
+  .cy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .cy-metric { background: var(--sunken); border-radius: 12px; padding: 12px 18px; display: flex; align-items: baseline; justify-content: space-between; }
+  .cy-n { font-size: 56px; }
+  .cy-u { font-size: 38px; font-weight: 700; color: var(--ink2); }
+</style>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  // Beat 0 (0 - 4.6s): Đưa Acetyl-CoA (2C) vào kết hợp 4C tạo Citrate (6C)
+  EK.draw(tl, "#in-path", 0.3, 1.0);
+  EK.draw(tl, "#arc-4", 1.2, 1.4);
+  EK.mark(tl, "#tt .kw", 1.8, "highlight", { color: "lam" });
+
+  // Beat 1 (4.6 - 9.2s): Chặng 1 (6C -> 5C) — chấm chạy cung 1 + hiện CO2 & NADH
+  EK.enter(tl, "#step-1", EK.cue(1), { from: "right", dur: 0.55 });
+  EK.draw(tl, "#arc-1", 4.8, 2.2);
+  EK.follow(tl, "#cycle-dot", "#arc-1", 4.8, 2.4);
+  EK.enter(tl, "#node-5c", 6.4, { from: "scale", dur: 0.55 });
+  EK.draw(tl, "#out-1", 6.8, 0.8);
+  EK.enter(tl, "#lbl-out-1, #lbl-out-1b", 7.2, { from: "left", stagger: 0.2 });
+
+  // Beat 2 (9.2 - 13.8s): Chặng 2 (5C -> 4C -> tái sinh 4C)
+  EK.enter(tl, "#step-2", EK.cue(2), { from: "right", dur: 0.55 });
+  EK.draw(tl, "#arc-2", 9.4, 1.8);
+  EK.follow(tl, "#cycle-dot", "#arc-2", 9.4, 2.0);
+  EK.enter(tl, "#node-4c", 10.8, { from: "scale", dur: 0.5 });
+  EK.draw(tl, "#out-2", 11.0, 0.7);
+  EK.enter(tl, "#lbl-out-2, #lbl-out-2b", 11.3, { from: "left", stagger: 0.2 });
+  EK.draw(tl, "#arc-3", 11.5, 1.8);
+  EK.follow(tl, "#cycle-dot", "#arc-3", 11.5, 2.0);
+  EK.draw(tl, "#out-3", 12.6, 0.7);
+  EK.enter(tl, "#lbl-out-3, #lbl-out-3b", 12.9, { from: "right", stagger: 0.2 });
+
+  // Beat 3 (13.8 - 18.0s): Khép kín vòng tới rìa ngoài Citrate + đếm tổng sản phẩm
+  EK.enter(tl, "#prod-card", EK.cue(3), { from: "up", dur: 0.55 });
+  EK.follow(tl, "#cycle-dot", "#arc-4", 14.0, 2.2);
+  EK.count(tl, "#c-co2", 0, 2, 14.3, 0.9, { decimals: 0 });
+  EK.count(tl, "#c-nadh", 0, 3, 14.6, 1.0, { decimals: 0 });
+  EK.count(tl, "#c-fadh", 0, 1, 14.9, 0.8, { decimals: 0 });
+  EK.count(tl, "#c-atp", 0, 1, 15.2, 0.8, { decimals: 0 });
+  EK.mark(tl, "#prod-card h3", 16.0, "highlight", { color: "xanhLa" });
+
+  window.__timelines["main"] = tl;
+</script>

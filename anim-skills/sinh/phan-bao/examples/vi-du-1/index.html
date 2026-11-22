@@ -1,0 +1,226 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-8" style="top:54px">SINH HỌC 10 · CHU KÌ TẾ BÀO &amp; PHÂN BÀO</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:96px">Nguyên phân ở tế bào lưỡng bội <span class="kw">2n = 4</span></h1>
+
+  <div class="ek-stage">
+    <!-- Cột 1-7: Sơ đồ tế bào biến hình liên tục bằng MorphSVG -->
+    <div id="cell-panel" class="pb-canvas ek-col-1 ek-span-7" style="top:196px;height:700px" data-ek-beat="0">
+      <svg id="cell-svg" viewBox="0 0 970 700" width="970" height="700">
+        <!-- Đường xích đạo tham chiếu (hiện ở Kì giữa) -->
+        <line id="equator" x1="485" y1="80" x2="485" y2="610" class="pb-eq ek-hidden" />
+
+        <!-- Màng tế bào chính biến hình liên tục qua 4 kì bằng MorphSVG -->
+        <path id="cell-membrane" class="pb-membrane" d="M485,80 C650,80 760,195 760,345 C760,495 650,610 485,610 C320,610 210,495 210,345 C210,195 320,80 485,80 Z" />
+
+        <!-- Thoi phân bào (đặt trên màng để luôn rõ sợi thoi, vẽ bằng EK.draw) -->
+        <g id="spindle-group">
+          <path class="pb-spindle" d="M135,345 Q310,175 485,180 Q660,175 835,345" />
+          <path class="pb-spindle" d="M135,345 Q310,285 485,290 Q660,285 835,345" />
+          <path class="pb-spindle" d="M135,345 Q310,405 485,400 Q660,405 835,345" />
+          <path class="pb-spindle" d="M135,345 Q310,515 485,510 Q660,515 835,345" />
+        </g>
+
+        <!-- Các hình mục tiêu MorphSVG ẩn -->
+        <g class="ek-hidden" aria-hidden="true">
+          <path id="mem-meta" d="M485,78 C675,78 795,195 795,345 C795,495 675,612 485,612 C295,612 175,495 175,345 C175,195 295,78 485,78 Z" />
+          <path id="mem-ana" d="M485,120 C685,112 870,190 870,345 C870,500 685,578 485,570 C285,578 100,500 100,345 C100,190 285,112 485,120 Z" />
+          <path id="mem-telo" d="M485,255 C555,140 675,110 770,145 C860,180 895,255 895,345 C895,435 860,510 770,545 C675,580 555,550 485,435 C415,550 295,580 200,545 C110,510 75,435 75,345 C75,255 110,180 200,145 C295,110 415,140 485,255 Z" />
+          <path id="chr-left-long-v" d="M-18,-42 L6,0 L-18,42" />
+          <path id="chr-right-long-v" d="M18,-42 L-6,0 L18,42" />
+          <path id="chr-left-short-v" d="M-14,-28 L6,0 L-14,28" />
+          <path id="chr-right-short-v" d="M14,-28 L-6,0 L14,28" />
+        </g>
+
+        <!-- Màng nhân nét đứt ở Kì đầu & 2 màng nhân con ở Kì cuối -->
+        <circle id="nuc-pro" cx="485" cy="345" r="195" class="pb-nucleus" />
+        <circle id="nuc-left" cx="265" cy="345" r="155" class="pb-nucleus-new ek-hidden" />
+        <circle id="nuc-right" cx="705" cy="345" r="155" class="pb-nucleus-new ek-hidden" />
+
+        <!-- Hai trung thể ở 2 cực -->
+        <circle id="pole-l" cx="135" cy="345" r="11" class="ek-fill-ink" />
+        <circle id="pole-r" cx="835" cy="345" r="11" class="ek-fill-ink" />
+
+        <!-- ĐÚNG 4 NST KÉP (không dùng thuộc tính transform SVG tĩnh; vị trí đặt thuần qua GSAP x/y để không lệch toạ độ) -->
+        <!-- Cặp 1 dài (lam): NST 1 và NST 2 -->
+        <g id="chr1-l" class="chr-arm">
+          <path id="chr1-l-p" class="pb-chr ek-stroke-lam" d="M-14,-42 Q0,-10 -2,0 Q0,10 -14,42" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+        <g id="chr1-r" class="chr-arm">
+          <path id="chr1-r-p" class="pb-chr ek-stroke-lam" d="M14,-42 Q0,-10 2,0 Q0,10 14,42" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+
+        <g id="chr2-l" class="chr-arm">
+          <path id="chr2-l-p" class="pb-chr ek-stroke-lam" d="M-14,-42 Q0,-10 -2,0 Q0,10 -14,42" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+        <g id="chr2-r" class="chr-arm">
+          <path id="chr2-r-p" class="pb-chr ek-stroke-lam" d="M14,-42 Q0,-10 2,0 Q0,10 14,42" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+
+        <!-- Cặp 2 ngắn (tím): NST 3 và NST 4 -->
+        <g id="chr3-l" class="chr-arm">
+          <path id="chr3-l-p" class="pb-chr ek-stroke-tim" d="M-11,-28 Q0,-7 -2,0 Q0,7 -11,28" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+        <g id="chr3-r" class="chr-arm">
+          <path id="chr3-r-p" class="pb-chr ek-stroke-tim" d="M11,-28 Q0,-7 2,0 Q0,7 11,28" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+
+        <g id="chr4-l" class="chr-arm">
+          <path id="chr4-l-p" class="pb-chr ek-stroke-tim" d="M-11,-28 Q0,-7 -2,0 Q0,7 -11,28" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+        <g id="chr4-r" class="chr-arm">
+          <path id="chr4-r-p" class="pb-chr ek-stroke-tim" d="M11,-28 Q0,-7 2,0 Q0,7 11,28" />
+          <circle cx="0" cy="0" r="8" class="ek-fill-doSon" />
+        </g>
+
+        <text x="485" y="668" text-anchor="middle" class="pb-svg-cap">Lam: cặp NST 1 · Tím: cặp NST 2 · Đỏ: tâm động</text>
+      </svg>
+    </div>
+
+    <!-- Cột 8-12: Bảng đếm định lượng (tách lớp riêng với stack thẻ bên dưới, không bao giờ chạm viền) -->
+    <div id="stats-box" class="pb-stats ek-col-8 ek-span-5" style="top:196px">
+      <div class="pb-stat">
+        <div class="pb-stat-lbl">Số NST</div>
+        <div class="pb-num-slot">
+          <span id="cnt-nst" class="ek-num pb-num">4</span>
+          <span id="cnt-nst-end" class="ek-num pb-num ek-c-xanhLa ek-hidden">4</span>
+        </div>
+      </div>
+      <div class="pb-stat">
+        <div class="pb-stat-lbl">Crômatit</div>
+        <div class="pb-num-slot">
+          <span id="cnt-cro" class="ek-num pb-num ek-c-tim">8</span>
+        </div>
+      </div>
+      <div class="pb-stat">
+        <div class="pb-stat-lbl">Tâm động</div>
+        <div class="pb-num-slot">
+          <span id="cnt-td" class="ek-num pb-num ek-c-doSon">4</span>
+          <span id="cnt-td-end" class="ek-num pb-num ek-c-xanhLa ek-hidden">4</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="phase-stack" class="pb-stack ek-col-8 ek-span-5" style="top:346px">
+      <div id="card-0" class="ek-card pb-card">
+        <h3>1. Kì đầu · 4 NST kép</h3>
+        <p>8 crômatit co xoắn; màng nhân mờ.</p>
+      </div>
+      <div id="card-1" class="ek-card pb-card ek-hidden" data-ek-beat="1">
+        <h3>2. Kì giữa · Xếp 1 hàng</h3>
+        <p>4 NST kép xếp 1 hàng ở xích đạo.</p>
+      </div>
+      <div id="card-2" class="ek-card pb-card ek-hidden" data-ek-beat="2">
+        <h3>3. Kì sau · 8 NST đơn</h3>
+        <p>Tách tâm động: 0 crômatit, 2 cực.</p>
+      </div>
+      <div id="card-3" class="ek-card pb-card ek-hidden" data-ek-beat="3">
+        <h3>4. Kì cuối · 2 tế bào con</h3>
+        <p>Mỗi tế bào con giữ đúng 4 NST đơn.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pb-canvas { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+  .pb-membrane { fill: var(--sunken); stroke: var(--accent); stroke-width: 6px; }
+  .pb-nucleus { fill: none; stroke: var(--ink3); stroke-width: 3px; stroke-dasharray: 12 10; }
+  .pb-nucleus-new { fill: none; stroke: var(--c-xanhLa); stroke-width: 4px; stroke-dasharray: 10 8; }
+  .pb-eq { stroke: var(--ink3); stroke-width: 3px; stroke-dasharray: 8 8; }
+  .pb-spindle { fill: none; stroke: var(--line); stroke-width: 3px; }
+  .pb-chr { fill: none; stroke-width: 11px; stroke-linecap: round; stroke-linejoin: round; }
+  .pb-svg-cap { font-size: 36px; fill: var(--ink2); font-weight: 500; }
+  .pb-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .pb-stat { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 10px 10px 12px; text-align: center; box-shadow: var(--shadow); }
+  .pb-stat-lbl { font-size: 36px; font-weight: 600; color: var(--ink2); line-height: 1.1; margin-bottom: 4px; }
+  .pb-num-slot { position: relative; height: 58px; display: flex; align-items: center; justify-content: center; }
+  .pb-num { position: absolute; font-size: 54px; line-height: 1; }
+  .pb-stack { display: flex; flex-direction: column; gap: 14px; }
+  .pb-card { padding: 12px 22px 14px; }
+  .pb-card h3 { font-size: 36px; line-height: 1.18; margin-bottom: 4px; }
+  .pb-card p { font-size: 36px; line-height: 1.22; }
+</style>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  // Vị trí khởi đầu Kì đầu (toạ độ tuyệt đối trong viewBox 970×700)
+  tl.set(["#chr1-l", "#chr1-r"], { x: 410, y: 235 }, 0);
+  tl.set(["#chr2-l", "#chr2-r"], { x: 560, y: 265 }, 0);
+  tl.set(["#chr3-l", "#chr3-r"], { x: 420, y: 440 }, 0);
+  tl.set(["#chr4-l", "#chr4-r"], { x: 555, y: 455 }, 0);
+
+  // Beat 0 (0 - 4.5s): Kì đầu — vẽ thoi phân bào, nhấn thẻ Kì đầu, màng nhân mờ dần
+  EK.draw(tl, ".pb-spindle", 0.3, 1.8);
+  EK.mark(tl, "#card-0 h3", 0.8, "highlight", { color: "lam" });
+  tl.to("#nuc-pro", { opacity: 0.25, duration: 1.6, ease: "power2.inOut" }, 2.2);
+
+  // Beat 1 (4.5 - 9.0s): Kì giữa — 4 NST kép xếp đúng 1 hàng dọc tại mặt phẳng xích đạo x = 485
+  EK.enter(tl, "#card-1", EK.cue(1), { from: "right", dur: 0.5 });
+  EK.morph(tl, "#cell-membrane", "#mem-meta", 4.6, 1.4);
+  tl.to("#nuc-pro", { opacity: 0, duration: 0.6, ease: "power2.in" }, 4.6);
+  tl.to("#equator", { opacity: 1, duration: 0.6, ease: "power2.out" }, 4.8);
+  tl.to(["#chr1-l", "#chr1-r"], { x: 485, y: 180, duration: 1.5, ease: "power3.inOut" }, 4.8);
+  tl.to(["#chr2-l", "#chr2-r"], { x: 485, y: 290, duration: 1.5, ease: "power3.inOut" }, 4.8);
+  tl.to(["#chr3-l", "#chr3-r"], { x: 485, y: 400, duration: 1.5, ease: "power3.inOut" }, 4.8);
+  tl.to(["#chr4-l", "#chr4-r"], { x: 485, y: 500, duration: 1.5, ease: "power3.inOut" }, 4.8);
+  EK.mark(tl, "#card-1 h3", 5.8, "highlight", { color: "lam" });
+  tl.to("#card-0", { opacity: 0.45, duration: 0.5, ease: "power2.inOut" }, 4.8);
+
+  // Beat 2 (9.0 - 13.8s): Kì sau — MorphSVG kéo dài màng + tách 4 NST kép thành 8 NST đơn hình V về 2 cực (x = 275 & 695)
+  EK.enter(tl, "#card-2", EK.cue(2), { from: "right", dur: 0.5 });
+  tl.to("#card-1", { opacity: 0.45, duration: 0.5, ease: "power2.inOut" }, 9.2);
+  tl.to("#equator", { opacity: 0, duration: 0.4, ease: "power2.in" }, 9.2);
+  EK.morph(tl, "#cell-membrane", "#mem-ana", 9.2, 1.6);
+  EK.morph(tl, "#chr1-l-p", "#chr-left-long-v", 9.3, 1.0);
+  EK.morph(tl, "#chr1-r-p", "#chr-right-long-v", 9.3, 1.0);
+  EK.morph(tl, "#chr2-l-p", "#chr-left-long-v", 9.3, 1.0);
+  EK.morph(tl, "#chr2-r-p", "#chr-right-long-v", 9.3, 1.0);
+  EK.morph(tl, "#chr3-l-p", "#chr-left-short-v", 9.3, 1.0);
+  EK.morph(tl, "#chr3-r-p", "#chr-right-short-v", 9.3, 1.0);
+  EK.morph(tl, "#chr4-l-p", "#chr-left-short-v", 9.3, 1.0);
+  EK.morph(tl, "#chr4-r-p", "#chr-right-short-v", 9.3, 1.0);
+
+  tl.to("#chr1-l", { x: 280, y: 215, duration: 2.0, ease: "power3.inOut" }, 9.4);
+  tl.to("#chr1-r", { x: 690, y: 215, duration: 2.0, ease: "power3.inOut" }, 9.4);
+  tl.to("#chr2-l", { x: 260, y: 305, duration: 2.0, ease: "power3.inOut" }, 9.4);
+  tl.to("#chr2-r", { x: 710, y: 305, duration: 2.0, ease: "power3.inOut" }, 9.4);
+  tl.to("#chr3-l", { x: 260, y: 395, duration: 2.0, ease: "power3.inOut" }, 9.4);
+  tl.to("#chr3-r", { x: 710, y: 395, duration: 2.0, ease: "power3.inOut" }, 9.4);
+  tl.to("#chr4-l", { x: 280, y: 470, duration: 2.0, ease: "power3.inOut" }, 9.4);
+  tl.to("#chr4-r", { x: 690, y: 470, duration: 2.0, ease: "power3.inOut" }, 9.4);
+
+  // Đếm chính xác một chiều: NST 4 -> 8, Crômatit 8 -> 0, Tâm động 4 -> 8
+  EK.count(tl, "#cnt-nst", 4, 8, 9.6, 1.0, { decimals: 0 });
+  EK.count(tl, "#cnt-cro", 8, 0, 9.6, 1.0, { decimals: 0 });
+  EK.count(tl, "#cnt-td", 4, 8, 9.6, 1.0, { decimals: 0 });
+  EK.mark(tl, "#card-2 h3", 10.6, "highlight", { color: "doSon" });
+
+  // Beat 3 (13.8 - 18.0s): Kì cuối — MorphSVG thắt eo tách 2 tế bào con, thu 4 NST đơn vào trong 2 nhân con (265, 345) & (705, 345)
+  EK.enter(tl, "#card-3", EK.cue(3), { from: "right", dur: 0.5 });
+  tl.to("#card-2", { opacity: 0.45, duration: 0.5, ease: "power2.inOut" }, 14.0);
+  EK.morph(tl, "#cell-membrane", "#mem-telo", 14.0, 1.8);
+  tl.to(".pb-spindle", { opacity: 0.15, duration: 0.8, ease: "power2.in" }, 14.0);
+  tl.to("#chr1-l", { x: 235, y: 270, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to("#chr2-l", { x: 305, y: 280, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to("#chr3-l", { x: 235, y: 405, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to("#chr4-l", { x: 305, y: 410, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to("#chr1-r", { x: 665, y: 270, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to("#chr2-r", { x: 735, y: 280, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to("#chr3-r", { x: 665, y: 405, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to("#chr4-r", { x: 735, y: 410, duration: 1.2, ease: "power3.inOut" }, 14.2);
+  tl.to(["#nuc-left", "#nuc-right"], { opacity: 1, duration: 1.0, ease: "power2.out" }, 14.8);
+  // Chuyển bộ đếm về 4 NST đơn & 4 tâm động trên mỗi tế bào con (dùng crossfade tránh ghi đè immediateRender của EK.count)
+  tl.to(["#cnt-nst", "#cnt-td"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 14.8);
+  tl.to(["#cnt-nst-end", "#cnt-td-end"], { opacity: 1, duration: 0.5, ease: "power2.out" }, 15.0);
+  EK.mark(tl, "#card-3 h3", 15.6, "highlight", { color: "xanhLa" });
+
+  window.__timelines["main"] = tl;
+</script>

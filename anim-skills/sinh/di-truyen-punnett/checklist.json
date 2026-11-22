@@ -1,0 +1,13 @@
+{
+  "requires": [
+    { "selector": ".punnett-grid", "min": 1 },
+    { "selector": ".punnett-cell", "min": 4, "max": 16 },
+    { "selector": ".ek-num", "min": 1 }
+  ],
+  "motion": [
+    { "kind": "staysInFrame", "selector": ".ek-label" },
+    { "kind": "keepsMoving", "maxStaticSec": 4 }
+  ],
+  "limits": { "cameraMoves": 0, "labels": 14, "minFontPx": 36 },
+  "data": { "placesFromGazetteer": false, "numbersFromSpeech": true }
+}

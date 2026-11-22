@@ -1,0 +1,118 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">KHTN 8 · HỆ TUẦN HOÀN Ở NGƯỜI</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:96px">Hai <span class="kw">vòng tuần hoàn</span> máu ở người</h1>
+
+  <div class="ek-stage">
+    <!-- Cột 1-7: Sơ đồ nét giải phẫu học thuật (tâm phải ở bên trái màn hình đúng chuẩn y sinh) -->
+    <div id="organ-panel" class="hq-panel ek-col-1 ek-span-7" style="top:200px;height:690px" data-ek-beat="0">
+      <svg id="organ-svg" viewBox="0 0 970 690" width="970" height="690">
+        <!-- Đường mạch Vòng tuần hoàn nhỏ (nối gọn mép ngoài Phổi x=305 & 665) -->
+        <path id="loop-small-1" class="organ-flow hq-vessel ek-stroke-lam" d="M350,395 C175,395 160,68 305,68" />
+        <path id="loop-small-2" class="organ-flow hq-vessel ek-stroke-doSon" d="M665,68 C810,68 795,295 620,295" />
+
+        <!-- Đường mạch Vòng tuần hoàn lớn (nối gọn mép ngoài hộp Cơ quan x=710 & 260) -->
+        <path id="loop-big-1" class="organ-flow hq-vessel ek-stroke-doSon" d="M620,395 C835,395 840,620 710,620" />
+        <path id="loop-big-2" class="organ-flow hq-vessel ek-stroke-lam" d="M260,620 C130,620 140,295 350,295" />
+
+        <!-- Phổi (trên) -->
+        <rect x="305" y="28" width="360" height="80" rx="40" class="hq-organ ek-soft-lucLam ek-stroke-lucLam" />
+        <text x="485" y="81" text-anchor="middle" class="hq-lbl ek-fill-lucLam">PHỔI (nhận O₂)</text>
+
+        <!-- Tim 4 ngăn (sơ đồ nét 2x2 chuẩn giải phẫu) -->
+        <rect x="350" y="242" width="135" height="104" rx="12" class="hq-chamber ek-soft-lam ek-stroke-lam" />
+        <text x="417" y="306" text-anchor="middle" class="hq-ch-txt ek-fill-lam">Nhĩ P</text>
+
+        <rect x="485" y="242" width="135" height="104" rx="12" class="hq-chamber ek-soft-doSon ek-stroke-doSon" />
+        <text x="552" y="306" text-anchor="middle" class="hq-ch-txt ek-fill-doSon">Nhĩ T</text>
+
+        <rect x="350" y="346" width="135" height="104" rx="12" class="hq-chamber ek-soft-lam ek-stroke-lam" />
+        <text x="417" y="410" text-anchor="middle" class="hq-ch-txt ek-fill-lam">Thất P</text>
+
+        <rect x="485" y="346" width="135" height="104" rx="12" class="hq-chamber ek-soft-doSon ek-stroke-doSon" />
+        <text x="552" y="410" text-anchor="middle" class="hq-ch-txt ek-fill-doSon">Thất T</text>
+
+        <!-- Cơ quan trong cơ thể (dưới, rộng 450px nối mép ngoài x=260..710) -->
+        <rect x="260" y="578" width="450" height="82" rx="41" class="hq-organ ek-soft-tim ek-stroke-tim" />
+        <text x="485" y="632" text-anchor="middle" class="hq-lbl ek-fill-tim">CÁC CƠ QUAN (dùng O₂)</text>
+
+        <!-- Chấm dòng máu di chuyển theo MotionPath -->
+        <circle id="dot-small" cx="350" cy="395" r="14" class="flow-dot ek-fill-lam hq-dot ek-hidden" />
+        <circle id="dot-big" cx="620" cy="395" r="14" class="flow-dot ek-fill-doSon hq-dot ek-hidden" />
+      </svg>
+    </div>
+
+    <!-- Cột 8-12: Flex stack chú giải + 3 thẻ với khoảng hở sạch -->
+    <div class="hq-stack ek-col-8 ek-span-5" style="top:200px">
+      <div id="hq-legend" class="hq-legend">
+        <div class="hq-leg-item"><span class="hq-sw hq-sw-do"></span><span>Máu giàu O₂ (đỏ son)</span></div>
+        <div class="hq-leg-item"><span class="hq-sw hq-sw-lam"></span><span>Máu giàu CO₂ (xanh lam)</span></div>
+      </div>
+
+      <div id="hq-c1" class="ek-card hq-card ek-hidden" data-ek-beat="1">
+        <h3 class="ek-c-lucLam">Vòng tuần hoàn nhỏ</h3>
+        <p>Thất phải → Phổi (nhận O₂) → Nhĩ trái.</p>
+      </div>
+
+      <div id="hq-c2" class="ek-card hq-card ek-hidden" data-ek-beat="2">
+        <h3 class="ek-c-doSon">Vòng tuần hoàn lớn</h3>
+        <p>Thất trái → Cơ quan (giao O₂) → Nhĩ phải.</p>
+      </div>
+
+      <div id="hq-c3" class="ek-card hq-card ek-hidden" data-ek-beat="3">
+        <h3 class="ek-c-lam">Tuần hoàn kép khép kín</h3>
+        <p>Tim 4 ngăn giúp máu chảy một chiều, tách biệt.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hq-panel { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+  .hq-organ { stroke-width: 4px; }
+  .hq-chamber { stroke-width: 4px; }
+  .hq-lbl { font-size: 36px; font-weight: 700; }
+  .hq-ch-txt { font-size: 36px; font-weight: 700; }
+  .hq-vessel { fill: none; stroke-width: 8px; stroke-linecap: round; }
+  .hq-dot { stroke: var(--surface); stroke-width: 4px; }
+  .hq-stack { display: flex; flex-direction: column; gap: 16px; }
+  .hq-legend { background: var(--surface); border: 2px solid var(--line); border-radius: 14px; padding: 14px 22px; display: flex; flex-direction: column; gap: 8px; box-shadow: var(--shadow); }
+  .hq-leg-item { display: flex; align-items: center; gap: 14px; font-size: 36px; font-weight: 600; color: var(--ink); }
+  .hq-sw { width: 26px; height: 26px; border-radius: 50%; flex: none; }
+  .hq-sw-do { background: var(--c-doSon); }
+  .hq-sw-lam { background: var(--c-lam); }
+  .hq-card { padding: 14px 24px 16px; }
+  .hq-card h3 { font-size: 38px; margin-bottom: 4px; }
+  .hq-card p { font-size: 36px; line-height: 1.28; }
+</style>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  // Beat 0 (0 - 4.5s): Nhấn sơ đồ tim 4 ngăn
+  EK.mark(tl, "#tt .kw", 0.6, "highlight", { color: "lam" });
+  EK.enter(tl, "#hq-legend", 1.2, { from: "right", dur: 0.6 });
+
+  // Beat 1 (4.5 - 9.3s): Vòng tuần hoàn nhỏ (Thất phải -> Phổi -> Nhĩ trái)
+  EK.enter(tl, "#hq-c1", EK.cue(1), { from: "right", dur: 0.55 });
+  EK.draw(tl, "#loop-small-1", 4.7, 1.5);
+  tl.set("#dot-small", { opacity: 1 }, 4.8);
+  EK.follow(tl, "#dot-small", "#loop-small-1", 4.8, 1.8);
+  EK.tint(tl, "#dot-small", 6.7, "doSon", { prop: "fill", dur: 0.35 });
+  EK.draw(tl, "#loop-small-2", 6.8, 1.5);
+  EK.follow(tl, "#dot-small", "#loop-small-2", 6.9, 1.8);
+
+  // Beat 2 (9.3 - 14.1s): Vòng tuần hoàn lớn (Thất trái -> Cơ quan -> Nhĩ phải)
+  EK.enter(tl, "#hq-c2", EK.cue(2), { from: "right", dur: 0.55 });
+  EK.draw(tl, "#loop-big-1", 9.5, 1.5);
+  tl.set("#dot-big", { opacity: 1 }, 9.6);
+  EK.follow(tl, "#dot-big", "#loop-big-1", 9.6, 1.8);
+  EK.tint(tl, "#dot-big", 11.5, "lam", { prop: "fill", dur: 0.35 });
+  EK.draw(tl, "#loop-big-2", 11.6, 1.5);
+  EK.follow(tl, "#dot-big", "#loop-big-2", 11.7, 1.8);
+
+  // Beat 3 (14.1 - 18.0s): Tổng kết tuần hoàn kép
+  EK.enter(tl, "#hq-c3", EK.cue(3), { from: "up", dur: 0.55 });
+  EK.mark(tl, "#hq-c3 h3", 15.0, "highlight", { color: "lam" });
+
+  window.__timelines["main"] = tl;
+</script>

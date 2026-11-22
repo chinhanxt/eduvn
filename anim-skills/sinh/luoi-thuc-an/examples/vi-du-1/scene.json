@@ -1,0 +1,12 @@
+{
+  "subject": "sinh",
+  "grade": 12,
+  "title": "Lưới thức ăn và tháp năng lượng đồng cỏ",
+  "slideText": "Lưới thức ăn đồng cỏ: Cỏ -> Châu chấu, Thỏ -> Ếch, Rắn -> Đại bàng. Tháp năng lượng (hiệu suất 10%): Bậc 1: 10.000 kcal -> Bậc 2: 1.000 kcal -> Bậc 3: 100 kcal -> Bậc 4: 10 kcal.",
+  "speech": [
+    { "text": "Ở bậc dinh dưỡng một, sinh vật sản xuất là cỏ tích luỹ mười nghìn kilocalo năng lượng làm nền tảng của lưới thức ăn.", "durationMs": 4500 },
+    { "text": "Châu chấu và thỏ ăn cỏ là sinh vật tiêu thụ bậc một, chỉ nhận được khoảng mười phần trăm tức một nghìn kilocalo.", "durationMs": 4500 },
+    { "text": "Năng lượng tiếp tục truyền lên ếch và rắn còn một trăm kilocalo, rồi tới đại bàng ở đỉnh chỉ còn mười kilocalo.", "durationMs": 4600 },
+    { "text": "Vì chín mươi phần trăm năng lượng mất qua hô hấp và toả nhiệt ở mỗi bậc, tháp năng lượng luôn thu hẹp dần lên đỉnh.", "durationMs": 4400 }
+  ]
+}

@@ -1,0 +1,107 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">KHTN 6 · TẾ BÀO — ĐƠN VỊ CƠ SỞ CỦA SỰ SỐNG</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:96px">Cấu tạo <span class="kw">tế bào thực vật</span></h1>
+
+  <div class="ek-world">
+    <div class="ek-stage">
+      <!-- Sơ đồ nét tế bào thực vật + đường dẫn chú thích thẳng hàng không cắt chéo -->
+      <div id="cell-board" class="ct-board" style="left:160px;top:210px;width:1600px;height:660px" data-ek-beat="0">
+        <svg id="cell-anatomy-svg" viewBox="0 0 1600 660" width="1600" height="660">
+          <!-- Khung tế bào thực vật hình lục giác bo góc -->
+          <path id="cell-wall" class="ct-wall" d="M180,82 L730,82 L812,196 L812,464 L730,578 L180,578 L98,464 L98,196 Z" />
+          <path id="cell-mem" class="ct-mem" d="M202,106 L708,106 L782,210 L782,450 L708,554 L202,554 L128,450 L128,210 Z" />
+
+          <!-- Không bào lớn trung tâm -->
+          <path id="vacuole" class="ct-vac ek-hidden" d="M315,246 C420,198 615,212 662,320 C700,412 628,504 486,512 C345,522 258,454 268,348 C275,300 282,262 315,246 Z" />
+
+          <!-- Nhân tế bào -->
+          <g id="nucleus" class="ek-hidden">
+            <circle cx="255" cy="232" r="72" class="ct-nuc" />
+            <circle cx="255" cy="232" r="22" class="ek-fill-tim" />
+          </g>
+
+          <!-- Các lục lạp xanh (lục lạp chính #chloroplast-main ở phía phải trên) -->
+          <g id="chloroplast-sub" class="ek-hidden">
+            <ellipse cx="222" cy="442" rx="50" ry="28" class="ct-chl" />
+            <line x1="192" y1="442" x2="252" y2="442" class="ct-chl-in" />
+          </g>
+
+          <g id="chloroplast-main" class="ek-hidden">
+            <ellipse cx="640" cy="210" rx="70" ry="40" class="ct-chl-focus" />
+            <rect x="598" y="192" width="22" height="36" rx="4" class="ek-fill-xanhLa" />
+            <rect x="628" y="188" width="22" height="44" rx="4" class="ek-fill-xanhLa" />
+            <rect x="658" y="194" width="22" height="32" rx="4" class="ek-fill-xanhLa" />
+          </g>
+
+          <!-- Đường dẫn chú thích .ek-leader không cắt chéo nhau -->
+          <line id="ld-wall" class="ek-leader ct-ld" x1="766" y1="132" x2="965" y2="104" />
+          <circle cx="766" cy="132" r="5" class="ek-fill-ink3" />
+
+          <line id="ld-chl" class="ek-leader ct-ld ek-hidden" x1="710" y1="210" x2="965" y2="210" />
+          <circle id="dot-chl" cx="710" cy="210" r="6" class="ek-fill-xanhLa ek-hidden" />
+
+          <line id="ld-nuc" class="ek-leader ct-ld ek-hidden" x1="322" y1="262" x2="965" y2="316" />
+          <circle id="dot-nuc" cx="322" cy="262" r="5" class="ek-fill-tim ek-hidden" />
+
+          <line id="ld-vac" class="ek-leader ct-ld ek-hidden" x1="664" y1="406" x2="965" y2="420" />
+          <circle id="dot-vac" cx="664" cy="406" r="5" class="ek-fill-lam ek-hidden" />
+        </svg>
+
+        <!-- Nhãn chú thích cột phải (định vị tuyệt đối bên trong #cell-board) -->
+        <div id="lbl-wall" class="ek-label ct-lbl" style="left:984px;top:76px" data-ek-for="#cell-wall">Thành &amp; màng tế bào</div>
+        <div id="lbl-chl" class="ek-label ct-lbl ek-c-xanhLa ek-hidden" style="left:984px;top:182px" data-ek-for="#chloroplast-main" data-ek-beat="1">Lục lạp (quang hợp)</div>
+        <div id="lbl-nuc" class="ek-label ct-lbl ek-c-tim ek-hidden" style="left:984px;top:288px" data-ek-for="#nucleus">Nhân tế bào</div>
+        <div id="lbl-vac" class="ek-label ct-lbl ek-c-lam ek-hidden" style="left:984px;top:394px" data-ek-for="#vacuole">Không bào lớn</div>
+
+        <!-- Thẻ kết luận chức năng lục lạp (Beat 2 + Beat 3) -->
+        <div id="chl-badge" class="ek-card ct-note ek-hidden" style="left:930px;top:468px;width:620px" data-ek-beat="2">
+          <h3 class="ek-c-xanhLa">Trọng tâm: Lục lạp</h3>
+          <p id="chl-desc" class="ek-hidden" data-ek-beat="3">Chứa chất diệp lục hấp thụ ánh sáng, tạo chất dinh dưỡng cho cây.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .ct-board { position: relative; background: var(--surface); border: 2px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+  .ct-wall { fill: var(--sunken); stroke: var(--c-xanhLa); stroke-width: 10px; stroke-linejoin: round; }
+  .ct-mem { fill: var(--bg); stroke: var(--accent); stroke-width: 4px; stroke-dasharray: 12 8; stroke-linejoin: round; }
+  .ct-vac { fill: var(--accent-soft); stroke: var(--c-lam); stroke-width: 4px; }
+  .ct-nuc { fill: var(--sunken); stroke: var(--c-tim); stroke-width: 5px; }
+  .ct-chl { fill: var(--bg); stroke: var(--c-xanhLa); stroke-width: 5px; }
+  .ct-chl-focus { fill: var(--bg); stroke: var(--c-xanhLa); stroke-width: 6px; }
+  .ct-chl-in { stroke: var(--c-xanhLa); stroke-width: 4px; }
+  .ct-ld { stroke-width: 3px; }
+  .ct-lbl { position: absolute; font-size: 40px; }
+  .ct-note { position: absolute; padding: 16px 22px; border-left-color: var(--c-xanhLa); }
+  .ct-note h3 { font-size: 38px; margin-bottom: 4px; }
+  .ct-note p { font-size: 36px; line-height: 1.28; }
+</style>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  // Beat 0 (0 - 4.5s): Vẽ thành tế bào, màng tế bào và đường dẫn đầu tiên
+  EK.draw(tl, "#cell-wall", 0.2, 1.4);
+  EK.draw(tl, "#cell-mem", 1.2, 1.2);
+  EK.draw(tl, "#ld-wall", 2.0, 0.7);
+
+  // Beat 1 (4.5 - 9.3s): Hiện nhân, không bào lớn, lục lạp và các đường dẫn chú thích
+  EK.enter(tl, "#nucleus, #vacuole, #chloroplast-sub, #chloroplast-main", 4.5, { from: "scale", stagger: 0.35 });
+  EK.enter(tl, "#lbl-chl, #lbl-nuc, #lbl-vac", EK.cue(1), { from: "right", stagger: 0.4 });
+  EK.draw(tl, "#ld-chl, #ld-nuc, #ld-vac", 5.2, 0.8);
+  EK.enter(tl, "#dot-chl, #dot-nuc, #dot-vac", 5.8, { from: "fade", dur: 0.4 });
+
+  // Beat 2 (9.3 - 13.9s): Làm mờ các thành phần phụ và phóng chậm ĐÚNG 1 LẦN bằng EK.camera vào lục lạp
+  EK.enter(tl, "#chl-badge", EK.cue(2), { from: "up", dur: 0.55 });
+  tl.to(["#vacuole", "#nucleus", "#chloroplast-sub", "#lbl-wall", "#lbl-nuc", "#lbl-vac", "#ld-wall", "#ld-nuc", "#ld-vac", "#dot-nuc", "#dot-vac"], { opacity: 0.3, duration: 0.8, ease: "power3.inOut" }, 9.6);
+  EK.camera(tl, 9.7, 2.2, { x: -24, y: 10, scale: 1.09 });
+  EK.mark(tl, "#lbl-chl", 11.4, "highlight", { color: "xanhLa" });
+
+  // Beat 3 (13.9 - 18.0s): Hiện nội dung kết luận chức năng quang hợp của lục lạp
+  EK.enter(tl, "#chl-desc", EK.cue(3), { from: "up", dur: 0.6 });
+  EK.mark(tl, "#chl-badge h3", 15.0, "underline", { color: "xanhLa" });
+
+  window.__timelines["main"] = tl;
+</script>

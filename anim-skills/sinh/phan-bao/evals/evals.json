@@ -1,0 +1,81 @@
+{
+  "skill": "phan-bao",
+  "evals": [
+    {
+      "id": "nguyen-phan-2n-4",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Diễn biến nguyên phân ở tế bào 2n = 4",
+        "slideText": "2n = 4. Kì đầu/giữa: 4 NST kép, 8 crômatit, 4 tâm động. Kì sau: 8 NST đơn, 0 crômatit, 8 tâm động. Kì cuối: 2 tế bào con, mỗi tế bào 4 NST đơn.",
+        "speech": [
+          { "text": "Ở kì đầu nguyên phân, tế bào có bốn nhiễm sắc thể kép gồm tám crômatit và bốn tâm động bắt đầu co xoắn.", "durationMs": 4500 },
+          { "text": "Sang kì giữa, bốn nhiễm sắc thể kép xếp thành một hàng ngay ngắn trên mặt phẳng xích đạo.", "durationMs": 4200 },
+          { "text": "Đến kì sau, các crômatit tách nhau ở tâm động tạo tám nhiễm sắc thể đơn, không còn crômatit, tiến về hai cực.", "durationMs": 4800 },
+          { "text": "Cuối cùng ở kì cuối, màng tế bào thắt eo tạo hai tế bào con, mỗi tế bào mang đúng bốn nhiễm sắc thể đơn.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["đếm đúng 4 NST kép -> 8 NST đơn -> 2x4 NST đơn", "số crômatit chuyển 8 -> 0 ở kì sau", "dùng MorphSVG biến hình màng tế bào"]
+    },
+    {
+      "id": "giam-phan-1-lop-10",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Các kì của Giảm phân I",
+        "slideText": "Kì đầu I tiếp hợp -> Kì giữa I xếp 2 hàng -> Kì sau I phân li cặp tương đồng -> Kì cuối I tạo 2 tế bào n kép.",
+        "speech": [
+          { "text": "Ở kì đầu một, các cặp nhiễm sắc thể kép tương đồng bắt đôi tiếp hợp với nhau.", "durationMs": 4000 },
+          { "text": "Đến kì giữa một, chúng xếp thành hai hàng trên mặt phẳng xích đạo của thoi phân bào.", "durationMs": 4200 },
+          { "text": "Ở kì sau một, mỗi nhiễm sắc thể kép phân li về một cực mà không tách tâm động, tạo hai tế bào đơn bội kép.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["xếp 2 hàng ở kì giữa I", "không tách tâm động ở kì sau I"]
+    },
+    {
+      "id": "nguyen-phan-khtn-9",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 9,
+        "title": "Ý nghĩa nguyên phân đối với sinh trưởng",
+        "slideText": "Từ 1 tế bào mẹ 2n tạo 2 tế bào con 2n giống hệt nhau qua 4 kì: đầu, giữa, sau, cuối.",
+        "speech": [
+          { "text": "Nguyên phân trải qua bốn kì liên tiếp giúp một tế bào mẹ lưỡng bội tạo ra hai tế bào con.", "durationMs": 4200 },
+          { "text": "Nhờ xếp một hàng ở kì giữa rồi tách đều ở kì sau, mỗi tế bào con giữ nguyên bộ nhiễm sắc thể hai n.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["đúng mức KHTN 9", "hiển thị 4 kì nguyên phân"]
+    },
+    {
+      "id": "khong-chon-cau-tao-te-bao",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 6,
+        "title": "Các thành phần chính của tế bào thực vật",
+        "slideText": "Thành tế bào, màng sinh chất, tế bào chất, nhân, lục lạp và không bào lớn.",
+        "speech": [
+          { "text": "Tế bào thực vật có thành tế bào cứng bên ngoài, không bào lớn ở giữa và các lục lạp màu xanh.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là cấu tạo tế bào tĩnh, chọn cau-tao-te-bao"]
+    },
+    {
+      "id": "khong-chon-phien-ma",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Quá trình phiên mã tổng hợp mARN",
+        "slideText": "Mạch khuôn ADN 3'->5' làm khuôn tổng hợp mARN 5'->3' theo nguyên tắc bổ sung.",
+        "speech": [
+          { "text": "Enzyme trượt trên mạch khuôn ADN từ ba phẩy đến năm phẩy lắp ghép nucleotide tự do tạo mạch mARN.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là phiên mã, chọn phien-ma-dich-ma"]
+    }
+  ]
+}

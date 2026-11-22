@@ -1,0 +1,12 @@
+{
+  "subject": "sinh",
+  "grade": 8,
+  "title": "Hai vòng tuần hoàn máu ở người",
+  "slideText": "Tim 4 ngăn: Tâm nhĩ phải, Tâm thất phải, Tâm nhĩ trái, Tâm thất trái. Vòng tuần hoàn nhỏ: Tâm thất phải -> Phổi (nhận O2) -> Tâm nhĩ trái. Vòng tuần hoàn lớn: Tâm thất trái -> Cơ quan (cung cấp O2) -> Tâm nhĩ phải.",
+  "speech": [
+    { "text": "Tim người có bốn ngăn tách biệt gồm hai tâm nhĩ ở phía trên và hai tâm thất ở phía dưới, ngăn cách máu giàu và nghèo oxi.", "durationMs": 4500 },
+    { "text": "Ở vòng tuần hoàn nhỏ, máu giàu CO2 từ tâm thất phải đi lên phổi trao đổi khí thành máu giàu oxi rồi trở về tâm nhĩ trái.", "durationMs": 4800 },
+    { "text": "Ở vòng tuần hoàn lớn, máu giàu oxi từ tâm thất trái tới các cơ quan cung cấp dưỡng chất rồi mang CO2 về tâm nhĩ phải.", "durationMs": 4800 },
+    { "text": "Nhờ hai vòng tuần hoàn khép kín này, máu luôn chảy một chiều và không bao giờ bị pha trộn.", "durationMs": 3900 }
+  ]
+}

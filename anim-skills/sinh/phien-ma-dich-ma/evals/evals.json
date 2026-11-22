@@ -1,0 +1,80 @@
+{
+  "skill": "phien-ma-dich-ma",
+  "evals": [
+    {
+      "id": "phien-ma-dich-ma-12",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Từ ADN khuôn đến chuỗi axit amin",
+        "slideText": "ADN khuôn 3'-TAC AAA GGG ATT-5' -> mARN 5'-AUG UUU CCC UAA-3' -> Met - Phe - Pro (3 axit amin sơ khai, 2 liên kết peptit, dừng tại UAA).",
+        "speech": [
+          { "text": "Xét đoạn mạch khuôn ADN chiều ba phẩy đến năm phẩy gồm bốn bộ ba là TAC, AAA, GGG và ATT.", "durationMs": 4500 },
+          { "text": "Trong phiên mã, phân tử mARN chiều năm phẩy đến ba phẩy được tổng hợp bổ sung thành AUG, UUU, CCC và UAA.", "durationMs": 4800 },
+          { "text": "Khi dịch mã, ribôxôm trượt từ mã mở đầu AUG lắp ghép lần lượt ba axit amin là Met, Phe và Pro với hai liên kết peptit.", "durationMs": 5000 },
+          { "text": "Gặp bộ ba kết thúc UAA không mã hoá axit amin, quá trình dịch mã dừng lại hoàn tất chuỗi pôlipeptit.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["khớp 100% bảng mã chuẩn: AUG=Met, UUU=Phe, CCC=Pro, UAA=Stop", "đếm đúng 3 axit amin và 2 liên kết peptit"]
+    },
+    {
+      "id": "khtn-9-phien-ma",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 9,
+        "title": "Nguyên tắc bổ sung trong tổng hợp mARN",
+        "slideText": "Mạch khuôn ADN 3'-ATG CGG TAT-5' -> mARN 5'-UAC GCC AUA-3' (A-U, T-A, G-C, C-G).",
+        "speech": [
+          { "text": "Khi tổng hợp mARN, các nucleotide trên mạch khuôn ADN bắt cặp bổ sung với nucleotide tự do trong môi trường.", "durationMs": 4400 },
+          { "text": "Cụ thể A liên kết với U, T liên kết với A, G liên kết với C và ngược lại để tạo mạch đơn mARN.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["đúng mức KHTN 9", "làm rõ cặp bổ sung A-U, T-A, G-C, C-G"]
+    },
+    {
+      "id": "dot-bien-thay-the-codon",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Ảnh hưởng của đột biến điểm lên chuỗi axit amin",
+        "slideText": "mARN bình thường: AUG UUU CCC -> Met-Phe-Pro; đột biến UUU -> UUA đổi Phe thành Leu.",
+        "speech": [
+          { "text": "Một đột biến thay thế một cặp nucleotide có thể làm đổi bộ ba UUU thành UUA trên phân tử mARN.", "durationMs": 4500 },
+          { "text": "Kết quả axit amin thứ hai bị thay từ Phe sang Leu làm biến đổi cấu trúc chuỗi pôlipeptit.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["hiển thị rõ bộ ba trước/sau", "khớp bảng mã UUU=Phe, UUA=Leu"]
+    },
+    {
+      "id": "khong-chon-punnett-lai",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Lai hai cặp tính trạng phân li độc lập",
+        "slideText": "AaBb × AaBb -> F1 có 9 kiểu gen, 4 kiểu hình theo tỉ lệ 9 : 3 : 3 : 1.",
+        "speech": [
+          { "text": "Khi lai hai cơ thể dị hợp hai cặp gen, đời con phân li kiểu hình theo tỉ lệ chín ba ba một.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là phép lai Mendel, chọn di-truyen-punnett"]
+    },
+    {
+      "id": "khong-chon-tuan-hoan",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 8,
+        "title": "Hệ tiêu hoá ở người",
+        "slideText": "Khoang miệng -> Thực quản -> Dạ dày -> Ruột non -> Ruột già.",
+        "speech": [
+          { "text": "Thức ăn đi qua khoang miệng, xuống thực quản tới dạ dày và được hấp thụ chủ yếu ở ruột non.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là hệ cơ quan, chọn he-co-quan"]
+    }
+  ]
+}

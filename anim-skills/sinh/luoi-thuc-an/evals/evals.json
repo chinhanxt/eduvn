@@ -1,0 +1,80 @@
+{
+  "skill": "luoi-thuc-an",
+  "evals": [
+    {
+      "id": "dong-co-thap-10-phan-tram",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Lưới thức ăn và tháp năng lượng đồng cỏ",
+        "slideText": "Cỏ (10.000 kcal) -> Châu chấu, Thỏ (1.000 kcal) -> Ếch, Rắn (100 kcal) -> Đại bàng (10 kcal). Hiệu suất sinh thái 10%.",
+        "speech": [
+          { "text": "Trong hệ sinh thái đồng cỏ, sinh vật sản xuất là cỏ tích luỹ mười nghìn kilocalo năng lượng ở bậc dinh dưỡng một.", "durationMs": 4500 },
+          { "text": "Châu chấu và thỏ ăn cỏ chỉ nhận khoảng mười phần trăm, tương đương một nghìn kilocalo ở bậc tiêu thụ một.", "durationMs": 4500 },
+          { "text": "Năng lượng tiếp tục truyền lên ếch và rắn còn một trăm kilocalo, rồi tới đại bàng ở đỉnh tháp chỉ còn mười kilocalo.", "durationMs": 4800 },
+          { "text": "Do chín mươi phần trăm năng lượng thất thoát qua hô hấp và nhiệt, tháp năng lượng luôn thu hẹp mạnh về phía đỉnh.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["lưới thức ăn đúng chiều mũi tên", "tháp năng lượng 4 tầng 10.000 -> 1.000 -> 100 -> 10 kcal"]
+    },
+    {
+      "id": "he-sinh-thai-ao-lop-8",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 8,
+        "title": "Chuỗi và lưới thức ăn trong ao nước ngọt",
+        "slideText": "Tảo lục -> Giáp xác, Cá mè -> Cá quả -> Chim bói cá. Bốn bậc dinh dưỡng.",
+        "speech": [
+          { "text": "Trong ao nước ngọt, tảo lục là sinh vật sản xuất làm thức ăn cho giáp xác và cá mè.", "durationMs": 4200 },
+          { "text": "Cá quả ăn giáp xác và cá nhỏ, sau đó bị chim bói cá săn bắt, tạo nên một lưới thức ăn bốn bậc.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["đúng mức KHTN 8", "vẽ mũi tên từ sinh vật bị ăn tới sinh vật ăn"]
+    },
+    {
+      "id": "thap-nang-luong-bien",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Tháp năng lượng hệ sinh thái biển",
+        "slideText": "Thực vật phù du (50.000 kJ) -> Động vật phù du (5.000 kJ) -> Cá nhỏ (500 kJ) -> Cá ngừ (50 kJ).",
+        "speech": [
+          { "text": "Thực vật phù du biển khởi đầu với năm mươi nghìn kilôjun năng lượng.", "durationMs": 4000 },
+          { "text": "Qua mỗi bậc từ động vật phù du đến cá nhỏ và cá ngừ, năng lượng giảm mười lần còn năm nghìn, năm trăm và năm mươi kilôjun.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["đúng số liệu 50.000 -> 5.000 -> 500 -> 50 kJ", "hình tháp thu hẹp chuẩn"]
+    },
+    {
+      "id": "khong-chon-chu-trinh-nito",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Chu trình nitơ trong sinh quyển",
+        "slideText": "N2 khí quyển -> Cố định đạm (NH4+) -> Nitrat hoá (NO3-) -> Thực vật hấp thụ -> Phản nitrat hoá trả về N2.",
+        "speech": [
+          { "text": "Nitơ khí quyển được vi khuẩn cố định thành amoni và nitrat cho cây hấp thụ, rồi quay lại khí quyển nhờ phản nitrat hoá.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là chu trình vật chất khép kín, chọn chu-trinh-sinh-hoc"]
+    },
+    {
+      "id": "khong-chon-he-tuan-hoan",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 8,
+        "title": "Hai vòng tuần hoàn máu ở người",
+        "slideText": "Vòng tuần hoàn nhỏ qua phổi trao đổi khí; vòng tuần hoàn lớn đưa máu giàu O2 nuôi cơ thể.",
+        "speech": [
+          { "text": "Tim co bóp đẩy máu đi theo vòng tuần hoàn nhỏ lên phổi và vòng tuần hoàn lớn tới các cơ quan.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là giải phẫu hệ cơ quan, chọn he-co-quan"]
+    }
+  ]
+}

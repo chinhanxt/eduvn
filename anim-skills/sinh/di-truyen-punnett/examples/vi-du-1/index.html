@@ -1,0 +1,130 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">KHTN 9 · QUY LUẬT PHÂN LI CỦA MENDEL</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:96px">Phép lai một cặp tính trạng <span class="kw">Aa × Aa</span></h1>
+
+  <div class="ek-stage">
+    <!-- Dải quy ước và giao tử (Beat 0) -->
+    <div id="p-banner" class="ek-card pn-banner ek-col-1 ek-span-6" style="top:198px" data-ek-beat="0">
+      <p><b>P:</b> Aa (hạt vàng) × Aa (hạt vàng) &nbsp;·&nbsp; <b>G:</b> ½ A, ½ a</p>
+    </div>
+
+    <!-- Bảng Punnett 2x2 (Beat 1) -->
+    <div id="punnett-wrap" class="punnett-grid ek-col-1 ek-span-6" style="top:312px;height:560px">
+      <div class="pn-head pn-corner">♀ \ ♂</div>
+      <div id="g-top-1" class="pn-head ek-c-lam">A (½)</div>
+      <div id="g-top-2" class="pn-head ek-c-xanhLa">a (½)</div>
+
+      <div id="g-left-1" class="pn-head ek-c-lam">A (½)</div>
+      <div id="cell-AA" class="punnett-cell ek-soft-lam ek-hidden" data-ek-beat="1">
+        <div class="pn-geno ek-c-lam">AA</div>
+        <div class="pn-pheno">Hạt vàng</div>
+      </div>
+      <div id="cell-Aa1" class="punnett-cell ek-soft-tim ek-hidden">
+        <div class="pn-geno ek-c-tim">Aa</div>
+        <div class="pn-pheno">Hạt vàng</div>
+      </div>
+
+      <div id="g-left-2" class="pn-head ek-c-xanhLa">a (½)</div>
+      <div id="cell-Aa2" class="punnett-cell ek-soft-tim ek-hidden">
+        <div class="pn-geno ek-c-tim">Aa</div>
+        <div class="pn-pheno">Hạt vàng</div>
+      </div>
+      <div id="cell-aa" class="punnett-cell ek-soft-xanhLa ek-hidden">
+        <div class="pn-geno ek-c-xanhLa">aa</div>
+        <div class="pn-pheno">Hạt xanh</div>
+      </div>
+    </div>
+
+    <!-- Cột phải: Tỉ lệ kiểu gen (Beat 2) -->
+    <div id="geno-card" class="ek-card pn-panel ek-col-7 ek-span-6 ek-hidden" style="top:198px" data-ek-beat="2">
+      <h3>Tỉ lệ kiểu gen F1 (1 : 2 : 1)</h3>
+      <div class="pn-row">
+        <span class="pn-tag ek-c-lam">AA</span>
+        <div class="pn-track"><div id="bar-AA" class="pn-fill pn-fill-lam"></div></div>
+        <span id="pct-AA" class="ek-num pn-pct ek-c-lam">0%</span>
+      </div>
+      <div class="pn-row">
+        <span class="pn-tag ek-c-tim">Aa</span>
+        <div class="pn-track"><div id="bar-Aa" class="pn-fill pn-fill-tim"></div></div>
+        <span id="pct-Aa" class="ek-num pn-pct ek-c-tim">0%</span>
+      </div>
+      <div class="pn-row">
+        <span class="pn-tag ek-c-xanhLa">aa</span>
+        <div class="pn-track"><div id="bar-aa" class="pn-fill pn-fill-xanhLa"></div></div>
+        <span id="pct-aa" class="ek-num pn-pct ek-c-xanhLa">0%</span>
+      </div>
+    </div>
+
+    <!-- Cột phải dưới: Tỉ lệ kiểu hình (Beat 3) -->
+    <div id="pheno-card" class="ek-card pn-panel ek-col-7 ek-span-6 ek-hidden" style="top:548px" data-ek-beat="3">
+      <h3>Tỉ lệ kiểu hình F1 (3 : 1)</h3>
+      <div class="pn-row">
+        <span class="pn-tag-wide ek-c-vangDam">Hạt vàng</span>
+        <div class="pn-track"><div id="bar-vang" class="pn-fill pn-fill-vang"></div></div>
+        <span id="pct-vang" class="ek-num pn-pct ek-c-vangDam">0%</span>
+      </div>
+      <div class="pn-row">
+        <span class="pn-tag-wide ek-c-xanhLa">Hạt xanh</span>
+        <div class="pn-track"><div id="bar-xanh" class="pn-fill pn-fill-xanhLa"></div></div>
+        <span id="pct-xanh" class="ek-num pn-pct ek-c-xanhLa">0%</span>
+      </div>
+      <p id="pn-note" class="ek-note pn-summary">Trội hoàn toàn: AA và Aa đều cho hạt vàng.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pn-banner { padding: 18px 26px; }
+  .pn-banner p { font-size: 38px; color: var(--ink); }
+  .punnett-grid { display: grid; grid-template-columns: 150px 1fr 1fr; grid-template-rows: 96px 1fr 1fr; gap: 14px; }
+  .pn-head { background: var(--surface); border: 2px solid var(--line); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 700; box-shadow: var(--shadow); }
+  .pn-corner { background: var(--sunken); color: var(--ink2); font-size: 38px; }
+  .punnett-cell { border: 3px solid var(--line); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+  .pn-geno { font-size: 62px; font-weight: 700; line-height: 1; }
+  .pn-pheno { font-size: 38px; font-weight: 600; color: var(--ink2); }
+  .pn-panel { padding: 24px 30px; }
+  .pn-panel h3 { font-size: 42px; margin-bottom: 18px; }
+  .pn-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .pn-tag { width: 82px; font-size: 40px; font-weight: 700; }
+  .pn-tag-wide { width: 190px; font-size: 38px; font-weight: 700; }
+  .pn-track { flex: 1; height: 34px; background: var(--sunken); border-radius: 99px; overflow: hidden; }
+  .pn-fill { height: 100%; border-radius: 99px; transform-origin: 0% 50%; }
+  .pn-fill-lam { width: 25%; background: var(--c-lam); }
+  .pn-fill-tim { width: 50%; background: var(--c-tim); }
+  .pn-fill-xanhLa { width: 25%; background: var(--c-xanhLa); }
+  .pn-fill-vang { width: 75%; background: var(--c-vangDam); }
+  .pn-pct { width: 126px; font-size: 44px; text-align: right; }
+  .pn-summary { margin-top: 10px; font-size: 36px; }
+</style>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  // Beat 0 (0 - 4.5s): Mở giao tử bố mẹ và khung Punnett
+  EK.enter(tl, "#g-top-1, #g-top-2", 0.5, { from: "down", stagger: 0.35 });
+  EK.enter(tl, "#g-left-1, #g-left-2", 1.4, { from: "left", stagger: 0.35 });
+  EK.mark(tl, "#p-banner p", 2.4, "highlight", { color: "lam" });
+
+  // Beat 1 (4.5 - 9.0s): Điền lần lượt 4 ô tổ hợp trong bảng Punnett
+  EK.enter(tl, "#cell-AA", EK.cue(1), { from: "scale", dur: 0.65 });
+  EK.enter(tl, "#cell-Aa1", 5.4, { from: "scale", dur: 0.65 });
+  EK.enter(tl, "#cell-Aa2", 6.3, { from: "scale", dur: 0.65 });
+  EK.enter(tl, "#cell-aa", 7.2, { from: "scale", dur: 0.65 });
+
+  // Beat 2 (9.0 - 13.5s): Hiện bảng kiểu gen và đếm lên 25% - 50% - 25%
+  EK.enter(tl, "#geno-card", EK.cue(2), { from: "right", dur: 0.6 });
+  EK.grow(tl, "#bar-AA, #bar-Aa, #bar-aa", 9.6, 1.1, { from: "left", stagger: 0.25 });
+  EK.count(tl, "#pct-AA", 0, 25, 9.6, 1.0, { decimals: 0, suffix: "%" });
+  EK.count(tl, "#pct-Aa", 0, 50, 10.0, 1.1, { decimals: 0, suffix: "%" });
+  EK.count(tl, "#pct-aa", 0, 25, 10.4, 1.0, { decimals: 0, suffix: "%" });
+  EK.mark(tl, "#geno-card h3", 11.6, "highlight", { color: "tim" });
+
+  // Beat 3 (13.5 - 18.0s): Gộp kiểu hình 75% vàng : 25% xanh (3 : 1)
+  EK.enter(tl, "#pheno-card", EK.cue(3), { from: "up", dur: 0.6 });
+  EK.grow(tl, "#bar-vang, #bar-xanh", 14.1, 1.2, { from: "left", stagger: 0.3 });
+  EK.count(tl, "#pct-vang", 0, 75, 14.1, 1.2, { decimals: 0, suffix: "%" });
+  EK.count(tl, "#pct-xanh", 0, 25, 14.5, 1.0, { decimals: 0, suffix: "%" });
+  EK.mark(tl, "#pheno-card h3", 15.8, "highlight", { color: "vangDam" });
+
+  window.__timelines["main"] = tl;
+</script>

@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "chu-trinh-sinh-hoc", "vaiTro": "chinh" }],
+  "confidence": 0.95,
+  "lyDo": "Chu trình Krebs là vòng chuyển hoá sinh học khép kín có 4 chặng chính và số liệu sản phẩm rõ ràng.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.6,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Hiện vòng chu trình Krebs, đưa Acetyl-CoA (2C) vào kết hợp chất 4C tạo Citrate (6C)",
+      "skill": "chu-trinh-sinh-hoc",
+      "duLieu": { "cIn": 2, "cAcc": 4, "cCit": 6 }
+    },
+    {
+      "i": 1,
+      "t0": 4.6,
+      "t1": 9.2,
+      "cau": [1],
+      "cue": "t",
+      "viec": "Chấm chạy chặng 6C → 5C giải phóng CO2 thứ nhất và NADH",
+      "skill": "chu-trinh-sinh-hoc",
+      "duLieu": { "cMid": 5 }
+    },
+    {
+      "i": 2,
+      "t0": 9.2,
+      "t1": 13.8,
+      "cau": [2],
+      "cue": "t",
+      "viec": "Chấm chạy nửa vòng sau 5C → 4C tái tạo chất nhận, sinh CO2, ATP, FADH2 và NADH",
+      "skill": "chu-trinh-sinh-hoc",
+      "duLieu": { "cEnd": 4 }
+    },
+    {
+      "i": 3,
+      "t0": 13.8,
+      "t1": 18.0,
+      "cau": [3],
+      "cue": "t",
+      "viec": "Tổng kết 1 vòng chu trình: đếm lên 2 CO2, 3 NADH, 1 FADH2 và 1 ATP",
+      "skill": "chu-trinh-sinh-hoc",
+      "duLieu": { "co2": 2, "nadh": 3, "fadh2": 1, "atp": 1 }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

@@ -1,0 +1,13 @@
+{
+  "requires": [
+    { "selector": "svg#foodweb-svg", "min": 1 },
+    { "selector": ".pyramid-bar", "min": 3, "max": 5 },
+    { "selector": ".ek-arrow", "min": 3, "max": 12 }
+  ],
+  "motion": [
+    { "kind": "staysInFrame", "selector": ".ek-label" },
+    { "kind": "keepsMoving", "maxStaticSec": 4 }
+  ],
+  "limits": { "cameraMoves": 0, "labels": 14, "minFontPx": 36 },
+  "data": { "placesFromGazetteer": false, "numbersFromSpeech": true }
+}
