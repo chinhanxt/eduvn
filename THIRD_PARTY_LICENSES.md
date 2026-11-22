@@ -234,3 +234,10 @@ authors nor the names of their institutions may be used to endorse or promote pr
 this software without specific prior written permission. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT
 WARRANTY OF ANY KIND; see the full license text at the URL above.
 ```
+
+## Dữ liệu và mô hình tham chiếu cho gói môn Lịch sử (`mon-su`)
+
+- **Natural Earth (`ne_10m_admin_0_countries_vnm`, `ne_10m_rivers_lake_centerlines`)** — Public Domain (`nvkelso/natural-earth-vector`). Dùng bản góc nhìn Việt Nam (`_vnm`) thể hiện đầy đủ chủ quyền Việt Nam đối với quần đảo Hoàng Sa và quần đảo Trường Sa.
+- **Wikidata** — CC0 1.0 Public Domain Dedication (`https://www.wikidata.org/`). Dùng để đối chiếu QID, toạ độ (`P625`) và mốc thời gian sự kiện/nhân vật lịch sử (`P585`, `P580`, `P582`, `P569`, `P570`) trong `services/anim-kit-data/dia-danh-lich-su.json` và bộ tự kiểm `server/src/subjects/su/verify.ts`.
+- **OpenStreetMap / Nominatim** — ODbL 1.0 (`https://www.openstreetmap.org/copyright`). Dùng đối chiếu toạ độ một số di tích cấp điểm (Đồi Him Lam, Đồi A1, Hầm Đờ Cát, Đồi Độc Lập, Phân khu Hồng Cúm) có ghi rõ mã đối tượng OSM trong `services/anim-kit-data/dia-danh-lich-su.json`.
+- **Knight Lab TimelineJS3** — MPL-2.0 (`https://github.com/NUKnightLab/TimelineJS3`). Chỉ tham khảo mô hình dữ liệu JSON sự kiện (`start_date`, `end_date`, `eras`, `group`) trong `anim-skills/su/dong-thoi-gian-su-kien/references/mo-hinh-su-kien-timelinejs.md` và `server/src/subjects/su/timeline.ts`; không chép mã runtime.
