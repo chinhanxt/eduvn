@@ -4,7 +4,10 @@
     <h1 id="tt" class="ek-title ek-col-8 ek-span-5 ek-hidden" style="top:106px">Tháp dân số <span class="kw">Việt Nam</span></h1>
     <div id="yr-card" class="ek-col-8 ek-span-5 ek-hidden" style="top:256px" data-ek-beat="0">
       <div class="ek-eyebrow">NĂM TỔNG ĐIỀU TRA</div>
-      <div id="n-yr" class="ek-num">1999</div>
+      <div class="yr-stack">
+        <div id="yr-1999" class="ek-num">1999</div>
+        <div id="yr-2019" class="ek-num ek-hidden">2019</div>
+      </div>
     </div>
     <div id="pyr-box" class="ek-col-1 ek-span-7 ek-hidden" style="top:138px;height:750px">
       <svg id="pyr" width="970" height="720" data-ek-chart="thap" data-ek-values='{"nhan":["0–9","10–19","20–29","30–39","40–49","50–59","60–69","70+"],"chuoi":[{"ten":"Nam","donVi":"%","giaTri":[10.4,11.4,8.6,7.2,5.1,3.0,2.0,1.4]},{"ten":"Nữ","donVi":"%","giaTri":[9.8,10.9,8.8,7.5,5.4,3.4,2.5,2.6]}],"chuoiSau":[{"ten":"Nam 2019","donVi":"%","giaTri":[8.2,7.1,8.1,8.4,6.8,5.6,3.3,2.2]},{"ten":"Nữ 2019","donVi":"%","giaTri":[7.5,6.7,7.8,8.3,6.9,6.0,3.8,3.3]}]}'></svg>
@@ -24,22 +27,23 @@
   </div>
 </div>
 <style>
-  #n-yr { font-size: 74px; margin-top: 6px; }
+  .yr-stack { position: relative; height: 84px; margin-top: 6px; }
+  #yr-1999, #yr-2019 { position: absolute; left: 0; top: 0; font-size: 74px; }
   .ek-card { padding: 14px 24px 16px; }
   #c-end { border-left-color: var(--c-xanhLa); }
 </style>
 <script>
 const tl = gsap.timeline({ paused: true });
 EK.enter(tl, "#tt, #yr-card, #pyr-box", EK.cue(0), { from: "up", stagger: 0.12 });
-tl.fromTo("#pyr .ek-bar-0", { scaleX: 0 }, { scaleX: 1, transformOrigin: "right center", duration: 1.0, stagger: 0.05, ease: "expo.out" }, EK.cue(0) + 0.3);
-tl.fromTo("#pyr .ek-bar-1", { scaleX: 0 }, { scaleX: 1, transformOrigin: "left center", duration: 1.0, stagger: 0.05, ease: "expo.out" }, EK.cue(0) + 0.3);
-EK.count(tl, "#n-yr", 1999, 2019, EK.cue(1), 1.4, { decimals: 0 });
+tl.fromTo("#pyr .ek-bar-0", { scaleX: 0 }, { scaleX: 1, svgOrigin: "0 0", duration: 1.0, stagger: 0.05, ease: "expo.out" }, EK.cue(0) + 0.3);
+tl.fromTo("#pyr .ek-bar-1", { scaleX: 0 }, { scaleX: 1, svgOrigin: "0 0", duration: 1.0, stagger: 0.05, ease: "expo.out" }, EK.cue(0) + 0.3);
+EK.exit(tl, "#yr-1999", EK.cue(1), { to: "up", dur: 0.45 });
+EK.enter(tl, "#yr-2019", EK.cue(1) + 0.25, { from: "up", dur: 0.55 });
 EK.enter(tl, "#c-morph", EK.cue(1), { from: "right" });
 const bars = document.querySelectorAll("#pyr .ek-bar[data-scale-after]");
 bars.forEach(function (el, idx) {
   const s = parseFloat(el.getAttribute("data-scale-after")) || 1;
-  const orig = el.classList.contains("ek-bar-0") ? "right center" : "left center";
-  tl.to(el, { scaleX: s, transformOrigin: orig, duration: 1.5, ease: "power3.inOut" }, EK.cue(1) + 0.1 + (idx % 8) * 0.04);
+  tl.to(el, { scaleX: s, svgOrigin: "0 0", duration: 1.5, ease: "power3.inOut" }, EK.cue(1) + 0.1 + (idx % 8) * 0.04);
 });
 EK.enter(tl, "#c-stat", EK.cue(2), { from: "right" });
 EK.enter(tl, "#c-end", EK.cue(3), { from: "up" });

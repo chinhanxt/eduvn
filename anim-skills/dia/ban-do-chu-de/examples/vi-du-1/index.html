@@ -3,13 +3,13 @@
   <div class="ek-stage">
     <div id="map-box" class="ek-col-1 ek-span-6 ek-hidden" style="top:118px;height:790px" data-ek-beat="0">
       <svg id="vnmap" width="828" height="780" data-ek-map="vn34" data-ek-highlight="ha-noi,tp-ho-chi-minh,hai-phong"></svg>
-      <div id="lbl-hn" class="ek-map-badge ek-hidden" style="left:415px;top:122px">ĐBSH · Hà Nội 2.621</div>
-      <div id="lbl-tb" class="ek-map-badge ek-hidden" style="left:18px;top:148px">Tây Bắc · Lai Châu 57</div>
-      <div id="lbl-hcm" class="ek-map-badge ek-hidden" style="left:385px;top:590px">TP.HCM · 2.068</div>
-      <div id="lbl-dbscl" class="ek-map-badge ek-hidden" style="left:28px;top:675px">ĐBSCL · 500–740</div>
+      <div id="lbl-hn" class="ek-map-badge ek-hidden" style="left:415px;top:116px">ĐBSH · Hà Nội 2.621</div>
+      <div id="lbl-tb" class="ek-map-badge ek-hidden" style="left:16px;top:162px">Tây Bắc · Lai Châu 57</div>
+      <div id="lbl-hcm" class="ek-map-badge ek-hidden" style="left:16px;top:492px">TP.HCM · 2.068</div>
+      <div id="lbl-dbscl" class="ek-map-badge ek-hidden" style="left:16px;top:698px">ĐBSCL · 500–740</div>
     </div>
     <h1 id="tt" class="ek-title ek-col-7 ek-span-6 ek-hidden" style="top:106px">Mật độ dân số <span class="kw">34 tỉnh</span></h1>
-    <div id="c1" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:230px" data-ek-beat="1">
+    <div id="c1" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:226px" data-ek-beat="1">
       <h3 class="ek-c-doSon">Rất cao (&gt; 1.000 người/km²)</h3>
       <p>Hà Nội 2.621 · TP.HCM 2.068 · Hải Phòng 1.460</p>
     </div>
@@ -17,11 +17,11 @@
       <h3 class="ek-c-lam">Khá cao (500 – 1.000 người/km²)</h3>
       <p>Bắc Ninh 767 · Đồng Tháp 736 · Cần Thơ 660</p>
     </div>
-    <div id="c3" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:582px" data-ek-beat="3">
+    <div id="c3" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:586px" data-ek-beat="3">
       <h3 class="ek-c-xanhLa">Thưa dân (&lt; 150 người/km²)</h3>
       <p>Lai Châu 57 · Điện Biên 71 · Cao Bằng 86</p>
     </div>
-    <div id="c4" class="ek-note ek-col-7 ek-span-6 ek-hidden" style="top:772px" data-ek-beat="4">
+    <div id="c4" class="ek-note ek-col-7 ek-span-6 ek-hidden" style="top:778px" data-ek-beat="4">
       Chênh lệch hơn 45 lần giữa đồng bằng với miền núi · NQ 202/2025/QH15
     </div>
   </div>
@@ -30,6 +30,8 @@
   #c1 { border-left-color: var(--c-doSon); }
   #c2 { border-left-color: var(--c-lam); }
   #c3 { border-left-color: var(--c-xanhLa); }
+  .ek-card { padding: 16px 26px 18px; }
+  .ek-card p { white-space: nowrap; font-size: 36px; }
   .ek-map-badge {
     position: absolute;
     background: var(--surface);
