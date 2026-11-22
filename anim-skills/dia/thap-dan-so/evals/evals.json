@@ -1,0 +1,114 @@
+{
+  "skill": "thap-dan-so",
+  "evals": [
+    {
+      "id": "vn-1999-2019",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Tháp dân số Việt Nam biến đổi: 1999 → 2019",
+        "slideText": "Tổng điều tra dân số 1999 và 2019 (%): Nhóm 0–14 tuổi giảm từ 33,1% xuống 24,3%; nhóm 15–64 tăng từ 61,1% lên 68,0%; nhóm 65+ tăng từ 5,8% lên 7,7%. Nam trái, Nữ phải (8 nhóm tuổi từ 0–9 đến 70+).",
+        "speech": [
+          {
+            "text": "Năm 1999, tháp dân số Việt Nam có đáy rất rộng, đặc trưng cho cơ cấu dân số trẻ.",
+            "durationMs": 3600
+          },
+          {
+            "text": "Sau hai mươi năm đến 2019, tháp biến hình rõ rệt: đáy thu hẹp nhanh trong khi phần thân phình rộng.",
+            "durationMs": 4400
+          },
+          {
+            "text": "Nhóm 0 đến 14 tuổi giảm từ 33,1 phần trăm còn 24,3 phần trăm, còn nhóm từ 65 tuổi tăng lên 7,7 phần trăm.",
+            "durationMs": 4400
+          },
+          {
+            "text": "Việt Nam đang ở thời kì cơ cấu dân số vàng nhưng bước vào giai đoạn già hóa nhanh.",
+            "durationMs": 3600
+          }
+        ]
+      },
+      "tieuChi": [
+        "Nam trái Nữ phải",
+        "biến hình 1999→2019",
+        "nêu đúng 33,1%→24,3%"
+      ]
+    },
+    {
+      "id": "nhat-ban-gia-hoa",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 11,
+        "title": "Tháp dân số Nhật Bản 1970 và 2020",
+        "slideText": "Nhóm 65+ của Nhật Bản tăng từ 7,1% (1970) lên 28,6% (2020); đáy tháp thu hẹp mạnh.",
+        "speech": [
+          {
+            "text": "So sánh tháp dân số Nhật Bản 1970 và 2020 cho thấy đỉnh tháp phình to bất thường do già hóa dân số.",
+            "durationMs": 6000
+          }
+        ]
+      },
+      "tieuChi": [
+        "biến hình đáy thu hẹp đỉnh phình"
+      ]
+    },
+    {
+      "id": "so-sanh-hai-nuoc",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 10,
+        "title": "Kiểu tháp dân số mở rộng và thu hẹp",
+        "slideText": "Nigeria (0–14 tuổi 43%) vs Đức (0–14 tuổi 14%, 65+ 22%).",
+        "speech": [
+          {
+            "text": "Tháp dân số kiểu mở rộng có đáy rộng đỉnh nhọn, còn kiểu thu hẹp có đáy hẹp và thân phình.",
+            "durationMs": 5800
+          }
+        ]
+      },
+      "tieuChi": [
+        "so sánh 2 hình dạng tháp"
+      ]
+    },
+    {
+      "id": "mat-do-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Mật độ dân số 34 tỉnh Việt Nam",
+        "slideText": "Hà Nội 2.621 người/km², Lai Châu 57 người/km².",
+        "speech": [
+          {
+            "text": "Mật độ dân số ở Đồng bằng sông Hồng cao gấp nhiều lần miền núi Tây Bắc.",
+            "durationMs": 5200
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: phân bố theo tỉnh dùng ban-do-chu-de"
+      ]
+    },
+    {
+      "id": "co-cau-nganh-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Cơ cấu lao động theo ngành kinh tế",
+        "slideText": "Nông nghiệp 27,5%, Công nghiệp 33,5%, Dịch vụ 39,0%.",
+        "speech": [
+          {
+            "text": "Tỉ trọng lao động trong khu vực dịch vụ và công nghiệp tăng nhanh qua các năm.",
+            "durationMs": 5400
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: cơ cấu ngành dùng bieu-do-co-cau"
+      ]
+    }
+  ]
+}

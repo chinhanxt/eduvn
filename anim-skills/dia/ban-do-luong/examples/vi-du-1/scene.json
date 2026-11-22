@@ -1,0 +1,24 @@
+{
+  "subject": "dia",
+  "grade": 12,
+  "title": "Các luồng di cư liên vùng chủ yếu ở Việt Nam",
+  "slideText": "Hai vùng nhập cư lớn nhất: Đông Nam Bộ (tâm điểm TP. Hồ Chí Minh) và Đồng bằng sông Hồng (tâm điểm Hà Nội). Vùng xuất cư mạnh: Đồng bằng sông Cửu Long (Cần Thơ), Bắc Trung Bộ (Vinh), Tây Nguyên (Buôn Ma Thuột).",
+  "speech": [
+    {
+      "text": "Trên bản đồ Việt Nam, hai cực thu hút di cư lớn nhất là TP. Hồ Chí Minh và Thủ đô Hà Nội.",
+      "durationMs": 3800
+    },
+    {
+      "text": "Luồng di cư dày nhất xuất phát từ Đồng bằng sông Cửu Long tiến mạnh về vùng Đông Nam Bộ.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Cùng lúc đó, lao động từ Bắc Trung Bộ và Tây Nguyên di chuyển mạnh ra Hà Nội và vào TP. Hồ Chí Minh.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Động lực chính là sức hút việc làm tại các khu công nghiệp, dịch vụ và cơ hội thu nhập cao hơn.",
+      "durationMs": 3800
+    }
+  ]
+}

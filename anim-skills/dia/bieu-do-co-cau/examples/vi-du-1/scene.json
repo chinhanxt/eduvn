@@ -1,0 +1,24 @@
+{
+  "subject": "dia",
+  "grade": 12,
+  "title": "Chuyển dịch cơ cấu GDP Việt Nam (2010–2023)",
+  "slideText": "Cơ cấu GDP Việt Nam (%) qua 4 mốc 2010, 2015, 2018, 2023 (tổng = 100%): Nông–lâm–thủy sản: 15,4 → 14,5 → 13,9 → 12,0; Công nghiệp & xây dựng: 33,0 → 34,3 → 35,4 → 37,1; Dịch vụ & thuế SP: 51,6 → 51,2 → 50,7 → 50,9.",
+  "speech": [
+    {
+      "text": "Với 4 mốc năm 2010, 2015, 2018 và 2023, ta dùng biểu đồ miền 100 phần trăm và giãn đúng khoảng cách năm thật.",
+      "durationMs": 4000
+    },
+    {
+      "text": "Miền nông, lâm nghiệp và thủy sản thu hẹp liên tục từ 15,4 phần trăm xuống còn 12,0 phần trăm.",
+      "durationMs": 4000
+    },
+    {
+      "text": "Trong khi đó, công nghiệp và xây dựng tăng nhanh từ 33,0 lên 37,1 phần trăm, còn dịch vụ luôn chiếm hơn 50 phần trăm.",
+      "durationMs": 4400
+    },
+    {
+      "text": "Chuyển dịch cơ cấu này phản ánh rõ quá trình công nghiệp hóa, hiện đại hóa đất nước.",
+      "durationMs": 3600
+    }
+  ]
+}

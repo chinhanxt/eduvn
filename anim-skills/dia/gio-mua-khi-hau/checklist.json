@@ -1,0 +1,41 @@
+{
+  "requires": [
+    {
+      "selector": "[data-ek-map]",
+      "min": 1
+    },
+    {
+      "selector": ".ek-arrow",
+      "min": 4
+    },
+    {
+      "selector": ".ek-islands",
+      "min": 1
+    }
+  ],
+  "motion": [
+    {
+      "kind": "before",
+      "a": "[data-ek-beat=\"0\"]",
+      "b": "[data-ek-beat=\"1\"]"
+    },
+    {
+      "kind": "before",
+      "a": "[data-ek-beat=\"1\"]",
+      "b": "[data-ek-beat=\"3\"]"
+    },
+    {
+      "kind": "staysInFrame",
+      "selector": ".ek-islands"
+    }
+  ],
+  "limits": {
+    "cameraMoves": 0,
+    "labels": 14,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

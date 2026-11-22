@@ -1,0 +1,113 @@
+{
+  "skill": "ban-do-luong",
+  "evals": [
+    {
+      "id": "di-cu-lien-vung",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Các luồng di cư liên vùng chủ yếu ở Việt Nam",
+        "slideText": "Hai vùng nhập cư lớn nhất: Đông Nam Bộ (tâm điểm TP. Hồ Chí Minh) và Đồng bằng sông Hồng (tâm điểm Hà Nội). Vùng xuất cư mạnh: Đồng bằng sông Cửu Long (Cần Thơ), Bắc Trung Bộ (Vinh), Tây Nguyên (Buôn Ma Thuột).",
+        "speech": [
+          {
+            "text": "Trên bản đồ Việt Nam, hai cực thu hút di cư lớn nhất là TP. Hồ Chí Minh và Thủ đô Hà Nội.",
+            "durationMs": 3800
+          },
+          {
+            "text": "Luồng di cư dày nhất xuất phát từ Đồng bằng sông Cửu Long tiến mạnh về vùng Đông Nam Bộ.",
+            "durationMs": 4200
+          },
+          {
+            "text": "Cùng lúc đó, lao động từ Bắc Trung Bộ và Tây Nguyên di chuyển mạnh ra Hà Nội và vào TP. Hồ Chí Minh.",
+            "durationMs": 4200
+          },
+          {
+            "text": "Động lực chính là sức hút việc làm tại các khu công nghiệp, dịch vụ và cơ hội thu nhập cao hơn.",
+            "durationMs": 3800
+          }
+        ]
+      },
+      "tieuChi": [
+        "mũi tên dày nhất ĐBSCL→TP.HCM",
+        "bản đồ có Hoàng Sa Trường Sa"
+      ]
+    },
+    {
+      "id": "hanh-lang-dong-tay",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Luồng thương mại Hành lang kinh tế Đông – Tây",
+        "slideText": "Tuyến Lao Bảo → Đông Hà → cảng Đà Nẵng vận chuyển hàng xuất nhập khẩu.",
+        "speech": [
+          {
+            "text": "Hàng hóa từ Lào qua cửa khẩu Lao Bảo theo quốc lộ 9 đổ về cảng biển Đà Nẵng.",
+            "durationMs": 5500
+          }
+        ]
+      },
+      "tieuChi": [
+        "mũi tên đi qua ck-lao-bao → da-nang"
+      ]
+    },
+    {
+      "id": "van-tai-than-bac-nam",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Luồng vận tải đường biển Bắc – Nam",
+        "slideText": "Tuyến chính Hải Phòng – Đà Nẵng – TP. Hồ Chí Minh chiếm tỉ trọng luân chuyển cao nhất.",
+        "speech": [
+          {
+            "text": "Tuyến vận tải biển trục Hải Phòng đến TP. Hồ Chí Minh vận chuyển khối lượng hàng hóa lớn nhất nước.",
+            "durationMs": 6000
+          }
+        ]
+      },
+      "tieuChi": [
+        "luồng nối hai-phong → da-nang → tp-ho-chi-minh"
+      ]
+    },
+    {
+      "id": "mat-do-tinh-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Bản đồ mật độ dân số 34 tỉnh",
+        "slideText": "Hà Nội 2.621, TP.HCM 2.068, Lai Châu 57 người/km².",
+        "speech": [
+          {
+            "text": "So sánh mật độ dân số giữa các tỉnh đồng bằng và miền núi.",
+            "durationMs": 5000
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: choropleth dùng ban-do-chu-de"
+      ]
+    },
+    {
+      "id": "vong-nuoc-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 6,
+        "title": "Vòng tuần hoàn nước",
+        "slideText": "Nước bốc hơi, ngưng tụ thành mây, rơi mưa và chảy về biển.",
+        "speech": [
+          {
+            "text": "Vòng tuần hoàn nước gồm bốn quá trình khép kín trong tự nhiên.",
+            "durationMs": 5200
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng vong-tuan-hoan-tu-nhien"
+      ]
+    }
+  ]
+}

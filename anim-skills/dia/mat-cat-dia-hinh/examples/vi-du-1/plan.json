@@ -1,0 +1,69 @@
+{
+  "skills": [
+    {
+      "id": "mat-cat-dia-hinh",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.96,
+  "lyDo": "Phân tích lát cắt độ cao địa hình từ vùng núi Hoàng Liên Sơn (Fansipan 3.143 m) xuống Đồng bằng sông Hồng ra Biển Đông.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.8,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Hiện tiêu đề và khung trục độ cao 0–3.500 m tuyến Tây Bắc – Đông Nam",
+      "skill": "mat-cat-dia-hinh"
+    },
+    {
+      "i": 1,
+      "t0": 3.8,
+      "t1": 8.0,
+      "cau": [
+        1
+      ],
+      "cue": "kw:Đường địa hình",
+      "viec": "Vẽ đường mặt cắt địa hình và nổi bật đỉnh Fansipan 3.143 m",
+      "skill": "mat-cat-dia-hinh",
+      "duLieu": {
+        "places": [
+          "fansipan"
+        ],
+        "cao": 3143
+      }
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.4,
+      "cau": [
+        2
+      ],
+      "cue": "kw:sông Hồng",
+      "viec": "Gắn nhãn thung lũng sông Hồng, Việt Trì và Đồng bằng sông Hồng 12 m",
+      "skill": "mat-cat-dia-hinh",
+      "duLieu": {
+        "places": [
+          "viet-tri",
+          "ha-noi"
+        ]
+      }
+    },
+    {
+      "i": 3,
+      "t0": 12.4,
+      "t1": 16.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:nghiêng",
+      "viec": "Hiện thẻ kết luận hướng nghiêng Tây Bắc – Đông Nam",
+      "skill": "mat-cat-dia-hinh"
+    }
+  ],
+  "khongCanHoatHinh": false
+}

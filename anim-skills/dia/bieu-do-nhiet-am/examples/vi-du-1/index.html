@@ -1,0 +1,48 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-12" style="top:56px">ĐỊA LÍ 12 · KHÍ HẬU VIỆT NAM · ATLAT TRANG 9</div>
+  <div class="ek-stage">
+    <h1 id="tt" class="ek-title ek-col-1 ek-span-4 ek-hidden" style="top:110px" data-ek-beat="0">Nhiệt – ẩm <span class="kw">Hà Nội</span></h1>
+    <div id="chart-wrap" class="ek-col-5 ek-span-8 ek-hidden" style="top:130px;height:740px">
+      <svg id="bd" width="1112" height="720" data-ek-chart="nhiet-am" data-ek-values='{"nhan":["T1","T2","T3","T4","T5","T6","T7","T8","T9","T10","T11","T12"],"chuoi":[{"ten":"Lượng mưa","donVi":"mm","giaTri":[18.6,26.2,43.8,90.1,188.5,239.9,288.2,318.0,265.4,130.7,43.4,23.4],"kieu":"cot","truc":"trai"},{"ten":"Nhiệt độ","donVi":"°C","giaTri":[16.4,17.0,20.2,23.7,27.3,28.8,28.9,28.2,27.2,24.6,21.4,18.2],"kieu":"duong","truc":"phai"}],"mien":[{"tu":5,"den":10,"nhan":"Mùa mưa T5–T10"}]}'></svg>
+    </div>
+    <div id="c-rain" class="ek-card ek-col-1 ek-span-4 ek-hidden" style="top:295px" data-ek-beat="1">
+      <h3>Tổng lượng mưa năm</h3>
+      <div id="n-rain" class="ek-num ek-c-lam">0</div>
+      <p>Đỉnh mưa tháng 8 đạt 318 mm</p>
+    </div>
+    <div id="c-season" class="ek-card ek-col-1 ek-span-4 ek-hidden" style="top:545px" data-ek-beat="2">
+      <h3>Mùa mưa rõ rệt</h3>
+      <p>Tháng 5 đến tháng 10 đều vượt 100 mm mỗi tháng</p>
+    </div>
+    <div id="c-temp" class="ek-card ek-col-1 ek-span-4 ek-hidden" style="top:545px" data-ek-beat="3">
+      <h3 class="ek-c-doSon">Nhiệt độ hai cực trị</h3>
+      <p>Tháng 1 lạnh 16,4 °C · Tháng 7 nóng 28,9 °C</p>
+    </div>
+    <div id="c-sum" class="ek-card ek-col-1 ek-span-4 ek-hidden" style="top:730px" data-ek-beat="4">
+      <h3>Biên độ nhiệt 12,5 °C</h3>
+      <p>Nhiệt đới ẩm gió mùa, mùa đông lạnh</p>
+    </div>
+  </div>
+</div>
+<style>
+  #n-rain { font-size: 68px; margin: 4px 0 8px; }
+  #c-temp { border-left-color: var(--c-doSon); }
+  #c-sum { border-left-color: var(--c-xanhLa); }
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+EK.enter(tl, "#tt", EK.cue(0), { from: "up" });
+EK.enter(tl, "#chart-wrap", EK.b(0, 0.25), { from: "fade" });
+tl.set("#bd .ek-season, #bd .ek-season-label, #bd .ek-line-1, #bd .ek-dot", { opacity: 0 }, 0);
+EK.enter(tl, "#c-rain", EK.cue(1), { from: "left" });
+EK.grow(tl, "#bd .ek-bar", EK.cue(1), 1.3, { stagger: 0.06, from: "bottom" });
+EK.count(tl, "#n-rain", 0, 1676, EK.cue(1) + 0.2, 1.4, { decimals: 0, suffix: " mm" });
+EK.enter(tl, "#bd .ek-season, #bd .ek-season-label", EK.cue(2), { from: "fade", dur: 0.8 });
+EK.enter(tl, "#c-season", EK.cue(2), { from: "left" });
+EK.exit(tl, "#c-season", EK.cue(3) - 0.35, { to: "fade", dur: 0.35 });
+EK.draw(tl, "#bd .ek-line-1", EK.cue(3), 1.5);
+EK.enter(tl, "#bd .ek-dot", EK.cue(3) + 0.35, { from: "scale", stagger: 0.06, dur: 0.4 });
+EK.enter(tl, "#c-temp", EK.cue(3), { from: "left" });
+EK.enter(tl, "#c-sum", EK.cue(4), { from: "up" });
+window.__timelines["main"] = tl;
+</script>

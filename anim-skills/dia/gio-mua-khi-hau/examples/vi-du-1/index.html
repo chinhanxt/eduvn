@@ -1,0 +1,51 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-12" style="top:54px">ĐỊA LÍ 12 · HOÀN LƯU GIÓ MÙA VIỆT NAM · ATLAT TRANG 9</div>
+  <div class="ek-stage">
+    <div id="map-wrap" class="ek-col-1 ek-span-6 ek-hidden" style="top:118px;height:790px" data-ek-beat="0">
+      <svg id="windmap" width="828" height="780" data-ek-map="vn34">
+        <path id="w-ne-1" class="ek-arrow ek-stroke-lam" style="stroke-width:10px" data-ek-arrow="from:lang-son;to:ha-noi" data-ek-bend="-0.15"></path>
+        <path id="w-ne-2" class="ek-arrow ek-stroke-lam" style="stroke-width:9px" data-ek-arrow="from:ha-long;via:thanh-hoa;to:hue" data-ek-bend="-0.12"></path>
+        <path id="w-sw-1" class="ek-arrow ek-stroke-lucLam" style="stroke-width:10px" data-ek-arrow="from:ca-mau;to:tp-ho-chi-minh" data-ek-bend="0.18"></path>
+        <path id="w-sw-2" class="ek-arrow ek-stroke-lucLam" style="stroke-width:9px" data-ek-arrow="from:phu-quoc;to:buon-ma-thuot" data-ek-bend="0.14"></path>
+        <path id="w-foehn" class="ek-arrow ek-stroke-doSon" style="stroke-width:8px" data-ek-arrow="from:ck-lao-bao;to:vinh" data-ek-bend="-0.2"></path>
+      </svg>
+      <div id="p-bm" class="ek-place ek-hidden" data-ek-place="bach-ma">Bạch Mã (16°B)</div>
+    </div>
+    <h1 id="tt" class="ek-title ek-col-7 ek-span-6 ek-hidden" style="top:106px">Hai mùa gió <span class="kw">Việt Nam</span></h1>
+    <div id="c1" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:226px" data-ek-beat="1">
+      <h3 class="ek-c-lam">Gió mùa Đông Bắc (T11 – T4)</h3>
+      <p>Gây mùa đông lạnh cho miền Bắc, đầu đông khô, cuối đông ẩm</p>
+    </div>
+    <div id="c2" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:408px" data-ek-beat="2">
+      <h3 class="ek-c-tim">Bức chắn Bạch Mã (16°B)</h3>
+      <p>Chặn gió lạnh suy yếu → phân hóa khí hậu Bắc – Nam</p>
+    </div>
+    <div id="c3" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:590px" data-ek-beat="3">
+      <h3 class="ek-c-lucLam">Gió mùa Tây Nam (T5 – T10)</h3>
+      <p>Mưa lớn Nam Bộ – Tây Nguyên · Phơn khô nóng Bắc Trung Bộ</p>
+    </div>
+    <div id="c4" class="ek-note ek-col-7 ek-span-6 ek-hidden" style="top:786px" data-ek-beat="4">
+      Hai mùa gió đối lập định hình khí hậu nhiệt đới ẩm gió mùa.
+    </div>
+  </div>
+</div>
+<style>
+  #c1 { border-left-color: var(--c-lam); }
+  #c2 { border-left-color: var(--c-tim); }
+  #c3 { border-left-color: var(--c-lucLam); }
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+EK.enter(tl, "#tt, #map-wrap", EK.cue(0), { from: "fade", stagger: 0.1 });
+EK.arrow(tl, "#w-ne-1", EK.cue(1), 1.1);
+EK.arrow(tl, "#w-ne-2", EK.cue(1) + 0.45, 1.3);
+EK.enter(tl, "#c1", EK.cue(1) + 0.15, { from: "right" });
+EK.enter(tl, "#p-bm, #c2", EK.cue(2), { from: "right", stagger: 0.15 });
+tl.to("#w-ne-1, #w-ne-2", { opacity: 0.22, duration: 0.6, ease: "power2.inOut" }, EK.cue(3) - 0.2);
+EK.arrow(tl, "#w-sw-1", EK.cue(3), 1.2);
+EK.arrow(tl, "#w-sw-2", EK.cue(3) + 0.35, 1.2);
+EK.arrow(tl, "#w-foehn", EK.cue(3) + 0.9, 1.1);
+EK.enter(tl, "#c3", EK.cue(3) + 0.2, { from: "right" });
+EK.enter(tl, "#c4", EK.cue(4), { from: "up" });
+window.__timelines["main"] = tl;
+</script>

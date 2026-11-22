@@ -1,0 +1,113 @@
+{
+  "skill": "trai-dat-chuyen-dong",
+  "evals": [
+    {
+      "id": "ngay-dem-bon-mua",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 10,
+        "title": "Trái Đất tự quay và chuyển động quanh Mặt Trời",
+        "slideText": "Trái Đất hình cầu tự quay từ Tây sang Đông quanh trục nghiêng 23°27' sinh ra ngày – đêm luân phiên. Khi chuyển động quanh Mặt Trời (trục không đổi hướng), lần lượt tạo 4 mùa: Xuân phân (21/3), Hạ chí (22/6), Thu phân (23/9), Đông chí (22/12).",
+        "speech": [
+          {
+            "text": "Trái Đất hình cầu tự quay từ Tây sang Đông quanh trục nghiêng 23 độ 27 phút, luôn chia một nửa sáng là ngày và một nửa tối là đêm.",
+            "durationMs": 4200
+          },
+          {
+            "text": "Khi chuyển động quanh Mặt Trời đến Hạ chí ngày 22 tháng 6, bán cầu Bắc ngả về phía Mặt Trời nên đón mùa hạ nóng và ngày dài.",
+            "durationMs": 4200
+          },
+          {
+            "text": "Qua Thu phân 23 tháng 9 đến Đông chí ngày 22 tháng 12, bán cầu Bắc chếch xa Mặt Trời nên bước vào mùa đông lạnh.",
+            "durationMs": 4200
+          },
+          {
+            "text": "Nhờ trục nghiêng 23 độ 27 phút không đổi hướng, Trái Đất có bốn mùa luân phiên đều đặn quanh năm.",
+            "durationMs": 3400
+          }
+        ]
+      },
+      "tieuChi": [
+        "trục nghiêng 23°27' song song ở 4 vị trí",
+        "đủ 4 mốc mùa"
+      ]
+    },
+    {
+      "id": "tu-quay-gio-mui",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 6,
+        "title": "Hệ quả tự quay quanh trục của Trái Đất",
+        "slideText": "Trái Đất quay từ Tây sang Đông 24 giờ sinh ra ngày đêm và giờ trên Trái Đất.",
+        "speech": [
+          {
+            "text": "Nhờ Trái Đất hình cầu tự quay quanh trục từ Tây sang Đông mà khắp nơi lần lượt có ngày và đêm.",
+            "durationMs": 5600
+          }
+        ]
+      },
+      "tieuChi": [
+        "hiển thị nửa sáng – nửa tối"
+      ]
+    },
+    {
+      "id": "ngay-dem-dai-ngan",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 10,
+        "title": "Ngày đêm dài ngắn theo mùa và vĩ độ",
+        "slideText": "Ngày 22/6 vòng cực Bắc có 24 giờ ban ngày; ngày 22/12 có 24 giờ ban đêm.",
+        "speech": [
+          {
+            "text": "Vào ngày Hạ chí 22 tháng 6, trục nghiêng làm vòng cực Bắc nằm hoàn toàn trong phần được chiếu sáng.",
+            "durationMs": 6000
+          }
+        ]
+      },
+      "tieuChi": [
+        "rõ đường phân chia sáng tối cắt vòng cực"
+      ]
+    },
+    {
+      "id": "gio-mua-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Gió mùa Đông Bắc Việt Nam",
+        "slideText": "Gió Đông Bắc thổi T11–T4 từ áp cao Xibia.",
+        "speech": [
+          {
+            "text": "Gió mùa Đông Bắc gây mùa đông lạnh cho miền Bắc Việt Nam.",
+            "durationMs": 5000
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng gio-mua-khi-hau"
+      ]
+    },
+    {
+      "id": "vong-nuoc-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 6,
+        "title": "Vòng tuần hoàn nước",
+        "slideText": "Bốc hơi → ngưng tụ → mưa → dòng chảy.",
+        "speech": [
+          {
+            "text": "Nước luân chuyển liên tục giữa biển, khí quyển và đất liền.",
+            "durationMs": 5000
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng vong-tuan-hoan-tu-nhien"
+      ]
+    }
+  ]
+}

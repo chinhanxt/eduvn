@@ -1,0 +1,57 @@
+{
+  "skills": [
+    {
+      "id": "trai-dat-chuyen-dong",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.97,
+  "lyDo": "Mô phỏng cơ học thiên văn: trục nghiêng 23°27' không đổi hướng, ngày đêm và 4 mùa quanh Mặt Trời.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.2,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Hiện Mặt Trời, Trái Đất, vòng sáng – tối (ngày đêm) và trục nghiêng 23°27'",
+      "skill": "trai-dat-chuyen-dong"
+    },
+    {
+      "i": 1,
+      "t0": 4.2,
+      "t1": 8.4,
+      "cau": [
+        1
+      ],
+      "cue": "kw:Hạ chí",
+      "viec": "Di chuyển Trái Đất tới vị trí Hạ chí 22/6 (bán cầu Bắc ngả về Mặt Trời)",
+      "skill": "trai-dat-chuyen-dong"
+    },
+    {
+      "i": 2,
+      "t0": 8.4,
+      "t1": 12.6,
+      "cau": [
+        2
+      ],
+      "cue": "kw:Đông chí",
+      "viec": "Đi qua Thu phân 23/9 tới Đông chí 22/12 (bán cầu Bắc chếch xa Mặt Trời)",
+      "skill": "trai-dat-chuyen-dong"
+    },
+    {
+      "i": 3,
+      "t0": 12.6,
+      "t1": 16.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:bốn mùa",
+      "viec": "Hoàn tất vòng quỹ đạo về Xuân phân 21/3 và thẻ kết luận 4 mùa",
+      "skill": "trai-dat-chuyen-dong"
+    }
+  ],
+  "khongCanHoatHinh": false
+}

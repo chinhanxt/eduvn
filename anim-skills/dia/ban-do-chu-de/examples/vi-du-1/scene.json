@@ -1,0 +1,28 @@
+{
+  "subject": "dia",
+  "grade": 12,
+  "title": "Mật độ dân số 34 tỉnh, thành phố Việt Nam (từ 01/07/2025)",
+  "slideText": "Bản đồ 34 tỉnh/thành (Nghị quyết 202/2025/QH15), kèm Đặc khu Hoàng Sa (TP. Đà Nẵng) và Trường Sa (Khánh Hòa). Cao nhất (>1.000 người/km²): Hà Nội 2.621; TP. Hồ Chí Minh 2.068; Hải Phòng 1.460; Hưng Yên 1.419; Ninh Bình 1.119. Trung bình cao (500–1.000): Bắc Ninh 767; Đồng Tháp 736; Vĩnh Long 676; Cần Thơ 660; An Giang 501. Thấp nhất (<150): Lai Châu 57; Điện Biên 71; Cao Bằng 86; Sơn La 100.",
+  "speech": [
+    {
+      "text": "Từ ngày 1 tháng 7 năm 2025, Việt Nam có 34 tỉnh, thành phố cùng hai quần đảo Hoàng Sa và Trường Sa.",
+      "durationMs": 3600
+    },
+    {
+      "text": "Mật độ dân số cao nhất tập trung ở Hà Nội 2.621, TP. Hồ Chí Minh 2.068 và Hải Phòng 1.460 người trên kilômét vuông.",
+      "durationMs": 4000
+    },
+    {
+      "text": "Nhóm mật độ khá cao từ 500 đến 1.000 người trên kilômét vuông gồm Bắc Ninh 767 và vùng đồng bằng sông Cửu Long như Đồng Tháp 736, Cần Thơ 660.",
+      "durationMs": 3800
+    },
+    {
+      "text": "Ngược lại, miền núi Tây Bắc và Đông Bắc rất thưa dân như Lai Châu chỉ 57, Điện Biên 71 và Cao Bằng 86 người trên kilômét vuông.",
+      "durationMs": 3600
+    },
+    {
+      "text": "Sự chênh lệch hơn 45 lần giữa Hà Nội và Lai Châu cho thấy dân cư phân bố chưa đều giữa đồng bằng với miền núi.",
+      "durationMs": 3000
+    }
+  ]
+}

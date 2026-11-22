@@ -1,0 +1,69 @@
+{
+  "skills": [
+    {
+      "id": "thap-dan-so",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.96,
+  "lyDo": "Cảnh so sánh biến đổi hình dáng tháp dân số Việt Nam giữa hai năm 1999 và 2019.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Dựng tháp dân số năm 1999 (Nam trái, Nữ phải)",
+      "skill": "thap-dan-so",
+      "duLieu": {
+        "namGoc": 1999
+      }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 8.0,
+      "cau": [
+        1
+      ],
+      "cue": "kw:2019",
+      "viec": "Biến hình các thanh nhóm tuổi từ 1999 sang 2019",
+      "skill": "thap-dan-so",
+      "duLieu": {
+        "namSau": 2019
+      }
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.4,
+      "cau": [
+        2
+      ],
+      "cue": "kw:33,1",
+      "viec": "Nổi bật tỉ trọng 0–14 giảm 33,1% → 24,3% và 65+ tăng 5,8% → 7,7%",
+      "skill": "thap-dan-so",
+      "duLieu": {
+        "tre99": 33.1,
+        "tre19": 24.3,
+        "gia99": 5.8,
+        "gia19": 7.7
+      }
+    },
+    {
+      "i": 3,
+      "t0": 12.4,
+      "t1": 16.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:dân số vàng",
+      "viec": "Hiện thẻ kết luận cơ cấu dân số vàng và già hóa dân số",
+      "skill": "thap-dan-so"
+    }
+  ],
+  "khongCanHoatHinh": false
+}

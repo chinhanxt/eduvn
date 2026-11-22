@@ -239,7 +239,12 @@ export function buildDiaQuestionPrompt(req: GenerateDiaQuestionReq): { system: s
     tinh_toan_so_lieu: `Dạng "tính toán số liệu Địa lí" (type: "short_answer"):
 - Chọn một trong các phép tính: tỉ trọng (%), tốc độ tăng trưởng (%, năm gốc = 100%), mật độ dân số (người/km²), biên độ nhiệt (°C), cán cân xuất nhập khẩu, năng suất (tạ/ha), tỉ lệ gia tăng tự nhiên (%).
 - Ghi rõ yêu cầu làm tròn (hàng đơn vị hoặc 1 chữ số thập phân) và đơn vị trong đề bài.
-- Bắt buộc trả kèm trường "problem" (object DiaCalcProblem) để máy chủ tự tính lại và ghi đè đáp số tất định.`,
+- Bắt buộc trả kèm trường "problem" đúng schema sau để máy chủ tự tính lại và ghi đè đáp số tất định:
+  + Mật độ dân số: {"phepTinh":"mat_do_dan_so","danSo":1324.5,"donViDanSo":"nghin_nguoi","dienTich":5994.5,"donViDienTich":"km2","lamTron":0}
+  + Tỉ trọng: {"phepTinh":"ti_trong","giaTriThanhPhan":355.5,"tongGiaTri":683.0,"lamTron":1}
+  + Tốc độ tăng trưởng: {"phepTinh":"toc_do_tang_truong","giaTriNamSau":355.5,"giaTriNamGoc":162.0,"lamTron":1}
+  + Biên độ nhiệt: {"phepTinh":"bien_do_nhiet","nhietDoThang":[16.4,28.9],"lamTron":1}
+  + Năng suất: {"phepTinh":"nang_suat","sanLuong":43500,"donViSanLuong":"nghin_tan","dienTich":7119.3,"donViDienTich":"nghin_ha","lamTron":1}`,
   };
 
   return {

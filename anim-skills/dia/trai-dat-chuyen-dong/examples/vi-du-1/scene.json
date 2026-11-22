@@ -1,0 +1,24 @@
+{
+  "subject": "dia",
+  "grade": 10,
+  "title": "Trái Đất tự quay và chuyển động quanh Mặt Trời",
+  "slideText": "Trái Đất hình cầu tự quay từ Tây sang Đông quanh trục nghiêng 23°27' sinh ra ngày – đêm luân phiên. Khi chuyển động quanh Mặt Trời (trục không đổi hướng), lần lượt tạo 4 mùa: Xuân phân (21/3), Hạ chí (22/6), Thu phân (23/9), Đông chí (22/12).",
+  "speech": [
+    {
+      "text": "Trái Đất hình cầu tự quay từ Tây sang Đông quanh trục nghiêng 23 độ 27 phút, luôn chia một nửa sáng là ngày và một nửa tối là đêm.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Khi chuyển động quanh Mặt Trời đến Hạ chí ngày 22 tháng 6, bán cầu Bắc ngả về phía Mặt Trời nên đón mùa hạ nóng và ngày dài.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Qua Thu phân 23 tháng 9 đến Đông chí ngày 22 tháng 12, bán cầu Bắc chếch xa Mặt Trời nên bước vào mùa đông lạnh.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Nhờ trục nghiêng 23 độ 27 phút không đổi hướng, Trái Đất có bốn mùa luân phiên đều đặn quanh năm.",
+      "durationMs": 3400
+    }
+  ]
+}

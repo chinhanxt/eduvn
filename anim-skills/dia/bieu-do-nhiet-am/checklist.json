@@ -1,0 +1,42 @@
+{
+  "requires": [
+    {
+      "selector": "[data-ek-chart=\"nhiet-am\"]",
+      "min": 1
+    },
+    {
+      "selector": ".ek-bar",
+      "min": 12,
+      "max": 12
+    },
+    {
+      "selector": ".ek-season",
+      "min": 1
+    }
+  ],
+  "motion": [
+    {
+      "kind": "before",
+      "a": "[data-ek-beat=\"0\"]",
+      "b": "[data-ek-beat=\"1\"]"
+    },
+    {
+      "kind": "before",
+      "a": "[data-ek-beat=\"1\"]",
+      "b": "[data-ek-beat=\"3\"]"
+    },
+    {
+      "kind": "staysInFrame",
+      "selector": "#c-rain"
+    }
+  ],
+  "limits": {
+    "cameraMoves": 0,
+    "labels": 16,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

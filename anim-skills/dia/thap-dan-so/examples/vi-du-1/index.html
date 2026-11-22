@@ -1,0 +1,47 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-12" style="top:54px">ĐỊA LÍ 12 · CƠ CẤU DÂN SỐ THEO TUỔI VÀ GIỚI TÍNH · GSO</div>
+  <div class="ek-stage">
+    <h1 id="tt" class="ek-title ek-col-8 ek-span-5 ek-hidden" style="top:106px">Tháp dân số <span class="kw">Việt Nam</span></h1>
+    <div id="yr-card" class="ek-col-8 ek-span-5 ek-hidden" style="top:256px" data-ek-beat="0">
+      <div class="ek-eyebrow">NĂM TỔNG ĐIỀU TRA</div>
+      <div id="n-yr" class="ek-num">1999</div>
+    </div>
+    <div id="pyr-box" class="ek-col-1 ek-span-7 ek-hidden" style="top:138px;height:750px">
+      <svg id="pyr" width="970" height="720" data-ek-chart="thap" data-ek-values='{"nhan":["0–9","10–19","20–29","30–39","40–49","50–59","60–69","70+"],"chuoi":[{"ten":"Nam","donVi":"%","giaTri":[10.4,11.4,8.6,7.2,5.1,3.0,2.0,1.4]},{"ten":"Nữ","donVi":"%","giaTri":[9.8,10.9,8.8,7.5,5.4,3.4,2.5,2.6]}],"chuoiSau":[{"ten":"Nam 2019","donVi":"%","giaTri":[8.2,7.1,8.1,8.4,6.8,5.6,3.3,2.2]},{"ten":"Nữ 2019","donVi":"%","giaTri":[7.5,6.7,7.8,8.3,6.9,6.0,3.8,3.3]}]}'></svg>
+    </div>
+    <div id="c-morph" class="ek-card ek-col-8 ek-span-5 ek-hidden" style="top:398px" data-ek-beat="1">
+      <h3>Biến hình 1999 → 2019</h3>
+      <p>Đáy tháp thu hẹp · Thân phình rộng</p>
+    </div>
+    <div id="c-stat" class="ek-card ek-col-8 ek-span-5 ek-hidden" style="top:568px" data-ek-beat="2">
+      <h3>Chuyển dịch 3 nhóm tuổi</h3>
+      <p>0–14: 33,1%→24,3% · 65+: 7,7%</p>
+    </div>
+    <div id="c-end" class="ek-card ek-col-8 ek-span-5 ek-hidden" style="top:738px" data-ek-beat="3">
+      <h3 class="ek-c-xanhLa">Cơ cấu dân số vàng</h3>
+      <p>Nhóm 15–64 đạt 68,0%, đang già hóa</p>
+    </div>
+  </div>
+</div>
+<style>
+  #n-yr { font-size: 74px; margin-top: 6px; }
+  .ek-card { padding: 14px 24px 16px; }
+  #c-end { border-left-color: var(--c-xanhLa); }
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+EK.enter(tl, "#tt, #yr-card, #pyr-box", EK.cue(0), { from: "up", stagger: 0.12 });
+tl.fromTo("#pyr .ek-bar-0", { scaleX: 0 }, { scaleX: 1, transformOrigin: "right center", duration: 1.0, stagger: 0.05, ease: "expo.out" }, EK.cue(0) + 0.3);
+tl.fromTo("#pyr .ek-bar-1", { scaleX: 0 }, { scaleX: 1, transformOrigin: "left center", duration: 1.0, stagger: 0.05, ease: "expo.out" }, EK.cue(0) + 0.3);
+EK.count(tl, "#n-yr", 1999, 2019, EK.cue(1), 1.4, { decimals: 0 });
+EK.enter(tl, "#c-morph", EK.cue(1), { from: "right" });
+const bars = document.querySelectorAll("#pyr .ek-bar[data-scale-after]");
+bars.forEach(function (el, idx) {
+  const s = parseFloat(el.getAttribute("data-scale-after")) || 1;
+  const orig = el.classList.contains("ek-bar-0") ? "right center" : "left center";
+  tl.to(el, { scaleX: s, transformOrigin: orig, duration: 1.5, ease: "power3.inOut" }, EK.cue(1) + 0.1 + (idx % 8) * 0.04);
+});
+EK.enter(tl, "#c-stat", EK.cue(2), { from: "right" });
+EK.enter(tl, "#c-end", EK.cue(3), { from: "up" });
+window.__timelines["main"] = tl;
+</script>

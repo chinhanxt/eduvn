@@ -1,0 +1,113 @@
+{
+  "skill": "bieu-do-co-cau",
+  "evals": [
+    {
+      "id": "gdp-mien-4-nam",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Chuyển dịch cơ cấu GDP Việt Nam (2010–2023)",
+        "slideText": "Cơ cấu GDP Việt Nam (%) qua 4 mốc 2010, 2015, 2018, 2023 (tổng = 100%): Nông–lâm–thủy sản: 15,4 → 14,5 → 13,9 → 12,0; Công nghiệp & xây dựng: 33,0 → 34,3 → 35,4 → 37,1; Dịch vụ & thuế SP: 51,6 → 51,2 → 50,7 → 50,9.",
+        "speech": [
+          {
+            "text": "Với 4 mốc năm 2010, 2015, 2018 và 2023, ta dùng biểu đồ miền 100 phần trăm và giãn đúng khoảng cách năm thật.",
+            "durationMs": 4000
+          },
+          {
+            "text": "Miền nông, lâm nghiệp và thủy sản thu hẹp liên tục từ 15,4 phần trăm xuống còn 12,0 phần trăm.",
+            "durationMs": 4000
+          },
+          {
+            "text": "Trong khi đó, công nghiệp và xây dựng tăng nhanh từ 33,0 lên 37,1 phần trăm, còn dịch vụ luôn chiếm hơn 50 phần trăm.",
+            "durationMs": 4400
+          },
+          {
+            "text": "Chuyển dịch cơ cấu này phản ánh rõ quá trình công nghiệp hóa, hiện đại hóa đất nước.",
+            "durationMs": 3600
+          }
+        ]
+      },
+      "tieuChi": [
+        "biểu đồ miền 100%",
+        "giãn năm đúng 5-3-5"
+      ]
+    },
+    {
+      "id": "co-cau-tron-2-nam",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Cơ cấu giá trị sản xuất nông nghiệp 2010 và 2023",
+        "slideText": "Trồng trọt 73,4% → 64,2%; Chăn nuôi 24,5% → 33,1%; Dịch vụ NN 2,1% → 2,7%.",
+        "speech": [
+          {
+            "text": "Chỉ có 2 năm nên ta vẽ hai biểu đồ tròn so sánh cơ cấu trồng trọt và chăn nuôi.",
+            "durationMs": 5600
+          }
+        ]
+      },
+      "tieuChi": [
+        "2 hình tròn tổng 100%"
+      ]
+    },
+    {
+      "id": "co-cau-lao-dong",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Chuyển dịch cơ cấu lao động 2010–2023",
+        "slideText": "Nông nghiệp 48,6% → 26,9%; Công nghiệp 21,7% → 33,6%; Dịch vụ 29,7% → 39,5%.",
+        "speech": [
+          {
+            "text": "Qua 5 mốc năm, tỉ trọng lao động nông nghiệp giảm mạnh, công nghiệp và dịch vụ tăng nhanh.",
+            "durationMs": 5800
+          }
+        ]
+      },
+      "tieuChi": [
+        "tổng từng năm 100%"
+      ]
+    },
+    {
+      "id": "toc-do-tang-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Tốc độ tăng trưởng sản lượng thủy sản 2010–2023",
+        "slideText": "Lấy 2010 = 100%: Nuôi trồng đạt 198%, khai thác đạt 158%.",
+        "speech": [
+          {
+            "text": "Tốc độ tăng trưởng nuôi trồng thủy sản cao hơn nhiều so với khai thác.",
+            "durationMs": 5200
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: tốc độ tăng trưởng dùng biểu đồ đường, không phải cơ cấu 100%"
+      ]
+    },
+    {
+      "id": "mat-cat-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Lát cắt địa hình Tây Bắc – Đông Nam",
+        "slideText": "Đỉnh Fansipan 3.143 m dốc dần xuống Đồng bằng sông Hồng.",
+        "speech": [
+          {
+            "text": "Mặt cắt địa hình cho thấy độ cao giảm rõ từ Tây Bắc xuống Đông Nam.",
+            "durationMs": 5000
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng mat-cat-dia-hinh"
+      ]
+    }
+  ]
+}

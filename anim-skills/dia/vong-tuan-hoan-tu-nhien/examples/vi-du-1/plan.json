@@ -1,0 +1,57 @@
+{
+  "skills": [
+    {
+      "id": "vong-tuan-hoan-tu-nhien",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.96,
+  "lyDo": "Trình bày quy trình khép kín 4 bước của vòng tuần hoàn nước trong tự nhiên.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.0,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Hiện biển, Mặt Trời và mũi tên bốc hơi đi lên",
+      "skill": "vong-tuan-hoan-tu-nhien"
+    },
+    {
+      "i": 1,
+      "t0": 4.0,
+      "t1": 8.0,
+      "cau": [
+        1
+      ],
+      "cue": "kw:ngưng tụ",
+      "viec": "Hiện khối mây ngưng tụ và mũi tên gió thổi vào lục địa",
+      "skill": "vong-tuan-hoan-tu-nhien"
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.0,
+      "cau": [
+        2
+      ],
+      "cue": "kw:mưa",
+      "viec": "Vẽ mũi tên mưa rơi xuống vùng núi và lục địa",
+      "skill": "vong-tuan-hoan-tu-nhien"
+    },
+    {
+      "i": 3,
+      "t0": 12.0,
+      "t1": 16.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:chảy ra biển",
+      "viec": "Vẽ dòng chảy mặt và nước ngầm khép vòng về biển",
+      "skill": "vong-tuan-hoan-tu-nhien"
+    }
+  ],
+  "khongCanHoatHinh": false
+}
