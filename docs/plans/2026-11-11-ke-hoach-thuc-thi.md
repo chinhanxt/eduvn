@@ -74,7 +74,11 @@ Thứ tự gộp: G1 → G6 → GX → S1. Gộp xong G1 thì **khởi động l
 3. G3 đợt 3–4 · G7 đợt 3–4 · G6 đợt 3–4 · G5 đợt 3
 4. G4 · G7 đợt 5 · các mục ưu tiên thấp (MarginNote, IMA, CLI-Anything…)
 
-## Giai đoạn D — P15 Văn/Sử/Địa (~2–3 ngày, sau khi S2 có khuôn bản đồ/thơ)
+## Giai đoạn D — Gói môn học (THAY ĐỔI 2026-11-23)
+
+Đã thay bằng 5 gói môn Văn · Sử · Địa · Hoá · Sinh, mỗi gói một agent riêng; luật chung ở `docs/plans/mon-hoc-chung.md`. S2 bỏ 9 skill của các môn này. Phần dưới giữ để tham khảo.
+
+### (cũ) P15 Văn/Sử/Địa
 
 1. **Dữ liệu:**
    - Natural Earth `_vnm`; kiểm bằng mắt rằng Hoàng Sa, Trường Sa thuộc Việt Nam.
