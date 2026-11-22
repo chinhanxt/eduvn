@@ -234,3 +234,19 @@ authors nor the names of their institutions may be used to endorse or promote pr
 this software without specific prior written permission. THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT
 WARRANTY OF ANY KIND; see the full license text at the URL above.
 ```
+
+
+## Dữ liệu bản đồ gói Địa lí (`services/anim-kit-data/geo/`)
+
+Các lớp nền bản đồ TopoJSON (dùng chung cho môn Địa lí và môn Lịch sử) được tổng hợp và giản lược từ các nguồn mở sau:
+
+- **Natural Earth** (`nvkelso/natural-earth-vector`, v5.1.2) — **Public Domain (CC0 / PD)**.
+  - `ne_10m_admin_0_countries_vnm.geojson`: đường bờ biển, biên giới quốc gia theo góc nhìn Việt Nam (giữ đầy đủ quần đảo Hoàng Sa và quần đảo Trường Sa thuộc Việt Nam) → `ne_vnm_admin0.topo.json`.
+  - `ne_10m_rivers_lake_centerlines.geojson`, `ne_10m_lakes.geojson`: hệ thống sông và hồ lớn → `song-ho.topo.json`.
+  - Nguồn: https://www.naturalearthdata.com/ · https://github.com/nvkelso/natural-earth-vector
+- **geoBoundaries** (`wmgeolab/geoBoundaries`, `gbOpen/VNM/ADM1`) — **Public Domain** (nguồn gốc Wikimedia Commons).
+  - Ranh giới 63 tỉnh/thành phố cũ (`vn63.topo.json`, gộp Côn Đảo về Bà Rịa – Vũng Tàu) và làm cơ sở hình học gộp thành 34 tỉnh/thành phố sau sắp xếp 01/07/2025 theo Nghị quyết 202/2025/QH15 (`vn34.topo.json`), gắn kèm quần đảo Hoàng Sa (TP. Đà Nẵng) và quần đảo Trường Sa (tỉnh Khánh Hòa) từ Natural Earth `_vnm`.
+  - Nguồn: https://www.geoboundaries.org/
+- **OpenStreetMap** — **Open Database License (ODbL 1.0)**, © OpenStreetMap contributors.
+  - Hình học chi tiết các hồ tiêu biểu của Việt Nam (Hồ Ba Bể, Hồ Thác Bà, Hồ Hòa Bình, Hồ Tây, Biển Hồ Pleiku, Hồ Dầu Tiếng, Hồ Trị An) trong `song-ho.topo.json` và đối chiếu toạ độ địa danh trong `dia-danh.json`.
+  - Toàn văn giấy phép: https://opendatacommons.org/licenses/odbl/1-0/
