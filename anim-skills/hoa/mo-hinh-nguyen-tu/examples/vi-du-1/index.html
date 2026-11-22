@@ -1,0 +1,134 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1920" data-height="1080">
+  <div id="meta" class="ek-meta ek-col-1 ek-span-10" style="top:64px">HOÁ HỌC 10 · CẤU TẠO NGUYÊN TỬ</div>
+  <h1 id="title" class="ek-title ek-col-1 ek-span-12" style="top:112px" data-ek-words>Mô hình nguyên tử <span class="kw">Carbon-12</span></h1>
+
+  <div class="ek-stage">
+    <!-- Trái: Thẻ ký hiệu + bảng đếm 3 loại hạt + tổng kết -->
+    <div id="symCard" class="ek-card sym-box ek-col-1 ek-span-5 ek-hidden" style="top:224px" data-ek-beat="0">
+      <div class="nuclide">
+        <div class="nuc-nums"><span class="ek-c-doSon">12</span><span class="ek-c-lam">6</span></div>
+        <span class="nuc-ch">C</span>
+      </div>
+      <div class="nuc-meta">
+        <h3>Carbon (A = 12)</h3>
+        <p>Z = 6 · Chu kỳ 2 · Nhóm IVA</p>
+      </div>
+    </div>
+
+    <div id="nucCard" class="ek-card stat-card ek-col-1 ek-span-5 ek-hidden" style="top:426px" data-ek-beat="1">
+      <div class="st-row"><span class="dot d-p"></span><span class="st-name">Proton (+)</span><span id="cntP" class="st-val ek-c-doSon">0</span></div>
+      <div class="st-row"><span class="dot d-n"></span><span class="st-name">Neutron (0)</span><span id="cntN" class="st-val ek-c-ink2">0</span></div>
+      <div class="st-row"><span class="dot d-e"></span><span class="st-name">Electron (−)</span><span id="cntE" class="st-val ek-c-lam">0</span></div>
+    </div>
+
+    <div id="balCard" class="ek-card ok-card ek-col-1 ek-span-5 ek-hidden" style="top:706px" data-ek-beat="3">
+      <h3>Trung hoà về điện</h3>
+      <p>6p = 6e = Z · A = Z + N = 12</p>
+    </div>
+
+    <!-- Phải: Sân khấu SVG mô hình Bohr Carbon-12 (828×680) -->
+    <svg id="atomSvg" class="ek-col-7 ek-span-6" style="top:214px" width="828" height="680" viewBox="0 0 828 680">
+      <!-- Lớp vỏ L (r=260) và lớp vỏ K (r=160) -->
+      <circle id="orbL" cx="414" cy="340" r="260" class="orb-ring"/>
+      <circle id="orbK" cx="414" cy="340" r="160" class="orb-ring"/>
+
+      <!-- Nhãn tên lớp vỏ cố định (không quay) -->
+      <text id="lblK" x="596" y="266" class="sh-lbl ek-fill-lam ek-hidden" data-ek-beat="2">Lớp K (2e)</text>
+      <text id="lblL" x="626" y="136" class="sh-lbl ek-fill-lucLam ek-hidden">Lớp L (4e)</text>
+
+      <!-- Hạt nhân: 6 proton (đỏ son) + 6 neutron (xám mực) bó gọn quanh tâm (414, 340) -->
+      <g id="nucleus" class="ek-hidden">
+        <circle cx="414" cy="340" r="68" class="nuc-halo"/>
+        <!-- 6 neutron -->
+        <circle cx="386" cy="316" r="16" class="n-dot"/>
+        <circle cx="442" cy="316" r="16" class="n-dot"/>
+        <circle cx="414" cy="368" r="16" class="n-dot"/>
+        <circle cx="378" cy="354" r="16" class="n-dot"/>
+        <circle cx="450" cy="354" r="16" class="n-dot"/>
+        <circle cx="414" cy="306" r="16" class="n-dot"/>
+        <!-- 6 proton -->
+        <circle cx="402" cy="336" r="16" class="p-dot"/>
+        <circle cx="428" cy="336" r="16" class="p-dot"/>
+        <circle cx="414" cy="352" r="16" class="p-dot"/>
+        <circle cx="394" cy="364" r="16" class="p-dot"/>
+        <circle cx="436" cy="364" r="16" class="p-dot"/>
+        <circle cx="414" cy="322" r="16" class="p-dot"/>
+        <text x="414" y="454" text-anchor="middle" class="nuc-lbl ek-fill-doSon">Hạt nhân (+6)</text>
+      </g>
+
+      <!-- Nhóm electron lớp K (2e đối xứng) -->
+      <g id="shellK" class="spin-g ek-hidden">
+        <circle cx="254" cy="340" r="17" class="e-dot ek-fill-lam"/>
+        <circle cx="574" cy="340" r="17" class="e-dot ek-fill-lam"/>
+      </g>
+
+      <!-- Nhóm electron lớp L (4e vuông góc) -->
+      <g id="shellL" class="spin-g ek-hidden">
+        <circle cx="414" cy="80" r="17" class="e-dot ek-fill-lucLam"/>
+        <circle cx="674" cy="340" r="17" class="e-dot ek-fill-lucLam"/>
+        <circle cx="414" cy="600" r="17" class="e-dot ek-fill-lucLam"/>
+        <circle cx="154" cy="340" r="17" class="e-dot ek-fill-lucLam"/>
+      </g>
+    </svg>
+  </div>
+</div>
+<style>
+  .sym-box{display:flex;align-items:center;gap:24px;padding:20px 28px}
+  .nuclide{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:14px;background:var(--accent-soft);border:3px solid var(--accent);flex:none}
+  .nuc-nums{display:flex;flex-direction:column;align-items:flex-end;font-family:var(--ui);font-size:36px;font-weight:700;line-height:1.1}
+  .nuc-ch{font-family:var(--read);font-size:74px;font-weight:700;color:var(--ink);line-height:1}
+  .nuc-meta h3{font-size:42px;margin-bottom:6px}
+  .nuc-meta p{font-size:36px}
+  .stat-card{display:flex;flex-direction:column;gap:18px;padding:24px 30px;border-left-color:var(--c-doSon)}
+  .st-row{display:flex;align-items:center;gap:16px}
+  .dot{width:24px;height:24px;border-radius:50%;flex:none}
+  .d-p{background:var(--c-doSon)}
+  .d-n{background:var(--ink3)}
+  .d-e{background:var(--c-lam)}
+  .st-name{font-family:var(--ui);font-size:38px;font-weight:600;color:var(--ink)}
+  .st-val{margin-left:auto;font-family:var(--ui);font-size:48px;font-weight:700;font-variant-numeric:tabular-nums}
+  .ok-card{border-left-color:var(--ok);padding:20px 28px}
+  .ok-card h3{font-size:40px;color:var(--ok);margin-bottom:6px}
+  .ok-card p{font-size:38px;font-weight:600;color:var(--ink)}
+  .orb-ring{fill:none;stroke:var(--line);stroke-width:4px}
+  .nuc-halo{fill:var(--sunken);stroke:var(--c-doSon);stroke-width:4px}
+  .p-dot{fill:var(--c-doSon);stroke:var(--surface);stroke-width:2.5px}
+  .n-dot{fill:var(--ink3);stroke:var(--surface);stroke-width:2.5px}
+  .e-dot{stroke:var(--surface);stroke-width:3px}
+  .sh-lbl{font-family:var(--ui);font-size:36px;font-weight:700}
+  .nuc-lbl{font-family:var(--ui);font-size:36px;font-weight:700}
+  .spin-g{transform-origin:414px 340px}
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+
+// Beat 0: Tiêu đề + ký hiệu Carbon-12
+EK.enter(tl, "#meta", 0.05, { from: "fade", dur: 0.45 });
+EK.words(tl, "#title", { t: 0.15, per: 0.08 });
+EK.enter(tl, "#symCard", EK.cue(0), { from: "up", dur: 0.65 });
+EK.draw(tl, "#orbK", 0.9, 1.0);
+EK.draw(tl, "#orbL", 1.3, 1.1);
+
+// Beat 1: Hạt nhân (6 proton + 6 neutron)
+const t1 = EK.cue(1);
+EK.enter(tl, "#nucCard", t1, { from: "up", dur: 0.6 });
+EK.enter(tl, "#nucleus", t1 + 0.2, { from: "scale", dur: 0.7 });
+EK.count(tl, "#cntP", 0, 6, t1 + 0.5, 1.0, { decimals: 0 });
+EK.count(tl, "#cntN", 0, 6, t1 + 1.2, 1.0, { decimals: 0 });
+
+// Beat 2: Vỏ nguyên tử (lớp K 2e + lớp L 4e quay đều)
+const t2 = EK.cue(2);
+EK.enter(tl, "#lblK, #shellK", t2, { from: "fade", dur: 0.6 });
+EK.count(tl, "#cntE", 0, 2, t2 + 0.1, 0.7, { decimals: 0 });
+EK.enter(tl, "#lblL, #shellL", t2 + 1.2, { from: "fade", dur: 0.6 });
+EK.count(tl, "#cntE", 2, 6, t2 + 1.2, 0.9, { decimals: 0 });
+tl.to("#shellK", { rotation: 180, svgOrigin: "414 340", duration: 7.5, ease: "none" }, t2);
+tl.to("#shellL", { rotation: -120, svgOrigin: "414 340", duration: 6.3, ease: "none" }, t2 + 1.2);
+
+// Beat 3: Tổng kết trung hoà điện
+const t3 = EK.cue(3);
+EK.enter(tl, "#balCard", t3, { from: "up", dur: 0.65 });
+EK.mark(tl, "#balCard p", t3 + 0.8, "highlight", { color: "ok", dur: 0.6 });
+
+window.__timelines["main"] = tl;
+</script>

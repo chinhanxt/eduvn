@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 10,
+  "title": "Xu hướng biến đổi độ âm điện trong bảng tuần hoàn",
+  "slideText": "Thang Pauling — Chu kỳ 2: Li 0,98 · Be 1,57 · B 2,04 · C 2,55 · N 3,04 · O 3,44 · F 3,98 (tăng dần). Nhóm VIIA: F 3,98 · Cl 3,16 · Br 2,96 · I 2,66 (giảm dần).",
+  "speech": [
+    { "text": "Hãy quan sát quy luật biến đổi độ âm điện Pauling trên Chu kỳ 2 và Nhóm VIIA của bảng tuần hoàn.", "durationMs": 3600 },
+    { "text": "Trong Chu kỳ 2 từ trái sang phải, độ âm điện tăng đều từ Lithium 0,98 lên tới Fluorine 3,98.", "durationMs": 3800 },
+    { "text": "Trong Nhóm VIIA từ trên xuống dưới, bán kính tăng làm độ âm điện giảm từ 3,98 xuống Iodine 2,66.", "durationMs": 3800 },
+    { "text": "Kết quả: Fluorine nằm góc trên bên phải có độ âm điện cực đại bằng 3,98.", "durationMs": 3800 }
+  ]
+}

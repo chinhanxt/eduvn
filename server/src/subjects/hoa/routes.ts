@@ -235,8 +235,9 @@ export function registerHoaRoutes(app: FastifyInstance, ctx: HoaRouteCtx): void 
           answer: obj.answer as number | string | boolean[] | undefined,
           statements: Array.isArray(obj.statements) ? obj.statements.map(String) : undefined,
         });
+        const textToVerify = meta.kind === "can_bang" ? (q.explanation ?? "") : `${q.stem}\n${q.explanation ?? ""}`;
         const verification = verifyChemistryContent({
-          text: `${q.stem}\n${q.explanation ?? ""}`,
+          text: textToVerify,
           checks:
             meta.kind === "cau_hinh_e"
               ? [{ type: "electron_config", z: meta.z, charge: meta.charge, stated: electronConfiguration(meta.z, meta.charge).ascii, requireFull: false }]

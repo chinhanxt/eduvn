@@ -1,0 +1,80 @@
+{
+  "skill": "phan-ung-va-cham",
+  "evals": [
+    {
+      "id": "nhiet-do-25-65",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Ảnh hưởng của nhiệt độ đến tốc độ phản ứng",
+        "slideText": "So sánh bình phản ứng ở 25 °C và 65 °C: tăng nhiệt độ → tăng động năng hạt → tăng tần số va chạm hiệu quả.",
+        "speech": [
+          { "text": "So sánh cùng một phản ứng xảy ra trong hai bình ở 25 độ C và 65 độ C.", "durationMs": 3800 },
+          { "text": "Ở 25 độ C, các hạt chuyển động chậm nên số va chạm hiệu quả rất ít.", "durationMs": 3800 },
+          { "text": "Ở 65 độ C, động năng tăng cao khiến tần số va chạm hiệu quả tăng mạnh.", "durationMs": 3800 },
+          { "text": "Nhiệt độ càng cao thì tốc độ phản ứng càng lớn.", "durationMs": 3600 }
+        ]
+      },
+      "tieuChi": ["hai bình so sánh 25 °C và 65 °C", "hạt chuyển động có seed cố định và đếm va chạm hiệu quả"]
+    },
+    {
+      "id": "nong-do-loang-dac",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Ảnh hưởng của nồng độ đến tần số va chạm",
+        "slideText": "Dung dịch HCl 0,5 M so với 2,0 M: tăng nồng độ → tăng mật độ hạt → tăng va chạm hiệu quả.",
+        "speech": [
+          { "text": "Khi tăng nồng độ dung dịch từ 0,5 M lên 2,0 M, số hạt chất tan trong một đơn vị thể tích tăng lên.", "durationMs": 4800 },
+          { "text": "Mật độ hạt dày hơn làm số va chạm hiệu quả tăng nhanh, kéo theo tốc độ phản ứng tăng.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["mật độ hạt hai bình khác rõ rệt", "thể hiện va chạm hiệu quả"]
+    },
+    {
+      "id": "nang-luong-hoat-hoa",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Thuyết va chạm hiệu quả và chất xúc tác",
+        "slideText": "Chỉ các va chạm đủ năng lượng hoạt hoá Ea và đúng hướng mới tạo ra sản phẩm.",
+        "speech": [
+          { "text": "Không phải mọi va chạm giữa hai phân tử đều dẫn đến phản ứng hoá học.", "durationMs": 4200 },
+          { "text": "Chỉ những va chạm có đủ năng lượng hoạt hoá và định hướng thuận lợi mới là va chạm hiệu quả.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["phân biệt va chạm thường và va chạm hiệu quả có vòng sáng"]
+    },
+    {
+      "id": "khong-chon-cau-hinh-e",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Cấu hình electron của Sodium (Z = 11)",
+        "slideText": "Na (Z = 11): 1s² 2s² 2p⁶ 3s¹.",
+        "speech": [
+          { "text": "Sodium có 11 electron phân bố vào 3 lớp vỏ với 1 electron lớp ngoài cùng 3s1.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về cấu hình electron, nên chọn cau-hinh-electron"]
+    },
+    {
+      "id": "khong-chon-pin-dien",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 12,
+        "title": "Nguyên tắc hoạt động của pin Galvani Zn–Cu",
+        "slideText": "Cực âm Zn bị oxi hoá, cực dương Cu xảy ra quá trình khử ion Cu²⁺.",
+        "speech": [
+          { "text": "Trong pin điện hoá kẽm đồng, electron di chuyển qua dây dẫn từ thanh kẽm sang thanh đồng.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về pin điện hoá, nên chọn dien-phan-pin-dien-hoa"]
+    }
+  ]
+}

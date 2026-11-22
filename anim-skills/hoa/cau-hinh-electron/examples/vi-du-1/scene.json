@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 10,
+  "title": "Cấu hình electron nguyên tử Oxygen (Z = 8)",
+  "slideText": "Oxygen (Z = 8): 8 electron. Điền ô lượng tử theo Aufbau (1s → 2s → 2p), Pauli (↑↓) và Hund (3 ô 2p). Cấu hình: 1s² 2s² 2p⁴ — 2 electron độc thân.",
+  "speech": [
+    { "text": "Nguyên tử Oxygen có Z bằng 8, gồm 8 electron xếp vào các phân lớp 1s, 2s và 2p theo chiều tăng năng lượng.", "durationMs": 3800 },
+    { "text": "Áp dụng nguyên lý Aufbau và Pauli: 2 electron điền đầy ô 1s và 2 electron điền đầy ô 2s với spin ngược chiều.", "durationMs": 4000 },
+    { "text": "Bốn electron còn lại vào phân lớp 2p: theo quy tắc Hund, 3 electron điền lần lượt từng ô trước rồi electron thứ 8 mới ghép đôi.", "durationMs": 4200 },
+    { "text": "Ta thu được cấu hình 1s2 2s2 2p4 với 2 electron độc thân ở lớp ngoài cùng.", "durationMs": 4000 }
+  ]
+}

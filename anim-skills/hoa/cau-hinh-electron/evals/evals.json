@@ -1,0 +1,80 @@
+{
+  "skill": "cau-hinh-electron",
+  "evals": [
+    {
+      "id": "oxygen-z8",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Viết cấu hình electron nguyên tử Oxygen (Z = 8)",
+        "slideText": "O (Z = 8): 1s² 2s² 2p⁴. Điền ô lượng tử theo Aufbau, Pauli, Hund → 2 electron độc thân.",
+        "speech": [
+          { "text": "Nguyên tử Oxygen có Z bằng 8, gồm 8 electron phân bố vào các phân lớp 1s, 2s và 2p.", "durationMs": 4000 },
+          { "text": "Theo nguyên lý vững bền và Pauli, 4 electron đầu tiên điền đầy hai ô 1s và 2s với spin ngược chiều.", "durationMs": 4000 },
+          { "text": "Bốn electron còn lại vào 3 ô 2p: điền 3 mũi tên hướng lên theo quy tắc Hund rồi mới ghép đôi ô đầu tiên.", "durationMs": 4500 },
+          { "text": "Vậy cấu hình electron của Oxygen là 1s2 2s2 2p4 và có 2 electron độc thân.", "durationMs": 3500 }
+        ]
+      },
+      "tieuChi": ["điền đúng thứ tự 1s → 2s → 2p", "3 electron vào 3 ô 2p trước khi ghép đôi"]
+    },
+    {
+      "id": "chromium-z24-exception",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Ngoại lệ bán bão hoà của Chromium (Z = 24)",
+        "slideText": "Cr (Z = 24): [Ar] 3d⁵ 4s¹ bền vững hơn [Ar] 3d⁴ 4s².",
+        "speech": [
+          { "text": "Với Chromium có Z bằng 24, sau lõi Argon còn 6 electron ở phân lớp 4s và 3d.", "durationMs": 4500 },
+          { "text": "Một electron từ 4s chuyển sang 3d để đạt trạng thái bán bão hoà 3d5 4s1 bền vững hơn.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["biểu diễn 5 ô 3d mỗi ô 1 mũi tên lên và 1 ô 4s có 1 mũi tên lên"]
+    },
+    {
+      "id": "nitrogen-hund",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Quy tắc Hund với nguyên tử Nitrogen (Z = 7)",
+        "slideText": "N (Z = 7): 1s² 2s² 2p³ — 3 electron độc thân trên 3 ô 2p.",
+        "speech": [
+          { "text": "Nitrogen có 7 electron, trong đó 3 electron cuối nằm ở phân lớp 2p.", "durationMs": 4000 },
+          { "text": "Theo quy tắc Hund, ba electron này chiếm riêng ba ô lượng tử với spin song song.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["3 ô 2p có 3 mũi tên hướng lên song song", "nêu rõ 3 electron độc thân"]
+    },
+    {
+      "id": "khong-chon-chuan-do",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Chuẩn độ dung dịch HCl bằng NaOH",
+        "slideText": "Thể tích điểm tương đương 25 mL, pH nhảy vọt từ 3 lên 11.",
+        "speech": [
+          { "text": "Nhỏ từ từ dung dịch NaOH 0,1M vào 25 mL dung dịch HCl 0,1M có vài giọt phenolphthalein.", "durationMs": 5000 }
+        ]
+      },
+      "tieuChi": ["không chọn: bài chuẩn độ acid–base, nên chọn chuan-do-ph"]
+    },
+    {
+      "id": "khong-chon-can-bang",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 8,
+        "title": "Cân bằng phương trình nhôm cháy",
+        "slideText": "4Al + 3O2 -> 2Al2O3",
+        "speech": [
+          { "text": "Đặt hệ số 4 trước nhôm, 3 trước oxygen và 2 trước aluminium oxide.", "durationMs": 4000 }
+        ]
+      },
+      "tieuChi": ["không chọn: bài cân bằng phương trình, nên chọn can-bang-phuong-trinh"]
+    }
+  ]
+}

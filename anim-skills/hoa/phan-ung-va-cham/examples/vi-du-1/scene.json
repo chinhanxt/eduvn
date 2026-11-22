@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 10,
+  "title": "Ảnh hưởng của nhiệt độ đến tốc độ phản ứng",
+  "slideText": "Thuyết va chạm hiệu quả: so sánh bình ở 25 °C (2 va chạm hiệu quả) và bình ở 65 °C (9 va chạm hiệu quả). Tăng nhiệt độ làm tăng động năng và tần số va chạm hiệu quả.",
+  "speech": [
+    { "text": "Xét cùng một phản ứng diễn ra trong hai bình ở hai mức nhiệt độ khác nhau là 25 độ C và 65 độ C.", "durationMs": 3600 },
+    { "text": "Ở 25 độ C, các phân tử chuyển động chậm nên ít đạt năng lượng hoạt hoá, chỉ có 2 va chạm hiệu quả.", "durationMs": 3900 },
+    { "text": "Khi nâng nhiệt độ lên 65 độ C, hạt chuyển động nhanh hơn nhiều và số va chạm hiệu quả tăng vọt lên 9 lần.", "durationMs": 3900 },
+    { "text": "Kết luận: tăng nhiệt độ làm tăng tần số va chạm hiệu quả, từ đó làm tăng mạnh tốc độ phản ứng.", "durationMs": 3600 }
+  ]
+}

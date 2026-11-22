@@ -1,0 +1,136 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1920" data-height="1080">
+  <div id="meta" class="ek-meta ek-col-1 ek-span-10" style="top:64px">HOÁ HỌC 8 · PHƯƠNG TRÌNH HOÁ HỌC</div>
+  <h1 id="title" class="ek-title ek-col-1 ek-span-12" style="top:112px" data-ek-words>Cân bằng phản ứng <span class="kw">sắt cháy trong oxygen</span></h1>
+
+  <div class="ek-stage">
+    <div id="eqCard" class="ek-card eq-box ek-col-1 ek-span-12 ek-hidden" style="top:228px;height:178px" data-ek-beat="0">
+      <div class="eq-line">
+        <span id="coefFe" class="co ek-c-lam">1</span><span class="fm">Fe<span class="st">(s)</span></span>
+        <span class="op">+</span>
+        <span id="cO2" class="co ek-c-doSon">1</span><span class="fm">O<sub>2</sub><span class="st">(g)</span></span>
+        <span class="op arr">→</span>
+        <span id="cProd" class="co ek-c-ink3">1</span><span class="fm">Fe<sub>3</sub>O<sub>4</sub><span class="st">(s)</span></span>
+      </div>
+    </div>
+
+    <div id="cardFe" class="ek-card atom-card ek-col-1 ek-span-6 ek-hidden" style="top:444px;height:326px">
+      <div class="ac-head">
+        <span class="ek-label ek-c-lam">Nguyên tố Fe (Iron)</span>
+        <div class="st-slot">
+          <span id="stFeBad" class="st-pill st-bad">Lệch · 1 ≠ 3</span>
+          <span id="stFeOk" class="st-pill st-ok ek-hidden" data-ek-beat="1">Khớp · 3 = 3</span>
+        </div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl">Vế trái</span>
+        <div class="bar-track"><div id="barFeL" class="bar-fill ek-fill-bg-lam"></div></div>
+        <span id="nFeL" class="bar-num ek-c-lam">1</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl">Vế phải</span>
+        <div class="bar-track"><div id="barFeR" class="bar-fill ek-fill-bg-lam"></div></div>
+        <span id="nFeR" class="bar-num ek-c-lam">3</span>
+      </div>
+    </div>
+
+    <div id="cardO" class="ek-card atom-card card-o ek-col-7 ek-span-6 ek-hidden" style="top:444px;height:326px">
+      <div class="ac-head">
+        <span class="ek-label ek-c-doSon">Nguyên tố O (Oxygen)</span>
+        <div class="st-slot">
+          <span id="stOBad" class="st-pill st-bad">Lệch · 2 ≠ 4</span>
+          <span id="stOOk" class="st-pill st-ok ek-hidden" data-ek-beat="2">Khớp · 4 = 4</span>
+        </div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl">Vế trái</span>
+        <div class="bar-track"><div id="barOL" class="bar-fill ek-fill-bg-doSon"></div></div>
+        <span id="nOL" class="bar-num ek-c-doSon">2</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-lbl">Vế phải</span>
+        <div class="bar-track"><div id="barOR" class="bar-fill ek-fill-bg-doSon"></div></div>
+        <span id="nOR" class="bar-num ek-c-doSon">4</span>
+      </div>
+    </div>
+
+    <div id="doneBar" class="ek-card done-card ek-col-1 ek-span-12 ek-hidden" style="top:804px;height:94px" data-ek-beat="3">
+      <div class="done-inner">
+        <span id="doneBadge" class="done-tag">Đã cân bằng</span>
+        <span class="ek-body">3Fe(s) + 2O<sub>2</sub>(g) → Fe<sub>3</sub>O<sub>4</sub>(s) · Hệ số tối giản (3 : 2 : 1)</span>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .eq-box{display:flex;align-items:center;justify-content:center;border-left-width:8px}
+  .eq-line{display:flex;align-items:baseline;justify-content:center;gap:14px;font-family:var(--ui);font-size:74px;font-weight:700;color:var(--ink);white-space:nowrap}
+  .eq-line sub{font-size:44px;vertical-align:-12px}
+  .eq-line .st{font-size:38px;font-weight:500;color:var(--ink3);margin-left:4px}
+  .eq-line .co{display:inline-block;min-width:56px;text-align:center;border-radius:10px;padding:0 10px;background:var(--sunken);font-variant-numeric:tabular-nums}
+  .eq-line .op{color:var(--ink3);font-weight:600;padding:0 14px}
+  .eq-line .arr{color:var(--accent);font-weight:700}
+  .atom-card{display:flex;flex-direction:column;justify-content:space-between;padding:28px 32px}
+  .card-o{border-left-color:var(--c-doSon)}
+  .ac-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .st-slot{position:relative;width:270px;height:56px;flex:none}
+  .st-pill{position:absolute;right:0;top:0;font-family:var(--ui);font-size:36px;font-weight:700;padding:6px 18px;border-radius:10px;white-space:nowrap}
+  .st-bad{background:var(--sunken);color:var(--bad)}
+  .st-ok{background:var(--sunken);color:var(--ok)}
+  .bar-row{display:flex;align-items:center;gap:20px}
+  .bar-lbl{font-family:var(--ui);font-size:38px;font-weight:600;color:var(--ink2);width:150px;flex:none}
+  .bar-track{flex:1;height:40px;background:var(--sunken);border-radius:10px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;width:100%;transform-origin:0 50%;border-radius:10px}
+  .ek-fill-bg-lam{background:var(--c-lam)}
+  .ek-fill-bg-doSon{background:var(--c-doSon)}
+  .bar-num{font-family:var(--ui);font-size:52px;font-weight:700;width:64px;text-align:right;font-variant-numeric:tabular-nums}
+  .done-card{border-left-color:var(--ok);display:flex;align-items:center;padding:0 32px}
+  .done-inner{display:flex;align-items:center;gap:24px;white-space:nowrap}
+  .done-tag{font-family:var(--ui);font-size:36px;font-weight:700;color:var(--accent-ink);background:var(--ok);padding:8px 20px;border-radius:10px}
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+
+// Trạng thái thanh ban đầu (tỉ lệ trên max = 4)
+tl.set("#barFeL", { scaleX: 0.25 }, 0);
+tl.set("#barFeR", { scaleX: 0.75 }, 0);
+tl.set("#barOL", { scaleX: 0.5 }, 0);
+tl.set("#barOR", { scaleX: 1.0 }, 0);
+
+// Beat 0: Hiện tiêu đề, phương trình và 2 thẻ đếm nguyên tử lệch
+EK.enter(tl, "#meta", 0.05, { from: "fade", dur: 0.45 });
+EK.words(tl, "#title", { t: 0.15, per: 0.07 });
+EK.enter(tl, "#eqCard", EK.cue(0), { from: "up", dur: 0.65 });
+EK.enter(tl, "#cardFe", 1.1, { from: "up", dur: 0.65 });
+EK.enter(tl, "#cardO", 1.5, { from: "up", dur: 0.65 });
+
+// Beat 1: Cân bằng nguyên tố Fe (1 -> 3)
+const t1 = EK.cue(1);
+EK.focus(tl, "#eqCard, #cardFe", t1, { dur: 0.45 });
+EK.mark(tl, "#coefFe", t1 + 0.15, "box", { color: "lam", dur: 0.5 });
+EK.count(tl, "#coefFe", 1, 3, t1 + 0.25, 0.85, { decimals: 0 });
+EK.count(tl, "#nFeL", 1, 3, t1 + 0.25, 0.85, { decimals: 0 });
+tl.to("#barFeL", { scaleX: 0.75, duration: 0.9, ease: "power3.inOut" }, t1 + 0.25);
+EK.exit(tl, "#stFeBad", t1 + 0.3, { dur: 0.3 });
+EK.enter(tl, "#stFeOk", t1 + 0.35, { from: "scale", dur: 0.55 });
+tl.to("#barFeL, #barFeR", { backgroundColor: EK.color("ok"), duration: 0.5, ease: "power2.out" }, t1 + 1.15);
+
+// Beat 2: Cân bằng nguyên tố O (2 -> 4)
+const t2 = EK.cue(2);
+EK.focus(tl, "#eqCard, #cardO", t2, { dur: 0.45 });
+EK.mark(tl, "#cO2", t2 + 0.15, "box", { color: "doSon", dur: 0.5 });
+EK.count(tl, "#cO2", 1, 2, t2 + 0.25, 0.85, { decimals: 0 });
+EK.count(tl, "#nOL", 2, 4, t2 + 0.25, 0.85, { decimals: 0 });
+tl.to("#barOL", { scaleX: 1.0, duration: 0.9, ease: "power3.inOut" }, t2 + 0.25);
+EK.exit(tl, "#stOBad", t2 + 0.3, { dur: 0.3 });
+EK.enter(tl, "#stOOk", t2 + 0.35, { from: "scale", dur: 0.55 });
+tl.to("#barOL, #barOR", { backgroundColor: EK.color("ok"), duration: 0.5, ease: "power2.out" }, t2 + 1.15);
+
+// Beat 3: Mở toàn cảnh + kết luận cân bằng tối giản
+const t3 = EK.cue(3);
+EK.unfocus(tl, t3, { dur: 0.45 });
+EK.enter(tl, "#doneBar", t3 + 0.15, { from: "up", dur: 0.65 });
+EK.tint(tl, "#coefFe, #cO2, #cProd", t3 + 0.4, "ok", { prop: "color", dur: 0.5 });
+EK.mark(tl, "#doneBadge", t3 + 0.9, "underline", { color: "ok", dur: 0.6 });
+
+window.__timelines["main"] = tl;
+</script>

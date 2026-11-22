@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 10,
+  "title": "Mô hình cấu tạo nguyên tử Carbon-12",
+  "slideText": "Ký hiệu ¹²₆C: Hạt nhân gồm 6 proton (+) và 6 neutron (0) → A = 12. Lớp vỏ gồm 6 electron: lớp K (2e), lớp L (4e). Trung hoà điện: 6p = 6e.",
+  "speech": [
+    { "text": "Xét mô hình nguyên tử Carbon-12 có số hiệu nguyên tử Z bằng 6 và số khối A bằng 12.", "durationMs": 3600 },
+    { "text": "Hạt nhân nằm ở tâm gồm 6 proton mang điện dương và 6 neutron không mang điện, tổng cộng 12 nucleon.", "durationMs": 3800 },
+    { "text": "Vỏ nguyên tử có 6 electron chuyển động trên hai lớp: lớp K bên trong gồm 2 electron và lớp L bên ngoài gồm 4 electron.", "durationMs": 4000 },
+    { "text": "Do số proton bằng số electron đều bằng 6 nên nguyên tử Carbon luôn trung hoà về điện.", "durationMs": 3600 }
+  ]
+}

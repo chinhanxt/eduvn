@@ -1,0 +1,16 @@
+{
+  "requires": [
+    { "selector": "[data-ek-beat=\"0\"]", "min": 1 },
+    { "selector": "[data-ek-beat=\"1\"]", "min": 1 },
+    { "selector": "[data-ek-beat=\"2\"]", "min": 1 },
+    { "selector": ".ek-card", "min": 2, "max": 8 }
+  ],
+  "motion": [
+    { "kind": "before", "a": "[data-ek-beat=\"0\"]", "b": "[data-ek-beat=\"1\"]" },
+    { "kind": "before", "a": "[data-ek-beat=\"1\"]", "b": "[data-ek-beat=\"2\"]" },
+    { "kind": "staysInFrame", "selector": ".ek-label" },
+    { "kind": "keepsMoving", "maxStaticSec": 4 }
+  ],
+  "limits": { "cameraMoves": 1, "labels": 16, "minFontPx": 36 },
+  "data": { "numbersFromSpeech": false }
+}

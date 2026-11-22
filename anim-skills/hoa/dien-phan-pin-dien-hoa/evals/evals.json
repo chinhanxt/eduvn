@@ -1,0 +1,79 @@
+{
+  "skill": "dien-phan-pin-dien-hoa",
+  "evals": [
+    {
+      "id": "pin-galvani-zn-cu",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 12,
+        "title": "Nguyên tắc hoạt động của pin Galvani Zn–Cu",
+        "slideText": "Anode (−): Zn -> Zn2+ + 2e. Cathode (+): Cu2+ + 2e -> Cu. E°pin = 0,34 − (−0,76) = 1,10 V.",
+        "speech": [
+          { "text": "Pin Galvani Zn Cu gồm hai nửa pin kẽm và đồng nối với nhau qua cầu muối KCl và dây dẫn có vôn kế.", "durationMs": 4000 },
+          { "text": "Tại cực âm anode, kẽm bị oxi hoá thành ion Zn2+ nhường 2 electron đi lên dây dẫn.", "durationMs": 4000 },
+          { "text": "Electron chạy sang cực dương cathode đồng, khử ion Cu2+ thành đồng kim loại và vôn kế chỉ 1,10 vôn.", "durationMs": 4200 },
+          { "text": "Phản ứng tổng là Zn cộng Cu2+ tạo thành Zn2+ cộng Cu với suất điện động chuẩn 1,10 vôn.", "durationMs": 3800 }
+        ]
+      },
+      "tieuChi": ["hạt e⁻ chạy từ Zn sang Cu", "hai bán phản ứng đúng và E°pin = 1,10 V"]
+    },
+    {
+      "id": "dien-phan-nacl-nong-chay",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 12,
+        "title": "Điện phân nóng chảy Sodium chloride (NaCl)",
+        "slideText": "2NaCl (đpnc) -> 2Na + Cl2. Cathode (−): Na+ + e -> Na; Anode (+): 2Cl- -> Cl2 + 2e.",
+        "speech": [
+          { "text": "Khi điện phân nóng chảy NaCl, ion Na+ di chuyển về cực âm cathode nhận electron tạo kim loại Sodium.", "durationMs": 4800 },
+          { "text": "Tại cực dương anode, ion Cl trừ bị oxi hoá giải phóng khí Chlorine.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["hiển thị rõ cực âm cathode và cực dương anode", "cân bằng 2NaCl -> 2Na + Cl2"]
+    },
+    {
+      "id": "vai-tro-cau-muoi",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 12,
+        "title": "Vai trò cầu muối trong pin điện hoá",
+        "slideText": "Cầu muối KCl bổ sung ion Cl− sang cốc anode và K+ sang cốc cathode để trung hoà điện tích.",
+        "speech": [
+          { "text": "Cầu muối chứa dung dịch KCl bão hoà giúp khép kín mạch điện và giữ trung hoà điện tích ở hai dung dịch.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["thể hiện chiều di chuyển ion trong cầu muối"]
+    },
+    {
+      "id": "khong-chon-cau-hinh-cu",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Cấu hình electron của Copper (Z = 29)",
+        "slideText": "Cu (Z = 29): [Ar] 3d¹⁰ 4s¹.",
+        "speech": [
+          { "text": "Copper có cấu hình bão hoà phân lớp 3d10 4s1 bền vững.", "durationMs": 4000 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh viết cấu hình electron"]
+    },
+    {
+      "id": "khong-chon-chuan-do-acid",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Đường cong chuẩn độ HCl bằng NaOH",
+        "slideText": "Điểm tương đương pH = 7 tại V = 25 mL.",
+        "speech": [
+          { "text": "Khi nhỏ NaOH vào HCl, pH tăng đột ngột quanh điểm tương đương.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về đường cong chuẩn độ pH"]
+    }
+  ]
+}

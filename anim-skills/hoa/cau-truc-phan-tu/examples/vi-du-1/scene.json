@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 12,
+  "title": "Cấu trúc phân tử 2D và nhóm chức của Alanine",
+  "slideText": "2-Aminopropanoic acid (Alanine, C₃H₇NO₂, M = 89 g/mol, SMILES: CC(N)C(=O)O). Nhóm –NH₂ (tính base) và nhóm –COOH (tính acid) → hợp chất lưỡng tính.",
+  "speech": [
+    { "text": "Xét công thức cấu tạo 2D của Alanine hay 2-aminopropanoic acid với công thức C3H7NO2, khối lượng mol 89.", "durationMs": 3600 },
+    { "text": "Nhóm amino NH2 gắn ở carbon alpha tạo cặp electron tự do nên thể hiện tính base khi gặp acid mạnh.", "durationMs": 3800 },
+    { "text": "Nhóm carboxyl COOH ở đầu mạch dễ phân li ion H cộng nên thể hiện tính acid khi tác dụng với base.", "durationMs": 3800 },
+    { "text": "Chứa đồng thời nhóm amino và nhóm carboxyl, Alanine là hợp chất hữu cơ tạp chức có tính lưỡng tính.", "durationMs": 3800 }
+  ]
+}

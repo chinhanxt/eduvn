@@ -1,0 +1,130 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div id="meta" class="ek-meta ek-col-1 ek-span-10" style="top:64px">HOÁ HỌC 12 · PIN ĐIỆN VÀ ĐIỆN PHÂN</div>
+  <h1 id="title" class="ek-title ek-col-1 ek-span-12" style="top:112px" data-ek-words>Pin điện hoá <span class="kw">Galvani Zn – Cu</span></h1>
+
+  <div class="ek-stage">
+    <!-- Sơ đồ mạch pin (1680 × 540, top:214px -> đáy 754px) -->
+    <svg id="cellSvg" class="ek-col-1 ek-span-12" style="top:214px" width="1680" height="540" viewBox="0 0 1680 540" data-ek-beat="0">
+      <!-- Dây dẫn mạch ngoài từ thanh Zn (x=290,y=190) vòng lên qua vôn kế (840,70) sang thanh Cu (x=1390,y=190) -->
+      <path id="wirePath" d="M 290,190 L 290,70 L 1390,70 L 1390,190" class="wire-line"/>
+
+      <!-- Mũi tên chiều dòng electron trên dây dẫn -->
+      <text id="eFlowLbl" x="560" y="50" text-anchor="middle" class="svg-tag ek-fill-lam ek-hidden">Dòng electron (e⁻) →</text>
+      <text id="eFlowLbl2" x="1120" y="50" text-anchor="middle" class="svg-tag ek-fill-lam ek-hidden">e⁻ → Cathode</text>
+
+      <!-- Vôn kế ở trung tâm mạch ngoài -->
+      <g id="voltmeter">
+        <rect x="740" y="18" width="200" height="104" rx="18" class="vm-box"/>
+        <text id="voltVal" x="840" y="84" text-anchor="middle" class="vm-num ek-fill-ok">0,00 V</text>
+      </g>
+
+      <!-- Cốc trái: Anode Zn trong dung dịch ZnSO4 -->
+      <g id="beakerLeft">
+        <rect x="110" y="294" width="380" height="220" rx="14" class="sol-zn"/>
+        <path d="M 110,226 L 110,500 Q 110,516 126,516 L 474,516 Q 490,516 490,500 L 490,226" class="beaker-wall"/>
+        <rect id="rodZn" x="258" y="190" width="64" height="260" rx="8" class="rod-zn"/>
+        <text x="290" y="330" text-anchor="middle" class="rod-txt">Zn</text>
+        <text x="166" y="486" class="sol-txt ek-fill-lam">ZnSO₄ (aq)</text>
+      </g>
+
+      <!-- Cốc phải: Cathode Cu trong dung dịch CuSO4 -->
+      <g id="beakerRight">
+        <rect x="1190" y="294" width="380" height="220" rx="14" class="sol-cu"/>
+        <path d="M 1190,226 L 1190,500 Q 1190,516 1206,516 L 1554,516 Q 1570,516 1570,500 L 1570,226" class="beaker-wall"/>
+        <rect id="rodCu" x="1358" y="190" width="64" height="260" rx="8" class="rod-cu"/>
+        <text x="1390" y="330" text-anchor="middle" class="rod-txt">Cu</text>
+        <text x="1340" y="486" class="sol-txt ek-fill-lucLam">CuSO₄ (aq)</text>
+      </g>
+
+      <!-- Cầu muối KCl nối giữa 2 cốc -->
+      <path id="saltBridge" d="M 420,380 L 420,204 Q 420,174 450,174 L 1230,174 Q 1260,174 1260,204 L 1260,380" class="bridge-line"/>
+      <text id="bridgeLbl" x="840" y="226" text-anchor="middle" class="svg-tag ek-fill-tim ek-hidden">Cầu muối KCl · ← Cl⁻ | K⁺ →</text>
+
+      <!-- Hai thẻ bán phản ứng đặt ngay giữa không gian trống bên dưới cầu muối (y=260..490, x=530..1150) -->
+      <g id="halfAnode" class="ek-hidden" data-ek-beat="1">
+        <rect x="532" y="256" width="616" height="106" rx="14" class="half-box half-an"/>
+        <text x="558" y="298" class="half-hd ek-fill-lam">Anode (−) · Sự oxi hoá</text>
+        <text x="558" y="344" class="half-eq ek-fill-ink">Zn(s) → Zn²⁺(aq) + 2e⁻   (−0,76 V)</text>
+      </g>
+
+      <g id="halfCathode" class="ek-hidden" data-ek-beat="2">
+        <rect x="532" y="384" width="616" height="106" rx="14" class="half-box half-ca"/>
+        <text x="558" y="426" class="half-hd ek-fill-doSon">Cathode (+) · Sự khử</text>
+        <text x="558" y="472" class="half-eq ek-fill-ink">Cu²⁺(aq) + 2e⁻ → Cu(s)   (+0,34 V)</text>
+      </g>
+
+      <!-- 3 hạt electron chạy theo #wirePath -->
+      <g id="eDot1" class="ek-hidden"><circle cx="0" cy="0" r="24" class="e-orb"/><text x="0" y="12" text-anchor="middle" class="e-ch">e⁻</text></g>
+      <g id="eDot2" class="ek-hidden"><circle cx="0" cy="0" r="24" class="e-orb"/><text x="0" y="12" text-anchor="middle" class="e-ch">e⁻</text></g>
+      <g id="eDot3" class="ek-hidden"><circle cx="0" cy="0" r="24" class="e-orb"/><text x="0" y="12" text-anchor="middle" class="e-ch">e⁻</text></g>
+    </svg>
+
+    <!-- Thanh tổng kết phản ứng tổng + suất điện động chuẩn (top:782px, cao 108px -> đáy 890px < 900px) -->
+    <div id="totBar" class="ek-card tot-card ek-col-1 ek-span-12 ek-hidden" style="top:782px;height:108px" data-ek-beat="3">
+      <div class="tot-row">
+        <span class="tot-eq">Zn(s) + Cu<sup>2+</sup>(aq) → Zn<sup>2+</sup>(aq) + Cu(s)</span>
+        <span id="emfBadge" class="emf-pill">E°<sub>pin</sub> = 0,34 − (−0,76) = +1,10 V</span>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .wire-line{fill:none;stroke:var(--ink2);stroke-width:6px;stroke-linecap:round;stroke-linejoin:round}
+  .vm-box{fill:var(--surface);stroke:var(--accent);stroke-width:4px}
+  .vm-num{font-family:var(--ui);font-size:44px;font-weight:700;font-variant-numeric:tabular-nums}
+  .beaker-wall{fill:none;stroke:var(--ink2);stroke-width:5px;stroke-linecap:round}
+  .sol-zn{fill:var(--c-lam);fill-opacity:0.12}
+  .sol-cu{fill:var(--c-lucLam);fill-opacity:0.18}
+  .rod-zn{fill:var(--c-lam);stroke:var(--ink);stroke-width:3px}
+  .rod-cu{fill:var(--c-doSon);stroke:var(--ink);stroke-width:3px}
+  .rod-txt{font-family:var(--ui);font-size:38px;font-weight:700;fill:var(--accent-ink)}
+  .sol-txt{font-family:var(--ui);font-size:36px;font-weight:600}
+  .bridge-line{fill:none;stroke:var(--c-tim);stroke-width:22px;stroke-linecap:round;stroke-linejoin:round;opacity:0.35}
+  .svg-tag{font-family:var(--ui);font-size:36px;font-weight:700}
+  .half-box{fill:var(--surface);stroke-width:4px}
+  .half-an{stroke:var(--c-lam)}
+  .half-ca{stroke:var(--c-doSon)}
+  .half-hd{font-family:var(--ui);font-size:36px;font-weight:700}
+  .half-eq{font-family:var(--ui);font-size:36px;font-weight:600}
+  .e-orb{fill:var(--c-lam);stroke:var(--surface);stroke-width:3px}
+  .e-ch{font-family:var(--ui);font-size:36px;font-weight:700;fill:var(--accent-ink)}
+  .tot-card{border-left-color:var(--ok);display:flex;align-items:center;padding:0 32px}
+  .tot-row{display:flex;align-items:center;justify-content:space-between;width:100%;gap:24px;white-space:nowrap}
+  .tot-eq{font-family:var(--ui);font-size:42px;font-weight:700;color:var(--ink)}
+  .tot-eq sup{font-size:36px}
+  .emf-pill{font-family:var(--ui);font-size:38px;font-weight:700;color:var(--ok);background:var(--sunken);padding:10px 22px;border-radius:12px}
+  .emf-pill sub{font-size:36px}
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+
+// Beat 0: Dựng sơ đồ pin điện hoá, vẽ dây dẫn và cầu muối
+EK.enter(tl, "#meta", 0.05, { from: "fade", dur: 0.45 });
+EK.words(tl, "#title", { t: 0.15, per: 0.08 });
+EK.draw(tl, "#wirePath", EK.cue(0) + 0.3, 1.3);
+EK.draw(tl, "#saltBridge", 1.2, 1.1);
+EK.enter(tl, "#eFlowLbl", 2.2, { from: "fade", dur: 0.5 });
+
+// Beat 1: Cực âm anode Zn bị oxi hoá + electron bắt đầu đi lên dây dẫn
+const t1 = EK.cue(1);
+EK.enter(tl, "#halfAnode", t1, { from: "up", dur: 0.65 });
+EK.enter(tl, "#eDot1", t1 + 0.3, { from: "fade", dur: 0.25 });
+EK.follow(tl, "#eDot1", "#wirePath", t1 + 0.35, 3.6);
+EK.enter(tl, "#eDot2", t1 + 1.5, { from: "fade", dur: 0.25 });
+EK.follow(tl, "#eDot2", "#wirePath", t1 + 1.55, 3.6);
+
+// Beat 2: Electron tới cực dương cathode Cu + bán phản ứng khử + vôn kế đếm lên 1,10 V
+const t2 = EK.cue(2);
+EK.enter(tl, "#halfCathode, #eFlowLbl2", t2, { from: "up", dur: 0.65 });
+EK.enter(tl, "#eDot3", t2 + 0.3, { from: "fade", dur: 0.25 });
+EK.follow(tl, "#eDot3", "#wirePath", t2 + 0.35, 3.6);
+EK.count(tl, "#voltVal", 0, 1.10, t2 + 0.5, 1.4, { decimals: 2, suffix: " V" });
+
+// Beat 3: Cầu muối trung hoà điện tích + phản ứng tổng + suất điện động chuẩn
+const t3 = EK.cue(3);
+EK.enter(tl, "#bridgeLbl", t3, { from: "fade", dur: 0.55 });
+EK.enter(tl, "#totBar", t3 + 0.35, { from: "up", dur: 0.65 });
+EK.mark(tl, "#emfBadge", t3 + 1.2, "underline", { color: "ok", dur: 0.6 });
+
+window.__timelines["main"] = tl;
+</script>

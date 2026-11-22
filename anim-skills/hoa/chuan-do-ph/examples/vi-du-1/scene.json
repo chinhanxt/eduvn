@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 11,
+  "title": "Chuẩn độ dung dịch HCl 0,1 M bằng NaOH 0,1 M",
+  "slideText": "Thí nghiệm SGK: 25 mL HCl 0,1 M + NaOH 0,1 M (chỉ thị phenolphthalein). V_tđ = 25,0 mL, pH_tđ = 7,0. Công thức: C_A · V_A = C_B · V_B.",
+  "speech": [
+    { "text": "Chuẩn độ 25 mL dung dịch HCl 0,1 M bằng dung dịch chuẩn NaOH 0,1 M có nhỏ vài giọt phenolphthalein.", "durationMs": 3800 },
+    { "text": "Từ 0 đến 24 mL NaOH, pH chỉ tăng nhẹ từ 1,0 lên 2,7 và dung dịch trong bình tam giác vẫn không màu.", "durationMs": 4200 },
+    { "text": "Gần 25 mL xảy ra bước nhảy pH vọt qua điểm tương đương 7,0 tới vùng 8,2 đến 10 làm dung dịch hoá hồng nhạt.", "durationMs": 4400 },
+    { "text": "Dừng chuẩn độ đúng điểm kết thúc để tính chính xác nồng độ acid theo hệ thức C_A nhân V_A bằng C_B nhân V_B.", "durationMs": 3600 }
+  ]
+}

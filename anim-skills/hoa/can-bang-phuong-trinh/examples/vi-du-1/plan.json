@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "can-bang-phuong-trinh", "vaiTro": "chinh" }],
+  "confidence": 0.94,
+  "lyDo": "Lời giảng hướng dẫn cân bằng từng nguyên tố Fe và O cho phản ứng Fe + O2 -> Fe3O4.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Hiện phương trình ban đầu Fe + O2 -> Fe3O4 và hai thẻ đếm nguyên tử Fe, O đang lệch.",
+      "skill": "can-bang-phuong-trinh",
+      "duLieu": { "feL": 1, "feR": 3, "oL": 2, "oR": 4 }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 7.4,
+      "cau": [1],
+      "cue": "kw:nguyên tử sắt",
+      "viec": "Đặt hệ số 3 trước Fe, đếm tăng số nguyên tử Fe vế trái từ 1 lên 3 và khớp hai vế.",
+      "skill": "can-bang-phuong-trinh",
+      "duLieu": { "cFe": 3, "feL": 3, "feR": 3 }
+    },
+    {
+      "i": 2,
+      "t0": 7.4,
+      "t1": 11.2,
+      "cau": [2],
+      "cue": "kw:nguyên tử oxygen",
+      "viec": "Đặt hệ số 2 trước O2, đếm tăng số nguyên tử O vế trái từ 2 lên 4 và khớp hai vế.",
+      "skill": "can-bang-phuong-trinh",
+      "duLieu": { "cO2": 2, "oL": 4, "oR": 4 }
+    },
+    {
+      "i": 3,
+      "t0": 11.2,
+      "t1": 15.0,
+      "cau": [3],
+      "cue": "kw:cân bằng tối giản",
+      "viec": "Mở lại toàn cảnh và hiện kết luận phương trình 3Fe + 2O2 -> Fe3O4 đã cân bằng tối giản.",
+      "skill": "can-bang-phuong-trinh",
+      "duLieu": { "heSo": [3, 2, 1] }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

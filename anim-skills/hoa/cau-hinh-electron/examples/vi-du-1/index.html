@@ -1,0 +1,140 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div id="meta" class="ek-meta ek-col-1 ek-span-8" style="top:64px">HOÁ HỌC 10 · CẤU TẠO NGUYÊN TỬ</div>
+  <h1 id="title" class="ek-title ek-col-1 ek-span-12" style="top:112px" data-ek-words>Điền ô orbital: <span class="kw">Oxygen (Z = 8)</span></h1>
+
+  <div class="ek-stage">
+    <div id="elemCard" class="ek-card ek-col-1 ek-span-5 ek-hidden" style="top:224px" data-ek-beat="0">
+      <div class="el-row">
+        <div class="el-tile"><span class="el-z">8</span><span class="el-sym">O</span></div>
+        <div class="el-info">
+          <h3>Oxygen · 8 electron</h3>
+          <p>Phân bố vào phân lớp 1s, 2s, 2p</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="rule1" class="ek-card rule-card ek-col-1 ek-span-5 ek-hidden" style="top:426px" data-ek-beat="1">
+      <h3>1. Aufbau &amp; Pauli</h3>
+      <p>Điền mức thấp trước (1s → 2s); mỗi ô tối đa 2e spin ngược chiều.</p>
+    </div>
+
+    <div id="rule2" class="ek-card rule-card rule-hund ek-col-1 ek-span-5 ek-hidden" style="top:426px" data-ek-beat="2">
+      <h3>2. Quy tắc Hund (2p⁴)</h3>
+      <p>Rải 3 electron song song khắp 3 ô 2p, rồi mới ghép đôi electron thứ 8.</p>
+    </div>
+
+    <div id="resCard" class="ek-card res-card ek-col-1 ek-span-5 ek-hidden" style="top:666px" data-ek-beat="3">
+      <div class="res-cfg">1s<sup>2</sup> 2s<sup>2</sup> 2p<sup>4</sup></div>
+      <div class="res-sub">2 electron độc thân · Lớp ngoài: 6e</div>
+    </div>
+
+    <svg id="orbSvg" class="ek-col-7 ek-span-6" style="top:216px" width="828" height="670" viewBox="0 0 828 670">
+      <!-- Trục năng lượng E -->
+      <line id="axisE" x1="142" y1="620" x2="142" y2="66" class="e-axis"/>
+      <polygon id="axisHead" points="142,46 128,74 156,74" class="ek-fill-accent ek-hidden"/>
+      <text id="axisLbl" x="142" y="34" text-anchor="middle" class="svg-lbl ek-fill-accent ek-hidden">Năng lượng E</text>
+
+      <!-- Hàng 2p (3 ô orbital) -->
+      <text id="lbl2p" x="236" y="182" text-anchor="end" class="sub-lbl ek-fill-ink ek-hidden">2p</text>
+      <rect id="b2p0" x="268" y="114" width="112" height="112" rx="12" class="orb-box"/>
+      <rect id="b2p1" x="404" y="114" width="112" height="112" rx="12" class="orb-box"/>
+      <rect id="b2p2" x="540" y="114" width="112" height="112" rx="12" class="orb-box"/>
+      <rect id="unpairedHl" x="392" y="100" width="272" height="140" rx="18" class="hl-unpaired ek-hidden"/>
+      <text id="unpairedTxt" x="528" y="84" text-anchor="middle" class="svg-tag ek-fill-doSon ek-hidden">2 electron độc thân</text>
+
+      <!-- Hàng 2s (1 ô orbital) -->
+      <text id="lbl2s" x="236" y="392" text-anchor="end" class="sub-lbl ek-fill-ink ek-hidden">2s</text>
+      <rect id="b2s0" x="268" y="324" width="112" height="112" rx="12" class="orb-box"/>
+
+      <!-- Hàng 1s (1 ô orbital) -->
+      <text id="lbl1s" x="236" y="576" text-anchor="end" class="sub-lbl ek-fill-ink ek-hidden">1s</text>
+      <rect id="b1s0" x="268" y="508" width="112" height="112" rx="12" class="orb-box"/>
+
+      <!-- 8 mũi tên electron (vẽ theo thứ tự Aufbau -> Pauli -> Hund) -->
+      <!-- 1s: e1 (up), e2 (down) -->
+      <path id="e1" d="M308,600 L308,528 L294,546" class="e-arr ek-stroke-lam"/>
+      <path id="e2" d="M340,528 L340,600 L354,582" class="e-arr ek-stroke-lucLam"/>
+      <!-- 2s: e3 (up), e4 (down) -->
+      <path id="e3" d="M308,416 L308,344 L294,362" class="e-arr ek-stroke-lam"/>
+      <path id="e4" d="M340,344 L340,416 L354,398" class="e-arr ek-stroke-lucLam"/>
+      <!-- 2p: e5, e6, e7 (Hund: 3 up) rồi e8 (Pauli: down vào ô 0) -->
+      <path id="e5" d="M308,206 L308,134 L294,152" class="e-arr ek-stroke-lam"/>
+      <path id="e6" d="M460,206 L460,134 L446,152" class="e-arr ek-stroke-doSon"/>
+      <path id="e7" d="M596,206 L596,134 L582,152" class="e-arr ek-stroke-doSon"/>
+      <path id="e8" d="M340,134 L340,206 L354,188" class="e-arr ek-stroke-tim"/>
+
+      <!-- Nhãn trạng thái đếm e trên sân khấu -->
+      <text id="cntLbl" x="698" y="582" text-anchor="middle" class="svg-cnt ek-fill-ink2 ek-hidden">Đã điền:</text>
+      <text id="cntVal" x="698" y="644" text-anchor="middle" class="svg-big ek-fill-accent ek-hidden">0 / 8 e</text>
+    </svg>
+  </div>
+</div>
+<style>
+  .el-row{display:flex;align-items:center;gap:22px}
+  .el-tile{width:108px;height:108px;border-radius:14px;background:var(--accent-soft);border:3px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+  .el-z{font-family:var(--ui);font-size:36px;font-weight:700;color:var(--accent);line-height:1}
+  .el-sym{font-family:var(--read);font-size:52px;font-weight:700;color:var(--ink);line-height:1.05}
+  .el-info h3{font-size:40px;margin-bottom:6px}
+  .el-info p{font-size:36px}
+  .rule-card{border-left-color:var(--c-lam)}
+  .rule-hund{border-left-color:var(--c-tim)}
+  .res-card{border-left-color:var(--ok)}
+  .res-cfg{font-family:var(--ui);font-size:56px;font-weight:700;color:var(--accent);line-height:1.2}
+  .res-cfg sup{font-size:36px}
+  .res-sub{font-family:var(--ui);font-size:36px;font-weight:600;color:var(--ink2);margin-top:8px}
+  .e-axis{fill:none;stroke:var(--accent);stroke-width:5px;stroke-linecap:round}
+  .orb-box{fill:var(--surface);stroke:var(--ink3);stroke-width:4px}
+  .hl-unpaired{fill:none;stroke:var(--c-doSon);stroke-width:5px;stroke-dasharray:12 8}
+  .e-arr{fill:none;stroke-width:7px;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+  .sub-lbl{font-family:var(--ui);font-size:46px;font-weight:700}
+  .svg-lbl{font-family:var(--ui);font-size:36px;font-weight:700}
+  .svg-tag{font-family:var(--ui);font-size:36px;font-weight:700}
+  .svg-cnt{font-family:var(--ui);font-size:36px;font-weight:600}
+  .svg-big{font-family:var(--ui);font-size:54px;font-weight:700}
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+
+// Beat 0: Hiện thẻ Oxygen + vẽ trục năng lượng + khung 5 ô orbital
+EK.enter(tl, "#meta", 0.05, { from: "fade", dur: 0.45 });
+EK.words(tl, "#title", { t: 0.15, per: 0.08 });
+EK.enter(tl, "#elemCard", EK.cue(0), { from: "up", dur: 0.65 });
+EK.draw(tl, "#axisE", 0.6, 1.0);
+EK.enter(tl, "#axisHead, #axisLbl", 1.4, { from: "fade", dur: 0.4 });
+EK.draw(tl, "#b1s0, #b2s0, #b2p0, #b2p1, #b2p2", 1.2, 1.0);
+EK.enter(tl, "#lbl1s, #lbl2s, #lbl2p, #cntLbl, #cntVal", 1.9, { from: "fade", dur: 0.5 });
+
+// Beat 1: Điền 1s² và 2s² (Aufbau + Pauli)
+const t1 = EK.cue(1);
+EK.enter(tl, "#rule1", t1, { from: "up", dur: 0.6 });
+EK.draw(tl, "#e1", t1 + 0.5, 0.5);
+EK.count(tl, "#cntVal", 0, 1, t1 + 0.5, 0.35, { decimals: 0, suffix: " / 8 e" });
+EK.draw(tl, "#e2", t1 + 1.15, 0.5);
+EK.count(tl, "#cntVal", 1, 2, t1 + 1.15, 0.35, { decimals: 0, suffix: " / 8 e" });
+EK.draw(tl, "#e3", t1 + 1.85, 0.5);
+EK.count(tl, "#cntVal", 2, 3, t1 + 1.85, 0.35, { decimals: 0, suffix: " / 8 e" });
+EK.draw(tl, "#e4", t1 + 2.5, 0.5);
+EK.count(tl, "#cntVal", 3, 4, t1 + 2.5, 0.35, { decimals: 0, suffix: " / 8 e" });
+
+// Beat 2: Điền 2p⁴ theo quy tắc Hund (3 mũi tên lên song song trước, rồi ghép đôi e8)
+const t2 = EK.cue(2);
+EK.exit(tl, "#rule1", t2 - 0.15, { dur: 0.35, to: "up" });
+EK.enter(tl, "#rule2", t2 + 0.15, { from: "up", dur: 0.6 });
+EK.draw(tl, "#e5", t2 + 0.55, 0.55);
+EK.count(tl, "#cntVal", 4, 5, t2 + 0.55, 0.35, { decimals: 0, suffix: " / 8 e" });
+EK.draw(tl, "#e6", t2 + 1.25, 0.55);
+EK.count(tl, "#cntVal", 5, 6, t2 + 1.25, 0.35, { decimals: 0, suffix: " / 8 e" });
+EK.draw(tl, "#e7", t2 + 1.95, 0.55);
+EK.count(tl, "#cntVal", 6, 7, t2 + 1.95, 0.35, { decimals: 0, suffix: " / 8 e" });
+EK.draw(tl, "#e8", t2 + 2.75, 0.6);
+EK.count(tl, "#cntVal", 7, 8, t2 + 2.75, 0.35, { decimals: 0, suffix: " / 8 e" });
+
+// Beat 3: Khoanh 2 electron độc thân + hiện thẻ kết quả cấu hình
+const t3 = EK.cue(3);
+EK.enter(tl, "#resCard", t3, { from: "up", dur: 0.65 });
+EK.enter(tl, "#unpairedHl, #unpairedTxt", t3 + 0.5, { from: "fade", dur: 0.6 });
+EK.tint(tl, "#b2p1, #b2p2", t3 + 0.5, "doSon", { prop: "stroke", dur: 0.5 });
+EK.mark(tl, ".res-cfg", t3 + 1.2, "highlight", { color: "accent", dur: 0.6 });
+
+window.__timelines["main"] = tl;
+</script>

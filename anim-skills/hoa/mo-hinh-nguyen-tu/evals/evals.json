@@ -1,0 +1,79 @@
+{
+  "skill": "mo-hinh-nguyen-tu",
+  "evals": [
+    {
+      "id": "carbon-12",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Mô hình cấu tạo nguyên tử Carbon-12",
+        "slideText": "Ký hiệu ¹²₆C: hạt nhân có 6 proton (+), 6 neutron (0), số khối A = 12. Lớp vỏ có 2e lớp K và 4e lớp L.",
+        "speech": [
+          { "text": "Xét nguyên tử Carbon-12 có số hiệu nguyên tử Z bằng 6 và số khối A bằng 12.", "durationMs": 3600 },
+          { "text": "Ở tâm là hạt nhân gồm 6 proton mang điện dương và 6 neutron không mang điện.", "durationMs": 3800 },
+          { "text": "Xung quanh hạt nhân có 6 electron chia thành 2 lớp: lớp K có 2 electron và lớp L có 4 electron.", "durationMs": 4000 },
+          { "text": "Vì số proton bằng số electron nên nguyên tử Carbon trung hoà về điện.", "durationMs": 3600 }
+        ]
+      },
+      "tieuChi": ["đủ 6p + 6n ở hạt nhân", "2 lớp vỏ với 2e lớp K và 4e lớp L"]
+    },
+    {
+      "id": "sodium-khtn7",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 7,
+        "title": "Mô hình nguyên tử Sodium (Na, Z = 11)",
+        "slideText": "Sodium có điện tích hạt nhân +11, 3 lớp electron phân bố 2 – 8 – 1.",
+        "speech": [
+          { "text": "Nguyên tử Sodium có 11 proton trong hạt nhân và 11 electron ở vỏ nguyên tử.", "durationMs": 4200 },
+          { "text": "Các electron xếp thành 3 lớp: lớp trong cùng 2e, lớp thứ hai 8e và lớp ngoài cùng 1e.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["3 vòng đồng tâm với phân bố 2, 8, 1"]
+    },
+    {
+      "id": "dong-vi-hydrogen",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Ba đồng vị của nguyên tố Hydrogen",
+        "slideText": "Protium (¹₁H: 1p, 0n), Deuterium (²₁H: 1p, 1n), Tritium (³₁H: 1p, 2n) đều có 1 electron.",
+        "speech": [
+          { "text": "Các đồng vị của Hydrogen đều có cùng 1 proton và 1 electron nhưng khác nhau về số neutron.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["làm nổi bật sự khác nhau số neutron trong hạt nhân"]
+    },
+    {
+      "id": "khong-chon-hund-pauli",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Điền ô orbital theo quy tắc Hund cho Oxygen",
+        "slideText": "O (Z = 8): 1s² 2s² 2p⁴ với 3 ô lượng tử phân lớp 2p.",
+        "speech": [
+          { "text": "Ba electron đầu tiên vào 3 ô 2p có spin song song trước khi ghép đôi ở ô thứ nhất.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh chuyên sâu về ô orbital Hund/Pauli, nên chọn cau-hinh-electron"]
+    },
+    {
+      "id": "khong-chon-phan-tu-ethanol",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Công thức cấu tạo của ethanol",
+        "slideText": "CH3-CH2-OH chứa nhóm chức hydroxyl -OH.",
+        "speech": [
+          { "text": "Phân tử ethanol gồm hai nguyên tử carbon liên kết với nhóm OH.", "durationMs": 4000 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về cấu tạo phân tử"]
+    }
+  ]
+}

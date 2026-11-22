@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "mo-hinh-nguyen-tu", "vaiTro": "chinh" }],
+  "confidence": 0.95,
+  "lyDo": "Lời giảng trình bày cấu tạo hạt nhân (6p, 6n) và 2 lớp vỏ electron (2e, 4e) của nguyên tử Carbon-12.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Hiện ký hiệu nguyên tử ¹²₆C và tâm hạt nhân nguyên tử.",
+      "skill": "mo-hinh-nguyen-tu",
+      "duLieu": { "z": 6, "a": 12 }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 7.4,
+      "cau": [1],
+      "cue": "kw:Hạt nhân",
+      "viec": "Hiện 6 proton (+) và 6 neutron (0) trong hạt nhân, đếm số khối A = 12.",
+      "skill": "mo-hinh-nguyen-tu",
+      "duLieu": { "p": 6, "n": 6 }
+    },
+    {
+      "i": 2,
+      "t0": 7.4,
+      "t1": 11.4,
+      "cau": [2],
+      "cue": "kw:Vỏ nguyên tử",
+      "viec": "Vẽ lớp vỏ K (2e) và lớp vỏ L (4e) quay chậm quanh hạt nhân.",
+      "skill": "mo-hinh-nguyen-tu",
+      "duLieu": { "k": 2, "l": 4 }
+    },
+    {
+      "i": 3,
+      "t0": 11.4,
+      "t1": 15.0,
+      "cau": [3],
+      "cue": "t",
+      "viec": "Hiện thẻ tổng kết tính trung hoà điện (6p = 6e) và nhấn công thức A = Z + N.",
+      "skill": "mo-hinh-nguyen-tu",
+      "duLieu": {}
+    }
+  ],
+  "khongCanHoatHinh": false
+}

@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 12,
+  "title": "Nguyên tắc hoạt động của pin điện hoá Galvani Zn–Cu",
+  "slideText": "Anode (−): Zn(s) → Zn²⁺(aq) + 2e⁻ (E° = −0,76 V). Cathode (+): Cu²⁺(aq) + 2e⁻ → Cu(s) (E° = +0,34 V). Tổng: Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s); E°pin = 1,10 V.",
+  "speech": [
+    { "text": "Pin Galvani Zn Cu gồm hai nửa pin nhúng trong dung dịch ZnSO4 và CuSO4, nối bằng cầu muối KCl và dây dẫn có vôn kế.", "durationMs": 4000 },
+    { "text": "Ở cực âm anode, thanh kẽm bị oxi hoá thành ion Zn 2 cộng và giải phóng 2 electron di chuyển lên dây dẫn.", "durationMs": 4000 },
+    { "text": "Electron chạy qua vôn kế sang cực dương cathode đồng, khử ion Cu 2 cộng bám thành lớp đồng và vôn kế chỉ 1,10 V.", "durationMs": 4200 },
+    { "text": "Cầu muối trung hoà điện tích hai cốc; phản ứng tổng Zn cộng Cu 2 cộng tạo Zn 2 cộng và Cu cho suất điện động chuẩn 1,10 V.", "durationMs": 3800 }
+  ]
+}

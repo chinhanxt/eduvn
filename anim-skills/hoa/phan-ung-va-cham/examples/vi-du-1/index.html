@@ -1,0 +1,138 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1920" data-height="1080">
+  <div id="meta" class="ek-meta ek-col-1 ek-span-10" style="top:64px">HOÁ HỌC 10 · TỐC ĐỘ PHẢN ỨNG</div>
+  <h1 id="title" class="ek-title ek-col-1 ek-span-12" style="top:112px" data-ek-words>Thuyết va chạm: <span class="kw">ảnh hưởng của nhiệt độ</span></h1>
+
+  <div class="ek-stage">
+    <!-- Bình trái: 25 °C -->
+    <div id="boxCold" class="ek-card vessel ek-col-1 ek-span-6 ek-hidden" style="top:226px;height:536px" data-ek-beat="0">
+      <div class="v-head">
+        <span class="ek-label ek-c-lam">Nhiệt độ thấp · 25 °C</span>
+        <span id="tagCold" class="v-cnt ek-c-lam" data-ek-beat="1"><span id="hitCold">0</span> va chạm</span>
+      </div>
+      <svg id="svgCold" width="760" height="410" viewBox="0 0 760 410" class="chamber">
+        <rect x="6" y="6" width="748" height="398" rx="16" class="chamber-bg"/>
+        <!-- 8 hạt: 4 hạt A (lam), 4 hạt B (xanhLa) -->
+        <circle id="c0" cx="120" cy="110" r="18" class="ptc ek-fill-lam"/>
+        <circle id="c1" cx="280" cy="290" r="18" class="ptc ek-fill-lam"/>
+        <circle id="c2" cx="480" cy="140" r="18" class="ptc ek-fill-lam"/>
+        <circle id="c3" cx="620" cy="300" r="18" class="ptc ek-fill-lam"/>
+        <circle id="c4" cx="190" cy="240" r="18" class="ptc ek-fill-xanhLa"/>
+        <circle id="c5" cx="390" cy="100" r="18" class="ptc ek-fill-xanhLa"/>
+        <circle id="c6" cx="540" cy="260" r="18" class="ptc ek-fill-xanhLa"/>
+        <circle id="c7" cx="650" cy="120" r="18" class="ptc ek-fill-xanhLa"/>
+        <!-- Vòng sáng va chạm hiệu quả -->
+        <circle id="cflash0" cx="310" cy="210" r="44" class="flash ek-stroke-doSon"/>
+        <circle id="cflash1" cx="510" cy="200" r="44" class="flash ek-stroke-doSon"/>
+      </svg>
+    </div>
+
+    <!-- Bình phải: 65 °C -->
+    <div id="boxHot" class="ek-card vessel vessel-hot ek-col-7 ek-span-6 ek-hidden" style="top:226px;height:536px">
+      <div class="v-head">
+        <span class="ek-label ek-c-doSon">Nhiệt độ cao · 65 °C</span>
+        <span id="tagHot" class="v-cnt ek-c-doSon" data-ek-beat="2"><span id="hitHot">0</span> va chạm</span>
+      </div>
+      <svg id="svgHot" width="760" height="410" viewBox="0 0 760 410" class="chamber">
+        <rect x="6" y="6" width="748" height="398" rx="16" class="chamber-bg"/>
+        <!-- 8 hạt: 4 hạt A (lam), 4 hạt B (xanhLa) -->
+        <circle id="h0" cx="110" cy="120" r="18" class="ptc ek-fill-lam"/>
+        <circle id="h1" cx="260" cy="300" r="18" class="ptc ek-fill-lam"/>
+        <circle id="h2" cx="460" cy="130" r="18" class="ptc ek-fill-lam"/>
+        <circle id="h3" cx="630" cy="280" r="18" class="ptc ek-fill-lam"/>
+        <circle id="h4" cx="180" cy="260" r="18" class="ptc ek-fill-xanhLa"/>
+        <circle id="h5" cx="370" cy="110" r="18" class="ptc ek-fill-xanhLa"/>
+        <circle id="h6" cx="550" cy="250" r="18" class="ptc ek-fill-xanhLa"/>
+        <circle id="h7" cx="640" cy="110" r="18" class="ptc ek-fill-xanhLa"/>
+        <!-- Vòng sáng va chạm hiệu quả (nhiều hơn rõ rệt) -->
+        <circle id="hf0" cx="220" cy="190" r="46" class="flash ek-stroke-doSon"/>
+        <circle id="hf1" cx="430" cy="240" r="46" class="flash ek-stroke-doSon"/>
+        <circle id="hf2" cx="570" cy="170" r="46" class="flash ek-stroke-doSon"/>
+        <circle id="hf3" cx="320" cy="130" r="46" class="flash ek-stroke-doSon"/>
+      </svg>
+    </div>
+
+    <!-- Thanh kết luận -->
+    <div id="sumBar" class="ek-card sum-card ek-col-1 ek-span-12 ek-hidden" style="top:794px;height:98px" data-ek-beat="3">
+      <div class="sum-row">
+        <span class="leg"><i class="dot-a"></i>Chất A</span>
+        <span class="leg"><i class="dot-b"></i>Chất B</span>
+        <span class="leg"><i class="dot-f"></i>Va chạm hiệu quả</span>
+        <span class="sum-txt">Nhiệt độ tăng → tốc độ phản ứng tăng</span>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .vessel{padding:24px 30px;display:flex;flex-direction:column;gap:16px}
+  .vessel-hot{border-left-color:var(--c-doSon)}
+  .v-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .v-cnt{font-family:var(--ui);font-size:38px;font-weight:700;background:var(--sunken);padding:6px 18px;border-radius:10px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .chamber{display:block;width:760px;height:410px}
+  .chamber-bg{fill:var(--sunken);stroke:var(--line);stroke-width:3px}
+  .ptc{stroke:var(--surface);stroke-width:3px}
+  .flash{fill:none;stroke-width:6px;opacity:0;transform-box:fill-box;transform-origin:50% 50%}
+  .sum-card{border-left-color:var(--ok);display:flex;align-items:center;padding:0 30px}
+  .sum-row{display:flex;align-items:center;gap:24px;width:100%;white-space:nowrap}
+  .leg{display:inline-flex;align-items:center;gap:10px;font-family:var(--ui);font-size:36px;font-weight:600;color:var(--ink2)}
+  .dot-a,.dot-b,.dot-f{display:inline-block;width:22px;height:22px;border-radius:50%}
+  .dot-a{background:var(--c-lam)}
+  .dot-b{background:var(--c-xanhLa)}
+  .dot-f{border:4px solid var(--c-doSon);background:transparent}
+  .sum-txt{font-family:var(--ui);font-size:36px;font-weight:700;color:var(--ink);margin-left:auto}
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+const rnd = EK.rand(202610);
+
+// Beat 0: Hiện tiêu đề và 2 bình
+EK.enter(tl, "#meta", 0.05, { from: "fade", dur: 0.45 });
+EK.words(tl, "#title", { t: 0.15, per: 0.08 });
+EK.enter(tl, "#boxCold", EK.cue(0), { from: "up", dur: 0.65 });
+EK.enter(tl, "#boxHot", 0.5, { from: "up", dur: 0.65 });
+
+// Quỹ đạo tất định bằng EK.rand(202610): bình 25 °C chậm (4 bước), bình 65 °C nhanh (12 bước)
+for (let i = 0; i < 8; i++) {
+  let tCold = 0.2;
+  for (let s = 0; s < 5; s++) {
+    const dx = Math.round((rnd() - 0.5) * 140);
+    const dy = Math.round((rnd() - 0.5) * 120);
+    tl.to("#c" + i, { x: dx, y: dy, duration: 2.9, ease: "sine.inOut" }, tCold);
+    tCold += 2.9;
+  }
+  let tHot = 0.2;
+  for (let s = 0; s < 14; s++) {
+    const dx = Math.round((rnd() - 0.5) * 210);
+    const dy = Math.round((rnd() - 0.5) * 160);
+    tl.to("#h" + i, { x: dx, y: dy, duration: 1.05, ease: "sine.inOut" }, tHot);
+    tHot += 1.05;
+  }
+}
+
+// Beat 1: Tập trung bình 25 °C — 2 vòng va chạm hiệu quả
+const t1 = EK.cue(1);
+EK.focus(tl, "#boxCold", t1, { dur: 0.45 });
+EK.enter(tl, "#tagCold", t1, { from: "fade", dur: 0.4 });
+tl.fromTo("#cflash0", { scale: 0.3, opacity: 0.95 }, { scale: 1.5, opacity: 0, duration: 0.85, ease: "power2.out" }, t1 + 0.5);
+EK.count(tl, "#hitCold", 0, 1, t1 + 0.5, 0.45, { decimals: 0 });
+tl.fromTo("#cflash1", { scale: 0.3, opacity: 0.95 }, { scale: 1.5, opacity: 0, duration: 0.85, ease: "power2.out" }, t1 + 2.0);
+EK.count(tl, "#hitCold", 1, 2, t1 + 2.0, 0.45, { decimals: 0 });
+
+// Beat 2: Tập trung bình 65 °C — 9 va chạm hiệu quả liên tiếp
+const t2 = EK.cue(2);
+EK.focus(tl, "#boxHot", t2, { dur: 0.45 });
+EK.enter(tl, "#tagHot", t2, { from: "fade", dur: 0.4 });
+const hotFlashes = ["#hf0", "#hf1", "#hf2", "#hf3", "#hf0", "#hf2", "#hf1", "#hf3", "#hf0"];
+hotFlashes.forEach(function (sel, idx) {
+  const at = t2 + 0.25 + idx * 0.36;
+  tl.fromTo(sel, { scale: 0.3, opacity: 0.95 }, { scale: 1.55, opacity: 0, duration: 0.55, ease: "power2.out" }, at);
+});
+EK.count(tl, "#hitHot", 0, 9, t2 + 0.3, 3.1, { decimals: 0 });
+
+// Beat 3: Mở cả hai bình + thanh kết luận
+const t3 = EK.cue(3);
+EK.unfocus(tl, t3, { dur: 0.45 });
+EK.enter(tl, "#sumBar", t3 + 0.1, { from: "up", dur: 0.65 });
+EK.mark(tl, "#tagHot", t3 + 0.7, "underline", { color: "doSon", dur: 0.55 });
+
+window.__timelines["main"] = tl;
+</script>

@@ -1,0 +1,80 @@
+{
+  "skill": "chuan-do-ph",
+  "evals": [
+    {
+      "id": "hcl-naoh-25ml",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Chuẩn độ dung dịch HCl 0,1 M bằng NaOH 0,1 M",
+        "slideText": "25 mL HCl 0,1 M + NaOH 0,1 M. Điểm tương đương tại V = 25,0 mL, pH = 7,0. Chỉ thị phenolphthalein đổi hồng ở pH 8,2–10.",
+        "speech": [
+          { "text": "Chuẩn độ 25 mL dung dịch HCl 0,1M bằng dung dịch chuẩn NaOH 0,1M với chỉ thị phenolphthalein.", "durationMs": 4000 },
+          { "text": "Khi nhỏ từ từ NaOH đến 24 mL, pH tăng chậm từ 1 lên 2,7 và dung dịch vẫn không màu.", "durationMs": 4000 },
+          { "text": "Quanh điểm tương đương 25 mL, pH nhảy vọt qua 7,0 lên 11 khiến phenolphthalein chuyển màu hồng nhạt.", "durationMs": 4200 },
+          { "text": "Từ thể tích tương đương ta tính chính xác nồng độ dung dịch acid ban đầu.", "durationMs": 3800 }
+        ]
+      },
+      "tieuChi": ["đường cong pH dốc đứng tại 25 mL", "chỉ thị đổi màu hồng nhạt sau pH 8,2"]
+    },
+    {
+      "id": "ch3cooh-naoh-acid-yeu",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Chuẩn độ ethanoic acid (acid yếu) bằng NaOH",
+        "slideText": "25 mL CH3COOH 0,1 M + NaOH 0,1 M: điểm tương đương có pH ≈ 8,72 (> 7) do muối CH3COONa thuỷ phân.",
+        "speech": [
+          { "text": "Khi chuẩn độ acid yếu CH3COOH 0,1M bằng NaOH 0,1M, pH ban đầu cao hơn khoảng 2,9.", "durationMs": 4400 },
+          { "text": "Tại điểm tương đương 25 mL, pH lớn hơn 7 vào khoảng 8,7 nên chọn phenolphthalein là phù hợp nhất.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["thể hiện điểm tương đương pH > 7", "giải thích lý do chọn phenolphthalein"]
+    },
+    {
+      "id": "chon-chi-thi-mau",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Bước nhảy pH và khoảng đổi màu chất chỉ thị",
+        "slideText": "Khoảng đổi màu chất chỉ thị phải nằm trong bước nhảy pH của đường cong chuẩn độ.",
+        "speech": [
+          { "text": "Bước nhảy pH là đoạn pH thay đổi đột ngột ngay gần điểm tương đương.", "durationMs": 4200 },
+          { "text": "Chất chỉ thị phù hợp cần có khoảng đổi màu nằm gọn trong bước nhảy pH này.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["tô dải khoảng đổi màu cắt qua bước nhảy pH"]
+    },
+    {
+      "id": "khong-chon-va-cham",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Ảnh hưởng của nhiệt độ đến tốc độ phản ứng",
+        "slideText": "Tăng nhiệt độ làm các hạt chuyển động nhanh hơn và tăng tần số va chạm hiệu quả.",
+        "speech": [
+          { "text": "Khi đun nóng, động năng của các phân tử tăng lên dẫn đến nhiều va chạm hiệu quả hơn.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về tốc độ phản ứng va chạm"]
+    },
+    {
+      "id": "khong-chon-mo-hinh-hat-nhan",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Cấu tạo hạt nhân nguyên tử Carbon-12",
+        "slideText": "Hạt nhân gồm 6 proton mang điện dương và 6 neutron không mang điện.",
+        "speech": [
+          { "text": "Nguyên tử Carbon-12 có 6 proton và 6 neutron trong hạt nhân cùng 6 electron ở lớp vỏ.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về mô hình nguyên tử"]
+    }
+  ]
+}
