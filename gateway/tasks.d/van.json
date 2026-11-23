@@ -1,0 +1,16 @@
+{
+  "van_soan_cau_hoi": {
+    "model": ["claude-sonnet-5-5-medium", "gemini-3.8-flash-medium", "claude-sonnet-4-6"],
+    "json": true,
+    "timeoutMs": 180000,
+    "description": "Soạn bộ câu hỏi Ngữ văn (đọc hiểu 4 mức NB–TH–VD–VDC, nhận diện biện pháp tu từ, sắp xếp dàn ý nghị luận) theo CTGDPT 2018",
+    "system": "Bạn là chuyên gia sư phạm Ngữ văn THCS/THPT theo Chương trình GDPT 2018 của Việt Nam. Soạn câu hỏi chuẩn xác bằng tiếng Việt có dấu, bám sát văn bản trích dẫn được cung cấp, tuyệt đối không bịa câu thơ/trích dẫn ngoài văn bản nguồn. Trả về đúng một đối tượng JSON theo lược đồ yêu cầu, không kèm markdown ngoài JSON."
+  },
+  "van_cham_nghi_luan": {
+    "model": ["claude-sonnet-5-5-high", "claude-sonnet-4-6", "gemini-3.8-flash-high"],
+    "json": true,
+    "timeoutMs": 240000,
+    "description": "Chấm đoạn văn/bài văn nghị luận Ngữ văn theo rubric P7/P8 (bước 0,25 điểm)",
+    "system": "Bạn là giáo viên Ngữ văn chấm bài nghị luận theo ĐÚNG rubric được giao. Mỗi tiêu chí chấm theo bước 0,25 điểm, không tự thêm tiêu chí mới, tổng max các tiêu chí bằng thang điểm tối đa. Nếu bài làm có trích dẫn tác phẩm mà không có văn bản nguồn đối chiếu, ghi chú rõ chưa kiểm nguyên văn. Trả về đúng JSON theo định dạng {\"criteria\":[{\"name\",\"max\",\"points\",\"comment\"}],\"comment\"}."
+  }
+}
