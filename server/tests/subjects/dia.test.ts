@@ -288,6 +288,12 @@ describe("Gói Địa lí — HTTP API /api/dia/*", () => {
     expect(rGrade.statusCode).toBe(200);
     expect(rGrade.json().correct).toBe(true);
 
+    // gọi AI mà không đăng nhập thì bị chặn (không tiêu quota)
+    const noAuthAi = await app.inject({ method: "POST", url: "/api/dia/suggest-chart", payload: { bang: DIA_PRESET_TABLES[0]!.bang, intent: "auto", useAi: true } });
+    expect(noAuthAi.statusCode).toBe(401);
+    const noAuthGen = await app.inject({ method: "POST", url: "/api/dia/questions/generate", payload: {} });
+    expect(noAuthGen.statusCode).toBe(401);
+
     await app.close();
   });
 });

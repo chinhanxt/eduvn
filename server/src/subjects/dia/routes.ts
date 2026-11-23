@@ -1,6 +1,8 @@
 // server/src/subjects/dia/routes.ts
 // REST API cho gói môn Địa lí: bản đồ TopoJSON, công cụ vẽ biểu đồ + nhận xét gợi ý, tự kiểm tất định, chấm tính toán, soạn câu hỏi.
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
+import { assertCan } from "../../domain/authz";
+import type { Actor } from "../../service";
 import { z } from "zod";
 import { type Ai, disabledAi, parseAiJson } from "../../services/ai";
 import { parseOverrides, withTaskOverrides } from "../../tutor/tasks";
@@ -28,9 +30,11 @@ import {
 
 export type DiaRouteDeps = {
   ai?: Ai;
+  /** Mọi lệnh gọi AI phải đăng nhập để người ngoài không tiêu quota. */
+  authenticate: (req: FastifyRequest) => Promise<Actor>;
 };
 
-export function registerDiaRoutes(app: FastifyInstance, deps: DiaRouteDeps = {}) {
+export function registerDiaRoutes(app: FastifyInstance, deps: DiaRouteDeps) {
   const ai = withTaskOverrides(deps.ai ?? disabledAi, parseOverrides(process.env.AI_TASK_OVERRIDES));
 
   // 1. Dữ liệu bản đồ TopoJSON & bộ địa danh (cache dài hạn, công khai cho cổng /hoc và /gv)
@@ -70,6 +74,7 @@ export function registerDiaRoutes(app: FastifyInstance, deps: DiaRouteDeps = {})
     let aiNoteIssue: string | null = null;
 
     if (body.useAi) {
+      await deps.authenticate(req);
       try {
         const tableJson = JSON.stringify(body.bang);
         const text = await ai.chat("dia_nhan_xet_bieu_do", [
@@ -131,6 +136,8 @@ export function registerDiaRoutes(app: FastifyInstance, deps: DiaRouteDeps = {})
 
   // 6. Soạn câu hỏi Địa lí qua AI gateway kèm tự kiểm tất định
   app.post("/api/dia/questions/generate", async (req) => {
+    const actor = await deps.authenticate(req);
+    assertCan(actor.role, "question:write");
     const input = GenerateDiaQuestionReqSchema.parse(req.body);
     const prompt = buildDiaQuestionPrompt(input);
     const rawText = await ai.chat(

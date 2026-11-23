@@ -112,7 +112,9 @@ const c11b2 = await klass("11B2", "Toán 11", 12);
 const vn = (dayOffset: number, hh: number, mm = 0) => {
   const d = new Date(Date.now() + 7 * 3600_000);
   const iso = `${d.toISOString().slice(0, 10)}T${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:00+07:00`;
-  return new Date(new Date(iso).getTime() + dayOffset * 86_400_000).toISOString();
+  // chạy demo sau giờ đó: hạn "hôm nay" đã qua thì lùi tới 2 giờ nữa để seed không lỗi
+  const t = new Date(iso).getTime() + dayOffset * 86_400_000;
+  return new Date(dayOffset >= 0 ? Math.max(t, Date.now() + 2 * 3600_000) : t).toISOString();
 };
 async function give(cls: { id: string }, ex: { id: string }, title: string, dueAt: string, kind: "practice" | "test" = "practice", extra: Record<string, unknown> = {}) {
   return ok(await call(t, "POST", `/api/classes/${cls.id}/assignments`, gv, { title, source: { examId: ex.id }, dueAt, publish: true, kind, ...extra }), "assignment").json().id as string;

@@ -429,7 +429,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerTodayRoutes(app, { db: deps.db, today: createTodayService(deps.db, { now }), authenticate, studentAuth });
   registerPhotoGradingRoutes(app, { photo: createPhotoGradingService(deps.db, service, geoAi, classes), authenticate });
   registerSolutionRoutes(app, { db: deps.db, ai: deps.ai ?? disabledAi, publicUrl: deps.publicUrl, webUrl: process.env.WEB_URL, authenticate, tutor, student: (req) => studentAuth.verifySession(bearer(req)).catch(() => Promise.reject(new UnauthorizedError("Phiên đã hết, em đăng nhập lại nhé"))) });
-  registerDiaRoutes(app, { ai: deps.ai });
+  registerDiaRoutes(app, { ai: deps.ai, authenticate });
   registerSuRoutes(app, { db: deps.db, ai: deps.ai, bank: service, authenticate });
   registerHoaRoutes(app, { ai: deps.ai, authenticate });
   registerSinhRoutes(app, { ai: deps.ai, authenticate });
