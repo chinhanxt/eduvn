@@ -1,180 +1,378 @@
-import { useCallback, useEffect, useState } from "react";
-import { errText } from "../api";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link } from "react-router";
+import { vn } from "../api";
+import { ApiError } from "../apiCore";
 import { MathText } from "../math/MathText";
+import { Mascot } from "../portal/hoc/Mascot";
+import { Columns } from "../ui/charts/Columns";
+import { Button } from "../ui/components/Button";
+import { Skeleton } from "../ui/components/Skeleton";
+import { EmptyState, ErrorState } from "../ui/components/States";
+import { type StreamState, StreamingText } from "../ui/components/StreamingText";
+import { useToast } from "../ui/components/Toast";
+import { Icon } from "../ui/Icon";
+import { request } from "../ui/data/http";
+import { invalidate, useQuery } from "../ui/data/query";
+import { useUrlState } from "../ui/data/urlState";
+import { usePageMeta } from "../ui/shell/AppShell";
+import type { Kb } from "./client";
 import { Markdown } from "./Markdown";
-import { type Kb, tutorApi } from "./client";
-
-type PQ = { id: string; type: "mcq" | "true_false" | "short_answer" | "essay"; topic: string; level: string; stem: string; options?: string[]; statements?: string[]; points?: number };
-type Next = { mode: "review" | "new" | "done"; question: PQ | null; counts: { due: number; new: number } };
-type Result = { correct: boolean; partial: boolean; score: number; max: number; graded: string; feedback: string; explanation: string | null; answer: unknown; rating: string; nextDueAt: string; intervalDays: number };
-type Stats = { learned: number; due: number; mistakes: number; accuracy: number | null; answered: number; daily: { date: string; answered: number; correct: number }[]; topics: { topic: string; learned: number; mistakes: number; due: number }[] };
+import { againIn, canSubmit, clockText, levelOf, type Mark, markOf, type Next, optState, type Result, sessionDots, type Stats } from "./practice";
+import "./luyen.css";
 
 const LETTER = "ABCD";
-const when = (iso: string, days: number) => (days < 0.1 ? "sau ít phút" : days < 1 ? "trong hôm nay" : `sau ${Math.round(days)} ngày`) + ` (${new Date(iso).toLocaleDateString("vi-VN")})`;
+const STATS_KEY = "hoc/luyen-tap/stats";
+const msg = (e: unknown) => (e instanceof ApiError ? e.message : e instanceof TypeError ? "Mất mạng — em thử lại nhé" : "Có lỗi, em thử lại nhé");
+const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+const ddmm = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
 
+function QSkeleton({ label = "Đang lấy thẻ tiếp" }: { label?: string }) {
+  return (
+    <section className="card qcard" aria-busy="true" aria-label={label}>
+      <div className="qhead"><Skeleton w={150} h={26} style={{ borderRadius: 999 }} /><Skeleton w={90} h={16} /></div>
+      <Skeleton w="88%" h={26} style={{ marginTop: 24 }} />
+      <Skeleton w="60%" h={26} style={{ marginTop: 10 }} />
+      <div className="opts">{[0, 1, 2, 3].map((i) => <Skeleton key={i} h={72} style={{ borderRadius: 16 }} />)}</div>
+    </section>
+  );
+}
+
+/** Luyện tập (mockup hoc/luyen-tap): thẻ ôn đến hạn + câu mới, chấm ngay, lời giải, hỏi gia sư; môn/lớp/chủ đề trong URL. */
 export function Practice() {
-  const [subject, setSubject] = useState("Toán");
-  const [grade, setGrade] = useState(8);
-  const [topic, setTopic] = useState("");
-  const [kbs, setKbs] = useState<Kb[]>([]);
+  usePageMeta("Luyện tập", [{ label: "Luyện tập" }, { label: "Ôn hôm nay" }]);
+  const toast = useToast();
+  const kbs = useQuery("hoc/luyen-tap/kbs", (signal) => request<Kb[]>("/api/tutor/kbs", { signal }), { staleMs: 5 * 60_000 });
+  const stats = useQuery(STATS_KEY, (signal) => request<Stats>("/api/tutor/practice/stats?days=7", { signal }));
+  const [monU, setMon] = useUrlState<string>("mon", "");
+  const [lopU, setLop] = useUrlState<number>("lop", 0);
+  const [topic, setTopic] = useUrlState<string>("chu-de", "");
+  const first = kbs.data?.[0];
+  const subject = monU || first?.subject || "Toán";
+  const grade = lopU || first?.grade || 10;
   const [cur, setCur] = useState<Next | null>(null);
-  const [extra, setExtra] = useState<PQ[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [extra, setExtra] = useState<Next["question"][]>([]);
   const [resp, setResp] = useState<unknown>(null);
   const [res, setRes] = useState<Result | null>(null);
   const [rated, setRated] = useState(false);
-  const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [gen, setGen] = useState(false);
+  const [marks, setMarks] = useState<Mark[]>([]);
+  const [t0] = useState(() => Date.now());
+  const [secs, setSecs] = useState(0);
   const [ask, setAsk] = useState("");
-  const [reply, setReply] = useState("");
-
+  const [ai, setAi] = useState<{ text: string; state: StreamState } | null>(null);
+  const [setup, setSetup] = useState(false);
+  const aiCtl = useRef<AbortController | null>(null);
+  const askRef = useRef<HTMLInputElement>(null);
   const q = cur?.question ?? null;
-  const loadStats = useCallback(() => tutorApi<Stats>("/practice/stats?days=7").then(setStats).catch(() => {}), []);
-  useEffect(() => {
-    void loadStats();
-    tutorApi<Kb[]>("/kbs").then((l) => { setKbs(l); if (l[0]) { setSubject(l[0].subject); setGrade(l[0].grade); } }).catch(() => {});
-  }, [loadStats]);
+  const locked = res !== null;
 
-  const reset = () => { setResp(null); setRes(null); setRated(false); setReply(""); setAsk(""); };
-  const nextQ = async () => {
+  useEffect(() => {
+    const iv = window.setInterval(() => setSecs(Math.round((Date.now() - t0) / 1000)), 1000);
+    return () => window.clearInterval(iv);
+  }, [t0]);
+
+  const reset = () => {
+    setResp(null);
+    setRes(null);
+    setRated(false);
+    setAsk("");
+    aiCtl.current?.abort();
+    setAi(null);
+  };
+  const nextQ = useCallback(async () => {
     reset();
     setError(null);
     if (extra.length) {
-      const [first, ...rest] = extra;
+      const [head, ...rest] = extra;
       setExtra(rest);
-      setCur({ mode: "new", question: first!, counts: cur?.counts ?? { due: 0, new: 0 } });
+      setCur({ mode: "new", question: head ?? null, counts: cur?.counts ?? { due: 0, new: 0 } });
       return;
     }
+    setLoading(true);
     try {
-      setCur(await tutorApi<Next>(`/practice/next?subject=${encodeURIComponent(subject)}&grade=${grade}${topic ? `&topic=${encodeURIComponent(topic)}` : ""}`));
+      setCur(await request<Next>(`/api/tutor/practice/next?subject=${encodeURIComponent(subject)}&grade=${grade}${topic ? `&topic=${encodeURIComponent(topic)}` : ""}`));
     } catch (e) {
-      setError(errText(e));
-    }
-  };
-  const submit = async () => {
-    if (!q || resp === null) return;
-    setBusy(true);
-    try {
-      setRes(await tutorApi<Result>("/practice/answer", { method: "POST", body: { questionId: q.id, response: Array.isArray(resp) ? resp.map((x) => x === true) : resp } }));
-      void loadStats();
-    } catch (e) {
-      setError(errText(e));
+      setError(msg(e));
     } finally {
-      setBusy(false);
+      setLoading(false);
+    }
+  }, [extra, cur, subject, grade, topic]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Đổi môn/lớp/chủ đề (hoặc vào trang) → lấy thẻ đầu tiên
+  const sig = `${subject}|${grade}|${topic}`;
+  const started = useRef("");
+  useEffect(() => {
+    if (kbs.loading || started.current === sig) return;
+    started.current = sig;
+    setExtra([]);
+    void nextQ();
+  }, [sig, kbs.loading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const submit = async () => {
+    if (!q || locked || !canSubmit(q, resp)) return;
+    try {
+      const r = await request<Result>("/api/tutor/practice/answer", { method: "POST", body: { questionId: q.id, response: Array.isArray(resp) ? resp.map((x) => x === true) : resp } });
+      setRes(r);
+      setMarks((m) => [...m, markOf(r)]);
+      invalidate(STATS_KEY);
+      invalidate("hoc/hom-nay");
+    } catch (e) {
+      toast({ kind: "err", title: "Chưa chấm được", msg: msg(e), action: { label: "Thử lại", run: submit } });
     }
   };
   const rate = async (rating: "hard" | "good" | "easy") => {
     if (!q) return;
-    const r = await tutorApi<{ nextDueAt: string; intervalDays: number }>("/practice/rate", { method: "POST", body: { questionId: q.id, rating } }).catch((e: unknown) => { setError(errText(e)); return null; });
-    if (r) { setRated(true); setRes((x) => (x ? { ...x, nextDueAt: r.nextDueAt, intervalDays: r.intervalDays } : x)); }
+    try {
+      const r = await request<{ nextDueAt: string; intervalDays: number }>("/api/tutor/practice/rate", { method: "POST", body: { questionId: q.id, rating } });
+      setRated(true);
+      setRes((x) => (x ? { ...x, nextDueAt: r.nextDueAt, intervalDays: r.intervalDays } : x));
+      toast({ title: "Đã ghi nhận", msg: `Thẻ quay lại ${againIn(r.intervalDays)}` });
+    } catch (e) {
+      toast({ kind: "err", title: "Chưa lưu được", msg: msg(e) });
+    }
   };
   const generate = async () => {
-    if (!topic.trim()) { setError("Nhập chủ đề em muốn luyện thêm"); return; }
-    setBusy(true);
+    if (!topic.trim()) {
+      setSetup(true);
+      toast({ kind: "info", title: "Chọn chủ đề trước", msg: "AI cần biết em muốn luyện chủ đề nào" });
+      return;
+    }
+    setGen(true);
     setError(null);
     try {
-      const g = await tutorApi<{ questions: PQ[] }>("/questions/generate", { method: "POST", body: { subject, grade, topic, count: 3, mode: "practice", kbId: kbs.find((k) => k.subject === subject && k.grade === grade)?.id } });
-      setExtra(g.questions);
-      const [first, ...rest] = g.questions;
+      const kbId = kbs.data?.find((k) => k.subject === subject && k.grade === grade)?.id;
+      const g = await request<{ questions: NonNullable<Next["question"]>[] }>("/api/tutor/questions/generate", { method: "POST", body: { subject, grade, topic, count: 3, mode: "practice", kbId } });
+      const [head, ...rest] = g.questions;
       reset();
       setExtra(rest);
-      setCur({ mode: "new", question: first ?? null, counts: { due: 0, new: 0 } });
+      setCur({ mode: "new", question: head ?? null, counts: { due: 0, new: g.questions.length } });
+      toast({ title: `AI đã soạn ${g.questions.length} câu`, msg: topic });
     } catch (e) {
-      setError(errText(e));
+      setError(msg(e));
     } finally {
-      setBusy(false);
+      setGen(false);
     }
   };
   const followup = async () => {
-    if (!q || !ask.trim()) return;
-    setReply("…");
-    setReply((await tutorApi<{ reply: string }>("/questions/followup", { method: "POST", body: { questionId: q.id, message: ask, userAnswer: resp } }).catch((e: unknown) => ({ reply: errText(e) }))).reply);
+    if (!q || !ask.trim() || ai?.state === "streaming") return;
+    aiCtl.current?.abort();
+    const ctl = new AbortController();
+    aiCtl.current = ctl;
+    setAi({ text: "", state: "streaming" });
+    try {
+      const r = await request<{ reply: string }>("/api/tutor/questions/followup", { method: "POST", body: { questionId: q.id, message: ask, userAnswer: resp }, signal: ctl.signal });
+      setAi({ text: r.reply, state: "streaming" });
+      // trả lời về một lần: hiện dần như đang viết (~90 ký tự/giây) rồi chốt
+      window.setTimeout(() => !ctl.signal.aborted && setAi((x) => (x && x.text === r.reply ? { ...x, state: "done" } : x)), Math.min(6000, (r.reply.length / 90) * 1000 + 300));
+    } catch (e) {
+      if (!ctl.signal.aborted) setAi({ text: msg(e), state: "error" });
+    }
   };
 
-  const locked = res !== null;
-  const answerKey = res?.answer;
+  // Phím: 1–4 chọn, Enter kiểm tra / thẻ tiếp, H hỏi gia sư
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || typing(e.target) || !q) return;
+      if (!locked && q.type === "mcq" && /^[1-4]$/.test(e.key) && Number(e.key) <= (q.options?.length ?? 0)) setResp(Number(e.key) - 1);
+      else if (e.key === "Enter") void (locked ? nextQ() : submit());
+      else if (locked && (e.key === "h" || e.key === "H")) askRef.current?.focus();
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  });
+
+  const due = cur?.counts.due ?? stats.data?.due ?? 0;
+  const dots = sessionDots(marks, due, !!q && !locked);
+  const ok = marks.filter((m) => m === "ok").length;
+  const bad = marks.length - ok;
+  const s = stats.data;
+  const lv = q ? levelOf(q.level) : null;
+  const key = res?.answer;
+  const lastMark = marks[marks.length - 1];
+
   return (
-    <div className="prac">
-      <div className="stack">
-        <div className="card">
-          <div className="formrow">
-            <label className="lbl">Môn<input className="inp w-m" value={subject} onChange={(e) => setSubject(e.target.value)} /></label>
-            <label className="lbl">Lớp<select className="inp" value={grade} onChange={(e) => setGrade(Number(e.target.value))}>{Array.from({ length: 16 }, (_, i) => i + 1).map((g) => <option key={g} value={g}>{g <= 12 ? g : `ĐH năm ${g - 12}`}</option>)}</select></label>
-            <label className="lbl">Chủ đề (không bắt buộc)<input className="inp w-m" value={topic} onChange={(e) => setTopic(e.target.value)} /></label>
-            <button className="btn" onClick={() => void nextQ()} data-testid="prac-start">{cur ? "Câu tiếp theo" : "Bắt đầu luyện"}</button>
-            <button className="btn ghost" disabled={busy} onClick={() => void generate()}>AI ra thêm câu về chủ đề</button>
-          </div>
-          {cur && <small style={{ color: "var(--muted)" }}>Đến hạn ôn: {cur.counts.due} · Câu mới: {cur.counts.new}{cur.mode === "review" ? " · đang ôn lại" : ""}</small>}
+    <div className="luyen">
+      <div style={{ minWidth: 0 }}>
+        <div className="prog">
+          <Link className="btn ghost sm" to="/hoc"><Icon name="left" size="sm" /><span>Thoát</span></Link>
+          <div className="dots" role="img" aria-label={`Đã làm ${marks.length} thẻ, ${ok} đúng`}>{dots.map((d, i) => <i key={i} className={d || undefined} />)}</div>
+          <b className="num">{marks.length}{due ? `/${marks.length + due}` : ""}</b>
         </div>
-        {error && <div className="err">{error}</div>}
-        {cur?.mode === "done" && <div className="card"><div className="empty">Em đã làm hết câu hiện có. Quay lại khi có câu đến hạn ôn nhé!</div></div>}
-        {q && (
-          <div className="card qbox" data-testid="prac-q">
-            <div className="bar"><span className="tag">{q.topic}</span><span className="tag violet">{q.level}</span>{cur?.mode === "review" && <span className="tag amber">Ôn lại</span>}</div>
+        <div className="scope">
+          <span className="chipc"><Icon name="book" size="sm" />{subject} · {grade <= 12 ? `lớp ${grade}` : `ĐH năm ${grade - 12}`}{topic ? ` · ${topic}` : ""}</span>
+          <Button variant="ghost" size="sm" icon="sliders" pressed={setup} onClick={() => setSetup(!setup)} aria-expanded={setup}>Đổi chủ đề</Button>
+          <span className="grow" />
+          <Button variant="ghost" size="sm" icon="spark" busy={gen} onClick={generate}>AI ra thêm 3 câu</Button>
+        </div>
+        {setup && (
+          <form className="card setup" onSubmit={(e) => { e.preventDefault(); const f = new FormData(e.currentTarget); setMon(String(f.get("mon") ?? "")); setLop(Number(f.get("lop") ?? 0)); setTopic(String(f.get("chu-de") ?? "").trim()); setSetup(false); }}>
+            <label className="field"><span className="lbl">Môn</span><input className="input" name="mon" defaultValue={subject} list="luyen-mon" /></label>
+            <datalist id="luyen-mon">{[...new Set((kbs.data ?? []).map((k) => k.subject))].map((m) => <option key={m} value={m} />)}</datalist>
+            <label className="field"><span className="lbl">Lớp</span>
+              <select className="select" name="lop" defaultValue={grade}>{Array.from({ length: 16 }, (_, i) => i + 1).map((g) => <option key={g} value={g}>{g <= 12 ? `Lớp ${g}` : `ĐH năm ${g - 12}`}</option>)}</select>
+            </label>
+            <label className="field grow"><span className="lbl">Chủ đề (không bắt buộc)</span><input className="input" name="chu-de" defaultValue={topic} placeholder="vd Dấu tam thức bậc hai" /></label>
+            <div className="acts"><Button type="submit" variant="primary">Áp dụng</Button></div>
+          </form>
+        )}
+
+        {gen ? (
+          <QSkeleton label="AI đang soạn câu" />
+        ) : error && !q ? (
+          <section className="card"><ErrorState title="Chưa lấy được thẻ" text={error} onRetry={nextQ} /></section>
+        ) : loading && !q ? (
+          <QSkeleton />
+        ) : !q || cur?.mode === "done" ? (
+          <section className="card qcard">
+            <EmptyState
+              icon="check"
+              title={marks.length ? "Hôm nay ôn xong rồi!" : "Chưa có thẻ nào đến hạn"}
+              text={marks.length ? `${ok}/${marks.length} thẻ đúng · thẻ tiếp theo đến hạn sau.` : `Chưa có câu ${subject} lớp ${grade}${topic ? ` chủ đề ${topic}` : ""}. Nhờ AI ra câu mới nhé.`}
+              action={<Button variant="primary" icon="spark" busy={gen} onClick={generate}>Luyện thêm 3 câu</Button>}
+            />
+            {marks.length > 0 && <div className="done-mam"><Mascot mood="khen" size={72} say="Ôn đều mỗi ngày là nhớ lâu!" /></div>}
+          </section>
+        ) : (
+          <section className={loading ? "card qcard is-stale" : "card qcard"} aria-label="Thẻ đang ôn" key={q.id} data-testid="prac-q">
+            <div className="qhead">
+              <span className="chipc acc">{q.topic}</span>
+              {lv && <span className={`lvl l${lv[1]}`}>{lv[0]}</span>}
+              <span className="caption">· {cur?.mode === "review" ? "ôn lại" : "câu mới"}</span>
+            </div>
             <div className="stem"><MathText value={q.stem} /></div>
-            {q.type === "mcq" && q.options?.map((o, i) => (
-              <button key={i} disabled={locked} className={`choice${resp === i ? " on" : ""}${locked && answerKey === i ? " right" : ""}${locked && resp === i && answerKey !== i ? " wrong" : ""}`} onClick={() => setResp(i)} data-testid="prac-opt">
-                <span className="letter">{LETTER[i]}</span><MathText value={o} />
-              </button>
-            ))}
-            {q.type === "true_false" && q.statements?.map((s, i) => {
-              const v = (Array.isArray(resp) ? resp : [null, null, null, null]) as (boolean | null)[];
-              const key = Array.isArray(answerKey) ? (answerKey as boolean[]) : null;
-              const set = (b: boolean) => setResp(v.map((x, j) => (j === i ? b : x)));
-              return (
-                <div className="tf-row" key={i}>
-                  <span className="letter" style={{ fontWeight: 600 }}>{"abcd"[i]})</span>
-                  <div className="grow"><MathText value={s} /></div>
-                  <button disabled={locked} className={`chip${Array.isArray(resp) && resp[i] === true ? " on" : ""}`} onClick={() => set(true)}>Đúng</button>
-                  <button disabled={locked} className={`chip${Array.isArray(resp) && resp[i] === false ? " on" : ""}`} onClick={() => set(false)}>Sai</button>
-                  {key && <span className={`tag ${resp && (resp as boolean[])[i] === key[i] ? "green" : "amber"}`}>{key[i] ? "Đúng" : "Sai"}</span>}
-                </div>
-              );
-            })}
-            {q.type === "short_answer" && <input className="inp w-l" disabled={locked} placeholder="Đáp án của em" value={typeof resp === "string" ? resp : ""} onChange={(e) => setResp(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void submit(); }} />}
-            {q.type === "essay" && <textarea className="inp" style={{ minHeight: 140 }} disabled={locked} placeholder={`Bài làm của em (tối đa ${q.points} điểm)`} value={typeof resp === "string" ? resp : ""} onChange={(e) => setResp(e.target.value)} />}
-            {!locked && <div style={{ marginTop: 14 }}><button className="btn" disabled={busy || resp === null || resp === "" || (Array.isArray(resp) && resp.some((x) => x === null))} onClick={() => void submit()} data-testid="prac-submit">{busy ? "Đang chấm…" : "Nộp câu này"}</button></div>}
-            {res && (
-              <div className={`result ${res.correct ? "ok" : res.partial ? "mid" : "no"}`} data-testid="prac-result">
-                <b>{res.correct ? "Chính xác!" : res.partial ? "Đúng một phần" : "Chưa đúng"}</b> · {res.score}/{res.max} điểm{res.graded === "ai" ? " · chấm bởi AI" : ""}
-                {res.feedback && <div>{res.feedback}</div>}
-                {res.explanation && <div style={{ marginTop: 6 }}><b>Lời giải: </b><MathText value={res.explanation} /></div>}
-                {q.type === "short_answer" && !res.correct && <div style={{ marginTop: 6 }}>Đáp án: <MathText value={String(res.answer)} /></div>}
-                <div style={{ marginTop: 8, color: "var(--muted)" }}>Ôn lại {when(res.nextDueAt, res.intervalDays)}</div>
-                {res.correct && !rated && (
-                  <div className="chips" style={{ marginTop: 8 }}>
-                    <span style={{ alignSelf: "center" }}>Em thấy câu này:</span>
-                    <button className="chip" onClick={() => void rate("hard")}>Khó</button>
-                    <button className="chip" onClick={() => void rate("good")}>Vừa</button>
-                    <button className="chip" onClick={() => void rate("easy")}>Dễ</button>
-                  </div>
-                )}
-                <div className="formrow" style={{ marginTop: 10, marginBottom: 0 }}>
-                  <input className="inp" style={{ flex: 1 }} placeholder="Hỏi gia sư về câu này…" value={ask} onChange={(e) => setAsk(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") void followup(); }} />
-                  <button className="btn ghost sm" onClick={() => void followup()}>Hỏi</button>
-                </div>
-                {reply && <div style={{ marginTop: 8 }}><Markdown text={reply} /></div>}
-                <div style={{ marginTop: 10 }}><button className="btn" onClick={() => void nextQ()}>Câu tiếp theo</button></div>
+            {q.type === "mcq" && (
+              <div className="opts" role="radiogroup" aria-label="Phương án">
+                {q.options?.map((o, i) => {
+                  const st = optState(i, resp, key, locked);
+                  return (
+                    <button type="button" key={i} role="radio" aria-checked={resp === i} disabled={locked} className={`opt ${st}`} onClick={() => setResp(i)} data-testid="prac-opt">
+                      <span className="k">{LETTER[i]}</span>
+                      <span className="tx"><MathText value={o} /></span>
+                      {st === "right" && <span className="st"><Icon name="ok" size="sm" />Đáp án</span>}
+                      {st === "wrong" && <span className="st"><Icon name="err" size="sm" />Em chọn</span>}
+                    </button>
+                  );
+                })}
               </div>
             )}
-          </div>
+            {q.type === "true_false" && (
+              <div className="ds">
+                {q.statements?.map((st, i) => {
+                  const v = (Array.isArray(resp) ? resp : (q.statements ?? []).map(() => null)) as (boolean | null)[];
+                  const k = Array.isArray(key) ? (key as boolean[]) : null;
+                  const set = (b: boolean) => setResp(v.map((x, j) => (j === i ? b : x)));
+                  return (
+                    <div className={k ? (v[i] === k[i] ? "r ok" : "r bad") : "r"} key={i}>
+                      <span className="l">{"abcd"[i]}</span>
+                      <span className="tx"><MathText value={st} /></span>
+                      <span className="tf" role="group" aria-label={`Ý ${"abcd"[i]}`}>
+                        <button type="button" disabled={locked} aria-pressed={v[i] === true} onClick={() => set(true)}>Đúng</button>
+                        <button type="button" disabled={locked} aria-pressed={v[i] === false} onClick={() => set(false)}>Sai</button>
+                      </span>
+                      {k && <span className="kv">{k[i] ? "Đúng" : "Sai"}</span>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            {q.type === "short_answer" && <input className="input big-in" disabled={locked} placeholder="Đáp án của em" value={typeof resp === "string" ? resp : ""} onChange={(e) => setResp(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void submit()} aria-label="Đáp án" />}
+            {q.type === "essay" && <textarea className="textarea essay" disabled={locked} placeholder={`Bài làm của em (tối đa ${q.points ?? 1} điểm)`} value={typeof resp === "string" ? resp : ""} onChange={(e) => setResp(e.target.value)} aria-label="Bài làm" />}
+
+            {!res ? (
+              <div className="after">
+                <span className="caption grow">{q.type === "mcq" ? <>Chọn rồi bấm <kbd>Enter</kbd></> : "Làm xong bấm Kiểm tra"}</span>
+                <Button size="lg" variant="primary" disabled={!canSubmit(q, resp)} onClick={submit} data-testid="prac-submit">Kiểm tra</Button>
+              </div>
+            ) : (
+              <>
+                <div className={`why ${markOf(res)}`} data-testid="prac-result">
+                  <h3>
+                    <Icon name={res.correct ? "ok" : res.partial ? "alert" : "bulb"} size="sm" />
+                    {res.correct ? "Chính xác!" : res.partial ? "Đúng một phần" : q.type === "mcq" && typeof key === "number" ? `Vì sao là ${LETTER[key]}` : "Chưa đúng"}
+                    <span className="grow" />
+                    <span className="sc">{vn(res.score)}/{vn(res.max)} điểm{res.graded === "ai" ? " · AI chấm" : ""}</span>
+                  </h3>
+                  {res.feedback && <p>{res.feedback}</p>}
+                  {res.explanation && <div className="read"><MathText value={res.explanation} /></div>}
+                  {q.type === "short_answer" && !res.correct && <p>Đáp án: <MathText value={String(res.answer)} /></p>}
+                </div>
+                {res.correct && !rated && (
+                  <div className="rate" role="group" aria-label="Em thấy câu này">
+                    <span className="caption">Em thấy câu này:</span>
+                    <Button size="sm" onClick={() => rate("hard")}>Khó</Button>
+                    <Button size="sm" onClick={() => rate("good")}>Vừa</Button>
+                    <Button size="sm" onClick={() => rate("easy")}>Dễ</Button>
+                  </div>
+                )}
+                <form className="askrow" onSubmit={(e) => { e.preventDefault(); void followup(); }}>
+                  <Icon name="bot" size="sm" />
+                  <input ref={askRef} className="input" placeholder="Hỏi gia sư về câu này…" value={ask} onChange={(e) => setAsk(e.target.value)} aria-label="Hỏi gia sư về câu này" />
+                  <Button type="submit" variant="ghost" disabled={!ask.trim()} busy={ai?.state === "streaming" && !ai.text}>Hỏi</Button>
+                </form>
+                {ai && (
+                  <div className="ai-reply">
+                    <StreamingText text={ai.text} state={ai.state} onStop={() => { aiCtl.current?.abort(); setAi((x) => (x ? { ...x, state: "stopped" } : x)); }} render={(t) => <Markdown text={t} />} />
+                  </div>
+                )}
+                <div className="after">
+                  <span className="caption grow"><Icon name="refresh" size="sm" /> Thẻ này quay lại {againIn(res.intervalDays)}</span>
+                  <Link className="btn lg" to="/hoc/gia-su"><Icon name="chat" size="sm" /><span>Gia sư</span></Link>
+                  <Button size="lg" variant="primary" onClick={nextQ} busy={loading} kbd="Enter">Thẻ tiếp</Button>
+                </div>
+              </>
+            )}
+          </section>
         )}
       </div>
-      <div className="card">
-        <h2>Tiến độ 7 ngày</h2>
-        {stats ? (
-          <>
-            <div className="bars" aria-label="Số câu mỗi ngày">
-              {stats.daily.map((d) => { const max = Math.max(1, ...stats.daily.map((x) => x.answered)); return <div key={d.date} title={`${d.date}: ${d.correct}/${d.answered}`} style={{ height: `${Math.max(3, (100 * d.answered) / max)}%` }}><i style={{ height: d.answered ? `${(100 * d.correct) / d.answered}%` : 0 }} /></div>; })}
-            </div>
-            <div className="stat"><span>Đến hạn ôn hôm nay</span><b>{stats.due}</b></div>
-            <div className="stat"><span>Đã học</span><b>{stats.learned}</b></div>
-            <div className="stat"><span>Câu hay sai</span><b>{stats.mistakes}</b></div>
-            <div className="stat"><span>Tỉ lệ đúng</span><b>{stats.accuracy === null ? "—" : `${stats.accuracy}%`}</b></div>
-            {stats.topics.slice(0, 5).map((t) => <div key={t.topic} className="stat"><span>{t.topic}</span><span>{t.mistakes} sai · {t.due} cần ôn</span></div>)}
-          </>
-        ) : <div className="empty">…</div>}
-      </div>
+
+      <aside className="rail" aria-label="Tiến độ">
+        <section className="card">
+          <div className="hd"><h2>Phiên này</h2><span className="grow" />{lastMark && <Mascot key={marks.length} mood={lastMark === "ok" ? "khen" : "dong-vien"} size={40} />}</div>
+          <div className="score">
+            <div><b style={{ color: "var(--ok)" }}>{ok}</b><span>đúng</span></div>
+            <div><b style={{ color: "var(--danger)" }}>{bad}</b><span>chưa đúng</span></div>
+            <div><b>{clockText(secs)}</b><span>thời gian</span></div>
+          </div>
+          <p className="caption" style={{ marginTop: 12, textAlign: "center" }}>{due ? `Còn ${due} thẻ đến hạn` : "Không còn thẻ đến hạn"}</p>
+        </section>
+        <section className="card">
+          <div className="hd"><h2>7 ngày qua</h2><span className="grow" /><span className="caption">{s?.accuracy == null ? "" : `đúng ${s.accuracy}%`}</span></div>
+          {s ? (
+            <>
+              <Columns vals={s.daily.map((d) => d.answered)} labels={s.daily.map((d) => ddmm(d.date))} height={120} unit="câu" />
+              <div className="mini-stats">
+                <span><b>{s.due}</b>đến hạn</span>
+                <span><b>{s.learned}</b>đã học</span>
+                <span><b>{s.mistakes}</b>hay sai</span>
+              </div>
+            </>
+          ) : stats.error ? (
+            <ErrorState title="Không tải được tiến độ" onRetry={() => stats.refetch()} />
+          ) : (
+            <Skeleton w="100%" h={150} style={{ borderRadius: 12 }} />
+          )}
+        </section>
+        {s && s.topics.length > 0 && (
+          <section className="card">
+            <div className="hd"><h2>Chủ đề hay sai</h2></div>
+            <ul className="topics">
+              {s.topics.slice(0, 5).map((t) => (
+                <li key={t.topic}>
+                  <button type="button" onClick={() => setTopic(t.topic)} aria-pressed={topic === t.topic}>
+                    <span className="t">{t.topic}<small>{t.mistakes} sai · {t.due} cần ôn</small></span>
+                    <Icon name="right" size="sm" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <p className="caption kbd-hint">Phím tắt: <kbd>1</kbd>–<kbd>4</kbd> chọn · <kbd>Enter</kbd> kiểm tra / tiếp · <kbd>H</kbd> hỏi gia sư</p>
+      </aside>
     </div>
   );
 }

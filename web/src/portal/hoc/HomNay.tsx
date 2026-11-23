@@ -1,7 +1,6 @@
-import { lazy, Suspense } from "react";
+import { lazy, type ReactNode, Suspense } from "react";
 import { Link } from "react-router";
 import { StreakDays } from "../../ui/charts/Heatmap";
-import { RingBig } from "../../ui/components/Progress";
 import { Skeleton } from "../../ui/components/Skeleton";
 import { EmptyState, ErrorState } from "../../ui/components/States";
 import { Icon } from "../../ui/Icon";
@@ -11,6 +10,7 @@ import { heroAction, heroTitle, longDay, metricText, subjectColor, subjectIcon }
 import type { HocToday } from "../today";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
 import { useLearner } from "./HocShell";
+import { HOC_PATH } from "../../student/paths";
 
 // Biểu đồ thành thạo nằm dưới thẻ việc tiếp theo: tải riêng (giữ JS lần đầu < 100 KB).
 const DotPlot = lazy(() => import("../../ui/charts/DotPlot").then((m) => ({ default: m.DotPlot })));
@@ -27,6 +27,13 @@ const MasterySkel = ({ n }: { n: number }) => (
 );
 
 const hhmm = (iso: string) => new Date(iso).toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", hour12: false });
+
+/** Vòng lớn trên mảng màu (= RingBig của ui/components/Progress, viết tại chỗ để màn đầu không kéo thêm một chunk dùng chung — ngân sách JS lần đầu). */
+const Ring = ({ done, total, children }: { done: number; total: number; children: ReactNode }) => (
+  <div className="ringbig" style={{ ["--p" as string]: `${Math.round((100 * Math.min(done, total)) / Math.max(1, total))}%` }} role="img" aria-label={`Đã làm ${done} trên ${total} câu`}>
+    <div>{children}</div>
+  </div>
+);
 
 function Hero({ d }: { d: HocToday }) {
   const n = d.next;
@@ -48,10 +55,10 @@ function Hero({ d }: { d: HocToday }) {
         </p>
       </div>
       {n && (
-        <RingBig value={n.answered} max={Math.max(1, n.total)} label={`Đã làm ${n.answered} trên ${n.total} câu`}>
+        <Ring done={n.answered} total={n.total}>
           <b>{n.answered}/{n.total}</b>
           <span>câu đã làm</span>
-        </RingBig>
+        </Ring>
       )}
       {n && (
         <div className="meta">
@@ -62,7 +69,7 @@ function Hero({ d }: { d: HocToday }) {
       )}
       <div className="acts">
         {n ? (
-          <Link className="btn lg primary on-field" to={`/hoc/hs/bai/${n.assignmentId}`}>
+          <Link className="btn lg primary on-field" to={HOC_PATH.lamBai(n.assignmentId)}>
             <span>{heroAction(n)}</span>
             <Icon name="right" size="sm" />
           </Link>
@@ -74,7 +81,7 @@ function Hero({ d }: { d: HocToday }) {
                 <Icon name="right" size="sm" />
               </Link>
             )}
-            <Link className="btn lg ghost-field" to="/hoc/hs">
+            <Link className="btn lg ghost-field" to={HOC_PATH.ketQua()}>
               <span>Xem bài đã làm</span>
             </Link>
           </>
@@ -139,7 +146,7 @@ export function HomNay() {
   if (!d && q.error) return <ErrorState title="Không tải được trang Hôm nay" onRetry={() => q.refetch()} />;
   if (!d) return <Skel />;
   const account = auth === "user";
-  const subjLink = account ? "/hoc/giao-trinh" : "/hoc/hs";
+  const subjLink = account ? "/hoc/giao-trinh" : HOC_PATH.baiTap;
   return (
     <div className={q.stale ? "today-hoc is-stale" : "today-hoc"}>
       <div style={{ minWidth: 0 }}>
@@ -222,7 +229,7 @@ export function HomNay() {
                     </span>
                   </>
                 );
-                return <li key={u.assignmentId}>{u.canStart ? <Link to={`/hoc/hs/bai/${u.assignmentId}`}>{inner}</Link> : <div>{inner}</div>}</li>;
+                return <li key={u.assignmentId}>{u.canStart ? <Link to={HOC_PATH.lamBai(u.assignmentId)}>{inner}</Link> : <div>{inner}</div>}</li>;
               })}
             </ul>
           )}

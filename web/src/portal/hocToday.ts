@@ -1,6 +1,8 @@
 // Hàm thuần màn Hôm nay cổng Học (tách khỏi today.ts để cổng GV không tải phần này).
 import type { HocToday } from "./today";
-import { vn1 } from "./today";
+
+// = vn1 của today.ts, viết lại ở đây: import runtime từ today.ts kéo cả chunk dùng chung với cổng GV (~0,9 KB) vào JS lần đầu cổng Học.
+const vn1 = (x: number): string => x.toLocaleString("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 const WD: Record<string, string> = { CN: "Chủ nhật", T2: "Thứ Hai", T3: "Thứ Ba", T4: "Thứ Tư", T5: "Thứ Năm", T6: "Thứ Sáu", T7: "Thứ Bảy" };
 /** "T2" + "2026-11-10" → "Thứ Hai · 10/11". */

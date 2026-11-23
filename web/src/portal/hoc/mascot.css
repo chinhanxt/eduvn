@@ -1,0 +1,40 @@
+/* Linh vật Mầm: chỉ transform/opacity; giảm chuyển động → đứng yên, vẫn đổi nét mặt theo tâm trạng. */
+.mam { display: inline-flex; align-items: center; gap: var(--s-3); min-width: 0; }
+.mam svg { flex: none; overflow: visible; }
+.mam-b, .mam-leaf, .mam-arm, .mam-eo { transform-box: fill-box; }
+.mam-leaf { transform-origin: 50% 100%; }
+.mam-arm { transform-origin: 0 100%; }
+.mam-eo { transform-origin: 50% 50%; animation: mam-blink 4.2s 1.2s infinite; }
+.mam-eh, .mam-mb, .mam-mc, .mam-sp, .mam-fl { opacity: 0; }
+.mam-say { position: relative; margin: 0; padding: 8px 12px; border-radius: 14px; background: var(--bg-raised); box-shadow: var(--shadow-card, var(--shadow-1)); font-size: var(--fs-sm); line-height: 18px; font-weight: 600; color: var(--ink); max-width: 26ch; animation: mam-pop var(--dur-3) var(--ease-out) both; }
+.mam-say::before { content: ""; position: absolute; left: -5px; top: 50%; width: 10px; height: 10px; background: inherit; transform: translateY(-50%) rotate(45deg); border-radius: 2px; }
+
+.mam-chao .mam-arm { animation: mam-wave .5s ease-in-out 3 alternate; }
+.mam-chao .mam-leaf { animation: mam-sway 1.6s ease-in-out 2 alternate; }
+
+.mam-khen .mam-eo, .mam-khen .mam-ms { opacity: 0; animation: none; }
+.mam-khen .mam-eh, .mam-khen .mam-mb, .mam-khen .mam-sp { opacity: 1; }
+.mam-khen .mam-b { transform-origin: 50% 100%; animation: mam-hop .42s var(--ease-out) 2; }
+.mam-khen .mam-sp { animation: mam-twinkle .9s ease-out 2 both; }
+
+.mam-dong-vien .mam-ms { opacity: 0; }
+.mam-dong-vien .mam-mc { opacity: 1; }
+.mam-dong-vien .mam-b { transform-origin: 50% 100%; animation: mam-tilt 1.4s ease-in-out 2; }
+.mam-dong-vien .mam-arm { transform: rotate(38deg); }
+
+.mam-chuoi .mam-eh, .mam-chuoi .mam-fl { opacity: 1; }
+.mam-chuoi .mam-eo { opacity: 0; animation: none; }
+.mam-chuoi .mam-fl { transform-box: fill-box; transform-origin: 50% 100%; animation: mam-flick .7s ease-in-out infinite alternate; }
+
+@keyframes mam-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+@keyframes mam-wave { from { transform: rotate(0); } to { transform: rotate(-28deg); } }
+@keyframes mam-sway { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+@keyframes mam-hop { 0%, 100% { transform: translateY(0) scale(1, 1); } 30% { transform: translateY(0) scale(1.06, .92); } 60% { transform: translateY(-7px) scale(.97, 1.04); } }
+@keyframes mam-twinkle { 0% { opacity: 0; transform: scale(.4); } 40% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+@keyframes mam-tilt { 0%, 100% { transform: rotate(0); } 35% { transform: rotate(-7deg); } 70% { transform: rotate(3deg); } }
+@keyframes mam-flick { from { transform: scale(1, 1); } to { transform: scale(.9, 1.12); } }
+@keyframes mam-pop { from { opacity: 0; transform: translateX(-4px) scale(.96); } }
+@media (prefers-reduced-motion: reduce) {
+  .mam *, .mam-say { animation: none !important; }
+  .mam-khen .mam-sp { opacity: 1; }
+}
