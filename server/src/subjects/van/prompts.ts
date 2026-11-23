@@ -99,33 +99,24 @@ export async function draftDocHieuSet(
   ai: Ai,
   req: Parameters<typeof buildDocHieuPrompt>[0],
 ): Promise<DocHieuSet> {
-  const out = await ai.chat({
-    task: "van_soan_cau_hoi",
-    messages: [{ role: "user", content: buildDocHieuPrompt(req) }],
-  });
-  return DocHieuSetSchema.parse(parseJsonBlock(out.text));
+  const out = await ai.chat("van_soan_cau_hoi", [{ role: "user", content: buildDocHieuPrompt(req) }], { json: true });
+  return DocHieuSetSchema.parse(parseJsonBlock(out));
 }
 
 export async function draftRhetoricalQuestion(
   ai: Ai,
   req: Parameters<typeof buildRhetoricalQuestionPrompt>[0],
 ): Promise<RhetoricalQuestion> {
-  const out = await ai.chat({
-    task: "van_soan_cau_hoi",
-    messages: [{ role: "user", content: buildRhetoricalQuestionPrompt(req) }],
-  });
-  return RhetoricalQuestionSchema.parse(parseJsonBlock(out.text));
+  const out = await ai.chat("van_soan_cau_hoi", [{ role: "user", content: buildRhetoricalQuestionPrompt(req) }], { json: true });
+  return RhetoricalQuestionSchema.parse(parseJsonBlock(out));
 }
 
 export async function draftOutlineOrderQuestion(
   ai: Ai,
   req: Parameters<typeof buildOutlineOrderPrompt>[0],
 ): Promise<OutlineOrderQuestion> {
-  const out = await ai.chat({
-    task: "van_soan_cau_hoi",
-    messages: [{ role: "user", content: buildOutlineOrderPrompt(req) }],
-  });
-  return OutlineOrderQuestionSchema.parse(parseJsonBlock(out.text));
+  const out = await ai.chat("van_soan_cau_hoi", [{ role: "user", content: buildOutlineOrderPrompt(req) }], { json: true });
+  return OutlineOrderQuestionSchema.parse(parseJsonBlock(out));
 }
 
 /** Chấm đoạn/bài văn nghị luận qua AI theo rubric + đính kèm kết quả tự kiểm trích dẫn tất định. */
@@ -134,10 +125,7 @@ export async function gradeLiteratureEssay(
   req: Parameters<typeof buildLiteratureGradePrompt>[0],
 ): Promise<{ grading: EssayResult; quoteCheck: QuoteVerificationResult }> {
   const { prompt, quoteCheck } = buildLiteratureGradePrompt(req);
-  const out = await ai.chat({
-    task: "van_cham_nghi_luan",
-    messages: [{ role: "user", content: prompt }],
-  });
-  const grading = normalizeLiteratureEssay(parseJsonBlock(out.text), req.maxPoints);
+  const out = await ai.chat("van_cham_nghi_luan", [{ role: "user", content: prompt }], { json: true });
+  const grading = normalizeLiteratureEssay(parseJsonBlock(out), req.maxPoints);
   return { grading, quoteCheck };
 }
