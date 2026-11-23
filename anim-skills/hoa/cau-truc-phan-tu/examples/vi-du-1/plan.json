@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "cau-truc-phan-tu", "vaiTro": "chinh" }],
+  "confidence": 0.96,
+  "lyDo": "Lời giảng phân tích cấu tạo phân tử 2D Alanine từ SMILES và giải thích hai nhóm chức –NH2, –COOH.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Hiện thông tin danh pháp 2-Aminopropanoic acid (M = 89 g/mol) và vẽ khung phân tử 2D dựng từ smilesDrawer.",
+      "skill": "cau-truc-phan-tu",
+      "duLieu": { "smiles": "CC(N)C(=O)O", "M": 89 }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 7.4,
+      "cau": [1],
+      "cue": "kw:Nhóm amino",
+      "viec": "Khoanh tô nhóm chức amino –NH₂ màu xanh lam và hiện thẻ tính base.",
+      "skill": "cau-truc-phan-tu",
+      "duLieu": { "group": "NH2" }
+    },
+    {
+      "i": 2,
+      "t0": 7.4,
+      "t1": 11.2,
+      "cau": [2],
+      "cue": "kw:Nhóm carboxyl",
+      "viec": "Khoanh tô nhóm chức carboxyl –COOH màu đỏ son và hiện thẻ tính acid.",
+      "skill": "cau-truc-phan-tu",
+      "duLieu": { "group": "COOH" }
+    },
+    {
+      "i": 3,
+      "t0": 11.2,
+      "t1": 15.0,
+      "cau": [3],
+      "cue": "t",
+      "viec": "Hiện đồng thời cả hai vùng nhóm chức và chốt kết luận tính lưỡng tính của α-amino acid.",
+      "skill": "cau-truc-phan-tu",
+      "duLieu": {}
+    }
+  ],
+  "khongCanHoatHinh": false
+}

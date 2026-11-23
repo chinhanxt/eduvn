@@ -1,0 +1,12 @@
+{
+  "subject": "hoa",
+  "grade": 8,
+  "title": "Cân bằng phản ứng sắt cháy trong oxygen",
+  "slideText": "Fe(s) + O2(g) -> Fe3O4(s). Đếm nguyên tử Fe và O hai vế: Fe (1 vs 3 → đặt 3), O (2 vs 4 → đặt 2). Kết quả tối giản: 3Fe(s) + 2O2(g) -> Fe3O4(s).",
+  "speech": [
+    { "text": "Xét phản ứng sắt cháy trong khí oxygen: Fe cộng O2 tạo thành Fe3O4, lúc đầu hai vế chưa cân bằng.", "durationMs": 3600 },
+    { "text": "Đếm nguyên tử sắt: vế phải có 3 nguyên tử Fe, ta đặt hệ số 3 trước Fe để hai vế cùng bằng 3.", "durationMs": 3800 },
+    { "text": "Tiếp theo đếm nguyên tử oxygen: vế phải có 4 nguyên tử O, ta đặt hệ số 2 trước O2 để hai vế cùng bằng 4.", "durationMs": 3800 },
+    { "text": "Phương trình cân bằng tối giản là 3Fe cộng 2O2 tạo thành Fe3O4, bảo toàn trọn vẹn cả hai nguyên tố.", "durationMs": 3800 }
+  ]
+}

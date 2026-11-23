@@ -1,0 +1,80 @@
+{
+  "skill": "bang-tuan-hoan-xu-huong",
+  "evals": [
+    {
+      "id": "do-am-dien-ck2-nhom7a",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Xu hướng biến đổi độ âm điện trong bảng tuần hoàn",
+        "slideText": "Chu kỳ 2: Li (0,98) → Be (1,57) → B (2,04) → C (2,55) → N (3,04) → O (3,44) → F (3,98). Nhóm VIIA: F (3,98) → Cl (3,16) → Br (2,96) → I (2,66).",
+        "speech": [
+          { "text": "Xét biến đổi độ âm điện theo thang Pauling trong chu kỳ 2 và nhóm VIIA.", "durationMs": 3600 },
+          { "text": "Trong chu kỳ 2 từ trái sang phải, độ âm điện tăng dần từ Li 0,98 đến Fluorine 3,98.", "durationMs": 3800 },
+          { "text": "Trong nhóm VIIA từ trên xuống dưới, độ âm điện giảm dần từ F 3,98 xuống Iodine 2,66.", "durationMs": 3800 },
+          { "text": "Fluorine có độ âm điện lớn nhất bảng tuần hoàn là 3,98.", "durationMs": 3800 }
+        ]
+      },
+      "tieuChi": ["tô màu tăng dần theo chu kỳ 2 và giảm dần theo nhóm VIIA", "nhấn Fluorine 3,98"]
+    },
+    {
+      "id": "ban-kinh-nguyen-tu",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Quy luật biến đổi bán kính nguyên tử",
+        "slideText": "Trong chu kỳ bán kính giảm dần (Na 190 pm → Cl 79 pm); trong nhóm IA bán kính tăng dần (Li → Cs).",
+        "speech": [
+          { "text": "Khi đi từ trái sang phải trong chu kỳ 3, điện tích hạt nhân tăng kéo lớp vỏ lại gần nên bán kính nguyên tử giảm dần.", "durationMs": 4800 },
+          { "text": "Đi từ trên xuống dưới trong nhóm IA, số lớp electron tăng lên nên bán kính nguyên tử tăng nhanh.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["mũi tên giảm theo chu kỳ và tăng theo nhóm"]
+    },
+    {
+      "id": "tinh-kim-loai-phi-kim",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Biến đổi tính kim loại và tính phi kim",
+        "slideText": "Chu kỳ 3: Na → Mg → Al → Si → P → S → Cl, tính kim loại giảm dần, tính phi kim tăng dần.",
+        "speech": [
+          { "text": "Dọc chu kỳ 3 từ Sodium đến Chlorine, khả năng nhường electron giảm dần nên tính kim loại yếu dần.", "durationMs": 4600 },
+          { "text": "Ngược lại, khả năng hút electron tăng nên tính phi kim mạnh dần tới Chlorine.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["thể hiện dãy Na→Cl với mũi tên biến đổi ngược chiều kim loại/phi kim"]
+    },
+    {
+      "id": "khong-chon-can-bang-pt",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 9,
+        "title": "Cân bằng phản ứng CaCO3 tác dụng HCl",
+        "slideText": "CaCO3 + 2HCl -> CaCl2 + CO2 + H2O",
+        "speech": [
+          { "text": "Đặt hệ số 2 trước HCl để cân bằng nguyên tử hydrogen và chlorine hai vế.", "durationMs": 4000 }
+        ]
+      },
+      "tieuChi": ["không chọn: bài cân bằng phương trình"]
+    },
+    {
+      "id": "khong-chon-cau-truc-alcohol",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Nhóm chức hydroxyl của ethanol",
+        "slideText": "Ethanol CH3-CH2-OH chứa nhóm -OH gắn vào carbon no.",
+        "speech": [
+          { "text": "Phân tử ethanol gồm gốc ethyl liên kết với nhóm chức hydroxyl OH.", "durationMs": 4000 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về công thức cấu tạo phân tử"]
+    }
+  ]
+}

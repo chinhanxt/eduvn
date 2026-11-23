@@ -1,0 +1,147 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div id="meta" class="ek-meta ek-col-1 ek-span-10" style="top:64px">HOÁ HỌC 11 · CÂN BẰNG TRONG DUNG DỊCH NƯỚC</div>
+  <h1 id="title" class="ek-title ek-col-1 ek-span-12" style="top:112px" data-ek-words>Đường cong chuẩn độ: <span class="kw">HCl 0,1 M + NaOH 0,1 M</span></h1>
+
+  <div class="ek-stage">
+    <!-- Trái: Đồ thị pH(V_NaOH) (cột 1–7, rộng 970px, cao 660px) -->
+    <!-- Ánh xạ toạ độ chính xác từ titrationPh(0.1, 25, 0.1):
+         x(V) = 130 + (V/50)*760   (V=0 -> 130, V=25 -> 510, V=50 -> 890)
+         y(pH) = 560 - (pH/14)*490 (pH=0 -> 560, pH=7 -> 315, pH=14 -> 70) -->
+    <svg id="chartSvg" class="ek-col-1 ek-span-7" style="top:220px" width="970" height="660" viewBox="0 0 970 660" data-ek-beat="0">
+      <rect x="0" y="0" width="970" height="660" rx="16" class="chart-bg"/>
+      <!-- Lưới ngang pH 0, 7, 14 -->
+      <line x1="130" y1="315" x2="890" y2="315" class="g-dash"/>
+      <line x1="510" y1="70" x2="510" y2="560" class="g-dash"/>
+      <!-- Dải đổi màu phenolphthalein pH 8,2 (y=273) đến 10,0 (y=210) -->
+      <rect id="indBand" x="130" y="210" width="760" height="63" class="ind-band ek-hidden"/>
+      <text id="indLbl" x="536" y="254" class="svg-ind ek-fill-hong ek-hidden">Chỉ thị pH 8,2–10</text>
+
+      <!-- Trục toạ độ -->
+      <path id="axes" d="M 130,60 L 130,560 L 908,560" class="ax-line"/>
+      <text x="112" y="568" text-anchor="end" class="ax-tick">0</text>
+      <text x="112" y="327" text-anchor="end" class="ax-tick">7</text>
+      <text x="112" y="84" text-anchor="end" class="ax-tick">14</text>
+      <text x="64" y="48" class="ax-name">pH</text>
+
+      <text x="130" y="608" text-anchor="middle" class="ax-tick">0</text>
+      <text x="510" y="608" text-anchor="middle" class="ax-tick">25</text>
+      <text x="890" y="608" text-anchor="middle" class="ax-tick">50</text>
+      <text x="740" y="646" text-anchor="middle" class="ax-name">V NaOH (mL)</text>
+
+      <!-- Đường cong chuẩn độ 3 đoạn mượt theo đúng kết quả titrationPh -->
+      <!-- Đoạn 1 (0 -> 24 mL): (0,1.0)->(130,525), (10,1.37)->(282,512), (20,1.95)->(434,492), (24,2.69)->(495,466) -->
+      <path id="titCurve" d="M 130,525 C 230,519 360,506 434,492 C 470,484 486,476 495,466" class="curve-main ek-stroke-lam"/>
+      <!-- Đoạn 2 (24 -> 26 mL bước nhảy): (24,2.69)->(495,466), (24.9,3.70)->(508,430), (25,7.0)->(510,315), (25.1,10.3)->(512,200), (26,11.29)->(525,165) -->
+      <path id="titJump" d="M 495,466 C 506,450 509,410 510,315 C 511,220 514,180 525,165" class="curve-main ek-stroke-doSon"/>
+      <!-- Đoạn 3 (26 -> 50 mL dư base): (26,11.29)->(525,165), (30,11.96)->(586,141), (40,12.36)->(738,127), (50,12.52)->(890,122) -->
+      <path id="titTail" d="M 525,165 C 546,151 564,144 586,141 C 660,132 760,126 890,122" class="curve-main ek-stroke-hong"/>
+
+      <!-- Điểm tương đương (25 mL; pH 7,0) -->
+      <circle id="eqDot" cx="510" cy="315" r="12" class="eq-dot ek-hidden"/>
+      <g id="eqLbl" class="ek-hidden" data-ek-beat="2">
+        <text x="536" y="346" class="eq-lbl ek-fill-doSon">Điểm tương đương</text>
+        <text x="536" y="392" class="eq-lbl ek-fill-ink2">(25 mL · pH 7,0)</text>
+      </g>
+    </svg>
+
+    <!-- Phải trên: Bình tam giác + đồng hồ số V & pH (cột 8–12) -->
+    <div id="flaskCard" class="ek-card flask-box ek-col-8 ek-span-5 ek-hidden" style="top:220px;height:396px" data-ek-beat="1">
+      <svg width="240" height="330" viewBox="0 0 240 330" class="flask-svg">
+        <!-- Đầu burette + giọt nhỏ -->
+        <rect x="108" y="8" width="24" height="58" rx="4" class="glass"/>
+        <circle id="drop" cx="120" cy="82" r="7" class="ek-fill-accent ek-hidden"/>
+        <!-- Chất lỏng trong bình tam giác (đổi từ trong suốt sang hồng nhạt) -->
+        <path id="liquid" d="M 54,244 L 186,244 L 210,302 Q 212,312 200,312 L 40,312 Q 28,312 30,302 Z" class="liq-clear"/>
+        <!-- Thành bình tam giác -->
+        <path d="M 96,120 L 96,174 L 28,302 Q 24,314 38,314 L 202,314 Q 216,314 212,302 L 144,174 L 144,120" class="glass-stroke"/>
+      </svg>
+      <div class="readouts">
+        <div class="ro-item">
+          <span class="ro-lbl">V NaOH đã nhỏ</span>
+          <span id="valV" class="ro-num ek-c-lam">0,0 mL</span>
+        </div>
+        <div class="ro-item">
+          <span class="ro-lbl">Giá trị pH</span>
+          <span id="valPh" class="ro-num ek-c-doSon">1,0</span>
+        </div>
+        <div class="color-slot">
+          <span id="colClear" class="col-pill">Không màu</span>
+          <span id="colPink" class="col-pill col-pink ek-hidden">Hồng nhạt</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phải dưới: Thẻ công thức & ghi chú an toàn -->
+    <div id="lawCard" class="ek-card law-box ek-col-8 ek-span-5 ek-hidden" style="top:646px;height:234px" data-ek-beat="3">
+      <h3>Tại điểm tương đương</h3>
+      <div class="law-eq">C<sub>A</sub> · V<sub>A</sub> = C<sub>B</sub> · V<sub>B</sub></div>
+      <p class="law-safe">An toàn: đeo kính, găng tay.</p>
+    </div>
+  </div>
+</div>
+<style>
+  .chart-bg{fill:var(--surface);stroke:var(--line);stroke-width:3px}
+  .g-dash{stroke:var(--grid);stroke-width:3px;stroke-dasharray:10 8}
+  .ax-line{fill:none;stroke:var(--ink);stroke-width:5px;stroke-linecap:round;stroke-linejoin:round}
+  .ax-tick{font-family:var(--ui);font-size:36px;font-weight:600;fill:var(--ink2);font-variant-numeric:tabular-nums}
+  .ax-name{font-family:var(--ui);font-size:36px;font-weight:700;fill:var(--ink)}
+  .ind-band{fill:var(--c-hong);fill-opacity:0.14}
+  .svg-ind{font-family:var(--ui);font-size:36px;font-weight:700}
+  .curve-main{fill:none;stroke-width:7px;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+  .eq-dot{fill:var(--c-doSon);stroke:var(--surface);stroke-width:4px}
+  .eq-lbl{font-family:var(--ui);font-size:36px;font-weight:700}
+  .flask-box{display:flex;align-items:center;gap:22px;padding:24px 26px}
+  .flask-svg{flex:none}
+  .glass{fill:var(--sunken);stroke:var(--ink3);stroke-width:3px}
+  .glass-stroke{fill:none;stroke:var(--ink2);stroke-width:5px;stroke-linecap:round;stroke-linejoin:round}
+  .liq-clear{fill:var(--accent-soft)}
+  .readouts{display:flex;flex-direction:column;gap:18px;flex:1;min-width:0}
+  .ro-item{display:flex;flex-direction:column;gap:4px}
+  .ro-lbl{font-family:var(--ui);font-size:36px;font-weight:600;color:var(--ink3)}
+  .ro-num{font-family:var(--ui);font-size:50px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+  .color-slot{position:relative;height:52px}
+  .col-pill{position:absolute;left:0;top:0;font-family:var(--ui);font-size:36px;font-weight:700;color:var(--ink2);background:var(--sunken);padding:6px 16px;border-radius:10px;white-space:nowrap}
+  .col-pink{color:var(--c-hong);background:var(--sunken)}
+  .law-box{border-left-color:var(--ok);padding:20px 28px;display:flex;flex-direction:column;justify-content:space-between}
+  .law-box h3{font-size:38px;margin-bottom:4px}
+  .law-eq{font-family:var(--read);font-size:48px;font-weight:700;color:var(--accent)}
+  .law-eq sub{font-size:36px}
+  .law-safe{font-family:var(--ui);font-size:36px;color:var(--ink2);line-height:1.25}
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+
+// Beat 0: Dựng khung đồ thị và bình tam giác
+EK.enter(tl, "#meta", 0.05, { from: "fade", dur: 0.45 });
+EK.words(tl, "#title", { t: 0.15, per: 0.07 });
+EK.draw(tl, "#axes", EK.cue(0) + 0.3, 1.0);
+EK.enter(tl, "#flaskCard", 1.1, { from: "up", dur: 0.65 });
+
+// Beat 1: Đoạn 0 -> 24 mL, pH tăng chậm từ 1,0 lên 2,7
+const t1 = EK.cue(1);
+EK.draw(tl, "#titCurve", t1, 2.8);
+EK.count(tl, "#valV", 0, 24.0, t1, 2.8, { decimals: 1, suffix: " mL" });
+EK.count(tl, "#valPh", 1.0, 2.7, t1, 2.8, { decimals: 1 });
+tl.fromTo("#drop", { opacity: 1, y: 0 }, { opacity: 0, y: 150, duration: 0.65, ease: "power2.in", repeat: 3 }, t1 + 0.2);
+
+// Beat 2: Bước nhảy pH đột ngột qua điểm tương đương (25 mL; pH 7,0) + đổi màu hồng nhạt
+const t2 = EK.cue(2);
+EK.draw(tl, "#titJump", t2, 1.8);
+EK.count(tl, "#valV", 24.0, 26.0, t2, 1.8, { decimals: 1, suffix: " mL" });
+EK.count(tl, "#valPh", 2.7, 11.3, t2, 1.8, { decimals: 1 });
+EK.enter(tl, "#eqDot, #eqLbl", t2 + 0.55, { from: "scale", dur: 0.55 });
+EK.enter(tl, "#indBand, #indLbl", t2 + 1.0, { from: "fade", dur: 0.6 });
+EK.fill(tl, "#liquid", t2 + 1.2, "hong", { alpha: 0.26, dur: 0.7 });
+EK.exit(tl, "#colClear", t2 + 1.15, { dur: 0.3 });
+EK.enter(tl, "#colPink", t2 + 1.25, { from: "fade", dur: 0.5 });
+
+// Beat 3: Nhánh dư base + công thức nồng độ + ghi chú an toàn
+const t3 = EK.cue(3);
+EK.draw(tl, "#titTail", t3, 1.6);
+EK.count(tl, "#valV", 26.0, 50.0, t3, 1.6, { decimals: 1, suffix: " mL" });
+EK.count(tl, "#valPh", 11.3, 12.5, t3, 1.6, { decimals: 1 });
+EK.enter(tl, "#lawCard", t3 + 0.2, { from: "up", dur: 0.65 });
+EK.mark(tl, ".law-eq", t3 + 1.2, "highlight", { color: "accent", dur: 0.6 });
+
+window.__timelines["main"] = tl;
+</script>

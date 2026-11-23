@@ -1,0 +1,78 @@
+{
+  "skill": "cau-truc-phan-tu",
+  "evals": [
+    {
+      "id": "alanine-nhom-chuc",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 12,
+        "title": "Cấu tạo phân tử Alanine và hai nhóm chức",
+        "slideText": "2-Aminopropanoic acid (Alanine, C3H7NO2, SMILES: CC(N)C(=O)O) gồm nhóm -NH2 (base) và nhóm -COOH (acid).",
+        "speech": [
+          { "text": "Xét công thức cấu tạo 2D của Alanine hay 2-aminopropanoic acid có công thức C3H7NO2.", "durationMs": 3600 },
+          { "text": "Nhóm amino NH2 gắn ở vị trí carbon alpha mang lại tính base cho phân tử.", "durationMs": 3800 },
+          { "text": "Nhóm carboxyl COOH mang lại tính acid, có thể tác dụng với dung dịch kiềm.", "durationMs": 3800 },
+          { "text": "Nhờ đồng thời chứa cả hai nhóm chức này, Alanine là hợp chất hữu cơ tạp chức có tính lưỡng tính.", "durationMs": 3800 }
+        ]
+      },
+      "tieuChi": ["dựng 2D từ SMILES CC(N)C(=O)O", "tô nổi riêng nhóm -NH2 và nhóm -COOH"]
+    },
+    {
+      "id": "ethyl-ethanoate-ester",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 12,
+        "title": "Nhóm chức ester trong ethyl ethanoate",
+        "slideText": "Ethyl ethanoate (CH3COOC2H5, SMILES: CCOC(=O)C) có nhóm chức -COO-.",
+        "speech": [
+          { "text": "Ethyl ethanoate được tạo thành từ ethanoic acid và ethanol, có nhóm chức ester COO ở trung tâm.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["vẽ cấu tạo 2D từ SMILES CCOC(=O)C và khoanh nhóm -COO-"]
+    },
+    {
+      "id": "phenol-anh-huong-vong",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Cấu tạo phân tử phenol (C6H5OH)",
+        "slideText": "Phenol (SMILES: Oc1ccccc1) có nhóm -OH gắn trực tiếp vào vòng thơm benzene.",
+        "speech": [
+          { "text": "Trong phân tử phenol, nhóm hydroxyl liên kết trực tiếp với nguyên tử carbon của vòng benzene.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["vẽ vòng benzene + nhóm -OH và tô nổi cả hai phần"]
+    },
+    {
+      "id": "khong-chon-bang-tuan-hoan",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Quy luật biến đổi bán kính nguyên tử trong chu kỳ 3",
+        "slideText": "Từ Na đến Cl bán kính nguyên tử giảm dần.",
+        "speech": [
+          { "text": "Trong chu kỳ 3, khi số hiệu nguyên tử tăng dần từ 11 đến 17 thì bán kính nguyên tử giảm dần.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về xu hướng bảng tuần hoàn"]
+    },
+    {
+      "id": "khong-chon-pin-dien-hoa",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 12,
+        "title": "Sơ đồ pin điện hoá Zn–Cu",
+        "slideText": "Anode Zn bị oxi hoá, cathode Cu xảy ra sự khử Cu2+.",
+        "speech": [
+          { "text": "Electron chảy từ điện cực âm kẽm qua dây dẫn sang điện cực dương đồng.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh về pin điện hoá"]
+    }
+  ]
+}

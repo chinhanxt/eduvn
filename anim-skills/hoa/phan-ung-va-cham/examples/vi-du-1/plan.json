@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "phan-ung-va-cham", "vaiTro": "chinh" }],
+  "confidence": 0.94,
+  "lyDo": "Lời giảng so sánh trực tiếp tốc độ va chạm hạt ở 25 °C và 65 °C kèm số va chạm hiệu quả.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Hiện hai bình phản ứng 25 °C và 65 °C với các hạt chất A và chất B bắt đầu chuyển động theo hạt giống cố định.",
+      "skill": "phan-ung-va-cham",
+      "duLieu": { "tCold": 25, "tHot": 65 }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 7.5,
+      "cau": [1],
+      "cue": "kw:25 độ C",
+      "viec": "Tập trung vào bình 25 °C: hạt di chuyển chậm, toả 2 vòng va chạm hiệu quả và đếm lên 2.",
+      "skill": "phan-ung-va-cham",
+      "duLieu": { "hitsCold": 2 }
+    },
+    {
+      "i": 2,
+      "t0": 7.5,
+      "t1": 11.4,
+      "cau": [2],
+      "cue": "kw:65 độ C",
+      "viec": "Tập trung vào bình 65 °C: hạt di chuyển nhanh, liên tiếp tạo 9 vòng va chạm hiệu quả và đếm lên 9.",
+      "skill": "phan-ung-va-cham",
+      "duLieu": { "hitsHot": 9 }
+    },
+    {
+      "i": 3,
+      "t0": 11.4,
+      "t1": 15.0,
+      "cau": [3],
+      "cue": "kw:Kết luận",
+      "viec": "Mở lại cả hai bình và hiện kết luận quy luật tăng nhiệt độ làm tăng tốc độ phản ứng.",
+      "skill": "phan-ung-va-cham",
+      "duLieu": {}
+    }
+  ],
+  "khongCanHoatHinh": false
+}

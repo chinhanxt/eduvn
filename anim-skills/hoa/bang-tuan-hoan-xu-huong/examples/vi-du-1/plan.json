@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "bang-tuan-hoan-xu-huong", "vaiTro": "chinh" }],
+  "confidence": 0.95,
+  "lyDo": "Lời giảng phân tích quy luật biến đổi độ âm điện Pauling theo Chu kỳ 2 và Nhóm VIIA.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Dựng sơ đồ chữ L gồm Chu kỳ 2 (Li đến F) và Nhóm VIIA (F đến I) trên nền giấy học thuật.",
+      "skill": "bang-tuan-hoan-xu-huong",
+      "duLieu": { "period": 2, "group": "VIIA" }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 7.4,
+      "cau": [1],
+      "cue": "kw:Chu kỳ 2",
+      "viec": "Tô sắc độ tăng dần dọc Chu kỳ 2 (0,98 → 3,98) và vẽ mũi tên xu hướng tăng sang phải.",
+      "skill": "bang-tuan-hoan-xu-huong",
+      "duLieu": { "Li": 0.98, "F": 3.98 }
+    },
+    {
+      "i": 2,
+      "t0": 7.4,
+      "t1": 11.2,
+      "cau": [2],
+      "cue": "kw:Nhóm VIIA",
+      "viec": "Tô sắc độ giảm dần dọc Nhóm VIIA (F → Cl → Br → I) và vẽ mũi tên xu hướng giảm xuống dưới.",
+      "skill": "bang-tuan-hoan-xu-huong",
+      "duLieu": { "Cl": 3.16, "Br": 2.96, "I": 2.66 }
+    },
+    {
+      "i": 3,
+      "t0": 11.2,
+      "t1": 15.0,
+      "cau": [3],
+      "cue": "kw:Fluorine",
+      "viec": "Khoanh cực đại Fluorine (3,98) và hiện thẻ quy luật tổng quát.",
+      "skill": "bang-tuan-hoan-xu-huong",
+      "duLieu": { "maxEn": 3.98 }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

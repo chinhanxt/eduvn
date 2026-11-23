@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "dien-phan-pin-dien-hoa", "vaiTro": "chinh" }],
+  "confidence": 0.96,
+  "lyDo": "Lời giảng trình bày nguyên tắc hoạt động, dòng electron và suất điện động chuẩn của pin Galvani Zn–Cu.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.0,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Dựng sơ đồ pin Galvani Zn–Cu gồm 2 cốc dung dịch, 2 điện cực, cầu muối KCl và vôn kế.",
+      "skill": "dien-phan-pin-dien-hoa",
+      "duLieu": { "anode": "Zn", "cathode": "Cu" }
+    },
+    {
+      "i": 1,
+      "t0": 4.0,
+      "t1": 8.0,
+      "cau": [1],
+      "cue": "kw:cực âm anode",
+      "viec": "Hiện bán phản ứng oxi hoá tại anode Zn(s) → Zn²⁺(aq) + 2e⁻ và khởi động các hạt electron đi lên mạch ngoài.",
+      "skill": "dien-phan-pin-dien-hoa",
+      "duLieu": { "eAnode": -0.76 }
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.2,
+      "cau": [2],
+      "cue": "kw:cực dương cathode",
+      "viec": "Cho electron chạy dọc dây dẫn qua vôn kế sang cathode Cu, hiện bán phản ứng khử Cu²⁺ + 2e⁻ → Cu và vôn kế đếm lên 1,10 V.",
+      "skill": "dien-phan-pin-dien-hoa",
+      "duLieu": { "eCathode": 0.34, "ePin": 1.1 }
+    },
+    {
+      "i": 3,
+      "t0": 12.2,
+      "t1": 16.0,
+      "cau": [3],
+      "cue": "kw:Cầu muối",
+      "viec": "Nhấn chiều ion cầu muối KCl trung hoà điện tích và hiện thanh phương trình tổng + E°pin = 1,10 V.",
+      "skill": "dien-phan-pin-dien-hoa",
+      "duLieu": {}
+    }
+  ],
+  "khongCanHoatHinh": false
+}

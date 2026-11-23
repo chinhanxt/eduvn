@@ -257,3 +257,12 @@ Các lớp nền bản đồ TopoJSON (dùng chung cho môn Địa lí và môn 
 - **Wikidata** — CC0 1.0 Public Domain Dedication (`https://www.wikidata.org/`). Dùng để đối chiếu QID, toạ độ (`P625`) và mốc thời gian sự kiện/nhân vật lịch sử (`P585`, `P580`, `P582`, `P569`, `P570`) trong `services/anim-kit-data/dia-danh-lich-su.json` và bộ tự kiểm `server/src/subjects/su/verify.ts`.
 - **OpenStreetMap / Nominatim** — ODbL 1.0 (`https://www.openstreetmap.org/copyright`). Dùng đối chiếu toạ độ một số di tích cấp điểm (Đồi Him Lam, Đồi A1, Hầm Đờ Cát, Đồi Độc Lập, Phân khu Hồng Cúm) có ghi rõ mã đối tượng OSM trong `services/anim-kit-data/dia-danh-lich-su.json`.
 - **Knight Lab TimelineJS3** — MPL-2.0 (`https://github.com/NUKnightLab/TimelineJS3`). Chỉ tham khảo mô hình dữ liệu JSON sự kiện (`start_date`, `end_date`, `eras`, `group`) trong `anim-skills/su/dong-thoi-gian-su-kien/references/mo-hinh-su-kien-timelinejs.md` và `server/src/subjects/su/timeline.ts`; không chép mã runtime.
+
+## Gói môn Hoá học (`mon-hoa`): smilesDrawer (MIT) & Dữ liệu tuần hoàn IUPAC/PubChem
+
+- **smiles-drawer** (`reymond-group/smilesDrawer`, `smiles-drawer@2.4.2`) — **MIT License**. Dùng để dựng công thức cấu tạo 2D từ SMILES trong phòng thí nghiệm Hoá học (`/hoc/hoa/phong-thi-nghiem`) và skill hoạt hình `anim-skills/hoa/cau-truc-phan-tu/`.
+  - Nguồn: Probst, D., & Reymond, J.-L. (2018). SmilesDrawer: Parsing and Drawing SMILES-Encoded Molecular Structures Using Client-Side JavaScript. *J. Chem. Inf. Model.*, 58(1), 1–7. https://github.com/reymond-group/smilesDrawer
+- **Dữ liệu Bảng tuần hoàn 118 nguyên tố** (`server/src/subjects/hoa/periodicTable.ts`):
+  - Nguyên tử khối chuẩn: IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW), *Standard Atomic Weights of the Elements 2021*, Pure Appl. Chem. 2022, 94, 573–600 (dữ liệu khoa học công cộng).
+  - Độ âm điện Pauling, bán kính nguyên tử, năng lượng ion hoá thứ nhất: PubChem Periodic Table (NCBI/NIH, public domain) & NIST Atomic Spectra Database (cấu hình electron thực nghiệm).
+  - Danh pháp tiếng Việt chuẩn hoá theo Chương trình GDPT 2018 (Bộ GD&ĐT).

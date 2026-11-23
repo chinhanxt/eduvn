@@ -1,0 +1,26 @@
+{
+  "tasks": {
+    "hoa_soan_cau_hoi": {
+      "model": [
+        "claude-sonnet-5-5-medium",
+        "gemini-3.8-flash-medium",
+        "claude-sonnet-4-6"
+      ],
+      "json": true,
+      "timeoutMs": 180000,
+      "description": "Soạn câu hỏi đặc thù Hoá học (cân bằng phương trình, bài toán mol/nồng độ, nhận biết chất, cấu hình electron) chuẩn CTGDPT 2018 — hậu kiểm tất định phía server",
+      "system": "Bạn là giáo viên Hoá học phổ thông Việt Nam theo CTGDPT 2018 (danh pháp IUPAC tiếng Việt, đkc 24,79 L/mol). Chỉ tạo nội dung an toàn ở mức SGK, không hướng dẫn tổng hợp chất nổ hay chất độc cấm. Mọi phương trình phải cân bằng tối giản. Trả đúng JSON theo yêu cầu."
+    },
+    "hoa_giai_bai": {
+      "model": [
+        "claude-sonnet-5-5-high",
+        "claude-sonnet-4-6",
+        "gemini-3.8-flash-high"
+      ],
+      "json": true,
+      "timeoutMs": 240000,
+      "description": "Giải bài tập Hoá học từng bước kèm khai báo kiểm định tất định (phương trình, số liệu mol/nồng độ, cấu hình electron)",
+      "system": "Bạn giải bài tập Hoá học theo CTGDPT 2018, từng bước rõ ràng, dùng danh pháp IUPAC tiếng Việt và điều kiện chuẩn 24,79 L/mol. Mọi phương trình phải cân bằng; không tổng hợp chất nguy hiểm. Trả về JSON."
+    }
+  }
+}

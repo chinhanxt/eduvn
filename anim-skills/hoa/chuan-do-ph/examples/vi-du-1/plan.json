@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "chuan-do-ph", "vaiTro": "chinh" }],
+  "confidence": 0.96,
+  "lyDo": "Lời giảng mô tả trực tiếp đường cong chuẩn độ 25 mL HCl 0,1 M bằng NaOH 0,1 M và đổi màu phenolphthalein.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.8,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Dựng hệ trục đồ thị V_NaOH – pH và bình tam giác chứa 25 mL HCl 0,1 M không màu.",
+      "skill": "chuan-do-ph",
+      "duLieu": { "ca": 0.1, "vaMl": 25, "cb": 0.1 }
+    },
+    {
+      "i": 1,
+      "t0": 3.8,
+      "t1": 8.0,
+      "cau": [1],
+      "cue": "kw:24 mL",
+      "viec": "Vẽ đoạn đầu đường cong pH từ 0 đến 24 mL (pH 1,0 → 2,7), đồng hồ đếm V và pH tăng chậm.",
+      "skill": "chuan-do-ph",
+      "duLieu": { "v1": 24, "ph1": 2.7 }
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.4,
+      "cau": [2],
+      "cue": "kw:bước nhảy pH",
+      "viec": "Vẽ bước nhảy pH qua điểm tương đương (25,0 mL; pH 7,0), bật dải phenolphthalein và đổi màu bình sang hồng nhạt.",
+      "skill": "chuan-do-ph",
+      "duLieu": { "vEq": 25, "phEq": 7 }
+    },
+    {
+      "i": 3,
+      "t0": 12.4,
+      "t1": 16.0,
+      "cau": [3],
+      "cue": "t",
+      "viec": "Vẽ nốt nhánh dư base đến 50 mL và hiện thẻ công thức C_A·V_A = C_B·V_B kèm ghi chú an toàn.",
+      "skill": "chuan-do-ph",
+      "duLieu": {}
+    }
+  ],
+  "khongCanHoatHinh": false
+}

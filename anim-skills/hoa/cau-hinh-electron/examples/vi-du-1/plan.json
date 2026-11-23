@@ -1,0 +1,48 @@
+{
+  "skills": [{ "id": "cau-hinh-electron", "vaiTro": "chinh" }],
+  "confidence": 0.95,
+  "lyDo": "Lời giảng minh hoạ điền 8 electron của Oxygen vào các ô orbital 1s, 2s, 2p theo Aufbau, Pauli và Hund.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.8,
+      "cau": [0],
+      "cue": "t",
+      "viec": "Hiện thông tin nguyên tử Oxygen (Z = 8) và dựng thang năng lượng gồm các ô orbital trống 1s, 2s, 2p.",
+      "skill": "cau-hinh-electron",
+      "duLieu": { "z": 8 }
+    },
+    {
+      "i": 1,
+      "t0": 3.8,
+      "t1": 7.8,
+      "cau": [1],
+      "cue": "kw:Aufbau và Pauli",
+      "viec": "Điền cặp electron ngược spin vào ô 1s và ô 2s theo nguyên lý vững bền và loại trừ Pauli.",
+      "skill": "cau-hinh-electron",
+      "duLieu": { "1s": 2, "2s": 2 }
+    },
+    {
+      "i": 2,
+      "t0": 7.8,
+      "t1": 12.0,
+      "cau": [2],
+      "cue": "kw:quy tắc Hund",
+      "viec": "Điền 3 electron hướng lên vào 3 ô 2p theo quy tắc Hund rồi ghép đôi electron thứ 8 ngược chiều ở ô đầu tiên.",
+      "skill": "cau-hinh-electron",
+      "duLieu": { "2p": 4 }
+    },
+    {
+      "i": 3,
+      "t0": 12.0,
+      "t1": 16.0,
+      "cau": [3],
+      "cue": "kw:cấu hình",
+      "viec": "Nhấn mạnh 2 electron độc thân ở phân lớp 2p và hiện thẻ cấu hình electron hoàn chỉnh 1s² 2s² 2p⁴.",
+      "skill": "cau-hinh-electron",
+      "duLieu": { "unpaired": 2 }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

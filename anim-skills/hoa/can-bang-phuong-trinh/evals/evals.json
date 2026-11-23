@@ -1,0 +1,84 @@
+{
+  "skill": "can-bang-phuong-trinh",
+  "evals": [
+    {
+      "id": "fe-o2-fe3o4",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 8,
+        "title": "Cân bằng phản ứng sắt cháy trong oxygen",
+        "slideText": "Fe + O2 -> Fe3O4. Bước 1: đếm nguyên tử Fe và O hai vế. Bước 2: đặt hệ số 3 trước Fe, 2 trước O2.",
+        "speech": [
+          { "text": "Xét phản ứng sắt tác dụng với khí oxygen tạo thành iron(II,III) oxide: Fe cộng O2 tạo ra Fe3O4.", "durationMs": 4000 },
+          { "text": "Vế phải có 3 nguyên tử Fe nên ta đặt hệ số 3 trước Fe ở vế trái.", "durationMs": 3800 },
+          { "text": "Vế phải có 4 nguyên tử O, ta đặt hệ số 2 trước O2 để hai vế đều có 4 nguyên tử O.", "durationMs": 3800 },
+          { "text": "Phương trình cân bằng tối giản là 3Fe cộng 2O2 tạo thành Fe3O4.", "durationMs": 3400 }
+        ]
+      },
+      "tieuChi": ["hiện số nguyên tử Fe và O hai vế thay đổi theo hệ số", "kết quả cuối 3Fe + 2O2 -> Fe3O4"]
+    },
+    {
+      "id": "kmno4-hcl-redox",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 10,
+        "title": "Cân bằng phản ứng KMnO4 và HCl",
+        "slideText": "2KMnO4 + 16HCl -> 2KCl + 2MnCl2 + 5Cl2 + 8H2O",
+        "speech": [
+          { "text": "Cân bằng phản ứng oxi hoá khử giữa potassium permanganate và dung dịch HCl đặc.", "durationMs": 4200 },
+          { "text": "Cân bằng electron cho nhận ta đặt hệ số 2 trước KMnO4 và 5 trước Cl2.", "durationMs": 4500 },
+          { "text": "Cuối cùng cân bằng nguyên tử Cl và H với 16 HCl và 8 H2O.", "durationMs": 4300 }
+        ]
+      },
+      "tieuChi": ["hiển thị từng bước điều chỉnh hệ số", "bảo toàn đầy đủ K, Mn, O, H, Cl"]
+    },
+    {
+      "id": "ion-mno4-fe2",
+      "nenChon": true,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Cân bằng phương trình ion MnO4- và Fe2+",
+        "slideText": "MnO4- + 5Fe2+ + 8H+ -> Mn2+ + 5Fe3+ + 4H2O",
+        "speech": [
+          { "text": "Xét phản ứng ion giữa MnO4 trừ và Fe 2 cộng trong môi trường acid.", "durationMs": 4000 },
+          { "text": "Đặt hệ số 5 trước Fe 2 cộng và Fe 3 cộng để cân bằng số electron trao đổi.", "durationMs": 4200 },
+          { "text": "Thêm 8 H cộng và 4 H2O để cân bằng cả nguyên tử oxygen, hydrogen và tổng điện tích +17 hai vế.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["đếm cả nguyên tử lẫn tổng điện tích hai vế", "hệ số tối giản 1, 5, 8, 1, 5, 4"]
+    },
+    {
+      "id": "khong-chon-dinh-nghia-mol",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 8,
+        "title": "Khái niệm mol và hằng số Avogadro",
+        "slideText": "1 mol chứa 6,022 × 10²³ hạt vi mô (nguyên tử, phân tử hoặc ion).",
+        "speech": [
+          { "text": "Mol là lượng chất có chứa 6,022 nhân 10 mũ 23 nguyên tử hoặc phân tử chất đó.", "durationMs": 4500 },
+          { "text": "Con số này gọi là hằng số Avogadro, ký hiệu là N A.", "durationMs": 4000 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh chỉ nêu định nghĩa mol, không có phương trình cần cân bằng"]
+    },
+    {
+      "id": "khong-chon-cau-truc-benzene",
+      "nenChon": false,
+      "scene": {
+        "subject": "hoa",
+        "grade": 11,
+        "title": "Cấu tạo vòng thơm benzene",
+        "slideText": "Benzene C6H6 gồm 6 nguyên tử carbon tạo thành vòng lục giác đều phẳng.",
+        "speech": [
+          { "text": "Phân tử benzene có công thức C6H6 với sáu nguyên tử carbon nằm trên một mặt phẳng.", "durationMs": 4500 },
+          { "text": "Sáu liên kết carbon–carbon có độ dài hoàn toàn bằng nhau do hệ liên hợp pi.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh mô tả cấu trúc phân tử, nên chọn cau-truc-phan-tu"]
+    }
+  ]
+}

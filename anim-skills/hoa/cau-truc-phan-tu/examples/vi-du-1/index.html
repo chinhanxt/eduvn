@@ -1,0 +1,110 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1920" data-height="1080">
+  <div id="meta" class="ek-meta ek-col-1 ek-span-10" style="top:64px">HOÁ HỌC 12 · AMINO ACID – PROTEIN</div>
+  <h1 id="title" class="ek-title ek-col-1 ek-span-12" style="top:112px" data-ek-words>Cấu trúc 2D và nhóm chức: <span class="kw">Alanine</span></h1>
+
+  <div class="ek-stage">
+    <!-- Trái: Thông tin phân tử + 2 thẻ nhóm chức + kết luận lưỡng tính -->
+    <div id="molMeta" class="ek-card ek-col-1 ek-span-5 ek-hidden" style="top:224px" data-ek-beat="0">
+      <h3>2-Aminopropanoic acid</h3>
+      <p>C<sub>3</sub>H<sub>7</sub>NO<sub>2</sub> · M = 89 g/mol</p>
+      <div class="smi-pill">SMILES: CC(N)C(=O)O</div>
+    </div>
+
+    <div id="cardNh2" class="ek-card grp-card grp-nh2 ek-col-1 ek-span-5 ek-hidden" style="top:454px" data-ek-beat="1">
+      <h3 class="ek-c-lam">Nhóm amino (–NH<sub>2</sub>)</h3>
+      <p>Có cặp electron tự do trên N → nhận H<sup>+</sup>, mang tính base.</p>
+    </div>
+
+    <div id="cardCooh" class="ek-card grp-card grp-cooh ek-col-1 ek-span-5 ek-hidden" style="top:454px" data-ek-beat="2">
+      <h3 class="ek-c-doSon">Nhóm carboxyl (–COOH)</h3>
+      <p>Phân li ion H<sup>+</sup> trong nước → tác dụng với base, mang tính acid.</p>
+    </div>
+
+    <div id="cardAmp" class="ek-card amp-card ek-col-1 ek-span-5 ek-hidden" style="top:686px" data-ek-beat="3">
+      <h3>Tính lưỡng tính</h3>
+      <p>Tác dụng được cả với acid (HCl) và base (NaOH).</p>
+    </div>
+
+    <!-- Phải: Công thức cấu tạo 2D dựng từ SMILES CC(N)C(=O)O qua smilesDrawer (MIT) -->
+    <svg id="molSvg" class="ek-col-7 ek-span-6" style="top:216px" width="828" height="670" viewBox="0 0 828 670" data-smiles="CC(N)C(=O)O">
+      <rect x="0" y="0" width="828" height="670" rx="18" class="mol-bg"/>
+
+      <!-- Vùng tô nhóm chức amino (–NH2) -->
+      <ellipse id="hlNh2" cx="670" cy="381" rx="112" ry="74" class="hl-nh2 ek-hidden"/>
+      <text id="lblNh2" x="670" y="492" text-anchor="middle" class="hl-lbl ek-fill-lam ek-hidden">Nhóm –NH₂ (base)</text>
+
+      <!-- Vùng tô nhóm chức carboxyl (–COOH) -->
+      <path id="hlCooh" d="M 118,266 Q 118,224 176,224 L 382,294 Q 444,320 444,388 L 444,548 Q 444,610 362,610 Q 278,610 278,548 L 278,434 L 154,364 Q 118,340 118,266 Z" class="hl-cooh ek-hidden"/>
+      <text id="lblCooh" x="280" y="646" text-anchor="middle" class="hl-lbl ek-fill-doSon ek-hidden">Nhóm –COOH (acid)</text>
+
+      <!-- Khung liên kết 2D (tỉ lệ & góc 120° chính xác từ smilesDrawer CC(N)C(=O)O) -->
+      <!-- C(methyl) 508,130 -> C(alpha) 508,297 -->
+      <line id="b1" x1="508" y1="170" x2="508" y2="297" class="mol-bond ek-stroke-ink"/>
+      <!-- C(alpha) 508,297 -> N 653,381 -->
+      <line id="b2" x1="508" y1="297" x2="616" y2="360" class="mol-bond ek-stroke-lam"/>
+      <!-- C(carboxyl) 362,381 -> C(alpha) 508,297 -->
+      <line id="b3" x1="362" y1="381" x2="508" y2="297" class="mol-bond ek-stroke-ink"/>
+      <!-- C(carboxyl) 362,381 = O 362,549 (liên kết đôi) -->
+      <line id="bond4a" x1="349" y1="381" x2="349" y2="508" class="mol-bond ek-stroke-doSon"/>
+      <line id="bond4b" x1="375" y1="381" x2="375" y2="508" class="mol-bond ek-stroke-doSon"/>
+      <!-- C(carboxyl) 362,381 -> OH 217,297 -->
+      <line id="b5" x1="362" y1="381" x2="262" y2="323" class="mol-bond ek-stroke-doSon"/>
+
+      <!-- Ký hiệu nguyên tử & nhóm nguyên tử (cỡ chữ ≥ 44px) -->
+      <text id="aMe" x="508" y="148" text-anchor="middle" class="atom-txt ek-fill-ink ek-hidden">H₃C</text>
+      <text id="aAlpha" x="536" y="286" class="atom-sub ek-fill-ink3 ek-hidden">Cα</text>
+      <text id="aNh2" x="630" y="398" class="atom-txt ek-fill-lam ek-hidden">NH₂</text>
+      <text id="aO" x="362" y="564" text-anchor="middle" class="atom-txt ek-fill-doSon ek-hidden">O</text>
+      <text id="aOh" x="248" y="314" text-anchor="end" class="atom-txt ek-fill-doSon ek-hidden">HO</text>
+
+      <!-- Nguồn dựng hình học -->
+      <text id="srcTag" x="800" y="54" text-anchor="end" class="src-lbl ek-fill-ink3 ek-hidden">2D từ SMILES · smilesDrawer</text>
+    </svg>
+  </div>
+</div>
+<style>
+  .smi-pill{display:inline-block;margin-top:12px;font-family:var(--ui);font-size:36px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:6px 16px;border-radius:10px}
+  .ek-card sub,.ek-card sup{font-size:36px}
+  .grp-nh2{border-left-color:var(--c-lam)}
+  .grp-cooh{border-left-color:var(--c-doSon)}
+  .amp-card{border-left-color:var(--ok)}
+  .amp-card h3{color:var(--ok)}
+  .mol-bg{fill:var(--surface);stroke:var(--line);stroke-width:3px}
+  .mol-bond{fill:none;stroke-width:7px;stroke-linecap:round;opacity:0}
+  .atom-txt{font-family:var(--ui);font-size:48px;font-weight:700}
+  .atom-sub{font-family:var(--ui);font-size:36px;font-weight:600}
+  .hl-nh2{fill:var(--c-lam);fill-opacity:0.14;stroke:var(--c-lam);stroke-width:4px;stroke-dasharray:12 8}
+  .hl-cooh{fill:var(--c-doSon);fill-opacity:0.14;stroke:var(--c-doSon);stroke-width:4px;stroke-dasharray:12 8}
+  .hl-lbl{font-family:var(--ui);font-size:36px;font-weight:700}
+  .src-lbl{font-family:var(--ui);font-size:36px;font-weight:500}
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+
+// Beat 0: Tiêu đề + thẻ danh pháp + vẽ khung phân tử 2D từ smilesDrawer
+EK.enter(tl, "#meta", 0.05, { from: "fade", dur: 0.45 });
+EK.words(tl, "#title", { t: 0.15, per: 0.08 });
+EK.enter(tl, "#molMeta", EK.cue(0), { from: "up", dur: 0.65 });
+EK.draw(tl, "#b1, #b3, #b2, #bond4a, #bond4b, #b5", 0.55, 1.3);
+EK.enter(tl, "#aMe, #aAlpha, #aNh2, #aO, #aOh, #srcTag", 1.5, { from: "scale", dur: 0.55, stagger: 0.12 });
+
+// Beat 1: Tô sáng nhóm amino (–NH2) + thẻ tính base
+const t1 = EK.cue(1);
+EK.enter(tl, "#cardNh2", t1, { from: "up", dur: 0.6 });
+EK.enter(tl, "#hlNh2, #lblNh2", t1 + 0.35, { from: "fade", dur: 0.6 });
+EK.mark(tl, "#cardNh2 h3", t1 + 1.1, "underline", { color: "lam", dur: 0.6 });
+
+// Beat 2: Tô sáng nhóm carboxyl (–COOH) + thẻ tính acid
+const t2 = EK.cue(2);
+EK.exit(tl, "#cardNh2", t2 - 0.15, { dur: 0.35, to: "up" });
+EK.enter(tl, "#cardCooh", t2 + 0.1, { from: "up", dur: 0.6 });
+EK.enter(tl, "#hlCooh, #lblCooh", t2 + 0.35, { from: "fade", dur: 0.6 });
+EK.mark(tl, "#cardCooh h3", t2 + 1.1, "underline", { color: "doSon", dur: 0.6 });
+
+// Beat 3: Kết luận tính lưỡng tính khi kết hợp cả hai nhóm chức
+const t3 = EK.cue(3);
+EK.enter(tl, "#cardAmp", t3, { from: "up", dur: 0.65 });
+EK.mark(tl, "#cardAmp h3", t3 + 0.85, "highlight", { color: "ok", dur: 0.6 });
+
+window.__timelines["main"] = tl;
+</script>
