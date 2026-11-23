@@ -1,0 +1,12 @@
+{
+  "subject": "sinh",
+  "grade": 10,
+  "title": "Diễn biến nguyên phân ở tế bào 2n = 4",
+  "slideText": "Nguyên phân (2n = 4). Kì đầu: 4 NST kép, 8 crômatit, 4 tâm động. Kì giữa: 4 NST kép xếp 1 hàng trên mặt phẳng xích đạo. Kì sau: 8 NST đơn, 0 crômatit, 8 tâm động phân li về 2 cực. Kì cuối: 2 tế bào con, mỗi tế bào 4 NST đơn, 0 crômatit, 4 tâm động.",
+  "speech": [
+    { "text": "Ở kì đầu nguyên phân, tế bào lưỡng bội hai n bằng bốn có bốn nhiễm sắc thể kép gồm tám crômatit và bốn tâm động bắt đầu co xoắn.", "durationMs": 4500 },
+    { "text": "Sang kì giữa, bốn nhiễm sắc thể kép đóng xoắn cực đại và xếp thành một hàng ngay ngắn trên mặt phẳng xích đạo.", "durationMs": 4500 },
+    { "text": "Đến kì sau, hai crômatit chị em tách nhau ở tâm động tạo tám nhiễm sắc thể đơn, không còn crômatit, tiến đều về hai cực tế bào.", "durationMs": 4800 },
+    { "text": "Cuối cùng ở kì cuối, màng tế bào thắt eo tách đôi tạo hai tế bào con giống hệt nhau, mỗi tế bào có đúng bốn nhiễm sắc thể đơn.", "durationMs": 4200 }
+  ]
+}

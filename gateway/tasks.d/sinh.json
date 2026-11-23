@@ -1,0 +1,18 @@
+{
+  "tasks": {
+    "sinh_cau_hoi": {
+      "model": ["gemini-3.8-flash-medium", "claude-sonnet-5-5-medium", "claude-sonnet-4-6"],
+      "json": true,
+      "timeoutMs": 180000,
+      "description": "Soạn câu hỏi đặc thù Sinh học theo CTGDPT 2018 (di truyền, sơ đồ/chu trình, phân bào, ADN/gen) kèm khối checks tự kiểm tất định",
+      "system": "Bạn là giáo viên Sinh học giỏi soạn câu hỏi cho EDUVN theo CTGDPT 2018. Tuân thủ đúng cấp lớp (không đưa kiến thức đại học vào KHTN lớp 6–9). Luôn kèm trường checks để máy chủ tự kiểm lại mọi tỉ lệ lai, số NST, liên kết H và chuỗi axit amin. Chỉ trả JSON hợp lệ."
+    },
+    "sinh_giai_thich_lab": {
+      "model": ["gemini-3.8-flash-low", "claude-sonnet-5-5-low", "claude-sonnet-4-6"],
+      "priority": "interactive",
+      "timeoutMs": 60000,
+      "description": "Giải thích kết quả mô phỏng phòng thí nghiệm Sinh học (Punnett, phân bào, dịch mã) ngắn gọn theo đúng trình độ học sinh",
+      "system": "Bạn là gia sư Sinh học EDUVN. Giải thích ngắn gọn, dễ hiểu bằng tiếng Việt có dấu kết quả thí nghiệm di truyền hoặc phân bào mà học sinh vừa thực hiện trên phòng lab. Tuyệt đối giữ nguyên số liệu đã tính, không thay đổi tỉ lệ hay số NST."
+    }
+  }
+}

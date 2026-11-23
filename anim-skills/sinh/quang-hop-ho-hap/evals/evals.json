@@ -1,0 +1,80 @@
+{
+  "skill": "quang-hop-ho-hap",
+  "evals": [
+    {
+      "id": "khtn-7-quang-hop-ho-hap",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 7,
+        "title": "Mối quan hệ giữa quang hợp và hô hấp tế bào",
+        "slideText": "Quang hợp (Lục lạp): Ánh sáng + Nước + CO2 -> Glucose + O2. Hô hấp tế bào (Ti thể): Glucose + O2 -> Năng lượng + Nước + CO2.",
+        "speech": [
+          { "text": "Quang hợp ở lục lạp và hô hấp tế bào ở ti thể là hai quá trình ngược chiều nhau nhưng gắn bó chặt chẽ.", "durationMs": 4500 },
+          { "text": "Nhờ ánh sáng mặt trời, quang hợp biến nước và khí CO2 thành chất hữu cơ glucose cùng khí oxi.", "durationMs": 4600 },
+          { "text": "Ngược lại, hô hấp tế bào phân giải glucose với khí oxi để giải phóng năng lượng nuôi tế bào, đồng thời trả lại nước và CO2.", "durationMs": 5000 },
+          { "text": "Như vậy, sản phẩm của quang hợp chính là nguyên liệu cho hô hấp tế bào và ngược lại.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["đúng mức KHTN 7 không có thuật ngữ vượt cấp", "hai luồng trao đổi chất ngược chiều rõ ràng"]
+    },
+    {
+      "id": "sinh-10-chuyen-hoa-nang-luong",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Chuyển hoá năng lượng giữa lục lạp và ti thể",
+        "slideText": "Lục lạp: quang năng -> hoá năng (glucose). Ti thể: hoá năng (glucose) -> ATP và nhiệt.",
+        "speech": [
+          { "text": "Lục lạp hấp thụ quang năng mặt trời để tích luỹ thành hoá năng trong các liên kết của phân tử glucose.", "durationMs": 4500 },
+          { "text": "Ti thể chuyển hoá năng trong glucose thành năng lượng ATP dễ sử dụng cho mọi hoạt động sống của tế bào.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["so sánh rõ tích luỹ vs giải phóng năng lượng", "màu phân biệt lục lạp và ti thể"]
+    },
+    {
+      "id": "so-sanh-phuong-trinh-qh-hh",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 7,
+        "title": "So sánh nguyên liệu và sản phẩm của quang hợp và hô hấp",
+        "slideText": "Quang hợp tổng hợp chất hữu cơ, tích luỹ năng lượng; Hô hấp phân giải chất hữu cơ, giải phóng năng lượng.",
+        "speech": [
+          { "text": "Quang hợp chỉ xảy ra ở tế bào có lục lạp khi có ánh sáng, tạo ra glucose và giải phóng khí oxi.", "durationMs": 4400 },
+          { "text": "Hô hấp tế bào diễn ra liên tục cả ngày lẫn đêm ở mọi tế bào sống để cung cấp năng lượng.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["đối chiếu nguyên liệu/sản phẩm 2 chiều", "ngôn ngữ KHTN 7"]
+    },
+    {
+      "id": "khong-chon-luoi-thuc-an",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Tháp năng lượng hệ sinh thái",
+        "slideText": "Cỏ 10.000 kcal -> Châu chấu 1.000 kcal -> Ếch 100 kcal -> Đại bàng 10 kcal.",
+        "speech": [
+          { "text": "Hiệu suất sinh thái trung bình giữa hai bậc dinh dưỡng liền kề khoảng mười phần trăm.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là tháp năng lượng sinh thái, chọn luoi-thuc-an"]
+    },
+    {
+      "id": "khong-chon-adn-cau-truc",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Cấu trúc xoắn kép ADN",
+        "slideText": "N = 2400, A = T = 600, G = C = 600, L = 4080 Å, H = 3000.",
+        "speech": [
+          { "text": "Một đoạn gen có hai nghìn bốn trăm nucleotide, mỗi chu kì xoắn gồm mười cặp nucleotide dài ba mươi tư ăngstrong.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["không chọn: không phải so sánh quang hợp - hô hấp"]
+    }
+  ]
+}

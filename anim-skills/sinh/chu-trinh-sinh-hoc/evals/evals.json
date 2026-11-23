@@ -1,0 +1,82 @@
+{
+  "skill": "chu-trinh-sinh-hoc",
+  "evals": [
+    {
+      "id": "krebs-lop-10",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Chu trình Krebs trong chất nền ti thể",
+        "slideText": "Acetyl-CoA (2C) + 4C -> Citrate (6C) -> 5C -> 4C. Sản phẩm 1 vòng: 2 CO2, 3 NADH, 1 FADH2, 1 ATP.",
+        "speech": [
+          { "text": "Trong chất nền ti thể, phân tử Acetyl-CoA hai carbon kết hợp chất bốn carbon mở đầu chu trình Krebs.", "durationMs": 4500 },
+          { "text": "Hợp chất sáu carbon trải qua các phản ứng oxi hoá khử, giải phóng hai phân tử CO2 và tạo NADH.", "durationMs": 4500 },
+          { "text": "Cuối vòng, chất bốn carbon được tái tạo và mỗi vòng thu được ba NADH, một FADH2 và một ATP.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["vẽ vòng khép kín 4 chặng", "chấm chạy theo đường vòng", "số 2 CO2, 3 NADH, 1 FADH2, 1 ATP khớp lời giảng"]
+    },
+    {
+      "id": "calvin-lop-11",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 11,
+        "title": "Chu trình Calvin cố định CO2",
+        "slideText": "3 giai đoạn: Cố định CO2 -> Khử tạo G3P -> Tái sinh RuBP (5C).",
+        "speech": [
+          { "text": "Chu trình Calvin diễn ra trong chất nền lục lạp gồm ba giai đoạn nối tiếp.", "durationMs": 4000 },
+          { "text": "CO2 gắn vào hợp chất năm carbon rồi được khử nhờ ATP và NADPH tạo đường ba carbon.", "durationMs": 4800 },
+          { "text": "Phần lớn phân tử đường quay lại tái sinh chất nhận năm carbon để vòng tiếp diễn.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["đủ 3 giai đoạn khép kín", "chấm chạy quanh vòng"]
+    },
+    {
+      "id": "chu-trinh-nuoc-lop-8",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 8,
+        "title": "Chu trình nước trong tự nhiên",
+        "slideText": "Bốc hơi -> Ngưng tụ tạo mây -> Mưa rơi -> Dòng chảy về biển.",
+        "speech": [
+          { "text": "Nước từ mặt biển và sông hồ bốc hơi lên cao nhờ năng lượng mặt trời.", "durationMs": 4000 },
+          { "text": "Hơi nước gặp lạnh ngưng tụ thành mây rồi rơi xuống đất dưới dạng mưa.", "durationMs": 4200 },
+          { "text": "Nước mưa chảy qua sông suối và mạch ngầm quay trở lại đại dương, khép kín vòng tuần hoàn.", "durationMs": 4600 }
+        ]
+      },
+      "tieuChi": ["phù hợp mức KHTN 8", "vòng 4 chặng khép kín với chấm chạy"]
+    },
+    {
+      "id": "khong-chon-punnett",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 9,
+        "title": "Phép lai một cặp tính trạng Aa x Aa",
+        "slideText": "P: Aa x Aa -> F1: 1 AA : 2 Aa : 1 aa (3 vàng : 1 xanh).",
+        "speech": [
+          { "text": "Cho hai cây đậu Hà Lan dị hợp Aa lai với nhau, ta lập bảng Punnett bốn ô.", "durationMs": 4200 },
+          { "text": "Kết quả thu được tỉ lệ kiểu gen một hai một và tỉ lệ kiểu hình ba vàng một xanh.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là bài tập lai Mendel, phải chọn di-truyen-punnett"]
+    },
+    {
+      "id": "khong-chon-dinh-nghia",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Khái niệm enzyme",
+        "slideText": "Enzyme là chất xúc tác sinh học có bản chất chủ yếu là protein.",
+        "speech": [
+          { "text": "Enzyme là chất xúc tác sinh học được tổng hợp trong tế bào sống, giúp tăng tốc độ phản ứng.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: cảnh chỉ nêu định nghĩa, không có chu trình khép kín"]
+    }
+  ]
+}

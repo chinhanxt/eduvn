@@ -1,0 +1,12 @@
+{
+  "subject": "sinh",
+  "grade": 10,
+  "title": "Chu trình Krebs trong chất nền ti thể",
+  "slideText": "Acetyl-CoA (2C) + 4C -> Citrate (6C) -> 5C -> 4C (tái tạo). Sản phẩm mỗi vòng (1 Acetyl-CoA): 2 CO2, 3 NADH, 1 FADH2, 1 ATP.",
+  "speech": [
+    { "text": "Trong chất nền ti thể, phân tử Acetyl-CoA hai carbon đi vào kết hợp hợp chất bốn carbon tạo phân tử sáu carbon Citrate.", "durationMs": 4600 },
+    { "text": "Ở chặng tiếp theo, hợp chất sáu carbon bị oxi hoá giải phóng phân tử CO2 đầu tiên tạo hợp chất năm carbon và phân tử NADH.", "durationMs": 4600 },
+    { "text": "Tiếp tục oxi hoá giải phóng phân tử CO2 thứ hai, chuyển hoá về bốn carbon đồng thời tạo thêm NADH, FADH2 và ATP.", "durationMs": 4600 },
+    { "text": "Tổng kết một vòng chu trình Krebs từ một Acetyl-CoA thu được hai CO2, ba NADH, một FADH2 và một ATP.", "durationMs": 4200 }
+  ]
+}

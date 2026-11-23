@@ -1,0 +1,101 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">KHTN 7 · TRAO ĐỔI CHẤT &amp; CHUYỂN HOÁ NĂNG LƯỢNG</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:96px">Quan hệ giữa <span class="kw">Quang hợp</span> và Hô hấp tế bào</h1>
+
+  <div class="ek-stage">
+    <!-- Sơ đồ vòng trao đổi chất giữa Lục lạp và Ti thể -->
+    <div id="qh-hh-board" class="qh-board ek-col-1 ek-span-12" style="top:196px;height:410px" data-ek-beat="0">
+      <svg id="qh-hh-svg" viewBox="0 0 1680 410" width="1680" height="410">
+        <!-- Đường luồng trên (Lục lạp -> Ti thể: Glucose + O2) -->
+        <path id="flow-top" class="qh-flow ek-stroke-xanhLa" d="M510,130 C720,60 960,60 1170,130" />
+        <polygon id="head-top" points="1182,135 1160,118 1154,138" class="ek-fill-xanhLa ek-hidden" />
+        <text id="lbl-top" x="840" y="58" text-anchor="middle" class="qh-flow-txt ek-fill-xanhLa ek-hidden">Glucose + Khí O₂</text>
+
+        <!-- Đường luồng dưới (Ti thể -> Lục lạp: Nước + CO2) -->
+        <path id="flow-bot" class="qh-flow ek-stroke-lucLam" d="M1170,278 C960,348 720,348 510,278" />
+        <polygon id="head-bot" points="498,273 520,290 526,270" class="ek-fill-lucLam ek-hidden" />
+        <text id="lbl-bot" x="840" y="378" text-anchor="middle" class="qh-flow-txt ek-fill-lucLam ek-hidden">Nước + Khí CO₂</text>
+
+        <!-- Khối Lục lạp (Trái) -->
+        <g id="qh-box">
+          <rect x="60" y="92" width="440" height="226" rx="28" class="qh-org ek-soft-xanhLa ek-stroke-xanhLa" />
+          <text x="280" y="168" text-anchor="middle" class="qh-org-t ek-fill-xanhLa">QUANG HỢP</text>
+          <text x="280" y="220" text-anchor="middle" class="qh-org-s">Tại Lục lạp (cây xanh)</text>
+          <text x="280" y="274" text-anchor="middle" class="qh-org-e ek-fill-vangDam">+ Ánh sáng mặt trời</text>
+        </g>
+
+        <!-- Khối Ti thể (Phải) -->
+        <g id="hh-box">
+          <rect x="1180" y="92" width="440" height="226" rx="28" class="qh-org ek-soft-lucLam ek-stroke-lucLam" />
+          <text x="1400" y="168" text-anchor="middle" class="qh-org-t ek-fill-lucLam">HÔ HẤP TẾ BÀO</text>
+          <text x="1400" y="220" text-anchor="middle" class="qh-org-s">Tại Ti thể (mọi tế bào)</text>
+          <text x="1400" y="274" text-anchor="middle" class="qh-org-e ek-fill-doSon">→ Năng lượng + Nhiệt</text>
+        </g>
+
+        <!-- Chấm chất chạy hai chiều -->
+        <circle id="dot-top" cx="510" cy="130" r="15" class="ek-fill-xanhLa qh-dot ek-hidden" />
+        <circle id="dot-bot" cx="1170" cy="278" r="15" class="ek-fill-lucLam qh-dot ek-hidden" />
+      </svg>
+    </div>
+
+    <!-- Hai thẻ đối chiếu phía dưới (tách rõ với chân trang) -->
+    <div id="qh-card" class="ek-card qh-c ek-col-1 ek-span-6 ek-hidden" style="top:628px" data-ek-beat="1">
+      <h3 class="ek-c-xanhLa">Quang hợp · Tích luỹ năng lượng</h3>
+      <p>Tổng hợp glucose khi có ánh sáng mặt trời.</p>
+    </div>
+
+    <div id="hh-card" class="ek-card qh-c ek-col-7 ek-span-6 ek-hidden" style="top:628px" data-ek-beat="2">
+      <h3 class="ek-c-lucLam">Hô hấp · Giải phóng năng lượng</h3>
+      <p>Phân giải glucose liên tục cả ngày lẫn đêm.</p>
+    </div>
+
+    <div id="qh-foot" class="qh-foot ek-col-1 ek-span-12 ek-hidden" style="top:824px" data-ek-beat="3">
+      Sản phẩm của quá trình này chính là nguyên liệu của quá trình kia.
+    </div>
+  </div>
+</div>
+
+<style>
+  .qh-board { background: var(--surface); border: 2px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); }
+  .qh-org { stroke-width: 5px; }
+  .qh-org-t { font-size: 42px; font-weight: 700; }
+  .qh-org-s { font-size: 36px; fill: var(--ink2); font-weight: 500; }
+  .qh-org-e { font-size: 36px; font-weight: 700; }
+  .qh-flow { fill: none; stroke-width: 8px; stroke-linecap: round; }
+  .qh-flow-txt { font-size: 38px; font-weight: 700; }
+  .qh-dot { stroke: var(--surface); stroke-width: 4px; }
+  .qh-c { padding: 20px 28px; }
+  .qh-c h3 { font-size: 38px; margin-bottom: 6px; }
+  .qh-c p { font-size: 36px; line-height: 1.3; }
+  .qh-foot { text-align: center; font-size: 38px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 12px 24px; border-radius: 12px; }
+</style>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  // Beat 0 (0 - 4.5s): Mở đối xứng Lục lạp và Ti thể
+  EK.enter(tl, "#qh-box", 0.3, { from: "left", dur: 0.8 });
+  EK.enter(tl, "#hh-box", 0.9, { from: "right", dur: 0.8 });
+  EK.mark(tl, "#tt .kw", 2.0, "highlight", { color: "xanhLa" });
+
+  // Beat 1 (4.5 - 9.0s): Luồng trên Glucose + O2 từ Lục lạp -> Ti thể
+  EK.draw(tl, "#flow-top", 4.5, 1.4);
+  EK.enter(tl, "#head-top, #lbl-top", 5.5, { from: "up", dur: 0.45 });
+  tl.set("#dot-top", { opacity: 1 }, 5.6);
+  EK.follow(tl, "#dot-top", "#flow-top", 5.6, 2.4);
+  EK.enter(tl, "#qh-card", EK.cue(1), { from: "up", dur: 0.55 });
+
+  // Beat 2 (9.0 - 13.8s): Luồng dưới Nước + CO2 từ Ti thể -> Lục lạp
+  EK.draw(tl, "#flow-bot", 9.0, 1.4);
+  EK.enter(tl, "#head-bot, #lbl-bot", 10.0, { from: "down", dur: 0.45 });
+  tl.set("#dot-bot", { opacity: 1 }, 10.1);
+  EK.follow(tl, "#dot-bot", "#flow-bot", 10.1, 2.4);
+  EK.enter(tl, "#hh-card", EK.cue(2), { from: "up", dur: 0.55 });
+
+  // Beat 3 (13.8 - 18.0s): Chốt mối quan hệ thống nhất 2 chiều
+  EK.enter(tl, "#qh-foot", EK.cue(3), { from: "up", dur: 0.6 });
+  EK.mark(tl, "#qh-card h3", 14.8, "underline", { color: "xanhLa" });
+  EK.mark(tl, "#hh-card h3", 15.6, "underline", { color: "lucLam" });
+
+  window.__timelines["main"] = tl;
+</script>

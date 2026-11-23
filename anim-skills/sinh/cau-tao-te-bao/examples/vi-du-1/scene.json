@@ -1,0 +1,12 @@
+{
+  "subject": "sinh",
+  "grade": 6,
+  "title": "Cấu tạo tế bào thực vật và lục lạp",
+  "slideText": "Tế bào thực vật gồm: Thành tế bào, Màng tế bào, Tế bào chất, Nhân, Không bào lớn và Lục lạp (chứa diệp lục giúp cây quang hợp).",
+  "speech": [
+    { "text": "Tế bào thực vật có thành tế bào cứng bên ngoài giúp giữ hình dạng ổn định và màng tế bào bao bọc bên trong.", "durationMs": 4500 },
+    { "text": "Bên trong tế bào chất có nhân điều khiển hoạt động sống, không bào lớn chứa dịch và các lục lạp màu xanh lục.", "durationMs": 4800 },
+    { "text": "Hãy phóng gần vào bào quan lục lạp: đây là nơi chứa chất diệp lục hấp thụ ánh sáng mặt trời.", "durationMs": 4600 },
+    { "text": "Nhờ lục lạp thực hiện quang hợp, thực vật tự tổng hợp được chất dinh dưỡng nuôi sống cơ thể.", "durationMs": 4100 }
+  ]
+}

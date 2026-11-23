@@ -1,0 +1,80 @@
+{
+  "skill": "cau-tao-te-bao",
+  "evals": [
+    {
+      "id": "te-bao-thuc-vat-khtn-6",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 6,
+        "title": "Cấu tạo tế bào thực vật",
+        "slideText": "Thành tế bào, màng tế bào, tế bào chất, nhân, không bào lớn và lục lạp giúp quang hợp.",
+        "speech": [
+          { "text": "Tế bào thực vật có thành tế bào cứng bên ngoài giúp giữ hình dạng ổn định và màng tế bào bọc bên trong.", "durationMs": 4500 },
+          { "text": "Bên trong tế bào chất có nhân điều khiển hoạt động sống, không bào lớn chứa dịch và các lục lạp màu xanh.", "durationMs": 4800 },
+          { "text": "Hãy quan sát kĩ bào quan lục lạp: đây là nơi chứa chất diệp lục hấp thụ ánh sáng mặt trời.", "durationMs": 4600 },
+          { "text": "Nhờ có lục lạp, cây xanh tự tổng hợp được chất dinh dưỡng nuôi cơ thể.", "durationMs": 4100 }
+        ]
+      },
+      "tieuChi": ["đúng mức KHTN 6 không có thuật ngữ đại học", "đường dẫn không cắt chéo", "đúng 1 cú camera phóng vào lục lạp"]
+    },
+    {
+      "id": "te-bao-dong-vat-ti-the-lop-10",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Cấu tạo tế bào nhân thực và vai trò ti thể",
+        "slideText": "Màng sinh chất, nhân, lưới nội chất, bộ máy Golgi và ti thể tạo ATP.",
+        "speech": [
+          { "text": "Tế bào động vật có màng sinh chất mềm dẻo bao quanh tế bào chất cùng nhiều bào quan có màng.", "durationMs": 4400 },
+          { "text": "Phóng gần vào ti thể, bào quan có màng kép với màng trong gấp nếp tạo mào để tổng hợp năng lượng ATP.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["sơ đồ tế bào nét học thuật", "phóng 1 camera vào ti thể"]
+    },
+    {
+      "id": "te-bao-nhan-so-lop-6",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 6,
+        "title": "Cấu tạo tế bào vi khuẩn (nhân sơ)",
+        "slideText": "Thành tế bào, màng tế bào, tế bào chất và vùng nhân chưa có màng nhân bao bọc.",
+        "speech": [
+          { "text": "Tế bào vi khuẩn có kích thước nhỏ, gồm thành tế bào, màng tế bào, tế bào chất và vùng nhân.", "durationMs": 4300 },
+          { "text": "Điểm đặc trưng cần chú ý ở vùng nhân là vật chất di truyền chưa có màng nhân bao bọc.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["phóng 1 camera vào vùng nhân", "nhãn gọn chuẩn KHTN 6"]
+    },
+    {
+      "id": "khong-chon-nguyen-phan",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 10,
+        "title": "Nguyên phân tạo hai tế bào con",
+        "slideText": "Kì đầu -> Kì giữa -> Kì sau -> Kì cuối: 2n kép -> 4n đơn -> 2 tế bào 2n đơn.",
+        "speech": [
+          { "text": "Trong nguyên phân, các nhiễm sắc thể kép tách ở tâm động rồi phân li đều về hai cực tế bào.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là diễn biến phân bào, chọn phan-bao"]
+    },
+    {
+      "id": "khong-chon-adn-dich-ma",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Dịch mã tổng hợp chuỗi pôlipeptit",
+        "slideText": "mARN: 5'-AUG UUU CCC UAA-3' -> Met-Phe-Pro.",
+        "speech": [
+          { "text": "Ribôxôm đọc từng bộ ba trên mARN bắt đầu từ AUG và dừng lại ở mã kết thúc UAA.", "durationMs": 4500 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là phiên mã dịch mã, chọn phien-ma-dich-ma"]
+    }
+  ]
+}

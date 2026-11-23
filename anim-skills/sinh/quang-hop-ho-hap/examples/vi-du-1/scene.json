@@ -1,0 +1,12 @@
+{
+  "subject": "sinh",
+  "grade": 7,
+  "title": "Mối quan hệ giữa Quang hợp và Hô hấp tế bào",
+  "slideText": "Quang hợp (Lục lạp): Ánh sáng + Nước + CO2 -> Glucose + O2 (tích luỹ năng lượng). Hô hấp tế bào (Ti thể): Glucose + O2 -> Năng lượng + Nước + CO2 (giải phóng năng lượng).",
+  "speech": [
+    { "text": "Quang hợp ở lục lạp và hô hấp tế bào ở ti thể là hai quá trình ngược chiều nhưng thống nhất trong cơ thể sống.", "durationMs": 4500 },
+    { "text": "Nhờ ánh sáng mặt trời, lục lạp chuyển nước và khí CO2 thành chất hữu cơ glucose và khí oxi.", "durationMs": 4500 },
+    { "text": "Ngược lại, ti thể phân giải glucose cùng khí oxi để giải phóng năng lượng nuôi tế bào và trả lại nước cùng CO2.", "durationMs": 4800 },
+    { "text": "Như vậy, sản phẩm của quá trình quang hợp chính là nguyên liệu cho hô hấp tế bào và ngược lại.", "durationMs": 4200 }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "skill": "di-truyen-punnett",
+  "evals": [
+    {
+      "id": "mendel-1-cap-aa",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 9,
+        "title": "Phép lai một cặp tính trạng Aa × Aa",
+        "slideText": "P: Aa × Aa (A: hạt vàng, a: hạt xanh). F1: 1 AA (25%) : 2 Aa (50%) : 1 aa (25%). Kiểu hình: 75% vàng : 25% xanh (3 : 1).",
+        "speech": [
+          { "text": "Xét phép lai hai cây đậu Hà Lan dị hợp Aa lai với nhau, mỗi cây cho hai loại giao tử A và a bằng nhau.", "durationMs": 4500 },
+          { "text": "Lập bảng Punnett bốn ô, ta thu được bốn tổ hợp giao tử là AA, hai Aa và một aa.", "durationMs": 4500 },
+          { "text": "Tỉ lệ kiểu gen là một AA hai mươi lăm phần trăm, hai Aa năm mươi phần trăm và một aa hai mươi lăm phần trăm.", "durationMs": 4600 },
+          { "text": "Vì A trội hoàn toàn so với a, tỉ lệ kiểu hình đạt bảy mươi lăm phần trăm hạt vàng và hai mươi lăm phần trăm hạt xanh, tức ba một.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["bảng Punnett 2x2 điền từng ô", "tỉ lệ kiểu gen 25/50/25% và kiểu hình 75/25% (3:1)"]
+    },
+    {
+      "id": "troi-khong-hoan-toan",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Trội không hoàn toàn ở hoa phấn",
+        "slideText": "P: Aa (hồng) × Aa (hồng) -> F1: 25% AA (đỏ) : 50% Aa (hồng) : 25% aa (trắng) — tỉ lệ 1 : 2 : 1.",
+        "speech": [
+          { "text": "Khi lai hai cây hoa phấn màu hồng có kiểu gen Aa với nhau trong hiện tượng trội không hoàn toàn.", "durationMs": 4200 },
+          { "text": "Bảng Punnett cho ba kiểu hình phân biệt theo đúng tỉ lệ một đỏ, hai hồng, một trắng.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["3 màu phân biệt rõ 3 kiểu hình", "tỉ lệ 1:2:1 khớp kiểu gen và kiểu hình"]
+    },
+    {
+      "id": "lien-ket-gioi-tinh-x",
+      "nenChon": true,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Di truyền liên kết giới tính trên NST X",
+        "slideText": "P: X^A X^a × X^A Y -> F1: 50% cái mắt đỏ : 25% đực mắt đỏ : 25% đực mắt trắng.",
+        "speech": [
+          { "text": "Cho ruồi giấm cái mắt đỏ dị hợp lai với ruồi đực mắt đỏ trên nhiễm sắc thể giới tính X.", "durationMs": 4400 },
+          { "text": "Lập bảng Punnett thấy toàn bộ ruồi cái đều mắt đỏ, còn ruồi đực phân li năm mươi phần trăm mắt đỏ và năm mươi phần trăm mắt trắng.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["hiển thị rõ giao tử X^A, X^a, Y", "tách kết quả theo giới tính đực cái"]
+    },
+    {
+      "id": "khong-chon-luoi-thuc-an",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 12,
+        "title": "Lưới thức ăn hệ sinh thái đồng cỏ",
+        "slideText": "Cỏ -> Châu chấu -> Ếch -> Rắn -> Đại bàng. Hiệu suất sinh thái 10%.",
+        "speech": [
+          { "text": "Năng lượng truyền từ sinh vật sản xuất qua các bậc tiêu thụ giảm mười lần mỗi bậc.", "durationMs": 4300 }
+        ]
+      },
+      "tieuChi": ["không chọn: đây là sinh thái học, chọn luoi-thuc-an"]
+    },
+    {
+      "id": "khong-chon-quang-hop",
+      "nenChon": false,
+      "scene": {
+        "subject": "sinh",
+        "grade": 7,
+        "title": "Quang hợp ở lá cây",
+        "slideText": "Nước + Carbon dioxide --(Ánh sáng, diệp lục)--> Glucose + Oxygen.",
+        "speech": [
+          { "text": "Lá cây lấy nước và khí carbon dioxide nhờ ánh sáng mặt trời để tổng hợp chất hữu cơ.", "durationMs": 4200 }
+        ]
+      },
+      "tieuChi": ["không chọn: không phải bài tập lai di truyền"]
+    }
+  ]
+}

@@ -55,6 +55,7 @@ import { registerSolutionRoutes } from "./routes/solutions";
 import { registerDiaRoutes } from "../subjects/dia/routes";
 import { registerSuRoutes } from "../subjects/su/routes";
 import { registerHoaRoutes } from "../subjects/hoa";
+import { registerSinhRoutes } from "../subjects/sinh/routes";
 import { type Actor, type ExamLinks, GenerateExamInput, createService } from "../service";
 
 export type AppDeps = {
@@ -431,6 +432,7 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   registerDiaRoutes(app, { ai: deps.ai });
   registerSuRoutes(app, { db: deps.db, ai: deps.ai, bank: service, authenticate });
   registerHoaRoutes(app, { ai: deps.ai, authenticate });
+  registerSinhRoutes(app, { ai: deps.ai, authenticate });
 
   app.post("/mcp", async (req, reply) => {
     const actor = await authenticate(req);

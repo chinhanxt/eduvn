@@ -1,0 +1,13 @@
+{
+  "requires": [
+    { "selector": ".dna-codon", "min": 3, "max": 8 },
+    { "selector": ".mrna-codon", "min": 3, "max": 8 },
+    { "selector": ".aa-bead", "min": 2, "max": 7 }
+  ],
+  "motion": [
+    { "kind": "staysInFrame", "selector": ".ek-label" },
+    { "kind": "keepsMoving", "maxStaticSec": 4 }
+  ],
+  "limits": { "cameraMoves": 0, "labels": 14, "minFontPx": 36 },
+  "data": { "placesFromGazetteer": false, "numbersFromSpeech": true }
+}

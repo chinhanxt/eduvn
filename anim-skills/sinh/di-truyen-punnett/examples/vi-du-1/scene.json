@@ -1,0 +1,12 @@
+{
+  "subject": "sinh",
+  "grade": 9,
+  "title": "Phép lai một cặp tính trạng Aa × Aa ở đậu Hà Lan",
+  "slideText": "P: Aa × Aa (A: hạt vàng, a: hạt xanh). Giao tử: 1/2 A, 1/2 a. F1: 1 AA (25%) : 2 Aa (50%) : 1 aa (25%). Kiểu hình: 75% hạt vàng : 25% hạt xanh (tỉ lệ 3 : 1).",
+  "speech": [
+    { "text": "Xét phép lai hai cây đậu Hà Lan dị hợp Aa với nhau, trong đó alen A quy định hạt vàng trội hoàn toàn so với alen a quy định hạt xanh.", "durationMs": 4500 },
+    { "text": "Lập bảng Punnett với hai loại giao tử A và a mỗi bên, ta điền lần lượt bốn tổ hợp là một AA, hai Aa và một aa.", "durationMs": 4500 },
+    { "text": "Thống kê kiểu gen ở đời F1 thu được tỉ lệ một AA hai mươi lăm phần trăm, hai Aa năm mươi phần trăm và một aa hai mươi lăm phần trăm.", "durationMs": 4500 },
+    { "text": "Gộp theo kiểu hình, đời F1 đạt bảy mươi lăm phần trăm hạt vàng và hai mươi lăm phần trăm hạt xanh, tức đúng tỉ lệ ba một.", "durationMs": 4500 }
+  ]
+}
