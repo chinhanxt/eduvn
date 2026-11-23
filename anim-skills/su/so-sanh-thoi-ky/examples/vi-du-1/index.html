@@ -1,0 +1,71 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">LỊCH SỬ 12 · SO SÁNH HAI THỜI KỲ</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:102px">Kháng chiến chống Pháp và <span class="kw">chống Mỹ</span></h1>
+
+  <div class="ek-stage">
+    <div id="col-a" class="ek-card ek-col-1 ek-span-6 cmp-head head-a ek-hidden" style="top:214px" data-ek-beat="0">
+      <div class="cmp-eyebrow ek-c-lam">1945 – 1954 · 9 NĂM</div>
+      <h3>Kháng chiến chống Pháp</h3>
+    </div>
+
+    <div id="col-b" class="ek-card ek-col-7 ek-span-6 cmp-head head-b ek-hidden" style="top:214px">
+      <div class="cmp-eyebrow ek-c-tim">1954 – 1975 · 21 NĂM</div>
+      <h3>Kháng chiến chống Mỹ</h3>
+    </div>
+
+    <div id="r1-a" class="ek-card ek-col-1 ek-span-6 cmp-row head-a ek-hidden" style="top:364px" data-ek-beat="1">
+      <div class="row-lbl ek-c-ink3">BỐI CẢNH CHIẾN TRƯỜNG</div>
+      <p>Khởi đầu trong thế bao vây, từng bước mở rộng căn cứ địa Việt Bắc.</p>
+    </div>
+
+    <div id="r1-b" class="ek-card ek-col-7 ek-span-6 cmp-row head-b ek-hidden" style="top:364px">
+      <div class="row-lbl ek-c-ink3">BỐI CẢNH CHIẾN TRƯỜNG</div>
+      <p>Hai miền Nam – Bắc phối hợp, hậu phương miền Bắc chi viện trực tiếp.</p>
+    </div>
+
+    <div id="r2-a" class="ek-card ek-col-1 ek-span-6 cmp-row head-a ek-hidden" style="top:534px" data-ek-beat="2">
+      <div class="row-lbl ek-c-ink3">TRẬN QUYẾT CHIẾN CHIẾN LƯỢC</div>
+      <p><span id="diff-a">Điện Biên Phủ (1954)</span> buộc Pháp ký Hiệp định Giơ-ne-vơ.</p>
+    </div>
+
+    <div id="r2-b" class="ek-card ek-col-7 ek-span-6 cmp-row head-b ek-hidden" style="top:534px">
+      <div class="row-lbl ek-c-ink3">TRẬN QUYẾT CHIẾN CHIẾN LƯỢC</div>
+      <p><span id="diff-b">Đại thắng mùa Xuân (1975)</span> giải phóng miền Nam, thống nhất đất nước.</p>
+    </div>
+
+    <div id="box-chung" class="ek-card ek-col-1 ek-span-12 cmp-common ek-hidden" style="top:714px" data-ek-beat="3">
+      <div class="cmp-eyebrow ek-c-xanhLa">ĐIỂM CHUNG XUYÊN SUỐT</div>
+      <p><span id="kw-chung">Đường lối chiến tranh nhân dân</span> kết hợp chặt chẽ đấu tranh quân sự, chính trị và ngoại giao.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cmp-head { padding: 18px 28px; }
+  .cmp-row { padding: 18px 28px; }
+  .cmp-common { padding: 20px 30px; border-left-color: var(--c-xanhLa); }
+  .head-a { border-left-color: var(--c-lam); }
+  .head-b { border-left-color: var(--c-tim); }
+  .cmp-eyebrow { font-size: 36px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .row-lbl { font-size: 36px; font-weight: 700; letter-spacing: 0.03em; margin-bottom: 6px; }
+</style>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+
+EK.enter(tl, "#tt", 0, { from: "up", dur: 0.7 });
+EK.enter(tl, "#col-a, #col-b", EK.cue(0), { from: "up", dur: 0.7, stagger: 0.2 });
+
+EK.enter(tl, "#r1-a, #r1-b", EK.cue(1), { from: "left", dur: 0.7, stagger: 0.25 });
+
+tl.to("#r1-a, #r1-b", { opacity: 0.65, duration: 0.5, ease: "power2.out" }, EK.cue(2));
+EK.enter(tl, "#r2-a, #r2-b", EK.cue(2), { from: "left", dur: 0.7, stagger: 0.25 });
+EK.mark(tl, "#diff-a", EK.cue(2) + 1.0, "underline", { color: "lam", dur: 0.7 });
+EK.mark(tl, "#diff-b", EK.cue(2) + 1.4, "underline", { color: "tim", dur: 0.7 });
+
+tl.to("#r1-a, #r1-b", { opacity: 1, duration: 0.4, ease: "power2.out" }, EK.cue(3));
+EK.enter(tl, "#box-chung", EK.cue(3), { from: "up", dur: 0.75 });
+EK.mark(tl, "#kw-chung", EK.cue(3) + 0.9, "highlight", { color: "xanhLa", dur: 0.9 });
+
+window.__timelines["main"] = tl;
+</script>

@@ -1,0 +1,20 @@
+{
+  "requires": [
+    { "selector": "[data-ek-timeline]", "min": 1 },
+    { "selector": ".ek-era", "min": 1, "max": 6 },
+    { "selector": ".ek-event", "min": 2, "max": 8 }
+  ],
+  "motion": [
+    { "kind": "before", "a": "[data-ek-timeline]", "b": ".ek-event-0" },
+    { "kind": "staysInFrame", "selector": ".ek-event-0 .ek-event-year" }
+  ],
+  "limits": {
+    "cameraMoves": 1,
+    "labels": 14,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

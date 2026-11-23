@@ -1,0 +1,105 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="20" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-7 ek-span-6" style="top:54px">LỊCH SỬ 11 · KHÔNG GIAN LÃNH THỔ &amp; BIỂN ĐẢO</div>
+  <h1 id="tt" class="ek-title ek-col-7 ek-span-6" style="top:100px;font-size:60px">Lãnh thổ <span class="kw">Việt Nam</span><br>thế kỷ X–XIX</h1>
+
+  <div class="ek-stage">
+    <div id="map-vn" class="ek-col-1 ek-span-6 vn-box ek-hidden" style="top:54px;height:846px" data-ek-beat="0">
+      <svg id="vn-svg" width="828" height="846" viewBox="0 0 828 846"
+           data-ek-map="vn63" data-ek-view="101.6,7.6,116.8,23.8">
+        <path id="sea-hs" class="sea-route" data-ek-arrow="from:hoi-an;to:hoang-sa" data-ek-bend="-0.16"/>
+        <path id="sea-ts" class="sea-route" data-ek-arrow="from:hoi-an;to:truong-sa" data-ek-bend="0.18"/>
+      </svg>
+
+      <div id="p-tl" class="ek-hidden" data-ek-place="thang-long-ha-noi">Thăng Long (1010)</div>
+      <div id="p-hl" class="ek-hidden" data-ek-place="hoa-lu">Hoa Lư (968)</div>
+      <div id="p-px" class="ek-hidden" data-ek-place="phu-xuan-hue">Phú Xuân</div>
+      <div id="p-ha" class="ek-hidden" data-ek-place="hoi-an">Hội An</div>
+      <div id="p-gd" class="ek-hidden" data-ek-place="gia-dinh-sai-gon">Gia Định (1698)</div>
+    </div>
+
+    <div id="st-0" class="ek-card ek-col-7 ek-span-6 era-card e-0 ek-hidden" style="top:262px">
+      <div class="era-tag ek-c-lam">THẾ KỶ X–XI · ĐẠI VIỆT</div>
+      <p>Kinh đô <span id="kw-bac">Hoa Lư (968), Thăng Long (1010)</span> ở Bắc Bộ.</p>
+    </div>
+
+    <div id="st-1" class="ek-card ek-col-7 ek-span-6 era-card e-1 ek-hidden" style="top:426px" data-ek-beat="1">
+      <div class="era-tag ek-c-lucLam">THẾ KỶ XV–XVI · MIỀN TRUNG</div>
+      <p>Mở rộng <span id="kw-trung">Thuận Hoá, Phú Xuân</span> và cảng Hội An.</p>
+    </div>
+
+    <div id="st-2" class="ek-card ek-col-7 ek-span-6 era-card e-2 ek-hidden" style="top:590px" data-ek-beat="2">
+      <div class="era-tag ek-c-xanhLa">THẾ KỶ XVII–XVIII · NAM BỘ &amp; BIỂN</div>
+      <p>Lập Gia Định (1698); đội Hoàng Sa, Bắc Hải ra biển.</p>
+    </div>
+
+    <div id="st-3" class="ek-card ek-col-7 ek-span-6 era-card e-3 ek-hidden" style="top:754px" data-ek-beat="3">
+      <div class="era-tag ek-c-doSon">THẾ KỶ XIX · CHỦ QUYỀN TOÀN VẸN</div>
+      <p>Đo đạc, cắm mốc <span id="kw-cq">năm 1816 và 1836</span> trên hai quần đảo.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .vn-box {
+    background: var(--surface);
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .ek-arrow {
+    visibility: hidden;
+  }
+  .sea-route {
+    stroke: var(--c-xanhLa);
+    stroke-width: 5px;
+    stroke-dasharray: 12 8;
+  }
+  .sea-route + .ek-arrow-head {
+    fill: var(--c-xanhLa);
+  }
+  .era-card {
+    padding: 16px 26px;
+  }
+  .e-0 { border-left-color: var(--c-lam); }
+  .e-1 { border-left-color: var(--c-lucLam); }
+  .e-2 { border-left-color: var(--c-xanhLa); }
+  .e-3 { border-left-color: var(--c-doSon); }
+  .era-tag {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+</style>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+
+EK.enter(tl, "#tt", 0, { from: "up", dur: 0.7 });
+EK.enter(tl, "#map-vn", 0.2, { from: "fade", dur: 0.8 });
+EK.enter(tl, "#st-0", EK.cue(0), { from: "right", dur: 0.7 });
+EK.enter(tl, "#p-hl, #p-tl", EK.cue(0) + 0.35, { from: "scale", dur: 0.5, stagger: 0.3 });
+EK.mark(tl, "#kw-bac", EK.b(0, 0.78), "highlight", { color: "lam", dur: 0.7 });
+
+// Beat 1: Thế kỷ XV–XVI
+tl.to("#st-0", { opacity: 0.55, duration: 0.5, ease: "power2.out" }, EK.cue(1));
+EK.enter(tl, "#st-1", EK.cue(1), { from: "right", dur: 0.7 });
+EK.enter(tl, "#p-px, #p-ha", EK.cue(1) + 0.35, { from: "scale", dur: 0.5, stagger: 0.3 });
+EK.mark(tl, "#kw-trung", EK.b(1, 0.55), "highlight", { color: "lucLam", dur: 0.9 });
+
+// Beat 2: Thế kỷ XVII–XVIII + đội Hoàng Sa & Bắc Hải
+tl.to("#st-1", { opacity: 0.55, duration: 0.5, ease: "power2.out" }, EK.cue(2));
+EK.enter(tl, "#st-2", EK.cue(2), { from: "right", dur: 0.7 });
+EK.enter(tl, "#p-gd", EK.cue(2) + 0.3, { from: "scale", dur: 0.5 });
+tl.set("#sea-hs", { visibility: "visible" }, EK.cue(2) + 0.8);
+EK.arrow(tl, "#sea-hs", EK.cue(2) + 0.8, 1.2);
+tl.set("#sea-ts", { visibility: "visible" }, EK.cue(2) + 1.8);
+EK.arrow(tl, "#sea-ts", EK.cue(2) + 1.8, 1.2);
+
+// Beat 3: Thế kỷ XIX
+tl.to("#st-2", { opacity: 0.55, duration: 0.5, ease: "power2.out" }, EK.cue(3));
+EK.enter(tl, "#st-3", EK.cue(3), { from: "right", dur: 0.7 });
+EK.mark(tl, "#kw-cq", EK.cue(3) + 0.9, "highlight", { color: "doSon", dur: 0.9 });
+
+window.__timelines["main"] = tl;
+</script>

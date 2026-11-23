@@ -1,0 +1,81 @@
+{
+  "skill": "nguyen-nhan-ket-qua",
+  "evals": [
+    {
+      "id": "bach-dang-938-nhan-qua",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 6,
+        "title": "Chiến thắng Bạch Đằng năm 938: Nguyên nhân đến Ý nghĩa",
+        "slideText": "Nguyên nhân: Nam Hán xâm lược · Diễn biến: bãi cọc gỗ lợi dụng thuỷ triều · Kết quả: đánh tan thuỷ quân Hoằng Tháo · Ý nghĩa: mở kỷ nguyên độc lập tự chủ.",
+        "speech": [
+          { "text": "Nguyên nhân trực tiếp năm 938 là nhà Nam Hán cử Lưu Hoằng Tháo kéo thuỷ quân sang xâm lược nước ta.", "durationMs": 4500 },
+          { "text": "Ngô Quyền cho đóng bãi cọc gỗ đầu bịt sắt tại cửa sông Bạch Đằng và lợi dụng thuỷ triều lên xuống.", "durationMs": 4700 },
+          { "text": "Kết quả, thuỷ quân Nam Hán đại bại, Hoằng Tháo tử trận và mộng xâm lược bị đập tan.", "durationMs": 4400 },
+          { "text": "Ý nghĩa lịch sử to lớn là chấm dứt hơn 1.000 năm Bắc thuộc, mở ra kỷ nguyên độc lập tự chủ lâu dài.", "durationMs": 4400 }
+        ]
+      },
+      "tieuChi": ["Đủ 4 khối Nguyên nhân → Diễn biến → Kết quả → Ý nghĩa", "Mũi tên nối đúng trình tự lời giảng"]
+    },
+    {
+      "id": "cmt8-nguyen-nhan-y-nghia",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Nguyên nhân thắng lợi và ý nghĩa Cách mạng tháng Tám 1945",
+        "slideText": "Nguyên nhân: chuẩn bị 15 năm + Nhật đầu hàng 8/1945 → Tổng khởi nghĩa 15 ngày → Thành lập nước VNDCCH → Mở kỷ nguyên độc lập tự do.",
+        "speech": [
+          { "text": "Cách mạng tháng Tám năm 1945 nổ ra khi lực lượng trong nước đã chuẩn bị suốt 15 năm và phát xít Nhật đầu hàng Đồng minh.", "durationMs": 5000 },
+          { "text": "Nhân dân cả nước tổng khởi nghĩa giành chính quyền nhanh chóng trong 15 ngày.", "durationMs": 4200 },
+          { "text": "Kết quả là khai sinh nước Việt Nam Dân chủ Cộng hoà ngày 2 tháng 9 năm 1945, mở ra kỷ nguyên độc lập tự do.", "durationMs": 5000 }
+        ]
+      },
+      "tieuChi": ["Mạch nhân quả 4 bước rõ ràng", "Nhấn mạnh ý nghĩa lịch sử ở beat cuối"]
+    },
+    {
+      "id": "doi-moi-1986-nhan-qua",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Công cuộc Đổi mới từ năm 1986: từ bối cảnh đến thành tựu",
+        "slideText": "Nguyên nhân: khủng hoảng kinh tế – xã hội → Đại hội VI (12/1986) đổi mới kinh tế → Kết quả: thoát khủng hoảng, tăng trưởng → Ý nghĩa: nâng cao vị thế Việt Nam.",
+        "speech": [
+          { "text": "Trước khủng hoảng kinh tế xã hội nghiêm trọng, Đại hội VI tháng 12 năm 1986 đã khởi xướng công cuộc Đổi mới.", "durationMs": 5000 },
+          { "text": "Chuyển sang kinh tế hàng hoá nhiều thành phần dẫn đến kết quả thoát khỏi khủng hoảng và hội nhập sâu rộng.", "durationMs": 5200 }
+        ]
+      },
+      "tieuChi": ["Thể hiện đầy đủ chuỗi nhân quả", "Giọng trung lập chuẩn SGK"]
+    },
+    {
+      "id": "khong-chon-chan-dung",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 7,
+        "title": "Tiểu sử danh tướng Trần Hưng Đạo",
+        "slideText": "Trần Quốc Tuấn (1228–1300), tác giả Hịch tướng sĩ và Binh thư yếu lược.",
+        "speech": [
+          { "text": "Trần Quốc Tuấn sinh năm 1228 mất năm 1300, là Quốc công Tiết chế lãnh đạo quân dân nhà Trần.", "durationMs": 5200 }
+        ]
+      },
+      "tieuChi": ["Không chọn: cảnh tiểu sử nhân vật, dùng chan-dung-nhan-vat"]
+    },
+    {
+      "id": "khong-chon-ban-do-dbp",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Mũi tiến công ba đợt Chiến dịch Điện Biên Phủ",
+        "slideText": "Tuần Giáo → Him Lam → Đồi A1 → Hầm Đờ Cát.",
+        "speech": [
+          { "text": "Đợt 1 từ Tuần Giáo đánh Him Lam và Độc Lập, đợt 2 đánh Đồi A1, đợt 3 đánh Hầm Đờ Cát.", "durationMs": 5500 }
+        ]
+      },
+      "tieuChi": ["Không chọn: có mũi tên địa danh chiến dịch, dùng ban-do-chien-dich"]
+    }
+  ]
+}

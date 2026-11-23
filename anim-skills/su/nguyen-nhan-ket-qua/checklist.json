@@ -1,0 +1,20 @@
+{
+  "requires": [
+    { "selector": "[data-ek-beat=\"0\"]", "min": 1 },
+    { "selector": "[data-ek-beat=\"3\"]", "min": 1 },
+    { "selector": ".ek-card", "min": 4, "max": 6 }
+  ],
+  "motion": [
+    { "kind": "before", "a": "[data-ek-beat=\"0\"]", "b": "[data-ek-beat=\"1\"]" },
+    { "kind": "before", "a": "[data-ek-beat=\"2\"]", "b": "[data-ek-beat=\"3\"]" }
+  ],
+  "limits": {
+    "cameraMoves": 1,
+    "labels": 12,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

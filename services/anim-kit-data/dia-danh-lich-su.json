@@ -1,0 +1,1091 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-23",
+  "note": "Bộ địa danh lịch sử Việt Nam phục vụ gói môn Lịch sử (CTGDPT 2018). Mọi toạ độ đều đối chiếu từ Wikidata (P625) hoặc OpenStreetMap (ODbL) có ghi nguồn rõ ràng; không có toạ độ do AI tự sinh. Bản đồ nền thuộc gói Địa (services/anim-kit-data/geo/); sử dụng góc nhìn Việt Nam (_vnm) thể hiện đầy đủ chủ quyền Việt Nam đối với Quần đảo Hoàng Sa và Quần đảo Trường Sa.",
+  "places": [
+    {
+      "id": "hoang-sa",
+      "ten": "Quần đảo Hoàng Sa",
+      "tenKhac": ["Hoàng Sa", "Bãi Cát Vàng", "Vạn Lý Trường Sa"],
+      "lat": 16.65461,
+      "lon": 112.74719,
+      "loai": "quan-dao",
+      "thoiKy": ["Thế kỷ XVII – nay"],
+      "tinhHienNay": "Thành phố Đà Nẵng",
+      "moTaNgan": "Quần đảo thuộc chủ quyền Việt Nam trên Biển Đông, được chúa Nguyễn lập đội Hoàng Sa khai thác và quản lý từ thế kỷ XVII.",
+      "nguon": {
+        "wikidataQid": "Q274388",
+        "taiLieu": "Wikidata Q274388 (P625); SGK Lịch sử 11 (CTGDPT 2018), Chủ đề 6",
+        "url": "https://www.wikidata.org/wiki/Q274388"
+      }
+    },
+    {
+      "id": "truong-sa",
+      "ten": "Quần đảo Trường Sa",
+      "tenKhac": ["Trường Sa", "Đội Bắc Hải"],
+      "lat": 10.0,
+      "lon": 114.0,
+      "loai": "quan-dao",
+      "thoiKy": ["Thế kỷ XVII – nay", "4/1975"],
+      "tinhHienNay": "Tỉnh Khánh Hoà",
+      "moTaNgan": "Quần đảo thuộc chủ quyền Việt Nam trên Biển Đông; được đội Bắc Hải thực thi chủ quyền từ thời chúa Nguyễn và giải phóng tháng 4/1975.",
+      "nguon": {
+        "wikidataQid": "Q215664",
+        "taiLieu": "Wikidata Q215664 (P625); SGK Lịch sử 11 (CTGDPT 2018), Chủ đề 6",
+        "url": "https://www.wikidata.org/wiki/Q215664"
+      }
+    },
+    {
+      "id": "co-loa",
+      "ten": "Thành Cổ Loa",
+      "tenKhac": ["Cổ Loa", "Kinh đô Âu Lạc"],
+      "lat": 21.11341,
+      "lon": 105.87321,
+      "loai": "kinh-do",
+      "thoiKy": ["Thế kỷ III TCN", "939–944"],
+      "tinhHienNay": "Thành phố Hà Nội",
+      "moTaNgan": "Kinh đô nước Âu Lạc thời An Dương Vương và kinh đô nhà Ngô (939–944).",
+      "nguon": {
+        "wikidataQid": "Q798059",
+        "taiLieu": "Wikidata Q798059 (P625); SGK Lịch sử và Địa lí 6",
+        "url": "https://www.wikidata.org/wiki/Q798059"
+      }
+    },
+    {
+      "id": "hoa-lu",
+      "ten": "Cố đô Hoa Lư",
+      "tenKhac": ["Hoa Lư", "Kinh đô Đại Cồ Việt"],
+      "lat": 20.25528,
+      "lon": 105.95417,
+      "loai": "kinh-do",
+      "thoiKy": ["968–1010"],
+      "tinhHienNay": "Tỉnh Ninh Bình",
+      "moTaNgan": "Kinh đô đầu tiên của nhà nước phong kiến tập quyền Đại Cồ Việt thời Đinh – Tiền Lê.",
+      "nguon": {
+        "wikidataQid": "Q2421186",
+        "taiLieu": "Wikidata Q2421186 (P625); SGK Lịch sử và Địa lí 7",
+        "url": "https://www.wikidata.org/wiki/Q2421186"
+      }
+    },
+    {
+      "id": "thang-long-ha-noi",
+      "ten": "Thăng Long – Hà Nội",
+      "tenKhac": ["Thăng Long", "Đông Đô", "Đông Kinh", "Hà Nội"],
+      "lat": 21.0245,
+      "lon": 105.84117,
+      "loai": "kinh-do",
+      "thoiKy": ["1010–nay"],
+      "tinhHienNay": "Thành phố Hà Nội",
+      "moTaNgan": "Kinh đô Đại Việt từ năm 1010 (Lý Công Uẩn dời đô) và Thủ đô nước Cộng hoà xã hội chủ nghĩa Việt Nam.",
+      "nguon": {
+        "wikidataQid": "Q1858",
+        "taiLieu": "Wikidata Q1858 (P625); SGK Lịch sử CTGDPT 2018",
+        "url": "https://www.wikidata.org/wiki/Q1858"
+      }
+    },
+    {
+      "id": "thanh-nha-ho",
+      "ten": "Thành nhà Hồ",
+      "tenKhac": ["Tây Đô", "Thành An Tôn"],
+      "lat": 20.07806,
+      "lon": 105.60472,
+      "loai": "kinh-do",
+      "thoiKy": ["1397–1407"],
+      "tinhHienNay": "Tỉnh Thanh Hoá",
+      "moTaNgan": "Kinh đô nước Đại Ngu dưới triều nhà Hồ, Di sản Văn hoá Thế giới UNESCO.",
+      "nguon": {
+        "wikidataQid": "Q190060",
+        "taiLieu": "Wikidata Q190060 (P625); SGK Lịch sử và Địa lí 7",
+        "url": "https://www.wikidata.org/wiki/Q190060"
+      }
+    },
+    {
+      "id": "phu-xuan-hue",
+      "ten": "Phú Xuân – Huế",
+      "tenKhac": ["Phú Xuân", "Huế", "Kinh đô Huế", "Thuận Hoá"],
+      "lat": 16.46389,
+      "lon": 107.58667,
+      "loai": "kinh-do",
+      "thoiKy": ["1687–1945", "1968", "3/1975"],
+      "tinhHienNay": "Thành phố Huế",
+      "moTaNgan": "Thủ phủ Đàng Trong, kinh đô triều Tây Sơn và triều Nguyễn; mặt trận quan trọng các năm 1945, 1968, 1975.",
+      "nguon": {
+        "wikidataQid": "Q36399",
+        "taiLieu": "Wikidata Q36399 (P625); SGK Lịch sử CTGDPT 2018",
+        "url": "https://www.wikidata.org/wiki/Q36399"
+      }
+    },
+    {
+      "id": "gia-dinh-sai-gon",
+      "ten": "Gia Định – Sài Gòn (TP. Hồ Chí Minh)",
+      "tenKhac": ["Gia Định", "Sài Gòn", "Thành phố Hồ Chí Minh", "TP.HCM"],
+      "lat": 10.77556,
+      "lon": 106.70194,
+      "loai": "dia-phuong",
+      "thoiKy": ["1698–nay", "25/8/1945", "30/4/1975"],
+      "tinhHienNay": "Thành phố Hồ Chí Minh",
+      "moTaNgan": "Trung tâm kinh tế, chính trị phía Nam; đích đến cuối cùng của Chiến dịch Hồ Chí Minh ngày 30/4/1975.",
+      "nguon": {
+        "wikidataQid": "Q1854",
+        "taiLieu": "Wikidata Q1854 (P625); SGK Lịch sử CTGDPT 2018",
+        "url": "https://www.wikidata.org/wiki/Q1854"
+      }
+    },
+    {
+      "id": "dinh-doc-lap",
+      "ten": "Dinh Độc Lập",
+      "tenKhac": ["Hội trường Thống Nhất", "Dinh Thống Nhất"],
+      "lat": 10.77705,
+      "lon": 106.69537,
+      "loai": "di-tich",
+      "thoiKy": ["30/4/1975"],
+      "tinhHienNay": "Thành phố Hồ Chí Minh",
+      "moTaNgan": "Nơi ghi dấu mốc 11 giờ 30 phút ngày 30/4/1975, kết thúc thắng lợi cuộc kháng chiến chống Mỹ, cứu nước.",
+      "nguon": {
+        "wikidataQid": "Q933384",
+        "taiLieu": "Wikidata Q933384 (P625); SGK Lịch sử 12 (CTGDPT 2018)",
+        "url": "https://www.wikidata.org/wiki/Q933384"
+      }
+    },
+    {
+      "id": "bach-dang",
+      "ten": "Sông Bạch Đằng",
+      "tenKhac": ["Bạch Đằng", "Cửa sông Bạch Đằng", "Bãi cọc Bạch Đằng"],
+      "lat": 20.8442,
+      "lon": 106.6317,
+      "loai": "chien-truong",
+      "thoiKy": ["938", "981", "1288"],
+      "tinhHienNay": "TP. Hải Phòng – Tỉnh Quảng Ninh",
+      "moTaNgan": "Địa danh gắn với ba chiến thắng thuỷ chiến lịch sử của Ngô Quyền (938), Lê Hoàn (981) và Trần Hưng Đạo (1288).",
+      "nguon": {
+        "wikidataQid": "Q4838688",
+        "taiLieu": "Wikidata Q4838688 (P625); SGK Lịch sử CTGDPT 2018",
+        "url": "https://www.wikidata.org/wiki/Q4838688"
+      }
+    },
+    {
+      "id": "nhu-nguyet",
+      "ten": "Phòng tuyến sông Như Nguyệt",
+      "tenKhac": ["Như Nguyệt", "Sông Cầu"],
+      "lat": 21.68389,
+      "lon": 105.86194,
+      "loai": "chien-truong",
+      "thoiKy": ["1077"],
+      "tinhHienNay": "Tỉnh Bắc Ninh",
+      "moTaNgan": "Phòng tuyến chiến lược do Lý Thường Kiệt xây dựng chặn đứng quân Tống năm 1077.",
+      "nguon": {
+        "wikidataQid": "Q10822794",
+        "taiLieu": "Wikidata Q10822794 (Sông Cầu, P625); Q10829781 (Trận Như Nguyệt); SGK Lịch sử 7 & 11",
+        "url": "https://www.wikidata.org/wiki/Q10822794"
+      }
+    },
+    {
+      "id": "ham-tu",
+      "ten": "Bến Hàm Tử",
+      "tenKhac": ["Hàm Tử"],
+      "lat": 20.84889,
+      "lon": 105.94389,
+      "loai": "chien-truong",
+      "thoiKy": ["1285"],
+      "tinhHienNay": "Tỉnh Hưng Yên",
+      "moTaNgan": "Trận đánh mở đầu đợt phản công chiến lược đánh bại quân Nguyên năm 1285.",
+      "nguon": {
+        "wikidataQid": "Q10770693",
+        "taiLieu": "Wikidata Q10770693 (P625); SGK Lịch sử và Địa lí 7",
+        "url": "https://www.wikidata.org/wiki/Q10770693"
+      }
+    },
+    {
+      "id": "chuong-duong",
+      "ten": "Bến Chương Dương",
+      "tenKhac": ["Chương Dương", "Chương Dương Độ"],
+      "lat": 20.83539,
+      "lon": 105.89827,
+      "loai": "chien-truong",
+      "thoiKy": ["1285"],
+      "tinhHienNay": "Thành phố Hà Nội",
+      "moTaNgan": "Chiến thắng của Trần Quang Khải năm 1285 mở đường tiến vào giải phóng Thăng Long.",
+      "nguon": {
+        "taiLieu": "OpenStreetMap relation/19411382 (Xã Chương Dương, Hà Nội); SGK Lịch sử và Địa lí 7",
+        "url": "https://www.openstreetmap.org/relation/19411382"
+      }
+    },
+    {
+      "id": "van-don",
+      "ten": "Thương cảng & Chiến trường Vân Đồn",
+      "tenKhac": ["Vân Đồn", "Cửa Lục"],
+      "lat": 21.06937,
+      "lon": 107.42024,
+      "loai": "thuong-cang",
+      "thoiKy": ["Thế kỷ XII–XIV", "1288"],
+      "tinhHienNay": "Tỉnh Quảng Ninh",
+      "moTaNgan": "Thương cảng lớn thời Lý – Trần và nơi Trần Khánh Dư tiêu diệt đoàn thuyền lương Trương Văn Hổ năm 1288.",
+      "nguon": {
+        "wikidataQid": "Q7913303",
+        "taiLieu": "Wikidata Q7913303 (P625); SGK Lịch sử và Địa lí 7",
+        "url": "https://www.wikidata.org/wiki/Q7913303"
+      }
+    },
+    {
+      "id": "lam-son",
+      "ten": "Căn cứ Lam Sơn",
+      "tenKhac": ["Lam Sơn", "Lam Kinh"],
+      "lat": 19.92985,
+      "lon": 105.40709,
+      "loai": "can-cu",
+      "thoiKy": ["1418–1427"],
+      "tinhHienNay": "Tỉnh Thanh Hoá",
+      "moTaNgan": "Nơi Lê Lợi dựng cờ khởi nghĩa chống quân Minh năm 1418.",
+      "nguon": {
+        "wikidataQid": "Q10784247",
+        "taiLieu": "Wikidata Q10784247 (Lam Kinh, P625); SGK Lịch sử 11",
+        "url": "https://www.wikidata.org/wiki/Q10784247"
+      }
+    },
+    {
+      "id": "tot-dong-chuc-dong",
+      "ten": "Tốt Động – Chúc Động",
+      "tenKhac": ["Tốt Động", "Chúc Động"],
+      "lat": 20.88167,
+      "lon": 105.67194,
+      "loai": "chien-truong",
+      "thoiKy": ["11/1426"],
+      "tinhHienNay": "Thành phố Hà Nội",
+      "moTaNgan": "Trận đại thắng của nghĩa quân Lam Sơn đánh bại chủ lực quân Minh do Vương Thông chỉ huy.",
+      "nguon": {
+        "wikidataQid": "Q10831724",
+        "taiLieu": "Wikidata Q10831724 (Tốt Động, P625); SGK Lịch sử 11",
+        "url": "https://www.wikidata.org/wiki/Q10831724"
+      }
+    },
+    {
+      "id": "chi-lang",
+      "ten": "Ải Chi Lăng",
+      "tenKhac": ["Chi Lăng"],
+      "lat": 21.667,
+      "lon": 106.667,
+      "loai": "chien-truong",
+      "thoiKy": ["981", "10/1427"],
+      "tinhHienNay": "Tỉnh Lạng Sơn",
+      "moTaNgan": "Cửa ải hiểm yếu phía Bắc, nơi nghĩa quân Lam Sơn phục kích tiêu diệt Liễu Thăng tháng 10/1427.",
+      "nguon": {
+        "wikidataQid": "Q5095074",
+        "taiLieu": "Wikidata Q5095074 (P625); SGK Lịch sử 11",
+        "url": "https://www.wikidata.org/wiki/Q5095074"
+      }
+    },
+    {
+      "id": "xuong-giang",
+      "ten": "Thành Xương Giang",
+      "tenKhac": ["Xương Giang"],
+      "lat": 21.29444,
+      "lon": 106.20972,
+      "loai": "chien-truong",
+      "thoiKy": ["10/1427"],
+      "tinhHienNay": "Tỉnh Bắc Giang",
+      "moTaNgan": "Trận quyết chiến cuối cùng của khởi nghĩa Lam Sơn tiêu diệt viện binh nhà Minh.",
+      "nguon": {
+        "wikidataQid": "Q2590709",
+        "taiLieu": "Wikidata Q2590709 (P625); SGK Lịch sử 11",
+        "url": "https://www.wikidata.org/wiki/Q2590709"
+      }
+    },
+    {
+      "id": "pho-hien",
+      "ten": "Phố Hiến",
+      "tenKhac": ["Hiến Nam"],
+      "lat": 20.6409,
+      "lon": 106.05692,
+      "loai": "thuong-cang",
+      "thoiKy": ["Thế kỷ XVI–XVII"],
+      "tinhHienNay": "Tỉnh Hưng Yên",
+      "moTaNgan": "Đô thị thương cảng sầm uất bậc nhất Đàng Ngoài thế kỷ XVII.",
+      "nguon": {
+        "wikidataQid": "Q10807145",
+        "taiLieu": "Wikidata Q10807145 (P625); SGK Lịch sử và Địa lí 8",
+        "url": "https://www.wikidata.org/wiki/Q10807145"
+      }
+    },
+    {
+      "id": "hoi-an",
+      "ten": "Thương cảng Hội An",
+      "tenKhac": ["Hội An", "Faifo"],
+      "lat": 15.87767,
+      "lon": 108.33265,
+      "loai": "thuong-cang",
+      "thoiKy": ["Thế kỷ XVI–XVIII"],
+      "tinhHienNay": "Thành phố Đà Nẵng",
+      "moTaNgan": "Thương cảng quốc tế lớn nhất Đàng Trong thế kỷ XVI–XVIII và điểm xuất phát hải trình ra Biển Đông.",
+      "nguon": {
+        "wikidataQid": "Q36160",
+        "taiLieu": "Wikidata Q36160 (P625); SGK Lịch sử và Địa lí 8",
+        "url": "https://www.wikidata.org/wiki/Q36160"
+      }
+    },
+    {
+      "id": "my-son",
+      "ten": "Thánh địa Mỹ Sơn",
+      "tenKhac": ["Mỹ Sơn"],
+      "lat": 15.76667,
+      "lon": 108.11667,
+      "loai": "di-tich",
+      "thoiKy": ["Thế kỷ IV–XIII"],
+      "tinhHienNay": "Thành phố Đà Nẵng",
+      "moTaNgan": "Quần thể đền tháp tiêu biểu của vương quốc Chăm-pa cổ, Di sản Văn hoá Thế giới.",
+      "nguon": {
+        "wikidataQid": "Q391406",
+        "taiLieu": "Wikidata Q391406 (P625); SGK Lịch sử 10 (CTGDPT 2018)",
+        "url": "https://www.wikidata.org/wiki/Q391406"
+      }
+    },
+    {
+      "id": "tay-son",
+      "ten": "Căn cứ Tây Sơn",
+      "tenKhac": ["Tây Sơn Thượng đạo", "Tây Sơn Hạ đạo", "Bình Định"],
+      "lat": 13.90749,
+      "lon": 108.92257,
+      "loai": "can-cu",
+      "thoiKy": ["1771–1789"],
+      "tinhHienNay": "Tỉnh Bình Định",
+      "moTaNgan": "Nơi ba anh em Nguyễn Nhạc, Nguyễn Huệ, Nguyễn Lữ khởi phát phong trào Tây Sơn năm 1771.",
+      "nguon": {
+        "wikidataQid": "Q1320837",
+        "taiLieu": "Wikidata Q1320837 (P625); SGK Lịch sử và Địa lí 8",
+        "url": "https://www.wikidata.org/wiki/Q1320837"
+      }
+    },
+    {
+      "id": "rach-gam-xoai-mut",
+      "ten": "Rạch Gầm – Xoài Mút",
+      "tenKhac": ["Rạch Gầm", "Xoài Mút"],
+      "lat": 10.33889,
+      "lon": 106.325,
+      "loai": "chien-truong",
+      "thoiKy": ["1/1785"],
+      "tinhHienNay": "Tỉnh Tiền Giang",
+      "moTaNgan": "Trận thuỷ chiến của Nguyễn Huệ đánh tan 5 vạn quân Xiêm xâm lược trên sông Tiền tháng 1/1785.",
+      "nguon": {
+        "wikidataQid": "Q1047091",
+        "taiLieu": "Wikidata Q1047091 (P625); SGK Lịch sử 11",
+        "url": "https://www.wikidata.org/wiki/Q1047091"
+      }
+    },
+    {
+      "id": "ngoc-hoi-dong-da",
+      "ten": "Ngọc Hồi – Đống Đa",
+      "tenKhac": ["Gò Đống Đa", "Đống Đa", "Ngọc Hồi"],
+      "lat": 21.012,
+      "lon": 105.824,
+      "loai": "chien-truong",
+      "thoiKy": ["Xuân Kỷ Dậu 1789"],
+      "tinhHienNay": "Thành phố Hà Nội",
+      "moTaNgan": "Chiến trường quyết định trong cuộc đại phá 29 vạn quân Thanh của vua Quang Trung dịp Tết Kỷ Dậu 1789.",
+      "nguon": {
+        "wikidataQid": "Q10763516",
+        "taiLieu": "Wikidata Q10763516 (Gò Đống Đa, P625); Q3539853; SGK Lịch sử 11",
+        "url": "https://www.wikidata.org/wiki/Q10763516"
+      }
+    },
+    {
+      "id": "ban-dao-son-tra-da-nang",
+      "ten": "Đà Nẵng (Bán đảo Sơn Trà)",
+      "tenKhac": ["Đà Nẵng", "Sơn Trà", "Cửa biển Đà Nẵng"],
+      "lat": 16.06944,
+      "lon": 108.20972,
+      "loai": "chien-truong",
+      "thoiKy": ["1858–1859", "29/3/1975"],
+      "tinhHienNay": "Thành phố Đà Nẵng",
+      "moTaNgan": "Nơi liên quân Pháp – Tây Ban Nha nổ súng xâm lược ngày 1/9/1858 và căn cứ lớn được giải phóng ngày 29/3/1975.",
+      "nguon": {
+        "wikidataQid": "Q25282",
+        "taiLieu": "Wikidata Q25282 (P625); SGK Lịch sử 8 & 12",
+        "url": "https://www.wikidata.org/wiki/Q25282"
+      }
+    },
+    {
+      "id": "huong-khe",
+      "ten": "Căn cứ Hương Khê",
+      "tenKhac": ["Hương Khê", "Vụ Quang"],
+      "lat": 18.17083,
+      "lon": 105.7,
+      "loai": "can-cu",
+      "thoiKy": ["1885–1896"],
+      "tinhHienNay": "Tỉnh Hà Tĩnh",
+      "moTaNgan": "Căn cứ chính của cuộc khởi nghĩa Hương Khê do Phan Đình Phùng và Cao Thắng lãnh đạo.",
+      "nguon": {
+        "wikidataQid": "Q1001809",
+        "taiLieu": "Wikidata Q1001809 (P625); SGK Lịch sử và Địa lí 8",
+        "url": "https://www.wikidata.org/wiki/Q1001809"
+      }
+    },
+    {
+      "id": "ba-dinh-nga-son",
+      "ten": "Căn cứ Ba Đình (Nga Sơn)",
+      "tenKhac": ["Ba Đình Thanh Hoá", "Nga Sơn"],
+      "lat": 19.98333,
+      "lon": 105.96667,
+      "loai": "can-cu",
+      "thoiKy": ["1886–1887"],
+      "tinhHienNay": "Tỉnh Thanh Hoá",
+      "moTaNgan": "Căn cứ của cuộc khởi nghĩa Ba Đình (Phạm Bành, Đinh Công Tráng) trong phong trào Cần Vương.",
+      "nguon": {
+        "wikidataQid": "Q7021817",
+        "taiLieu": "Wikidata Q7021817 (P625); SGK Lịch sử và Địa lí 8",
+        "url": "https://www.wikidata.org/wiki/Q7021817"
+      }
+    },
+    {
+      "id": "yen-the",
+      "ten": "Căn cứ Yên Thế",
+      "tenKhac": ["Yên Thế", "Phồn Xương"],
+      "lat": 21.517,
+      "lon": 106.133,
+      "loai": "can-cu",
+      "thoiKy": ["1884–1913"],
+      "tinhHienNay": "Tỉnh Bắc Giang",
+      "moTaNgan": "Địa bàn phong trào nông dân Yên Thế do Đề Nắm và Hoàng Hoa Thám lãnh đạo kéo dài gần 30 năm.",
+      "nguon": {
+        "wikidataQid": "Q1924620",
+        "taiLieu": "Wikidata Q1924620 (P625); SGK Lịch sử và Địa lí 8",
+        "url": "https://www.wikidata.org/wiki/Q1924620"
+      }
+    },
+    {
+      "id": "son-tay",
+      "ten": "Thành cổ Sơn Tây",
+      "tenKhac": ["Sơn Tây"],
+      "lat": 21.1388,
+      "lon": 105.5042,
+      "loai": "thanh-co",
+      "thoiKy": ["1822", "1883"],
+      "tinhHienNay": "Thành phố Hà Nội",
+      "moTaNgan": "Phòng tuyến bảo vệ phía Tây Bắc Kỳ cuối thế kỷ XIX.",
+      "nguon": {
+        "wikidataQid": "Q4240280",
+        "taiLieu": "Wikidata Q4240280 (P625); Wikipedia tiếng Việt",
+        "url": "https://www.wikidata.org/wiki/Q4240280"
+      }
+    },
+    {
+      "id": "ben-nha-rong",
+      "ten": "Bến Nhà Rồng",
+      "tenKhac": ["Thương cảng Sài Gòn", "Nhà Rồng"],
+      "lat": 10.76824,
+      "lon": 106.7068,
+      "loai": "di-tich",
+      "thoiKy": ["5/6/1911"],
+      "tinhHienNay": "Thành phố Hồ Chí Minh",
+      "moTaNgan": "Nơi người thanh niên yêu nước Nguyễn Tất Thành lên tàu Amiral Latouche-Tréville ra đi tìm đường cứu nước ngày 5/6/1911.",
+      "nguon": {
+        "wikidataQid": "Q10743440",
+        "taiLieu": "Wikidata Q10743440 (P625); SGK Lịch sử 9 & 12",
+        "url": "https://www.wikidata.org/wiki/Q10743440"
+      }
+    },
+    {
+      "id": "vinh-nghe-an",
+      "ten": "Vinh – Nghệ An (Xô viết Nghệ – Tĩnh)",
+      "tenKhac": ["Vinh", "Bến Thuỷ", "Nghệ An", "Nghệ Tĩnh"],
+      "lat": 18.67635,
+      "lon": 105.67655,
+      "loai": "dia-phuong",
+      "thoiKy": ["1930–1931", "1788–1789"],
+      "tinhHienNay": "Tỉnh Nghệ An",
+      "moTaNgan": "Tâm điểm phong trào cách mạng 1930–1931 với đỉnh cao Xô viết Nghệ – Tĩnh; nơi tuyển quân của vua Quang Trung cuối năm 1788.",
+      "nguon": {
+        "wikidataQid": "Q33428",
+        "taiLieu": "Wikidata Q33428 (P625); SGK Lịch sử 9 & 12",
+        "url": "https://www.wikidata.org/wiki/Q33428"
+      }
+    },
+    {
+      "id": "pac-bo",
+      "ten": "Hang Pác Bó",
+      "tenKhac": ["Pác Bó", "Suối Lê-nin"],
+      "lat": 22.978,
+      "lon": 106.054,
+      "loai": "can-cu",
+      "thoiKy": ["1941–1945"],
+      "tinhHienNay": "Tỉnh Cao Bằng",
+      "moTaNgan": "Nơi Nguyễn Ái Quốc trở về Tổ quốc (28/1/1941) và triệu tập Hội nghị Trung ương 8 thành lập Mặt trận Việt Minh.",
+      "nguon": {
+        "wikidataQid": "Q7263979",
+        "taiLieu": "Wikidata Q7263979 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q7263979"
+      }
+    },
+    {
+      "id": "tan-trao",
+      "ten": "Chiến khu Tân Trào",
+      "tenKhac": ["Tân Trào", "Đình Tân Trào", "Lán Nà Nưa"],
+      "lat": 21.77722,
+      "lon": 105.46806,
+      "loai": "can-cu",
+      "thoiKy": ["8/1945", "1946–1954"],
+      "tinhHienNay": "Tỉnh Tuyên Quang",
+      "moTaNgan": "Thủ đô Khu giải phóng Việt Bắc, nơi diễn ra Quốc dân Đại hội (16–17/8/1945) phát động Tổng khởi nghĩa.",
+      "nguon": {
+        "wikidataQid": "Q10830937",
+        "taiLieu": "Wikidata Q10830937 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q10830937"
+      }
+    },
+    {
+      "id": "ba-dinh-ha-noi",
+      "ten": "Quảng trường Ba Đình",
+      "tenKhac": ["Ba Đình Hà Nội"],
+      "lat": 21.03667,
+      "lon": 105.83583,
+      "loai": "di-tich",
+      "thoiKy": ["2/9/1945"],
+      "tinhHienNay": "Thành phố Hà Nội",
+      "moTaNgan": "Nơi Chủ tịch Hồ Chí Minh đọc bản Tuyên ngôn Độc lập khai sinh nước Việt Nam Dân chủ Cộng hoà ngày 2/9/1945.",
+      "nguon": {
+        "wikidataQid": "Q2234574",
+        "taiLieu": "Wikidata Q2234574 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q2234574"
+      }
+    },
+    {
+      "id": "viet-bac",
+      "ten": "Căn cứ địa Việt Bắc",
+      "tenKhac": ["Việt Bắc", "ATK Thái Nguyên"],
+      "lat": 21.66667,
+      "lon": 105.83333,
+      "loai": "can-cu",
+      "thoiKy": ["1945–1954", "1947"],
+      "tinhHienNay": "Tỉnh Thái Nguyên – Tuyên Quang – Cao Bằng",
+      "moTaNgan": "Căn cứ địa đầu não của cuộc kháng chiến chống thực dân Pháp và địa bàn Chiến dịch Việt Bắc thu – đông 1947.",
+      "nguon": {
+        "wikidataQid": "Q26575",
+        "taiLieu": "Wikidata Q26575 (Thái Nguyên, trung tâm ATK Việt Bắc, P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q26575"
+      }
+    },
+    {
+      "id": "cao-bang",
+      "ten": "Cao Bằng",
+      "tenKhac": ["Thị xã Cao Bằng"],
+      "lat": 22.75,
+      "lon": 106.08333,
+      "loai": "dia-phuong",
+      "thoiKy": ["1941–1950"],
+      "tinhHienNay": "Tỉnh Cao Bằng",
+      "moTaNgan": "Điểm đầu Đường số 4 trong Chiến dịch Biên giới thu – đông 1950.",
+      "nguon": {
+        "wikidataQid": "Q36865",
+        "taiLieu": "Wikidata Q36865 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q36865"
+      }
+    },
+    {
+      "id": "dong-khe",
+      "ten": "Cứ điểm Đông Khê",
+      "tenKhac": ["Đông Khê"],
+      "lat": 22.4242,
+      "lon": 106.44,
+      "loai": "chien-truong",
+      "thoiKy": ["16–18/9/1950"],
+      "tinhHienNay": "Tỉnh Cao Bằng",
+      "moTaNgan": "Trận mở màn thắng lợi của Chiến dịch Biên giới thu – đông 1950.",
+      "nguon": {
+        "wikidataQid": "Q10840765",
+        "taiLieu": "Wikidata Q10840765 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q10840765"
+      }
+    },
+    {
+      "id": "that-khe",
+      "ten": "Thất Khê",
+      "tenKhac": ["Cứ điểm Thất Khê"],
+      "lat": 22.2562,
+      "lon": 106.476,
+      "loai": "chien-truong",
+      "thoiKy": ["10/1950"],
+      "tinhHienNay": "Tỉnh Lạng Sơn",
+      "moTaNgan": "Vị trí then chốt trên Đường số 4 nơi quân Pháp rút chạy trong Chiến dịch Biên giới 1950.",
+      "nguon": {
+        "wikidataQid": "Q10826350",
+        "taiLieu": "Wikidata Q10826350 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q10826350"
+      }
+    },
+    {
+      "id": "lang-son",
+      "ten": "Lạng Sơn",
+      "tenKhac": ["Đường số 4 Lạng Sơn"],
+      "lat": 21.75,
+      "lon": 106.5,
+      "loai": "dia-phuong",
+      "thoiKy": ["10/1950"],
+      "tinhHienNay": "Tỉnh Lạng Sơn",
+      "moTaNgan": "Địa bàn biên giới phía Bắc được giải phóng tháng 10/1950 trong Chiến dịch Biên giới.",
+      "nguon": {
+        "wikidataQid": "Q33403",
+        "taiLieu": "Wikidata Q33403 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q33403"
+      }
+    },
+    {
+      "id": "tuan-giao",
+      "ten": "Tuần Giáo",
+      "tenKhac": ["Ngã ba Tuần Giáo", "Đường 41"],
+      "lat": 21.667,
+      "lon": 103.333,
+      "loai": "can-cu",
+      "thoiKy": ["1954"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Đầu mối hậu cần, tập kết lực lượng và kéo pháo trên trục Đường 41 vào chiến trường Điện Biên Phủ.",
+      "nguon": {
+        "wikidataQid": "Q7484848",
+        "taiLieu": "Wikidata Q7484848 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q7484848"
+      }
+    },
+    {
+      "id": "muong-phang",
+      "ten": "Sở chỉ huy Mường Phăng",
+      "tenKhac": ["Mường Phăng", "Sở chỉ huy Chiến dịch Điện Biên Phủ"],
+      "lat": 21.44306,
+      "lon": 103.15472,
+      "loai": "can-cu",
+      "thoiKy": ["31/1 – 15/5/1954"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Sở chỉ huy Chiến dịch Điện Biên Phủ của Đại tướng Võ Nguyên Giáp và Bộ Chỉ huy chiến dịch.",
+      "nguon": {
+        "wikidataQid": "Q6951158",
+        "taiLieu": "Wikidata Q6951158 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q6951158"
+      }
+    },
+    {
+      "id": "dien-bien-phu",
+      "ten": "Điện Biên Phủ",
+      "tenKhac": ["Lòng chảo Điện Biên", "Tập đoàn cứ điểm Điện Biên Phủ"],
+      "lat": 21.38694,
+      "lon": 103.01556,
+      "loai": "chien-truong",
+      "thoiKy": ["13/3 – 7/5/1954"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Thung lũng chiến lược ở Tây Bắc, nơi diễn ra Chiến dịch Điện Biên Phủ 56 ngày đêm năm 1954.",
+      "nguon": {
+        "wikidataQid": "Q604897",
+        "taiLieu": "Wikidata Q604897 (Battle of Dien Bien Phu, P625); Q36027; SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q604897"
+      }
+    },
+    {
+      "id": "him-lam",
+      "ten": "Cứ điểm Him Lam",
+      "tenKhac": ["Him Lam", "Đồi Him Lam", "Béatrice"],
+      "lat": 21.40578,
+      "lon": 103.02479,
+      "loai": "chien-truong",
+      "thoiKy": ["13/3/1954 (Đợt 1 Điện Biên Phủ)"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Cứ điểm tiền tiêu phía Đông Bắc Điện Biên Phủ bị Đại đoàn 312 tiêu diệt mở màn Đợt 1 ngày 13/3/1954.",
+      "nguon": {
+        "wikidataQid": "Q10829741",
+        "taiLieu": "Wikidata Q10829741 (Trận Him Lam); toạ độ OpenStreetMap way/1204347952",
+        "url": "https://www.wikidata.org/wiki/Q10829741"
+      }
+    },
+    {
+      "id": "doi-doc-lap",
+      "ten": "Cứ điểm Độc Lập",
+      "tenKhac": ["Đồi Độc Lập", "Cứ điểm Độc Lập", "Gabrielle"],
+      "lat": 21.42268,
+      "lon": 103.00727,
+      "loai": "chien-truong",
+      "thoiKy": ["14–15/3/1954 (Đợt 1 Điện Biên Phủ)"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Cứ điểm mạnh án ngữ phía Bắc phân khu Trung tâm, bị tiêu diệt sáng 15/3/1954 trong Đợt 1.",
+      "nguon": {
+        "wikidataQid": "Q10829847",
+        "taiLieu": "Wikidata Q10829847 (Trận đồi Độc Lập); toạ độ OpenStreetMap way/1204349341",
+        "url": "https://www.wikidata.org/wiki/Q10829847"
+      }
+    },
+    {
+      "id": "doi-c1",
+      "ten": "Đồi C1",
+      "tenKhac": ["Eliane 1"],
+      "lat": 21.38717,
+      "lon": 103.01846,
+      "loai": "chien-truong",
+      "thoiKy": ["30/3 – 1/5/1954 (Đợt 2–3 Điện Biên Phủ)"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Một trong các cao điểm quyết liệt phía Đông lòng chảo Điện Biên Phủ.",
+      "nguon": {
+        "taiLieu": "OpenStreetMap way/960016476 (Đồi C1, Điện Biên Phủ); SGK Lịch sử 12",
+        "url": "https://www.openstreetmap.org/way/960016476"
+      }
+    },
+    {
+      "id": "doi-a1",
+      "ten": "Đồi A1",
+      "tenKhac": ["Eliane 2"],
+      "lat": 21.38309,
+      "lon": 103.01762,
+      "loai": "chien-truong",
+      "thoiKy": ["30/3 – 7/5/1954 (Đợt 2–3 Điện Biên Phủ)"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Cứ điểm quan trọng bậc nhất bảo vệ trực tiếp Sở chỉ huy Đờ Cát; khối bộc phá gần 1 tấn nổ đêm 6/5 mở màn tổng công kích.",
+      "nguon": {
+        "wikidataQid": "Q10829845",
+        "taiLieu": "Wikidata Q10829845 (Trận đồi A1); toạ độ OpenStreetMap way/640290256",
+        "url": "https://www.wikidata.org/wiki/Q10829845"
+      }
+    },
+    {
+      "id": "muong-thanh",
+      "ten": "Sân bay Mường Thanh",
+      "tenKhac": ["Mường Thanh", "Sân bay Điện Biên"],
+      "lat": 21.40218,
+      "lon": 103.00051,
+      "loai": "chien-truong",
+      "thoiKy": ["3–5/1954 (Điện Biên Phủ)"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Yết hầu tiếp tế đường không của tập đoàn cứ điểm Điện Biên Phủ, bị quân ta cắt đôi trong Đợt 2.",
+      "nguon": {
+        "wikidataQid": "Q1654720",
+        "taiLieu": "Wikidata Q1654720 (Sân bay Điện Biên, P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q1654720"
+      }
+    },
+    {
+      "id": "ham-de-castries",
+      "ten": "Hầm Đờ Cát (Sở chỉ huy phân khu Trung tâm)",
+      "tenKhac": ["Hầm Đờ Cát", "Hầm De Castries"],
+      "lat": 21.38611,
+      "lon": 103.00987,
+      "loai": "di-tich",
+      "thoiKy": ["7/5/1954 (Đợt 3 Điện Biên Phủ)"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Sở chỉ huy tập đoàn cứ điểm Điện Biên Phủ; 17h30 ngày 7/5/1954 quân ta bắt sống tướng De Castries và toàn bộ Bộ tham mưu.",
+      "nguon": {
+        "taiLieu": "OpenStreetMap way/1204349012 (Di tích Hầm Đờ Cát); SGK Lịch sử 12",
+        "url": "https://www.openstreetmap.org/way/1204349012"
+      }
+    },
+    {
+      "id": "hong-cum",
+      "ten": "Phân khu Hồng Cúm",
+      "tenKhac": ["Hồng Cúm", "Isabelle"],
+      "lat": 21.30182,
+      "lon": 103.04648,
+      "loai": "chien-truong",
+      "thoiKy": ["7–8/5/1954 (Đợt 3 Điện Biên Phủ)"],
+      "tinhHienNay": "Tỉnh Điện Biên",
+      "moTaNgan": "Phân khu Nam của tập đoàn cứ điểm Điện Biên Phủ, bị bao vây và tiêu diệt hoàn toàn đêm 7/5/1954.",
+      "nguon": {
+        "taiLieu": "OpenStreetMap relation/19571191 (Xã Thanh An — địa bàn Hồng Cúm, Điện Biên); SGK Lịch sử 12",
+        "url": "https://www.openstreetmap.org/relation/19571191"
+      }
+    },
+    {
+      "id": "vi-tuyen-17-hien-luong",
+      "ten": "Cầu Hiền Lương – Sông Bến Hải (Vĩ tuyến 17)",
+      "tenKhac": ["Vĩ tuyến 17", "Cầu Hiền Lương", "Sông Bến Hải"],
+      "lat": 17.00437,
+      "lon": 107.05175,
+      "loai": "di-tich",
+      "thoiKy": ["1954–1975"],
+      "tinhHienNay": "Tỉnh Quảng Trị",
+      "moTaNgan": "Giới tuyến quân sự tạm thời theo Hiệp định Giơ-ne-vơ 1954.",
+      "nguon": {
+        "wikidataQid": "Q1537236",
+        "taiLieu": "Wikidata Q1537236 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q1537236"
+      }
+    },
+    {
+      "id": "ben-tre",
+      "ten": "Bến Tre (Phong trào Đồng khởi)",
+      "tenKhac": ["Bến Tre", "Mỏ Cày"],
+      "lat": 10.16667,
+      "lon": 106.5,
+      "loai": "chien-truong",
+      "thoiKy": ["17/1/1960"],
+      "tinhHienNay": "Tỉnh Bến Tre",
+      "moTaNgan": "Nơi khởi phát tiêu biểu của phong trào Đồng khởi (1959–1960) ở miền Nam.",
+      "nguon": {
+        "wikidataQid": "Q33366",
+        "taiLieu": "Wikidata Q33366 (P625); Q10805519; SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q33366"
+      }
+    },
+    {
+      "id": "ap-bac",
+      "ten": "Chiến thắng Ấp Bắc",
+      "tenKhac": ["Ấp Bắc"],
+      "lat": 10.43833,
+      "lon": 106.19528,
+      "loai": "chien-truong",
+      "thoiKy": ["2/1/1963"],
+      "tinhHienNay": "Tỉnh Tiền Giang",
+      "moTaNgan": "Chiến thắng mở đầu khả năng đánh bại chiến thuật 'trực thăng vận', 'thiết xa vận' của Mỹ – chính quyền Sài Gòn.",
+      "nguon": {
+        "wikidataQid": "Q280468",
+        "taiLieu": "Wikidata Q280468 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q280468"
+      }
+    },
+    {
+      "id": "van-tuong",
+      "ten": "Chiến thắng Vạn Tường",
+      "tenKhac": ["Vạn Tường", "Bình Sơn"],
+      "lat": 15.28725,
+      "lon": 108.75857,
+      "loai": "chien-truong",
+      "thoiKy": ["18–19/8/1965"],
+      "tinhHienNay": "Tỉnh Quảng Ngãi",
+      "moTaNgan": "Trận thắng mở đầu cao trào đánh bại chiến lược 'Chiến tranh cục bộ' của Mỹ.",
+      "nguon": {
+        "wikidataQid": "Q3636651",
+        "taiLieu": "Wikidata Q3636651 (Trận Vạn Tường); toạ độ OpenStreetMap node/10599280867 (Bình Sơn, Quảng Ngãi)",
+        "url": "https://www.wikidata.org/wiki/Q3636651"
+      }
+    },
+    {
+      "id": "khe-sanh",
+      "ten": "Mặt trận Khe Sanh",
+      "tenKhac": ["Khe Sanh", "Đường 9 – Khe Sanh"],
+      "lat": 16.62721,
+      "lon": 106.73733,
+      "loai": "chien-truong",
+      "thoiKy": ["1968"],
+      "tinhHienNay": "Tỉnh Quảng Trị",
+      "moTaNgan": "Mặt trận nghi binh thu hút lực lượng địch phối hợp với Tổng tiến công Xuân Mậu Thân 1968.",
+      "nguon": {
+        "wikidataQid": "Q1924264",
+        "taiLieu": "Wikidata Q1924264 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q1924264"
+      }
+    },
+    {
+      "id": "thanh-co-quang-tri",
+      "ten": "Thành cổ Quảng Trị",
+      "tenKhac": ["Quảng Trị 1972"],
+      "lat": 16.75392,
+      "lon": 107.18951,
+      "loai": "chien-truong",
+      "thoiKy": ["6–9/1972 (81 ngày đêm)"],
+      "tinhHienNay": "Tỉnh Quảng Trị",
+      "moTaNgan": "Địa điểm cuộc chiến đấu bảo vệ Thành cổ 81 ngày đêm mùa hè 1972, tạo thế trên bàn đàm phán Pa-ri.",
+      "nguon": {
+        "wikidataQid": "Q10825609",
+        "taiLieu": "Wikidata Q10825609 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q10825609"
+      }
+    },
+    {
+      "id": "vung-ro",
+      "ten": "Bến Vũng Rô",
+      "tenKhac": ["Vũng Rô", "Đường Hồ Chí Minh trên biển"],
+      "lat": 12.86489,
+      "lon": 109.42257,
+      "loai": "di-tich",
+      "thoiKy": ["1964–1965"],
+      "tinhHienNay": "Tỉnh Phú Yên",
+      "moTaNgan": "Bến tiếp nhận vũ khí quan trọng của tuyến Đường Hồ Chí Minh trên biển (Đoàn tàu không số).",
+      "nguon": {
+        "wikidataQid": "Q7943655",
+        "taiLieu": "Wikidata Q7943655 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q7943655"
+      }
+    },
+    {
+      "id": "con-dao",
+      "ten": "Côn Đảo",
+      "tenKhac": ["Nhà tù Côn Đảo"],
+      "lat": 8.68327,
+      "lon": 106.60626,
+      "loai": "di-tich",
+      "thoiKy": ["1862–1975"],
+      "tinhHienNay": "Thành phố Hồ Chí Minh",
+      "moTaNgan": "Di tích lịch sử quốc gia đặc biệt gắn với cuộc đấu tranh kiên cường của các chiến sĩ yêu nước và cách mạng.",
+      "nguon": {
+        "wikidataQid": "Q370746",
+        "taiLieu": "Wikidata Q370746 (P625); SGK Lịch sử CTGDPT 2018",
+        "url": "https://www.wikidata.org/wiki/Q370746"
+      }
+    },
+    {
+      "id": "cu-chi",
+      "ten": "Địa đạo Củ Chi",
+      "tenKhac": ["Củ Chi", "Đất thép Củ Chi"],
+      "lat": 11.061,
+      "lon": 106.526,
+      "loai": "can-cu",
+      "thoiKy": ["1948–1975"],
+      "tinhHienNay": "Thành phố Hồ Chí Minh",
+      "moTaNgan": "Hệ thống địa đạo và căn cứ kháng chiến ở cửa ngõ Tây Bắc Sài Gòn.",
+      "nguon": {
+        "wikidataQid": "Q192721",
+        "taiLieu": "Wikidata Q192721 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q192721"
+      }
+    },
+    {
+      "id": "tay-ninh",
+      "ten": "Căn cứ Trung ương Cục miền Nam (Tây Ninh)",
+      "tenKhac": ["Tây Ninh", "Trung ương Cục miền Nam"],
+      "lat": 11.36779,
+      "lon": 106.119,
+      "loai": "can-cu",
+      "thoiKy": ["1961–1975"],
+      "tinhHienNay": "Tỉnh Tây Ninh",
+      "moTaNgan": "Địa bàn đặt cơ quan đầu não chỉ đạo cách mạng miền Nam trong kháng chiến chống Mỹ.",
+      "nguon": {
+        "wikidataQid": "Q36608",
+        "taiLieu": "Wikidata Q36608 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q36608"
+      }
+    },
+    {
+      "id": "phuoc-long",
+      "ten": "Phước Long (Chiến thắng Đường 14 – Phước Long)",
+      "tenKhac": ["Phước Long", "Đường 14 – Phước Long"],
+      "lat": 11.81889,
+      "lon": 106.99111,
+      "loai": "chien-truong",
+      "thoiKy": ["6/1/1975"],
+      "tinhHienNay": "Tỉnh Bình Phước",
+      "moTaNgan": "Trận trinh sát chiến lược giải phóng hoàn toàn tỉnh đầu tiên ở miền Nam đầu năm 1975.",
+      "nguon": {
+        "wikidataQid": "Q10806425",
+        "taiLieu": "Wikidata Q10806425 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q10806425"
+      }
+    },
+    {
+      "id": "buon-ma-thuot",
+      "ten": "Buôn Ma Thuột",
+      "tenKhac": ["Trận Buôn Ma Thuột", "Tây Nguyên 1975"],
+      "lat": 12.66667,
+      "lon": 108.05,
+      "loai": "chien-truong",
+      "thoiKy": ["10–11/3/1975 (Chiến dịch Tây Nguyên)"],
+      "tinhHienNay": "Tỉnh Đắk Lắk",
+      "moTaNgan": "Trận then chốt mở màn cuộc Tổng tiến công và nổi dậy mùa Xuân 1975.",
+      "nguon": {
+        "wikidataQid": "Q33469",
+        "taiLieu": "Wikidata Q33469 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q33469"
+      }
+    },
+    {
+      "id": "pleiku",
+      "ten": "Pleiku",
+      "tenKhac": ["Đường 7 Tây Nguyên"],
+      "lat": 13.97152,
+      "lon": 108.01467,
+      "loai": "chien-truong",
+      "thoiKy": ["3/1975"],
+      "tinhHienNay": "Tỉnh Gia Lai",
+      "moTaNgan": "Căn cứ quân sự ở Bắc Tây Nguyên bị địch rút chạy hỗn loạn sau trận Buôn Ma Thuột.",
+      "nguon": {
+        "wikidataQid": "Q30599",
+        "taiLieu": "Wikidata Q30599 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q30599"
+      }
+    },
+    {
+      "id": "nha-trang",
+      "ten": "Nha Trang",
+      "tenKhac": ["Khánh Hoà"],
+      "lat": 12.245,
+      "lon": 109.19167,
+      "loai": "dia-phuong",
+      "thoiKy": ["2/4/1975"],
+      "tinhHienNay": "Tỉnh Khánh Hoà",
+      "moTaNgan": "Thành phố duyên hải Nam Trung Bộ được giải phóng ngày 2/4/1975, hướng kết nối ra quần đảo Trường Sa.",
+      "nguon": {
+        "wikidataQid": "Q19491",
+        "taiLieu": "Wikidata Q19491 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q19491"
+      }
+    },
+    {
+      "id": "cam-ranh",
+      "ten": "Vịnh Cam Ranh",
+      "tenKhac": ["Cam Ranh"],
+      "lat": 11.91361,
+      "lon": 109.13694,
+      "loai": "dia-phuong",
+      "thoiKy": ["3/4/1975"],
+      "tinhHienNay": "Tỉnh Khánh Hoà",
+      "moTaNgan": "Quân cảng chiến lược ở Nam Trung Bộ được giải phóng ngày 3/4/1975.",
+      "nguon": {
+        "wikidataQid": "Q33116",
+        "taiLieu": "Wikidata Q33116 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q33116"
+      }
+    },
+    {
+      "id": "xuan-loc",
+      "ten": "Xuân Lộc (Long Khánh)",
+      "tenKhac": ["Xuân Lộc", "Phòng tuyến Xuân Lộc"],
+      "lat": 10.93306,
+      "lon": 107.24472,
+      "loai": "chien-truong",
+      "thoiKy": ["9–21/4/1975"],
+      "tinhHienNay": "Tỉnh Đồng Nai",
+      "moTaNgan": "Cánh cửa thép phía Đông bảo vệ Sài Gòn bị chọc thủng trước khi mở màn Chiến dịch Hồ Chí Minh.",
+      "nguon": {
+        "wikidataQid": "Q1320477",
+        "taiLieu": "Wikidata Q1320477 (Long Khánh, P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q1320477"
+      }
+    },
+    {
+      "id": "hai-phong",
+      "ten": "Hải Phòng",
+      "tenKhac": ["Cảng Hải Phòng"],
+      "lat": 20.8,
+      "lon": 106.66667,
+      "loai": "dia-phuong",
+      "thoiKy": ["1946–1975"],
+      "tinhHienNay": "Thành phố Hải Phòng",
+      "moTaNgan": "Thành phố cảng phía Bắc, vùng chiến đấu chống phong toả và tập kích B-52 năm 1972.",
+      "nguon": {
+        "wikidataQid": "Q72818",
+        "taiLieu": "Wikidata Q72818 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q72818"
+      }
+    },
+    {
+      "id": "phu-quoc",
+      "ten": "Đảo Phú Quốc",
+      "tenKhac": ["Phú Quốc"],
+      "lat": 10.21608,
+      "lon": 103.95939,
+      "loai": "dia-phuong",
+      "thoiKy": ["Thế kỷ XVII – nay"],
+      "tinhHienNay": "Tỉnh Kiên Giang",
+      "moTaNgan": "Đảo lớn nhất Việt Nam trên vùng biển Tây Nam.",
+      "nguon": {
+        "wikidataQid": "Q146695",
+        "taiLieu": "Wikidata Q146695 (P625); SGK Lịch sử & Địa lí",
+        "url": "https://www.wikidata.org/wiki/Q146695"
+      }
+    },
+    {
+      "id": "can-tho",
+      "ten": "Cần Thơ",
+      "tenKhac": ["Tây Đô Nam Bộ"],
+      "lat": 10.03242,
+      "lon": 105.78409,
+      "loai": "dia-phuong",
+      "thoiKy": ["30/4/1975"],
+      "tinhHienNay": "Thành phố Cần Thơ",
+      "moTaNgan": "Trung tâm vùng Đồng bằng sông Cửu Long, hoàn thành giải phóng ngày 30/4/1975.",
+      "nguon": {
+        "wikidataQid": "Q216075",
+        "taiLieu": "Wikidata Q216075 (P625); SGK Lịch sử 12",
+        "url": "https://www.wikidata.org/wiki/Q216075"
+      }
+    }
+  ]
+}

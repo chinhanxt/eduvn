@@ -1,0 +1,20 @@
+{
+  "requires": [
+    { "selector": "[data-ek-beat=\"0\"]", "min": 1 },
+    { "selector": ".ek-meta", "min": 1 },
+    { "selector": ".ek-read", "min": 1 }
+  ],
+  "motion": [
+    { "kind": "before", "a": "[data-ek-beat=\"0\"]", "b": "[data-ek-beat=\"1\"]" },
+    { "kind": "before", "a": "[data-ek-beat=\"2\"]", "b": "[data-ek-beat=\"3\"]" }
+  ],
+  "limits": {
+    "cameraMoves": 1,
+    "labels": 10,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

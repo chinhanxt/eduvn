@@ -1,0 +1,80 @@
+{
+  "skill": "bien-doi-lanh-tho",
+  "evals": [
+    {
+      "id": "mo-rong-lanh-tho-x-xix",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 11,
+        "title": "Không gian lãnh thổ và chủ quyền biển đảo Việt Nam (thế kỷ X – XIX)",
+        "slideText": "Thế kỷ X–XI: Hoa Lư (968), Thăng Long (1010) · Thế kỷ XV–XVI: Thuận Hoá, Hội An · Thế kỷ XVII–XVIII: Gia Định (1698), đội Hoàng Sa – Bắc Hải · Thế kỷ XIX: thống nhất và đo đạc 1816–1836.",
+        "speech": [
+          { "text": "Thế kỷ X đến XI, quốc gia Đại Cồ Việt ở Hoa Lư năm 968 và Đại Việt ở Thăng Long năm 1010 tập trung ở Bắc Bộ và Bắc Trung Bộ.", "durationMs": 5000 },
+          { "text": "Từ thế kỷ XV đến XVI, không gian lãnh thổ mở rộng vào vùng Thuận Hoá, Phú Xuân và thương cảng Hội An.", "durationMs": 5000 },
+          { "text": "Thế kỷ XVII đến XVIII, chúa Nguyễn mở cõi vào Gia Định năm 1698 và lập đội Hoàng Sa, đội Bắc Hải thực thi chủ quyền trên Hoàng Sa và Trường Sa.", "durationMs": 5200 },
+          { "text": "Đến đầu thế kỷ XIX, lãnh thổ thống nhất từ Bắc vào Nam cùng hoạt động đo đạc, cắm mốc năm 1816 và 1836 khẳng định chủ quyền biển đảo.", "durationMs": 4800 }
+        ]
+      },
+      "tieuChi": ["Dùng bản đồ nền _vnm có đủ Hoàng Sa và Trường Sa", "Tô dần các dải không gian từ Bắc vào Nam", "Vẽ tuyến hải trình ra Hoàng Sa, Trường Sa"]
+    },
+    {
+      "id": "doi-do-cac-trieu-dai",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 7,
+        "title": "Sự dịch chuyển kinh đô từ Cổ Loa, Hoa Lư đến Thăng Long và Phú Xuân",
+        "slideText": "Cổ Loa (939) → Hoa Lư (968) → Thăng Long (1010) → Phú Xuân (1802).",
+        "speech": [
+          { "text": "Kinh đô nước ta dịch chuyển từ Cổ Loa năm 939, Hoa Lư năm 968 tới Thăng Long năm 1010 và Phú Xuân năm 1802.", "durationMs": 6000 },
+          { "text": "Mỗi lần định đô phản ánh bước mở rộng tầm vóc và không gian quản lý của quốc gia thống nhất.", "durationMs": 5200 }
+        ]
+      },
+      "tieuChi": ["Đặt đúng toạ độ các kinh đô từ dia-danh-lich-su.json", "Giữ rõ Hoàng Sa và Trường Sa"]
+    },
+    {
+      "id": "chu-quyen-bien-dong-tk17-19",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 11,
+        "title": "Quá trình xác lập chủ quyền của Việt Nam ở Hoàng Sa và Trường Sa",
+        "slideText": "Thế kỷ XVII: Đội Hoàng Sa, Đội Bắc Hải từ miền Trung ra Biển Đông · 1816–1836: Triều Nguyễn đo đạc, cắm mốc.",
+        "speech": [
+          { "text": "Từ thế kỷ XVII, nhà nước Đàng Trong tổ chức đội Hoàng Sa và đội Bắc Hải từ Hội An, Phú Xuân ra Hoàng Sa và Trường Sa.", "durationMs": 5500 },
+          { "text": "Sang thế kỷ XIX, triều Nguyễn tiếp tục phái thuỷ quân đo đạc năm 1816 và 1836, ghi nhận rõ trên bản đồ chính sử.", "durationMs": 5500 }
+        ]
+      },
+      "tieuChi": ["Làm nổi bật Hoàng Sa, Trường Sa và Biển Đông đúng vị trí địa lý"]
+    },
+    {
+      "id": "khong-chon-so-sanh-hai-khang-chien",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "So sánh kháng chiến chống Pháp và kháng chiến chống Mỹ",
+        "slideText": "Đối chiếu đối tượng, thời gian và trận quyết chiến giữa 1945–1954 và 1954–1975.",
+        "speech": [
+          { "text": "So sánh hai cuộc kháng chiến chống Pháp và chống Mỹ theo tiêu chí bối cảnh, đối tượng và trận quyết chiến.", "durationMs": 5500 }
+        ]
+      },
+      "tieuChi": ["Không chọn: cảnh so sánh tiêu chí, dùng so-sanh-thoi-ky"]
+    },
+    {
+      "id": "khong-chon-bieu-do-nhiet-am",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Biểu đồ nhiệt độ và lượng mưa Hà Nội",
+        "slideText": "12 tháng nhiệt độ (°C) và lượng mưa (mm) trạm Hà Nội.",
+        "speech": [
+          { "text": "Quan sát biểu đồ nhiệt độ và lượng mưa 12 tháng của trạm khí tượng Hà Nội để nhận xét mùa mưa.", "durationMs": 5000 }
+        ]
+      },
+      "tieuChi": ["Không chọn: biểu đồ khí hậu Địa lí, không phải biến đổi lãnh thổ"]
+    }
+  ]
+}

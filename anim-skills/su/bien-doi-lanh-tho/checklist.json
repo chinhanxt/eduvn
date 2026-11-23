@@ -1,0 +1,20 @@
+{
+  "requires": [
+    { "selector": "[data-ek-map]", "min": 1 },
+    { "selector": ".ek-islands", "min": 1 },
+    { "selector": ".ek-place", "min": 2, "max": 12 }
+  ],
+  "motion": [
+    { "kind": "staysInFrame", "selector": ".ek-islands" },
+    { "kind": "before", "a": "[data-ek-beat=\"0\"]", "b": "[data-ek-beat=\"2\"]" }
+  ],
+  "limits": {
+    "cameraMoves": 1,
+    "labels": 14,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

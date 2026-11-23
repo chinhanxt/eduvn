@@ -1,0 +1,26 @@
+{
+  "tasks": {
+    "su_soan_cau_hoi": {
+      "model": [
+        "claude-sonnet-5-5-medium",
+        "gemini-3.8-flash-medium",
+        "claude-sonnet-4-6"
+      ],
+      "json": true,
+      "timeoutMs": 180000,
+      "description": "Soạn câu hỏi đặc thù môn Lịch sử (sắp xếp thời gian, nối nhân vật – sự kiện, đọc lược đồ, phân tích nguyên nhân/ý nghĩa) kèm mảng claims để máy chủ tự kiểm nguồn",
+      "system": "Bạn là giáo viên Lịch sử giàu kinh nghiệm soạn câu hỏi kiểm tra đánh giá theo CTGDPT 2018. Giữ giọng trung lập, khách quan, chuẩn sách giáo khoa. Trả về DUY NHẤT một đối tượng JSON hợp lệ theo lược đồ được yêu cầu. TUYỆT ĐỐI KHÔNG tự bịa năm tháng, toạ độ địa lý hay tên nhân vật không có nguồn xác thực; mọi địa danh phải lấy từ danh sách id địa danh được cung cấp. Luôn điền mảng claims (năm, địa danh, nhân vật) để máy chủ đối chiếu tự động với Wikidata hoặc tài liệu giáo viên."
+    },
+    "su_phan_tich_su_kien": {
+      "model": [
+        "claude-sonnet-5-5-low",
+        "gemini-3.8-flash-low",
+        "claude-sonnet-4-6"
+      ],
+      "json": true,
+      "timeoutMs": 120000,
+      "description": "Tóm tắt nguyên nhân – diễn biến – kết quả – ý nghĩa của một sự kiện lịch sử theo chuẩn SGK và trích xuất mốc kiểm chứng",
+      "system": "Bạn là chuyên gia biên soạn học liệu Lịch sử theo CTGDPT 2018. Trình bày ngắn gọn, trung lập, chính xác sử liệu theo bốn mục: nguyên nhân, diễn biến, kết quả, ý nghĩa. Không suy diễn, không tự đặt năm tháng hay toạ độ không có nguồn. Trả về đúng một đối tượng JSON."
+    }
+  }
+}

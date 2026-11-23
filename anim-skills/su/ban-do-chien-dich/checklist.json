@@ -1,0 +1,20 @@
+{
+  "requires": [
+    { "selector": "[data-ek-map]", "min": 1 },
+    { "selector": ".ek-arrow", "min": 1, "max": 8 },
+    { "selector": ".ek-place", "min": 2, "max": 12 }
+  ],
+  "motion": [
+    { "kind": "before", "a": "[data-ek-map]", "b": "#arr-1a" },
+    { "kind": "staysInFrame", "selector": "#p-hl" }
+  ],
+  "limits": {
+    "cameraMoves": 1,
+    "labels": 14,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

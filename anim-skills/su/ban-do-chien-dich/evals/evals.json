@@ -1,0 +1,83 @@
+{
+  "skill": "ban-do-chien-dich",
+  "evals": [
+    {
+      "id": "dbp-3-dot",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Diễn biến Chiến dịch Điện Biên Phủ (1954)",
+        "slideText": "Chiến dịch Điện Biên Phủ (13/3 – 7/5/1954): Đợt 1 tiêu diệt Him Lam, Độc Lập; Đợt 2 tiến công Đồi A1 và cắt sân bay Mường Thanh; Đợt 3 tổng công kích Hầm Đờ Cát, giải phóng Hồng Cúm.",
+        "speech": [
+          { "text": "Chiến dịch Điện Biên Phủ năm 1954 diễn ra trong 56 ngày đêm qua ba đợt tiến công liên tiếp.", "durationMs": 4800 },
+          { "text": "Đợt 1 từ ngày 13 đến 17 tháng 3, quân ta từ Tuần Giáo và Mường Phăng tiến công tiêu diệt Him Lam và Đồi Độc Lập.", "durationMs": 5400 },
+          { "text": "Đợt 2 đánh các cao điểm phía Đông như Đồi A1 và bao vây cắt đứt sân bay Mường Thanh.", "durationMs": 5200 },
+          { "text": "Đợt 3 tổng công kích đánh thẳng Hầm Đờ Cát ngày 7 tháng 5 năm 1954 và tiêu diệt phân khu Hồng Cúm.", "durationMs": 5200 }
+        ]
+      },
+      "tieuChi": ["Mũi tên xuất phát từ Tuần Giáo/Mường Phăng vào Him Lam, Độc Lập", "3 đợt vẽ theo đúng thứ tự lời giảng", "Có ô định vị Việt Nam đủ Hoàng Sa và Trường Sa"]
+    },
+    {
+      "id": "chien-dich-ho-chi-minh-1975",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Tổng tiến công và nổi dậy mùa Xuân 1975",
+        "slideText": "Tháng 3–4/1975: Chiến dịch Tây Nguyên (Buôn Ma Thuột) → Huế – Đà Nẵng → Xuân Lộc → Chiến dịch Hồ Chí Minh tiến vào Dinh Độc Lập và giải phóng Trường Sa.",
+        "speech": [
+          { "text": "Tháng 3 năm 1975, quân ta mở màn bằng trận điểm huyệt Buôn Ma Thuột ở Tây Nguyên.", "durationMs": 4800 },
+          { "text": "Tiếp đó giải phóng Huế, Đà Nẵng và hải quân tiến ra giải phóng quần đảo Trường Sa.", "durationMs": 5000 },
+          { "text": "Ngày 30 tháng 4 năm 1975, năm cánh quân vượt qua Xuân Lộc tiến vào Dinh Độc Lập giải phóng Sài Gòn.", "durationMs": 5400 }
+        ]
+      },
+      "tieuChi": ["Thể hiện đầy đủ bản đồ Việt Nam có Hoàng Sa, Trường Sa", "Mũi tên tiến công qua Buôn Ma Thuột, Huế, Đà Nẵng, Xuân Lộc, Sài Gòn"]
+    },
+    {
+      "id": "bien-gioi-1950",
+      "nenChon": true,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "Chiến dịch Biên giới thu – đông 1950",
+        "slideText": "Tháng 9–10/1950: Đánh điểm Đông Khê, chặn địch rút từ Cao Bằng về Thất Khê và giải phóng Lạng Sơn.",
+        "speech": [
+          { "text": "Tháng 9 năm 1950, quân ta chủ động tiến công tiêu diệt cứ điểm Đông Khê trên Đường số 4.", "durationMs": 5000 },
+          { "text": "Quân Pháp phải rút khỏi Cao Bằng và bị ta chặn đánh trên đường về Thất Khê, giải phóng Lạng Sơn.", "durationMs": 5600 }
+        ]
+      },
+      "tieuChi": ["Phân biệt mũi tiến công nét liền và mũi địch rút lui nét đứt từ Cao Bằng", "Địa danh lấy từ bộ địa danh lịch sử"]
+    },
+    {
+      "id": "khong-chon-dinh-nghia",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 10,
+        "title": "Khái niệm sử học và chức năng của sử học",
+        "slideText": "Sử học là khoa học nghiên cứu quá khứ của loài người. Chức năng khoa học và chức năng xã hội.",
+        "speech": [
+          { "text": "Sử học là ngành khoa học nghiên cứu quá khứ của xã hội loài người dựa trên các nguồn sử liệu.", "durationMs": 5500 },
+          { "text": "Sử học có chức năng khôi phục hiện thực lịch sử và rút ra bài học kinh nghiệm cho hiện tại.", "durationMs": 5500 }
+        ]
+      },
+      "tieuChi": ["Không chọn: cảnh chỉ định nghĩa khái niệm, không có diễn biến chiến dịch hay địa danh"]
+    },
+    {
+      "id": "khong-chon-so-sanh-cuong-linh",
+      "nenChon": false,
+      "scene": {
+        "subject": "su",
+        "grade": 12,
+        "title": "So sánh Cương lĩnh tháng 2/1930 và Luận cương tháng 10/1930",
+        "slideText": "So sánh nhiệm vụ cách mạng và lực lượng cách mạng giữa hai văn kiện năm 1930.",
+        "speech": [
+          { "text": "Cương lĩnh tháng 2 năm 1930 đặt nhiệm vụ giải phóng dân tộc lên hàng đầu và đoàn kết toàn dân.", "durationMs": 5400 },
+          { "text": "Luận cương tháng 10 năm 1930 nhấn mạnh đấu tranh giai cấp và xác định động lực chính là công nông.", "durationMs": 5400 }
+        ]
+      },
+      "tieuChi": ["Không chọn: cảnh so sánh hai văn kiện, nên dùng so-sanh-thoi-ky"]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "subject": "su",
+  "grade": 12,
+  "title": "So sánh Kháng chiến chống Pháp (1945–1954) và Kháng chiến chống Mỹ (1954–1975)",
+  "slideText": "Chống Pháp (1945–1954): 9 năm, từ thế bị bao vây tiến tới thế chủ động, quyết chiến Điện Biên Phủ (1954) → Hiệp định Giơ-ne-vơ. Chống Mỹ (1954–1975): 21 năm, hai miền Nam – Bắc cùng chiến đấu, quyết chiến Đại thắng mùa Xuân (1975). Điểm chung: chiến tranh nhân dân, kết hợp quân sự – chính trị – ngoại giao.",
+  "speech": [
+    {
+      "text": "So sánh hai cuộc kháng chiến lớn của dân tộc: chống thực dân Pháp từ 1945 đến 1954 và chống Mỹ từ 1954 đến 1975.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Về thời gian và bối cảnh, kháng chiến chống Pháp kéo dài 9 năm trong thế bao vây ban đầu, còn kháng chiến chống Mỹ dài 21 năm với hậu phương miền Bắc chi viện miền Nam.",
+      "durationMs": 4600
+    },
+    {
+      "text": "Về trận quyết chiến chiến lược, chống Pháp kết thúc bằng Điện Biên Phủ năm 1954, còn chống Mỹ kết thúc bằng Đại thắng mùa Xuân năm 1975.",
+      "durationMs": 4600
+    },
+    {
+      "text": "Điểm chung xuyên suốt cả hai thời kỳ là đường lối chiến tranh nhân dân và nghệ thuật kết hợp quân sự, chính trị, ngoại giao.",
+      "durationMs": 4600
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-10" style="top:54px">LỊCH SỬ 12 · NIÊN BIỂU TỈ LỆ THẬT</div>
+  <h1 id="tt" class="ek-title ek-col-1 ek-span-12" style="top:104px">Tiến trình cách mạng Việt Nam <span class="kw">1945–1975</span></h1>
+
+  <div class="ek-stage">
+    <svg id="tl-svg" class="ek-col-1 ek-span-12 ek-hidden" style="top:220px" width="1680" height="330" viewBox="0 0 1680 330"
+         data-ek-beat="0"
+         data-ek-timeline='{"tu":1945,"den":1975,"buoc":5,"thoiKy":[{"tu":1945,"den":1954,"nhan":"Chống Pháp (9 năm)","mau":"doSon"},{"tu":1954,"den":1975,"nhan":"Kháng chiến chống Mỹ (21 năm)","mau":"tim"}],"moc":[{"nam":1945,"nhan":"Cách mạng tháng Tám"},{"nam":1954,"nhan":"Điện Biên Phủ"},{"nam":1968,"nhan":"Xuân Mậu Thân"},{"nam":1975,"nhan":"Đại thắng mùa Xuân"}]}'>
+    </svg>
+
+    <div id="card-1945" class="ek-card ek-col-1 ek-span-6 ev-card card-phap ek-hidden" style="top:590px" data-ek-beat="1">
+      <div class="ev-tag ek-c-doSon">MỐC 1945 · 2/9/1945</div>
+      <h3>Cách mạng tháng Tám &amp; Độc lập</h3>
+      <p>Khai sinh nước Việt Nam Dân chủ Cộng hoà tại Quảng trường Ba Đình.</p>
+    </div>
+
+    <div id="card-1954" class="ek-card ek-col-7 ek-span-6 ev-card card-phap ek-hidden" style="top:590px" data-ek-beat="2">
+      <div class="ev-tag ek-c-doSon">MỐC 1954 · 7/5/1954</div>
+      <h3>Chiến thắng Điện Biên Phủ</h3>
+      <p>Kết thúc <span id="kw-9nam">9 năm kháng chiến chống Pháp</span>, chuyển sang chống Mỹ.</p>
+    </div>
+
+    <div id="card-1975" class="ek-card ek-col-1 ek-span-12 ev-card card-my ek-hidden" style="top:590px" data-ek-beat="3">
+      <div class="ev-tag ek-c-tim">MỐC 1968 → 30/4/1975</div>
+      <h3>Từ Mậu Thân 1968 đến Đại thắng mùa Xuân 1975</h3>
+      <p>Khép lại <span id="kw-30">30 năm kháng chiến giành độc lập, thống nhất</span>.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .ev-card {
+    padding: 24px 32px;
+  }
+  .card-phap {
+    border-left-color: var(--c-doSon);
+  }
+  .card-my {
+    border-left-color: var(--c-tim);
+  }
+  .ev-tag {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+</style>
+
+<script>
+const tl = gsap.timeline({ paused: true });
+
+EK.enter(tl, "#tt", 0, { from: "up", dur: 0.7 });
+EK.enter(tl, "#tl-svg", EK.cue(0), { from: "fade", dur: 0.6 });
+EK.draw(tl, "#tl-svg .ek-tl-axis", EK.cue(0) + 0.15, 1.1);
+EK.enter(tl, "#tl-svg .ek-era", EK.cue(0) + 0.9, { from: "left", dur: 0.8, stagger: 0.35 });
+
+// Beat 1: 1945
+EK.enter(tl, "#tl-svg .ek-event-0", EK.cue(1), { from: "scale", dur: 0.6 });
+EK.enter(tl, "#card-1945", EK.cue(1) + 0.25, { from: "up", dur: 0.7 });
+
+// Beat 2: 1954
+tl.to("#card-1945", { opacity: 0.55, duration: 0.5, ease: "power2.out" }, EK.cue(2));
+EK.enter(tl, "#tl-svg .ek-event-1", EK.cue(2), { from: "scale", dur: 0.6 });
+EK.enter(tl, "#card-1954", EK.cue(2) + 0.25, { from: "up", dur: 0.7 });
+EK.mark(tl, "#kw-9nam", EK.b(2, 0.52), "highlight", { color: "doSon", dur: 0.9 });
+
+// Beat 3: 1968 & 1975
+EK.exit(tl, "#card-1945, #card-1954", EK.cue(3) - 0.55, { dur: 0.45, to: "up" });
+EK.enter(tl, "#tl-svg .ek-event-2", EK.cue(3) - 0.2, { from: "scale", dur: 0.55 });
+EK.enter(tl, "#card-1975", EK.cue(3), { from: "up", dur: 0.7 });
+EK.enter(tl, "#tl-svg .ek-event-3", EK.cue(3) + 0.9, { from: "scale", dur: 0.6 });
+EK.mark(tl, "#kw-30", EK.cue(3) + 1.5, "highlight", { color: "tim", dur: 0.9 });
+
+window.__timelines["main"] = tl;
+</script>
