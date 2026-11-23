@@ -1,6 +1,6 @@
 # EDUVN: bối cảnh dự án (nguồn chuẩn duy nhất)
 
-> Mọi agent và mọi profile (Claude, Codex, agy/Gemini) **đọc file này trước tiên**. Thay đổi quyết định nào thì sửa ngay ở đây và commit. Cập nhật lần cuối: 2026-11-23.
+> Mọi agent và mọi profile (Claude, Codex, agy/Gemini) **đọc file này trước tiên**. Thay đổi quyết định nào thì sửa ngay ở đây và commit. Cập nhật lần cuối: 2026-11-23 (thêm AI hồ sơ, kho công cụ 3 tầng, AI local).
 
 ## 1. Dự án là gì
 - **Môi trường, công cụ dạy và học có AI** theo chương trình Việt Nam (CTGDPT 2018, CV 7991, SGK). **KHÔNG phải LMS** (quản lý lớp, hành chính).
@@ -45,6 +45,9 @@
 - Màn hoặc phong cách **hoàn toàn mới** (ví dụ phụ huynh, ban giám hiệu) phải có mockup cho chủ dự án duyệt trước khi code.
 
 ## 5. Quyết định đã chốt
+- **AI hồ sơ (bộ não của vòng lặp):** mỗi HS/SV, GV, phụ huynh, nhà trường có một AI riêng nắm hồ sơ chủ nhân (năng lực, đường quên, lỗi đặc trưng, nhịp học, mục tiêu), các AI phối hợp có quyền, hồ sơ theo suốt cấp 2 → ĐH. Chi tiết: `docs/design/ai-ho-so.md`.
+- **Chia AI:** trò chuyện cá nhân và hồ sơ dùng **AI local** trên máy chủ riêng (chủ dự án sẽ giới thiệu máy chủ sau; dữ liệu HS không rời trường). Việc nặng/tự động (soạn bài, video, đề, chấm, nghiên cứu, tạo công cụ) vẫn qua **cổng AI :4340**.
+- **Kho công cụ 3 tầng (động, không bao giờ thiếu):** (1) **AI tạo công cụ theo yêu cầu** từ khối dựng sẵn, tự kiểm rồi lưu vào kho; (2) **kho mở** ghép từ nguồn có giấy phép phù hợp (PhET, 3Dmol/smilesDrawer, Pyodide/Blockly, bản đồ, Stellarium, nhạc lý, Infographic), Việt hoá và gắn môn/cấp/chủ đề CTGDPT 2018; (3) **30–40 công cụ chuẩn làm tay** để demo. Màn kho có ô "Bạn cần công cụ gì?" + nút "Để AI tạo", nhãn nguồn Chuẩn/Mở/AI tạo/Cộng đồng GV.
 - **Công cụ môn học là phụ kiện cắm thêm** ("Kho công cụ"), tự hiện đúng chỗ (bài giảng, bài tập, gia sư, bảng giảng). **Không** làm trang môn cố định trên menu. 5 gói Văn/Sử/Địa/Hoá/Sinh là 5 công cụ đầu tiên; code nằm ở `server/src/subjects/`, `anim-skills/`, `services/anim-kit-data/`.
 - **Repo ngoài: lấy codebase rồi tinh chỉnh, không tự xây lại.**
   - `antvis/Infographic` (MIT): dùng gói npm `@antv/infographic` + skills/templates, làm theme EDUVN, gắn vào slide, gia sư, báo cáo, tin gửi phụ huynh.
@@ -68,7 +71,7 @@
 
 ## 7. Lộ trình tiếp theo
 1. Làm đẹp toàn bộ màn hiện có và rà tính trung lập môn.
-2. Infographic + Sổ tay học tập (open-notebook) + Kho công cụ môn học.
+2. Infographic + Sổ tay học tập (open-notebook) + Kho công cụ 3 tầng + AI hồ sơ.
 3. 11 nỗi đau. Ưu tiên giấy tờ GV, phụ huynh, vòng lặp lỗ hổng, ban giám hiệu.
 4. Mockup đủ 395 mục mở rộng.
 5. Bộ máy demo, mạch trình diễn theo vòng lặp lõi, rồi video 2–3 phút, slide, link demo.
