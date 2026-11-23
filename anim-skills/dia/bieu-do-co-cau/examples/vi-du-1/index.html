@@ -1,0 +1,36 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-12" style="top:54px">ĐỊA LÍ 12 · CHUYỂN DỊCH CƠ CẤU KINH TẾ · GSO</div>
+  <div class="ek-stage">
+    <h1 id="tt" class="ek-title ek-col-1 ek-span-12 ek-hidden" style="top:104px" data-ek-beat="0">Cơ cấu <span class="kw">GDP Việt Nam</span> (2010–2023)</h1>
+    <div id="area-wrap" class="ek-col-1 ek-span-8 ek-hidden" style="top:210px;height:690px">
+      <svg id="bd-mien" width="1112" height="670" data-ek-chart="mien" data-ek-values='{"nhan":["2010","2015","2018","2023"],"nam":[2010,2015,2018,2023],"chuoi":[{"ten":"Nông–lâm–thủy sản","donVi":"%","giaTri":[15.4,14.5,13.9,12.0]},{"ten":"Công nghiệp & XD","donVi":"%","giaTri":[33.0,34.3,35.4,37.1]},{"ten":"Dịch vụ & thuế SP","donVi":"%","giaTri":[51.6,51.2,50.7,50.9]}]}'></svg>
+    </div>
+    <div id="c1" class="ek-card ek-col-9 ek-span-4 ek-hidden" style="top:230px" data-ek-beat="1">
+      <h3 class="ek-c-xanhLa">Nông – lâm – thủy sản</h3>
+      <p>Giảm từ 15,4% xuống 12,0% (−3,4%)</p>
+    </div>
+    <div id="c2" class="ek-card ek-col-9 ek-span-4 ek-hidden" style="top:442px" data-ek-beat="2">
+      <h3 class="ek-c-lam">Công nghiệp &amp; Dịch vụ</h3>
+      <p>CN tăng 33,0% → 37,1% · DV giữ 50,9%</p>
+    </div>
+    <div id="c3" class="ek-card ek-col-9 ek-span-4 ek-hidden" style="top:654px" data-ek-beat="3">
+      <h3 class="ek-c-tim">Xu hướng tích cực</h3>
+      <p>Đúng tiến trình công nghiệp hóa · Tổng = 100%</p>
+    </div>
+  </div>
+</div>
+<style>
+  #c1 { border-left-color: var(--c-xanhLa); }
+  #c2 { border-left-color: var(--c-lam); }
+  #c3 { border-left-color: var(--c-tim); }
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+EK.enter(tl, "#tt, #area-wrap", EK.cue(0), { from: "up", stagger: 0.12 });
+tl.set("#bd-mien .ek-area, #bd-mien .ek-area-label", { opacity: 0 }, 0);
+EK.enter(tl, "#bd-mien .ek-area-0, #bd-mien .ek-area-label-0, #c1", EK.cue(1), { from: "fade", stagger: 0.1, dur: 0.9 });
+EK.enter(tl, "#bd-mien .ek-area-1, #bd-mien .ek-area-label-1, #c2", EK.cue(2), { from: "fade", dur: 0.8 });
+EK.enter(tl, "#bd-mien .ek-area-2, #bd-mien .ek-area-label-2", EK.cue(2) + 0.45, { from: "fade", dur: 0.8 });
+EK.enter(tl, "#c3", EK.cue(3), { from: "up" });
+window.__timelines["main"] = tl;
+</script>

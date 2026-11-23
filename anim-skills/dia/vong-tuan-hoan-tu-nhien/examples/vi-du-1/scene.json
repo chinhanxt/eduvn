@@ -1,0 +1,24 @@
+{
+  "subject": "dia",
+  "grade": 10,
+  "title": "Vòng tuần hoàn lớn của nước trong tự nhiên",
+  "slideText": "4 giai đoạn chính: 1. Bốc hơi từ đại dương (nhờ bức xạ Mặt Trời) → 2. Ngưng tụ tạo mây và gió đưa vào lục địa → 3. Giáng thủy (mưa rơi trên đất liền) → 4. Dòng chảy mặt (sông ngòi) và dòng chảy ngầm trở về biển.",
+  "speech": [
+    {
+      "text": "Bước 1, nhờ nhiệt năng Mặt Trời, nước từ biển và đại dương bốc hơi bay lên khí quyển.",
+      "durationMs": 4000
+    },
+    {
+      "text": "Bước 2, lên cao gặp lạnh, hơi nước ngưng tụ thành mây rồi được gió thổi sâu vào lục địa.",
+      "durationMs": 4000
+    },
+    {
+      "text": "Bước 3, các hạt nước kết tụ đủ nặng rơi xuống mặt đất thành mưa, gọi là giáng thủy.",
+      "durationMs": 4000
+    },
+    {
+      "text": "Bước 4, nước theo sông suối trên mặt và mạch nước ngầm chảy ra biển, khép kín vòng tuần hoàn.",
+      "durationMs": 4000
+    }
+  ]
+}

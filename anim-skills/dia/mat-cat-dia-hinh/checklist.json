@@ -1,0 +1,37 @@
+{
+  "requires": [
+    {
+      "selector": "[data-ek-chart=\"mat-cat\"]",
+      "min": 1
+    },
+    {
+      "selector": ".ek-profile-line",
+      "min": 1
+    }
+  ],
+  "motion": [
+    {
+      "kind": "before",
+      "a": "[data-ek-beat=\"0\"]",
+      "b": "[data-ek-beat=\"1\"]"
+    },
+    {
+      "kind": "before",
+      "a": "[data-ek-beat=\"1\"]",
+      "b": "[data-ek-beat=\"2\"]"
+    },
+    {
+      "kind": "staysInFrame",
+      "selector": "#c1"
+    }
+  ],
+  "limits": {
+    "cameraMoves": 0,
+    "labels": 12,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": true,
+    "numbersFromSpeech": true
+  }
+}

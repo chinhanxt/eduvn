@@ -1,0 +1,73 @@
+{
+  "skills": [
+    {
+      "id": "ban-do-luong",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.95,
+  "lyDo": "Cảnh trình bày hướng và quy mô các luồng di cư liên vùng giữa các địa danh lớn của Việt Nam.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.8,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Hiện bản đồ Việt Nam và hai cực hút TP. Hồ Chí Minh, Hà Nội",
+      "skill": "ban-do-luong",
+      "duLieu": {
+        "places": [
+          "ha-noi",
+          "tp-ho-chi-minh"
+        ]
+      }
+    },
+    {
+      "i": 1,
+      "t0": 3.8,
+      "t1": 8.0,
+      "cau": [
+        1
+      ],
+      "cue": "kw:sông Cửu Long",
+      "viec": "Vẽ mũi tên dày nhất từ Cần Thơ về TP. Hồ Chí Minh",
+      "skill": "ban-do-luong",
+      "duLieu": {
+        "from": "can-tho",
+        "to": "tp-ho-chi-minh"
+      }
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.2,
+      "cau": [
+        2
+      ],
+      "cue": "kw:Bắc Trung Bộ",
+      "viec": "Vẽ các luồng từ Vinh ra Hà Nội, Vinh và Buôn Ma Thuột vào TP.HCM",
+      "skill": "ban-do-luong",
+      "duLieu": {
+        "places": [
+          "vinh",
+          "buon-ma-thuot"
+        ]
+      }
+    },
+    {
+      "i": 3,
+      "t0": 12.2,
+      "t1": 16.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:việc làm",
+      "viec": "Hiện thẻ tổng kết nguyên nhân kinh tế của di cư liên vùng",
+      "skill": "ban-do-luong"
+    }
+  ],
+  "khongCanHoatHinh": false
+}

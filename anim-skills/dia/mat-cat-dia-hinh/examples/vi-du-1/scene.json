@@ -1,0 +1,24 @@
+{
+  "subject": "dia",
+  "grade": 12,
+  "title": "Mặt cắt địa hình Tây Bắc – Đông Nam (Fansipan → Biển Đông)",
+  "slideText": "Tuyến cắt A–B (km / độ cao m): Biên giới Tây Bắc 1.200 m → Sông Đà 260 m → Đỉnh Fansipan 3.143 m (Hoàng Liên Sơn) → Sông Hồng 80 m → Trung du Việt Trì 45 m → Đồng bằng sông Hồng (Hà Nội) 12 m → Biển Đông 0 m.",
+  "speech": [
+    {
+      "text": "Ta dựng lát cắt địa hình từ Tây Bắc xuống Đông Nam với trục độ cao bắt đầu từ mực nước biển 0 mét.",
+      "durationMs": 3800
+    },
+    {
+      "text": "Đường địa hình vọt lên mạnh mẽ tại dãy Hoàng Liên Sơn với đỉnh Fansipan cao 3.143 mét.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Qua thung lũng sông Hồng và trung du Việt Trì, địa hình hạ thấp nhanh xuống Đồng bằng sông Hồng chỉ khoảng 12 mét rồi ra Biển Đông.",
+      "durationMs": 4400
+    },
+    {
+      "text": "Lát cắt chứng minh rõ địa hình nước ta phân bậc và nghiêng theo hướng Tây Bắc xuống Đông Nam.",
+      "durationMs": 3600
+    }
+  ]
+}

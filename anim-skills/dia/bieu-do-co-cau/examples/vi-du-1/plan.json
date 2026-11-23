@@ -1,0 +1,74 @@
+{
+  "skills": [
+    {
+      "id": "bieu-do-co-cau",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.97,
+  "lyDo": "Thể hiện sự chuyển dịch cơ cấu GDP 3 khu vực kinh tế qua 4 mốc năm có tổng bằng 100%.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 4.0,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Hiện khung biểu đồ miền 0–100% với trục năm 2010–2015–2018–2023 đúng tỉ lệ",
+      "skill": "bieu-do-co-cau",
+      "duLieu": {
+        "nam": [
+          2010,
+          2015,
+          2018,
+          2023
+        ]
+      }
+    },
+    {
+      "i": 1,
+      "t0": 4.0,
+      "t1": 8.0,
+      "cau": [
+        1
+      ],
+      "cue": "kw:nông",
+      "viec": "Hiện miền Nông–lâm–thủy sản giảm 15,4% → 12,0%",
+      "skill": "bieu-do-co-cau",
+      "duLieu": {
+        "nong10": 15.4,
+        "nong23": 12.0
+      }
+    },
+    {
+      "i": 2,
+      "t0": 8.0,
+      "t1": 12.4,
+      "cau": [
+        2
+      ],
+      "cue": "kw:công nghiệp",
+      "viec": "Hiện miền Công nghiệp tăng 33,0% → 37,1% và miền Dịch vụ > 50%",
+      "skill": "bieu-do-co-cau",
+      "duLieu": {
+        "cn10": 33.0,
+        "cn23": 37.1,
+        "dv23": 50.9
+      }
+    },
+    {
+      "i": 3,
+      "t0": 12.4,
+      "t1": 16.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:công nghiệp hóa",
+      "viec": "Thẻ tổng kết xu hướng chuyển dịch cơ cấu kinh tế",
+      "skill": "bieu-do-co-cau"
+    }
+  ],
+  "khongCanHoatHinh": false
+}

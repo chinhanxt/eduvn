@@ -1,0 +1,113 @@
+{
+  "skill": "vong-tuan-hoan-tu-nhien",
+  "evals": [
+    {
+      "id": "tuan-hoan-nuoc",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 10,
+        "title": "Vòng tuần hoàn lớn của nước trong tự nhiên",
+        "slideText": "4 giai đoạn chính: 1. Bốc hơi từ đại dương (nhờ bức xạ Mặt Trời) → 2. Ngưng tụ tạo mây và gió đưa vào lục địa → 3. Giáng thủy (mưa rơi trên đất liền) → 4. Dòng chảy mặt (sông ngòi) và dòng chảy ngầm trở về biển.",
+        "speech": [
+          {
+            "text": "Bước 1, nhờ nhiệt năng Mặt Trời, nước từ biển và đại dương bốc hơi bay lên khí quyển.",
+            "durationMs": 4000
+          },
+          {
+            "text": "Bước 2, lên cao gặp lạnh, hơi nước ngưng tụ thành mây rồi được gió thổi sâu vào lục địa.",
+            "durationMs": 4000
+          },
+          {
+            "text": "Bước 3, các hạt nước kết tụ đủ nặng rơi xuống mặt đất thành mưa, gọi là giáng thủy.",
+            "durationMs": 4000
+          },
+          {
+            "text": "Bước 4, nước theo sông suối trên mặt và mạch nước ngầm chảy ra biển, khép kín vòng tuần hoàn.",
+            "durationMs": 4000
+          }
+        ]
+      },
+      "tieuChi": [
+        "đủ 4 khâu khép kín",
+        "có chuyển động dọc chu trình"
+      ]
+    },
+    {
+      "id": "vong-tuan-hoan-nho",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 6,
+        "title": "Vòng tuần hoàn nhỏ của nước",
+        "slideText": "Nước biển bốc hơi → ngưng tụ thành mây → rơi mưa ngay xuống biển.",
+        "speech": [
+          {
+            "text": "Vòng tuần hoàn nhỏ chỉ gồm hai bước bốc hơi và mưa rơi trực tiếp ngay trên đại dương.",
+            "durationMs": 5400
+          }
+        ]
+      },
+      "tieuChi": [
+        "thể hiện chu trình khép kín trên biển"
+      ]
+    },
+    {
+      "id": "vong-tuan-hoan-da",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 10,
+        "title": "Vòng tuần hoàn đá trong vỏ Trái Đất",
+        "slideText": "Đá macma → phong hóa tạo đá trầm tích → biến chất → nóng chảy thành macma.",
+        "speech": [
+          {
+            "text": "Các loại đá chuyển hóa qua lại khép kín giữa macma, trầm tích và biến chất.",
+            "durationMs": 5800
+          }
+        ]
+      },
+      "tieuChi": [
+        "sơ đồ chu trình 3–4 khâu khép kín"
+      ]
+    },
+    {
+      "id": "trai-dat-mua-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 6,
+        "title": "Trái Đất quay quanh Mặt Trời sinh 4 mùa",
+        "slideText": "Trục nghiêng 23°27' tạo Xuân phân, Hạ chí, Thu phân, Đông chí.",
+        "speech": [
+          {
+            "text": "Do trục nghiêng không đổi hướng khi quay quanh Mặt Trời nên bán cầu Bắc có bốn mùa.",
+            "durationMs": 5800
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng trai-dat-chuyen-dong"
+      ]
+    },
+    {
+      "id": "bieu-do-lua-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Diện tích và sản lượng lúa 2010–2023",
+        "slideText": "Diện tích 7,1 triệu ha, sản lượng 43,5 triệu tấn.",
+        "speech": [
+          {
+            "text": "Sản lượng lúa tăng nhờ năng suất tăng dù diện tích giảm nhẹ.",
+            "durationMs": 5200
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng biểu đồ kết hợp"
+      ]
+    }
+  ]
+}

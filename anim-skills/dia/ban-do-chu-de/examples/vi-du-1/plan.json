@@ -1,0 +1,92 @@
+{
+  "skills": [
+    {
+      "id": "ban-do-chu-de",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.97,
+  "lyDo": "Cảnh phân tích bản đồ mật độ dân số phân theo 34 tỉnh, thành phố mới sau 01/07/2025.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Hiện bản đồ 34 tỉnh/thành Việt Nam kèm Quần đảo Hoàng Sa và Trường Sa",
+      "skill": "ban-do-chu-de",
+      "duLieu": {
+        "places": [
+          "hoang-sa",
+          "truong-sa"
+        ]
+      }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 7.6,
+      "cau": [
+        1
+      ],
+      "cue": "kw:Hà Nội",
+      "viec": "Tô màu đậm nhóm > 1.000 người/km² (Hà Nội, TP.HCM, Hải Phòng, Hưng Yên, Ninh Bình)",
+      "skill": "ban-do-chu-de",
+      "duLieu": {
+        "haNoi": 2621,
+        "tphcm": 2068,
+        "haiPhong": 1460
+      }
+    },
+    {
+      "i": 2,
+      "t0": 7.6,
+      "t1": 11.4,
+      "cau": [
+        2
+      ],
+      "cue": "kw:Bắc Ninh",
+      "viec": "Tô màu trung bình cao 500–1.000 người/km² (Bắc Ninh, Đồng Tháp, Vĩnh Long, Cần Thơ, An Giang)",
+      "skill": "ban-do-chu-de",
+      "duLieu": {
+        "bacNinh": 767,
+        "dongThap": 736,
+        "canTho": 660
+      }
+    },
+    {
+      "i": 3,
+      "t0": 11.4,
+      "t1": 15.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:Lai Châu",
+      "viec": "Tô màu sáng nhóm < 150 người/km² (Lai Châu, Điện Biên, Cao Bằng, Sơn La)",
+      "skill": "ban-do-chu-de",
+      "duLieu": {
+        "laiChau": 57,
+        "dienBien": 71,
+        "caoBang": 86
+      }
+    },
+    {
+      "i": 4,
+      "t0": 15.0,
+      "t1": 18.0,
+      "cau": [
+        4
+      ],
+      "cue": "kw:chênh lệch",
+      "viec": "Hiện thẻ tổng kết chênh lệch đồng bằng – miền núi và thang chú giải",
+      "skill": "ban-do-chu-de",
+      "duLieu": {
+        "gapLan": 45
+      }
+    }
+  ],
+  "khongCanHoatHinh": false
+}

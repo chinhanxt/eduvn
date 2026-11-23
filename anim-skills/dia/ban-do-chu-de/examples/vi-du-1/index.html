@@ -1,0 +1,61 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="18" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-12" style="top:54px">ĐỊA LÍ 12 · BẢN ĐỒ 34 TỈNH, THÀNH PHỐ (TỪ 01/07/2025)</div>
+  <div class="ek-stage">
+    <div id="map-box" class="ek-col-1 ek-span-6 ek-hidden" style="top:118px;height:790px" data-ek-beat="0">
+      <svg id="vnmap" width="828" height="780" data-ek-map="vn34" data-ek-highlight="ha-noi,tp-ho-chi-minh,hai-phong"></svg>
+      <div id="lbl-hn" class="ek-map-badge ek-hidden" style="left:415px;top:116px">ĐBSH · Hà Nội 2.621</div>
+      <div id="lbl-tb" class="ek-map-badge ek-hidden" style="left:16px;top:162px">Tây Bắc · Lai Châu 57</div>
+      <div id="lbl-hcm" class="ek-map-badge ek-hidden" style="left:16px;top:492px">TP.HCM · 2.068</div>
+      <div id="lbl-dbscl" class="ek-map-badge ek-hidden" style="left:16px;top:698px">ĐBSCL · 500–740</div>
+    </div>
+    <h1 id="tt" class="ek-title ek-col-7 ek-span-6 ek-hidden" style="top:106px">Mật độ dân số <span class="kw">34 tỉnh</span></h1>
+    <div id="c1" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:226px" data-ek-beat="1">
+      <h3 class="ek-c-doSon">Rất cao (&gt; 1.000 người/km²)</h3>
+      <p>Hà Nội 2.621 · TP.HCM 2.068 · Hải Phòng 1.460</p>
+    </div>
+    <div id="c2" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:406px" data-ek-beat="2">
+      <h3 class="ek-c-lam">Khá cao (500 – 1.000 người/km²)</h3>
+      <p>Bắc Ninh 767 · Đồng Tháp 736 · Cần Thơ 660</p>
+    </div>
+    <div id="c3" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:586px" data-ek-beat="3">
+      <h3 class="ek-c-xanhLa">Thưa dân (&lt; 150 người/km²)</h3>
+      <p>Lai Châu 57 · Điện Biên 71 · Cao Bằng 86</p>
+    </div>
+    <div id="c4" class="ek-note ek-col-7 ek-span-6 ek-hidden" style="top:778px" data-ek-beat="4">
+      Chênh lệch hơn 45 lần giữa đồng bằng với miền núi · NQ 202/2025/QH15
+    </div>
+  </div>
+</div>
+<style>
+  #c1 { border-left-color: var(--c-doSon); }
+  #c2 { border-left-color: var(--c-lam); }
+  #c3 { border-left-color: var(--c-xanhLa); }
+  .ek-card { padding: 16px 26px 18px; }
+  .ek-card p { white-space: nowrap; font-size: 36px; }
+  .ek-map-badge {
+    position: absolute;
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-family: var(--ui);
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+  }
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+EK.enter(tl, "#tt", EK.cue(0), { from: "up" });
+EK.enter(tl, "#map-box", EK.cue(0), { from: "fade", dur: 0.9 });
+EK.fill(tl, "[data-ek-region='ha-noi'],[data-ek-region='tp-ho-chi-minh'],[data-ek-region='hai-phong'],[data-ek-region='hung-yen'],[data-ek-region='ninh-binh']", EK.cue(1), "doSon", { alpha: 0.85, dur: 0.9 });
+EK.enter(tl, "#c1, #lbl-hn, #lbl-hcm", EK.cue(1) + 0.15, { from: "right", stagger: 0.12 });
+EK.fill(tl, "[data-ek-region='bac-ninh'],[data-ek-region='dong-thap'],[data-ek-region='vinh-long'],[data-ek-region='can-tho'],[data-ek-region='an-giang'],[data-ek-region='phu-tho'],[data-ek-region='thanh-hoa'],[data-ek-region='dong-nai'],[data-ek-region='tay-ninh'],[data-ek-region='ca-mau']", EK.cue(2), "lam", { alpha: 0.65, dur: 0.9 });
+EK.enter(tl, "#c2, #lbl-dbscl", EK.cue(2) + 0.15, { from: "right", stagger: 0.12 });
+EK.fill(tl, "[data-ek-region='lai-chau'],[data-ek-region='dien-bien'],[data-ek-region='cao-bang'],[data-ek-region='son-la'],[data-ek-region='lang-son'],[data-ek-region='tuyen-quang'],[data-ek-region='lao-cai'],[data-ek-region='quang-tri'],[data-ek-region='quang-ngai']", EK.cue(3), "xanhLa", { alpha: 0.4, dur: 0.9 });
+EK.enter(tl, "#c3, #lbl-tb", EK.cue(3) + 0.15, { from: "right", stagger: 0.12 });
+EK.enter(tl, "#c4", EK.cue(4), { from: "up" });
+window.__timelines["main"] = tl;
+</script>

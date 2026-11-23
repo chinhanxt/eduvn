@@ -1,0 +1,46 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-12" style="top:54px">ĐỊA LÍ 12 · DI CƯ VÀ ĐÔ THỊ HÓA VIỆT NAM</div>
+  <div class="ek-stage">
+    <div id="map-wrap" class="ek-col-1 ek-span-6 ek-hidden" style="top:118px;height:790px" data-ek-beat="0">
+      <svg id="flowmap" width="828" height="780" data-ek-map="vn34" data-ek-highlight="ha-noi,tp-ho-chi-minh">
+        <path id="f-dbscl" class="ek-arrow ek-stroke-doSon" style="stroke-width:14px" data-ek-arrow="from:can-tho;to:tp-ho-chi-minh" data-ek-bend="-0.25"></path>
+        <path id="f-btb-hn" class="ek-arrow ek-stroke-lam" style="stroke-width:9px" data-ek-arrow="from:vinh;to:ha-noi" data-ek-bend="0.22"></path>
+        <path id="f-btb-hcm" class="ek-arrow ek-stroke-tim" style="stroke-width:8px" data-ek-arrow="from:vinh;via:da-nang;to:tp-ho-chi-minh" data-ek-bend="0.18"></path>
+        <path id="f-tn-hcm" class="ek-arrow ek-stroke-lucLam" style="stroke-width:7px" data-ek-arrow="from:buon-ma-thuot;to:tp-ho-chi-minh" data-ek-bend="-0.18"></path>
+      </svg>
+      <div id="p-hn" class="ek-place ek-hidden" data-ek-place="ha-noi">Hà Nội</div>
+      <div id="p-hcm" class="ek-place ek-hidden" data-ek-place="tp-ho-chi-minh">TP.HCM</div>
+    </div>
+    <h1 id="tt" class="ek-title ek-col-7 ek-span-6 ek-hidden" style="top:116px">Luồng <span class="kw">di cư</span> liên vùng</h1>
+    <div id="c1" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:292px" data-ek-beat="1">
+      <h3 class="ek-c-doSon">Luồng lớn nhất: ĐBSCL → Đông Nam Bộ</h3>
+      <p>Lao động đổ về các khu công nghiệp quanh TP. Hồ Chí Minh</p>
+    </div>
+    <div id="c2" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:484px" data-ek-beat="2">
+      <h3 class="ek-c-lam">Từ Bắc Trung Bộ &amp; Tây Nguyên</h3>
+      <p>Hướng ra Đồng bằng sông Hồng (Hà Nội) và vào Đông Nam Bộ</p>
+    </div>
+    <div id="c3" class="ek-card ek-col-7 ek-span-6 ek-hidden" style="top:676px" data-ek-beat="3">
+      <h3 class="ek-c-xanhLa">Động lực hút lao động</h3>
+      <p>Việc làm công nghiệp, dịch vụ và cơ hội nâng cao thu nhập</p>
+    </div>
+  </div>
+</div>
+<style>
+  #c1 { border-left-color: var(--c-doSon); }
+  #c2 { border-left-color: var(--c-lam); }
+  #c3 { border-left-color: var(--c-xanhLa); }
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+EK.enter(tl, "#tt, #map-wrap", EK.cue(0), { from: "fade", stagger: 0.1 });
+EK.enter(tl, "#p-hn, #p-hcm", EK.cue(0) + 0.5, { from: "scale", stagger: 0.15 });
+EK.arrow(tl, "#f-dbscl", EK.cue(1), 1.4);
+EK.enter(tl, "#c1", EK.cue(1) + 0.2, { from: "right" });
+EK.arrow(tl, "#f-btb-hn", EK.cue(2), 1.2);
+EK.arrow(tl, "#f-btb-hcm", EK.cue(2) + 0.4, 1.4);
+EK.arrow(tl, "#f-tn-hcm", EK.cue(2) + 0.8, 1.1);
+EK.enter(tl, "#c2", EK.cue(2) + 0.25, { from: "right" });
+EK.enter(tl, "#c3", EK.cue(3), { from: "up" });
+window.__timelines["main"] = tl;
+</script>

@@ -1,0 +1,117 @@
+{
+  "skill": "gio-mua-khi-hau",
+  "evals": [
+    {
+      "id": "hai-mua-gio-vn",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Gió mùa Đông Bắc và Gió mùa Tây Nam ở Việt Nam",
+        "slideText": "Gió mùa Đông Bắc (T11–T4): lạnh khô đầu đông, lạnh ẩm cuối đông; suy yếu ở dãy Bạch Mã (16°B). Gió mùa Tây Nam (T5–T10): nóng ẩm, gây mưa lớn Nam Bộ – Tây Nguyên; vượt Trường Sơn gây gió phơn Tây Nam khô nóng ở Bắc Trung Bộ.",
+        "speech": [
+          {
+            "text": "Khí hậu Việt Nam chịu chi phối sâu sắc bởi hai mùa gió đối lập cùng bức chắn dãy Bạch Mã ở vĩ tuyến 16 độ Bắc.",
+            "durationMs": 3600
+          },
+          {
+            "text": "Từ tháng 11 đến tháng 4, gió mùa Đông Bắc từ lục địa châu Á tràn xuống mang theo mùa đông lạnh cho miền Bắc.",
+            "durationMs": 3800
+          },
+          {
+            "text": "Gặp dãy Bạch Mã và đèo Hải Vân, khối khí lạnh bị chặn lại và suy yếu hẳn nên miền Nam nóng quanh năm.",
+            "durationMs": 3400
+          },
+          {
+            "text": "Từ tháng 5 đến tháng 10, gió mùa Tây Nam thổi từ biển vào gây mưa lớn ở Nam Bộ, Tây Nguyên và hiệu ứng phơn khô nóng ở Bắc Trung Bộ.",
+            "durationMs": 4200
+          },
+          {
+            "text": "Sự luân phiên hai mùa gió tạo nên thiên nhiên nhiệt đới ẩm gió mùa phân hóa đa dạng.",
+            "durationMs": 3000
+          }
+        ]
+      },
+      "tieuChi": [
+        "mũi tên Đông Bắc và Tây Nam rõ hướng",
+        "nhấn dãy Bạch Mã 16°B"
+      ]
+    },
+    {
+      "id": "gio-phon-truong-son",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Hiệu ứng phơn Tây Nam ở Bắc Trung Bộ",
+        "slideText": "Gió Tây Nam vượt Trường Sơn Bắc gây mưa sườn Tây, khô nóng sườn Đông.",
+        "speech": [
+          {
+            "text": "Đầu mùa hạ gió Tây Nam vượt dãy Trường Sơn Bắc biến tính thành gió phơn khô nóng thổi xuống Vinh và Đồng Hới.",
+            "durationMs": 5800
+          }
+        ]
+      },
+      "tieuChi": [
+        "vẽ hướng gió vượt Trường Sơn"
+      ]
+    },
+    {
+      "id": "tin-phong-ban-cau-bac",
+      "nenChon": true,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Tín phong bán cầu Bắc ở miền Nam",
+        "slideText": "Mùa đông từ 16°B trở vào, Tín phong Đông Bắc chiếm ưu thế gây mùa khô Nam Bộ.",
+        "speech": [
+          {
+            "text": "Từ dãy Bạch Mã trở vào Nam, Tín phong bán cầu Bắc thổi hướng Đông Bắc gây mưa cho Trung Bộ và khô cho Nam Bộ.",
+            "durationMs": 6000
+          }
+        ]
+      },
+      "tieuChi": [
+        "tách rõ 16°B trở vào Nam"
+      ]
+    },
+    {
+      "id": "thap-tuoi-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Tháp dân số Việt Nam 2019",
+        "slideText": "Nhóm 0–14 chiếm 24,3%, nhóm 65+ chiếm 7,7%.",
+        "speech": [
+          {
+            "text": "Tháp dân số cho thấy cơ cấu dân số Việt Nam đang già hóa.",
+            "durationMs": 5000
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng thap-dan-so"
+      ]
+    },
+    {
+      "id": "co-cau-khong-chon",
+      "nenChon": false,
+      "scene": {
+        "subject": "dia",
+        "grade": 12,
+        "title": "Cơ cấu GDP 2010–2023",
+        "slideText": "Nông nghiệp 12%, Công nghiệp 37,1%, Dịch vụ 50,9%.",
+        "speech": [
+          {
+            "text": "Công nghiệp tăng nhanh tỉ trọng trong GDP cả nước.",
+            "durationMs": 5000
+          }
+        ]
+      },
+      "tieuChi": [
+        "không chọn: dùng bieu-do-co-cau"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "subject": "dia",
+  "grade": 12,
+  "title": "Gió mùa Đông Bắc và Gió mùa Tây Nam ở Việt Nam",
+  "slideText": "Gió mùa Đông Bắc (T11–T4): lạnh khô đầu đông, lạnh ẩm cuối đông; suy yếu ở dãy Bạch Mã (16°B). Gió mùa Tây Nam (T5–T10): nóng ẩm, gây mưa lớn Nam Bộ – Tây Nguyên; vượt Trường Sơn gây gió phơn Tây Nam khô nóng ở Bắc Trung Bộ.",
+  "speech": [
+    {
+      "text": "Khí hậu Việt Nam chịu chi phối sâu sắc bởi hai mùa gió đối lập cùng bức chắn dãy Bạch Mã ở vĩ tuyến 16 độ Bắc.",
+      "durationMs": 3600
+    },
+    {
+      "text": "Từ tháng 11 đến tháng 4, gió mùa Đông Bắc từ lục địa châu Á tràn xuống mang theo mùa đông lạnh cho miền Bắc.",
+      "durationMs": 3800
+    },
+    {
+      "text": "Gặp dãy Bạch Mã và đèo Hải Vân, khối khí lạnh bị chặn lại và suy yếu hẳn nên miền Nam nóng quanh năm.",
+      "durationMs": 3400
+    },
+    {
+      "text": "Từ tháng 5 đến tháng 10, gió mùa Tây Nam thổi từ biển vào gây mưa lớn ở Nam Bộ, Tây Nguyên và hiệu ứng phơn khô nóng ở Bắc Trung Bộ.",
+      "durationMs": 4200
+    },
+    {
+      "text": "Sự luân phiên hai mùa gió tạo nên thiên nhiên nhiệt đới ẩm gió mùa phân hóa đa dạng.",
+      "durationMs": 3000
+    }
+  ]
+}

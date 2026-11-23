@@ -1,0 +1,60 @@
+<div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1920" data-height="1080">
+  <div class="ek-meta ek-col-1 ek-span-12" style="top:54px">ĐỊA LÍ 10 · THỦY QUYỂN · VÒNG TUẦN HOÀN NƯỚC</div>
+  <div class="ek-stage">
+    <h1 id="tt" class="ek-title ek-col-1 ek-span-12 ek-hidden" style="top:104px">Vòng tuần hoàn <span class="kw">nước</span> trong tự nhiên</h1>
+    <svg id="cyc" class="ek-col-1 ek-span-12" style="top:200px" width="1680" height="690" viewBox="0 0 1680 690" data-ek-cycle="nuoc">
+      <rect id="sea" x="980" y="470" width="660" height="170" rx="18" class="ek-soft-lam ek-stroke-lam" style="stroke-width:3px"></rect>
+      <path id="land" d="M 40 640 L 40 420 L 240 270 L 460 400 L 760 460 L 980 470 L 980 640 Z" class="ek-soft-xanhLa ek-stroke-xanhLa" style="stroke-width:3px"></path>
+      <circle id="sun" cx="1510" cy="110" r="56" class="ek-soft-vangDam ek-stroke-vangDam" style="stroke-width:5px"></circle>
+      <path id="a-evap" class="ek-arrow ek-stroke-vangDam" d="M 1310 460 C 1310 340, 1290 250, 1210 175"></path>
+      <polygon class="ek-arrow-head ek-fill-vangDam" points="1210,175 1236,184 1220,204"></polygon>
+      <path id="a-wind" class="ek-arrow ek-stroke-lam" d="M 1020 135 C 830 105, 650 105, 470 140"></path>
+      <polygon class="ek-arrow-head ek-fill-lam" points="470,140 498,124 496,150"></polygon>
+      <path id="a-rain" class="ek-arrow ek-stroke-lucLam" d="M 320 215 C 310 275, 305 325, 305 385"></path>
+      <polygon class="ek-arrow-head ek-fill-lucLam" points="305,385 292,358 318,358"></polygon>
+      <path id="a-runoff" class="ek-arrow ek-stroke-xanhLa" d="M 450 450 C 620 485, 790 520, 965 535"></path>
+      <polygon class="ek-arrow-head ek-fill-xanhLa" points="965,535 938,522 936,548"></polygon>
+      <circle id="drop" cx="1310" cy="460" r="14" class="ek-fill-lam ek-hidden"></circle>
+    </svg>
+    <div id="n0" class="ek-card ek-hidden" style="left:1230px;top:410px;width:480px" data-ek-beat="0">
+      <h3 class="ek-c-vangDam">1. Bốc hơi</h3>
+      <p>Nhiệt Mặt Trời làm nước biển bay hơi</p>
+    </div>
+    <div id="n1" class="ek-card ek-hidden" style="left:700px;top:210px;width:490px" data-ek-beat="1">
+      <h3 class="ek-c-lam">2. Ngưng tụ tạo mây</h3>
+      <p>Gặp lạnh tạo mây, gió đưa vào đất liền</p>
+    </div>
+    <div id="n2" class="ek-card ek-hidden" style="left:160px;top:220px;width:430px" data-ek-beat="2">
+      <h3 class="ek-c-lucLam">3. Giáng thủy (Mưa)</h3>
+      <p>Cung cấp nước ngọt cho lục địa</p>
+    </div>
+    <div id="n3" class="ek-card ek-hidden" style="left:440px;top:708px;width:620px" data-ek-beat="3">
+      <h3 class="ek-c-xanhLa">4. Dòng chảy mặt &amp; ngầm</h3>
+      <p>Nước theo sông và mạch ngầm trở về biển</p>
+    </div>
+  </div>
+</div>
+<style>
+  #n0 { border-left-color: var(--c-vangDam); }
+  #n1 { border-left-color: var(--c-lam); }
+  #n2 { border-left-color: var(--c-lucLam); }
+  #n3 { border-left-color: var(--c-xanhLa); }
+</style>
+<script>
+const tl = gsap.timeline({ paused: true });
+EK.enter(tl, "#tt", EK.cue(0), { from: "up" });
+EK.enter(tl, "#n0", EK.cue(0) + 0.2, { from: "up" });
+EK.arrow(tl, "#a-evap", EK.cue(0) + 0.3, 1.4);
+EK.enter(tl, "#drop", EK.cue(0) + 0.4, { from: "scale", dur: 0.3 });
+EK.follow(tl, "#drop", "#a-evap", EK.cue(0) + 0.7, 1.5);
+EK.enter(tl, "#n1", EK.cue(1), { from: "down" });
+EK.arrow(tl, "#a-wind", EK.cue(1) + 0.2, 1.4);
+EK.follow(tl, "#drop", "#a-wind", EK.cue(1) + 0.5, 1.6);
+EK.enter(tl, "#n2", EK.cue(2), { from: "left" });
+EK.arrow(tl, "#a-rain", EK.cue(2) + 0.2, 1.2);
+EK.follow(tl, "#drop", "#a-rain", EK.cue(2) + 0.4, 1.4);
+EK.enter(tl, "#n3", EK.cue(3), { from: "up" });
+EK.arrow(tl, "#a-runoff", EK.cue(3) + 0.2, 1.4);
+EK.follow(tl, "#drop", "#a-runoff", EK.cue(3) + 0.5, 1.6);
+window.__timelines["main"] = tl;
+</script>

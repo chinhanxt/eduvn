@@ -1,0 +1,13 @@
+{
+  "requires": [],
+  "motion": [],
+  "limits": {
+    "cameraMoves": 0,
+    "labels": 10,
+    "minFontPx": 36
+  },
+  "data": {
+    "placesFromGazetteer": false,
+    "numbersFromSpeech": true
+  }
+}

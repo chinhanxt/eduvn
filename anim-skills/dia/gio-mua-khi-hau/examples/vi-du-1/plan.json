@@ -1,0 +1,80 @@
+{
+  "skills": [
+    {
+      "id": "gio-mua-khi-hau",
+      "vaiTro": "chinh"
+    }
+  ],
+  "confidence": 0.97,
+  "lyDo": "Cảnh minh họa hai mùa gió Đông Bắc và Tây Nam cùng bức chắn Bạch Mã trên bản đồ Việt Nam.",
+  "beats": [
+    {
+      "i": 0,
+      "t0": 0,
+      "t1": 3.6,
+      "cau": [
+        0
+      ],
+      "cue": "t",
+      "viec": "Hiện bản đồ Việt Nam và ranh giới dãy Bạch Mã 16°B",
+      "skill": "gio-mua-khi-hau",
+      "duLieu": {
+        "places": [
+          "bach-ma",
+          "hoang-sa",
+          "truong-sa"
+        ]
+      }
+    },
+    {
+      "i": 1,
+      "t0": 3.6,
+      "t1": 7.4,
+      "cau": [
+        1
+      ],
+      "cue": "kw:Đông Bắc",
+      "viec": "Vẽ các mũi tên Gió mùa Đông Bắc T11–T4 tràn xuống miền Bắc",
+      "skill": "gio-mua-khi-hau"
+    },
+    {
+      "i": 2,
+      "t0": 7.4,
+      "t1": 10.8,
+      "cau": [
+        2
+      ],
+      "cue": "kw:Bạch Mã",
+      "viec": "Nhấn dãy Bạch Mã (16°B) ngăn gió lạnh",
+      "skill": "gio-mua-khi-hau",
+      "duLieu": {
+        "places": [
+          "deo-hai-van"
+        ]
+      }
+    },
+    {
+      "i": 3,
+      "t0": 10.8,
+      "t1": 15.0,
+      "cau": [
+        3
+      ],
+      "cue": "kw:Tây Nam",
+      "viec": "Giảm mờ gió Đông Bắc, vẽ Gió mùa Tây Nam T5–T10 và gió phơn",
+      "skill": "gio-mua-khi-hau"
+    },
+    {
+      "i": 4,
+      "t0": 15.0,
+      "t1": 18.0,
+      "cau": [
+        4
+      ],
+      "cue": "kw:luân phiên",
+      "viec": "Thẻ kết luận phân hóa khí hậu Bắc – Nam và Đông – Tây",
+      "skill": "gio-mua-khi-hau"
+    }
+  ],
+  "khongCanHoatHinh": false
+}
