@@ -280,3 +280,85 @@
 .gs-text mark { background: linear-gradient(transparent 55%, color-mix(in srgb, var(--c4) 38%, transparent) 55%); color: inherit; padding: 0 1px; }
 .gs-flip { display: inline-block; color: var(--danger); margin: 0 4px; animation: gs-flip .7s var(--ease-out) .3s both; }
 @keyframes gs-flip { 0% { transform: rotateY(0); color: var(--ink); } 50% { transform: rotateY(90deg); } 100% { transform: rotateY(0); color: var(--danger); } }
+
+/* ---------- Vòng lặp lỗ hổng ---------- */
+.lh-lap { font-size: 13px; font-weight: 600; color: var(--ink-3); margin-right: var(--s-2); }
+.lh-main { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--gap); align-items: center; }
+.lh-ring { --gc: var(--c1); position: relative; width: 100%; max-width: 520px; aspect-ratio: 1; margin: 0 auto; }
+.lh-ring > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.lh-ring .trk { fill: none; stroke: var(--line-2); stroke-width: 2; }
+.lh-ring .arc { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; }
+.lh-ring .chev { fill: none; stroke: var(--ink-3); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; opacity: .5; }
+.lh-ring .dot { fill: var(--accent); stroke: var(--bg); stroke-width: 3; }
+.lh-ring .glow { fill: var(--accent); opacity: .16; }
+.lh-st { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 8px; background: none; border: 0; padding: 0; cursor: pointer; color: var(--ink-3); }
+.lh-st.p0 { left: 50%; top: 10%; } .lh-st.p1 { left: 90%; top: 50%; } .lh-st.p2 { left: 50%; top: 90%; } .lh-st.p3 { left: 10%; top: 50%; }
+.lh-st .ic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-raised); box-shadow: 0 0 0 2px var(--line-2); color: var(--ink-3); transition: background var(--dur-3) var(--ease-out), color var(--dur-3), box-shadow var(--dur-3), transform var(--dur-3) var(--ease-out); }
+.lh-st .lb { font: 600 13px/1 var(--font-ui); white-space: nowrap; padding: 4px 8px; border-radius: 6px; background: var(--bg); transition: color var(--dur-3); }
+.lh-st.p1 .lb, .lh-st.p3 .lb { position: absolute; top: 64px; }
+.lh-st.past .ic { box-shadow: 0 0 0 2px var(--accent); color: var(--accent); }
+.lh-st.on .ic { background: var(--accent); color: var(--ink-on-accent); box-shadow: 0 0 0 6px var(--accent-bg); transform: scale(1.12); }
+.lh-st.on .lb { color: var(--ink); }
+.lh-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 52%; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; animation: dm-in .4s var(--ease-out); }
+.lh-center .big { font: 600 clamp(56px, 7vw, 88px)/1 var(--font-read); letter-spacing: -.03em; color: var(--ink); }
+.lh-center .big small { font-size: .42em; color: var(--ink-3); margin-left: 2px; }
+.lh-center > span { font-size: 14px; color: var(--ink-3); text-wrap: balance; }
+.lh-detail { min-height: 300px; display: flex; flex-direction: column; gap: var(--s-6); animation: dm-in .35s var(--ease-out); }
+.lh-gap { display: flex; flex-direction: column; gap: 8px; }
+.lh-gap b { font: 600 28px/1.2 var(--font-read); letter-spacing: -.01em; }
+.lh-subj { --sc: var(--c1); display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.lh-subj::before { content: ""; width: 9px; height: 9px; border-radius: 3px; background: var(--sc); }
+.lh-d { display: flex; flex-direction: column; gap: var(--s-6); }
+.lh-answers { display: flex; gap: 10px; flex-wrap: wrap; }
+.lh-answers span { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--bg-raised); box-shadow: var(--shadow-card, var(--shadow-1)); color: var(--ink-3); animation: dm-in .3s var(--ease-out) both; }
+.lh-answers .ok { color: var(--ok); }
+.lh-answers .bad { color: var(--ink-3); transition: background .3s, color .3s, transform .3s var(--ease-out); }
+.lh-answers .bad.on { background: var(--danger-bg); color: var(--danger); transform: translateY(-4px); }
+.lh-found { display: flex; align-items: center; gap: 10px; font: 400 18px/1.4 var(--font-read); color: var(--ink-2); opacity: 0; transform: translateY(6px); transition: opacity .4s var(--ease-out), transform .4s var(--ease-out); }
+.lh-found.in { opacity: 1; transform: none; }
+.lh-found b { color: var(--danger); font-weight: 600; }
+.lh-found .i { color: var(--accent); }
+.lh-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.lh-items li { display: flex; align-items: center; gap: var(--s-4); padding: 14px 18px; border-radius: 14px; background: var(--bg-raised); box-shadow: var(--shadow-card, var(--shadow-1)); opacity: 0; transform: translateX(16px); transition: opacity .4s var(--ease-out), transform .4s var(--ease-out); }
+.lh-items li.in { opacity: 1; transform: none; }
+.lh-items .q { font: 500 18px/1.3 var(--font-read); }
+.lh-items .lv { position: relative; width: 104px; flex: none; font-size: 11px; font-weight: 600; color: var(--ink-3); padding-top: 9px; }
+.lh-items .lv i { position: absolute; top: 0; left: 0; height: 4px; border-radius: 4px; background: var(--accent); }
+.lh-items .tick { width: 26px; height: 26px; flex: none; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--line-2); color: transparent; transition: background .25s, color .25s, box-shadow .25s; }
+.lh-items .tick.on { background: var(--ok); color: #fff; box-shadow: none; }
+.lh-mastery { position: relative; height: 10px; border-radius: 10px; background: var(--bg-sunken); }
+.lh-mastery i { position: absolute; inset: 0 auto 0 0; border-radius: 10px; background: var(--accent); }
+.lh-mastery .was { position: absolute; top: -4px; width: 2px; height: 18px; background: var(--ink-3); }
+.lh-card { display: flex; gap: var(--s-3); align-items: flex-start; padding: 18px 20px; border-radius: 14px; background: var(--bg-raised); box-shadow: var(--shadow-card, var(--shadow-1)); opacity: 0; transform: translateY(-10px) scale(.98); transition: opacity .45s var(--ease-out), transform .6s var(--ease-out); }
+.lh-card.in { opacity: 1; transform: none; }
+.lh-card .i { color: var(--accent); margin-top: 3px; }
+.lh-card b { display: block; font: 600 18px/1.3 var(--font-read); }
+.lh-card span { font-size: 13px; color: var(--ink-3); }
+.lh-book { margin-top: var(--gap); }
+.lh-book ul { list-style: none; margin: var(--s-3) 0 0; padding: 0; }
+.lh-book li { display: grid; grid-template-columns: 100px minmax(0, 1.4fr) minmax(0, 1fr) 120px; gap: var(--s-4); align-items: center; padding: 14px 8px; border-top: 1px solid var(--line); transition: background .4s; border-radius: 0; }
+.lh-book li.active { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.lh-book li.just { animation: hs-fresh 1.8s var(--ease-out); }
+.lh-book .q { font: 500 16px/1.35 var(--font-read); }
+.lh-book .why { font-size: 13px; color: var(--ink-3); }
+.lh-book .st { justify-self: end; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.lh-book .st.ok { color: var(--ok); }
+.lh-book .st.now { color: var(--accent); }
+.lh-book .st.now::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: dm-pulse-s 1.4s infinite; margin-right: 3px; }
+@keyframes dm-pulse-s { 50% { opacity: .3; } }
+@media (max-width: 1024px) { .lh-main { grid-template-columns: minmax(0, 1fr); } .lh-detail { min-height: 0; } }
+@media (max-width: 720px) {
+  .lh-st .ic { width: 44px; height: 44px; }
+  .lh-st .lb { font-size: 11px; }
+  .lh-st.p1 .lb, .lh-st.p3 .lb { top: 50px; }
+  .lh-center .big { font-size: 52px; }
+  .lh-center > span { font-size: 12px; }
+  .lh-book li { grid-template-columns: minmax(0, 1fr) auto; row-gap: 4px; }
+  .lh-book .why { grid-column: 1; }
+  .lh-book .q { grid-column: 1; }
+  .lh-book .st { grid-row: 1; grid-column: 2; }
+  .lh-gap b { font-size: 22px; }
+}
+.lh-tell { display: flex; flex-direction: column; gap: 10px; }
+.lh-tell span { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-2); opacity: 0; transform: translateX(-10px); transition: opacity .4s var(--ease-out), transform .4s var(--ease-out); }
+.lh-tell span.in { opacity: 1; transform: none; }

@@ -72,7 +72,7 @@ export function useClock(run: boolean, rate = 1): [number, (s: number) => void] 
     let raf = 0;
     let last = performance.now();
     const f = (now: number) => {
-      base.current += ((now - last) / 1000) * rate;
+      base.current += (Math.max(0, now - last) / 1000) * rate;
       last = now;
       setT(base.current);
       raf = requestAnimationFrame(f);
