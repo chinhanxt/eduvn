@@ -10,4 +10,5 @@ export const GV_LOP_NAV: NavEntry[] = [
   { to: "/giao-phan-hoa", label: "Giao phân hoá", icon: "shuffle" },
   { to: "/chong-chatgpt", label: "Chống ChatGPT", icon: "shield" },
   { to: "/tro-ly-lop", label: "Trợ lý lớp", icon: "bot" },
+  { to: "/cai-dat-ai", label: "Cài đặt AI", icon: "sliders" },
 ];
