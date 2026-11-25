@@ -85,7 +85,7 @@ export function useClock(run: boolean, rate = 1): [number, (s: number) => void] 
 
 /** Ảnh đại diện tròn có màu riêng theo người (hue). */
 export function Face({ name, hue, size = 40, ring }: { name: string; hue: number; size?: number; ring?: boolean }) {
-  const ini = name.split(/\s+/).slice(-2).map((w) => w[0]).join("");
+  const ini = name.split(/\s+/).slice(-2).map((w) => w[0]).join("").toLocaleUpperCase("vi");
   return (
     <span className={ring ? "dm-face ring" : "dm-face"} style={{ width: size, height: size, fontSize: size * 0.38, ["--h" as string]: hue }} aria-hidden="true">
       {ini}
