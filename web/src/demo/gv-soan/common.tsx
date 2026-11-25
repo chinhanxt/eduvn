@@ -3,12 +3,13 @@ import { type ReactNode, useEffect, useState } from "react";
 import { usePageMeta } from "../../ui/shell/AppShell";
 import { PageHead, type Primary } from "../../ui/shell/PageHead";
 import { Icon } from "../../ui/Icon";
+import type { Crumb } from "../../ui/shell/nav";
 import { MockBadge } from "../kit";
 import { wave } from "./data";
 import "./soan.css";
 
-export function Head({ title, tabs, primary, children }: { title: string; tabs?: ReactNode; primary?: Primary; children?: ReactNode }) {
-  usePageMeta(title);
+export function Head({ title, tabs, primary, children, crumbs }: { title: string; tabs?: ReactNode; primary?: Primary; children?: ReactNode; crumbs?: Crumb[] }) {
+  usePageMeta(title, crumbs);
   return (
     <PageHead
       title={

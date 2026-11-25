@@ -26,7 +26,7 @@ export function TaoBaiGiang() {
   };
   return (
     <>
-      <Head title="Tạo bài giảng">{step > 0 && <Button size="sm" variant="ghost" icon="refresh" onClick={restart}>Làm lại</Button>}</Head>
+      <Head title="Tạo bài giảng" crumbs={[{ label: "Bài giảng AI", to: "/bai-giang-ai" }, { label: "Tạo mới" }]}>{step > 0 && <Button size="sm" variant="ghost" icon="refresh" onClick={restart}>Làm lại</Button>}</Head>
       <div className="gs-wiz" key={run}>
         <Rail steps={STEPS} at={Math.min(step, 5)} onPick={(i) => i >= 2 && setStep(i)} />
         <div className="gs-stage">

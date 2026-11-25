@@ -18,11 +18,11 @@ function parabola(r1: number, r2: number, a: number, axisY = 180, sx = 40, only 
   return pts.join(" ");
 }
 
-function Axes({ y = 180, delay = 0 }: { y?: number; delay?: number }) {
+function Axes({ y = 180, delay = 0, noY }: { y?: number; delay?: number; noY?: boolean }) {
   return (
     <g className="pp-axis">
       <path className="draw" pathLength={1} d={`M20 ${y} H380`} style={d(delay)} />
-      <path className="draw" pathLength={1} d="M200 290 V20" style={d(delay + 0.15)} />
+      {!noY && <path className="draw" pathLength={1} d="M200 290 V20" style={d(delay + 0.15)} />}
     </g>
   );
 }
@@ -53,7 +53,7 @@ function Fig({ kind, illus }: { kind: Slide["kind"]; illus?: "gen" | "done" }) {
               </g>
             ))}
           </g>
-          <Axes y={280} delay={1.2} />
+          <Axes y={280} delay={1.2} noY />
           <path className="pp-area fade" d={`${parabola(1, 3, -2.6, 280, 52, true)} Z`} style={d(2.4)} />
           <path className="draw pp-c1" pathLength={1} d={parabola(1, 3, -2.6, 280, 52)} style={d(1.6)} />
         </svg>

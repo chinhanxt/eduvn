@@ -44,6 +44,7 @@ const P = {
   books: pick(() => Promise.all([import("../../hoc/Books"), import("../../hoc/hoc.css")]), ([m]) => m.Books),
   // Gói A mô phỏng: Soạn, bài giảng, giấy tờ (web/src/demo/gv-soan)
   gsTao: pick(() => import("../../demo/gv-soan/TaoBaiGiang"), (m) => m.TaoBaiGiang),
+  gsSua: pick(() => import("../../demo/gv-soan/SuaBaiGiang"), (m) => m.SuaBaiGiang),
 };
 
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
@@ -75,6 +76,7 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/kho-tri-thuc", page: P.kho, legacy: true },
   { path: "/giao-trinh", page: P.books, legacy: true },
   { path: "/bai-giang-ai/tao", page: P.gsTao },
+  { path: "/bai-giang-ai/sua", page: P.gsSua },
 ];
 /** Màn toàn màn hình (không khung): bảng giảng, sơ đồ, màn chiếu đấu trường. */
 const FULL_ROUTES: { path: string; page: Page }[] = [
