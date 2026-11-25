@@ -12,4 +12,5 @@ export const GV_LOP_ROUTES: { path: string; page: Page }[] = [
   { path: "/kho-cong-cu", page: pick(() => import("./KhoCongCu"), (m) => m.KhoCongCu) },
   { path: "/giao-phan-hoa", page: pick(() => import("./GiaoPhanHoa"), (m) => m.GiaoPhanHoa) },
   { path: "/chong-chatgpt", page: pick(() => import("./ChongChatGpt"), (m) => m.ChongChatGpt) },
+  { path: "/tro-ly-lop", page: pick(() => import("./TroLyLop"), (m) => m.TroLyLop) },
 ];

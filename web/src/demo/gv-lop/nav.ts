@@ -9,4 +9,5 @@ export const GV_LOP_NAV: NavEntry[] = [
   { to: "/kho-cong-cu", label: "Kho công cụ", icon: "box" },
   { to: "/giao-phan-hoa", label: "Giao phân hoá", icon: "shuffle" },
   { to: "/chong-chatgpt", label: "Chống ChatGPT", icon: "shield" },
+  { to: "/tro-ly-lop", label: "Trợ lý lớp", icon: "bot" },
 ];

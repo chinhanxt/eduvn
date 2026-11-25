@@ -1,5 +1,5 @@
 /** Dàn nhân vật tự vẽ (nguyên bản) cho Lớp học AI và Bạn đồng hành: chân dung bán thân SVG, mắt chớp, miệng mấp máy khi nói. */
-export type CastId = "lam" | "bon" | "su" | "tun" | "minhAnh" | "khanhDuy" | "bacTu" | "nhu";
+export type CastId = "lam" | "bon" | "su" | "tun" | "minhAnh" | "khanhDuy" | "bacTu" | "nhu" | "ducThinh";
 export type CastMember = { id: CastId; name: string; role: string; hue: number; ai: boolean };
 
 export const CAST: Record<CastId, CastMember> = {
@@ -11,10 +11,11 @@ export const CAST: Record<CastId, CastMember> = {
   khanhDuy: { id: "khanhDuy", name: "Khánh Duy", role: "Học sinh", hue: 150, ai: false },
   bacTu: { id: "bacTu", name: "Bác Tư", role: "Phụ huynh (AI đóng vai)", hue: 25, ai: true },
   nhu: { id: "nhu", name: "Nhú", role: "Bạn đồng hành", hue: 95, ai: true },
+  ducThinh: { id: "ducThinh", name: "Đức Thịnh", role: "Học sinh", hue: 265, ai: false },
 };
 
-const SKIN: Record<CastId, string> = { lam: "#F2D3B8", bon: "#E9C29E", su: "#F6DCC6", tun: "#DDB08A", minhAnh: "#F4D6BE", khanhDuy: "#E3B892", bacTu: "#D9A982", nhu: "#CDEBB4" };
-const HAIR: Record<CastId, string> = { lam: "#2A2420", bon: "#3B2A1E", su: "#5B2C4F", tun: "#1E1A17", minhAnh: "#231C18", khanhDuy: "#2B211B", bacTu: "#B9B4AE", nhu: "#5E9C3A" };
+const SKIN: Record<CastId, string> = { lam: "#F2D3B8", bon: "#E9C29E", su: "#F6DCC6", tun: "#DDB08A", minhAnh: "#F4D6BE", khanhDuy: "#E3B892", bacTu: "#D9A982", nhu: "#CDEBB4", ducThinh: "#EBC6A2" };
+const HAIR: Record<CastId, string> = { lam: "#2A2420", bon: "#3B2A1E", su: "#5B2C4F", tun: "#1E1A17", minhAnh: "#231C18", khanhDuy: "#2B211B", bacTu: "#B9B4AE", nhu: "#5E9C3A", ducThinh: "#1F1915" };
 
 function Hair({ id }: { id: CastId }) {
   const c = HAIR[id];
@@ -72,6 +73,8 @@ function Hair({ id }: { id: CastId }) {
           <path fill={c} d="M17 27c0-9 6-14 15-14s15 5 15 14c-1.5-3-3-4.5-5-5-2 2-18 2-20 0-2 .5-3.5 2-5 5z" />
         </g>
       );
+    case "ducThinh": // tóc dựng gọn hai bên
+      return <path fill={c} d="M16.5 26c-.5-9 5-14.5 15.5-14.5S48 17 47.5 26c-2-3-5-5-8-5.5l-1-3-3 2.5-3-3.5-3 3.5-3-2.5-1 3c-3 .5-6 2.5-8.5 5.5z" />;
     case "nhu": // mầm cây trên đầu
       return (
         <g>

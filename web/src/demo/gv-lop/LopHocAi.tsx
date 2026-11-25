@@ -287,7 +287,7 @@ function Feather({ x, y }: { x: number; y: number }) {
 }
 
 /* ----------------------------- Bàn tròn ----------------------------- */
-const SEAT_POS: Record<CastId, [number, number]> = { lam: [50, 6], tun: [88, 34], su: [76, 82], minhAnh: [24, 82], bon: [12, 34], khanhDuy: [0, 0], bacTu: [0, 0], nhu: [0, 0] };
+const SEAT_POS: Record<CastId, [number, number]> = { lam: [50, 6], tun: [88, 34], su: [76, 82], minhAnh: [24, 82], bon: [12, 34], khanhDuy: [0, 0], bacTu: [0, 0], nhu: [0, 0], ducThinh: [0, 0] };
 
 function RoundTable({ beat }: { beat: number }) {
   const cur = BEATS[beat];
