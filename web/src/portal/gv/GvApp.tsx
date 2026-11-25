@@ -48,6 +48,7 @@ const P = {
   gsXuat: pick(() => import("../../demo/gv-soan/XuatBan"), (m) => m.XuatBan),
   gsStudio: pick(() => import("../../demo/gv-soan/Studio"), (m) => m.Studio),
   gsInfo: pick(() => import("../../demo/gv-soan/Infographic"), (m) => m.InfographicPage),
+  gsGiayTo: pick(() => import("../../demo/gv-soan/GiayTo"), (m) => m.GiayTo),
 };
 
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
@@ -83,6 +84,7 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/xuat-ban", page: P.gsXuat },
   { path: "/studio", page: P.gsStudio },
   { path: "/infographic", page: P.gsInfo },
+  { path: "/giay-to", page: P.gsGiayTo },
 ];
 /** Màn toàn màn hình (không khung): bảng giảng, sơ đồ, màn chiếu đấu trường. */
 const FULL_ROUTES: { path: string; page: Page }[] = [

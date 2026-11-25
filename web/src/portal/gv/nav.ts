@@ -21,6 +21,7 @@ export function gvNav(counts: { classes?: number; grading?: number } = {}): NavE
     { to: "/studio", label: "Studio hoạt hình", icon: "play" },
     { to: "/infographic", label: "Infographic", icon: "image" },
     { to: "/xuat-ban", label: "Xuất bản", icon: "upload" },
+    { to: "/giay-to", label: "Giấy tờ", icon: "clip" },
     { group: "Ôn tập & tư liệu" },
     { to: "/tro-choi", label: "Trò chơi ôn tập", icon: "game" },
     { to: "/dau-truong", label: "Đấu trường", icon: "target" },
