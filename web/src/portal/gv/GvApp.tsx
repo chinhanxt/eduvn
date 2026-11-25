@@ -43,6 +43,15 @@ const P = {
   kho: pick(() => Promise.all([import("../../hoc/KhoTriThuc"), import("../../hoc/hoc.css")]), ([m]) => m.KhoTriThuc),
   sapCo: pick(() => import("./CongCu"), (m) => m.SapCo),
   books: pick(() => Promise.all([import("../../hoc/Books"), import("../../hoc/hoc.css")]), ([m]) => m.Books),
+  // Gói A mô phỏng: Soạn, bài giảng, giấy tờ (web/src/demo/gv-soan)
+  gsTao: pick(() => import("../../demo/gv-soan/TaoBaiGiang"), (m) => m.TaoBaiGiang),
+  gsSua: pick(() => import("../../demo/gv-soan/SuaBaiGiang"), (m) => m.SuaBaiGiang),
+  gsXuat: pick(() => import("../../demo/gv-soan/XuatBan"), (m) => m.XuatBan),
+  gsStudio: pick(() => import("../../demo/gv-soan/Studio"), (m) => m.Studio),
+  gsInfo: pick(() => import("../../demo/gv-soan/Infographic"), (m) => m.InfographicPage),
+  gsGiayTo: pick(() => import("../../demo/gv-soan/GiayTo"), (m) => m.GiayTo),
+  gsTo: pick(() => import("../../demo/gv-soan/ToChuyenMon"), (m) => m.ToChuyenMon),
+  gsNangLuc: pick(() => import("../../demo/gv-soan/NangLuc"), (m) => m.NangLuc),
 };
 
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
@@ -74,6 +83,14 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/ket-noi", page: P.connect },
   { path: "/kho-tri-thuc", page: P.kho, legacy: true },
   { path: "/giao-trinh", page: P.books, legacy: true },
+  { path: "/bai-giang-ai/tao", page: P.gsTao },
+  { path: "/bai-giang-ai/sua", page: P.gsSua },
+  { path: "/xuat-ban", page: P.gsXuat },
+  { path: "/studio", page: P.gsStudio },
+  { path: "/infographic", page: P.gsInfo },
+  { path: "/giay-to", page: P.gsGiayTo },
+  { path: "/to-chuyen-mon", page: P.gsTo },
+  { path: "/day-theo-nang-luc", page: P.gsNangLuc },
 ];
 /** Màn toàn màn hình (không khung): bảng giảng, sơ đồ, màn chiếu đấu trường. */
 const FULL_ROUTES: { path: string; page: Page }[] = [
