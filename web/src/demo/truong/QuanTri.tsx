@@ -1,7 +1,10 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import { Button, Icon, Tabs, useToast } from "../../ui";
-import { GUARDIANS, KHANH_DUY, MINH_ANH, QUANG_HUY, SCHOOL, TEACHERS, THAO_VY } from "../kit";
+import { Button } from "../../ui/components/Button";
+import { Tabs } from "../../ui/components/Tabs";
+import { useToast } from "../../ui/components/Toast";
+import { Icon } from "../../ui/Icon";
+import { GUARDIANS, KHANH_DUY, MINH_ANH, QUANG_HUY, SCHOOL, TEACHERS, THAO_VY } from "../kit/world";
 
 /* ---------------- Người dùng ---------------- */
 type Role = "hs" | "ph" | "gv" | "bgh" | "qt";

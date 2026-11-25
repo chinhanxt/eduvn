@@ -1,4 +1,4 @@
-import { Icon } from "../../ui";
+import { Icon } from "../../ui/Icon";
 import { Face, Karaoke, Loa } from "./bits";
 import { LIGHTS, type ParentView } from "./data";
 import type { useSpeak } from "./speak";

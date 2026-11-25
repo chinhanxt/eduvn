@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Button, Icon, Segmented, StreamingText, useToast } from "../../ui";
-import { NUMBERS, useFakeStream } from "../kit";
+import { useToast } from "../../ui/components/Toast";
+import { Icon } from "../../ui/Icon";
+import { useFakeStream } from "../kit/useFakeStream";
+import { NUMBERS } from "../kit/world";
 import { KPIS, ROWS, SUBJECTS, TEACHER_ROWS, avg, fmt, schoolAvg, type ClassRow } from "./data";
 import { useAfter, useCount } from "./hooks";
 
@@ -97,6 +99,7 @@ function Alerts() {
   const go = useAfter(1900);
   const s = useFakeStream(ADVICE, { run: go, delayMs: 200 });
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
   return (
     <section className="tr-sec tr-alerts" aria-labelledby="tr-al">
       <div className="tr-sec-h">
@@ -113,24 +116,28 @@ function Alerts() {
         </div>
         <div className="al-ai">
           <span className="al-ai-h"><Icon name="spark" size="sm" /> AI nhà trường</span>
-          <StreamingText text={s.text} state={s.state} className="al-ai-t" />
+          <p className="al-ai-t" aria-live="polite">
+            {s.text}
+            {s.state === "streaming" && <i className="caret" aria-hidden="true" />}
+          </p>
         </div>
-        <Button
-          variant="primary"
-          icon={sent ? "check" : "send"}
-          disabled={sent}
-          onClick={() =>
-            new Promise<void>((ok) =>
-              setTimeout(() => {
-                setSent(true);
-                toast({ title: "Đã giao tổ Văn", msg: "Thầy Bảo và tổ trưởng nhận việc kèm số liệu.", kind: "ok" });
-                ok();
-              }, 700),
-            )
-          }
+        <button
+          type="button"
+          className="btn primary"
+          disabled={sent || busy}
+          aria-busy={busy || undefined}
+          onClick={() => {
+            setBusy(true);
+            setTimeout(() => {
+              setBusy(false);
+              setSent(true);
+              toast({ title: "Đã giao tổ Văn", msg: "Thầy Bảo và tổ trưởng nhận việc kèm số liệu.", kind: "ok" });
+            }, 700);
+          }}
         >
-          {sent ? "Đã giao" : "Giao tổ Văn"}
-        </Button>
+          <Icon name={sent ? "check" : "send"} />
+          <span>{sent ? "Đã giao" : "Giao tổ Văn"}</span>
+        </button>
       </div>
       <div className="al-kids">
         <span className="al-n num">{NUMBERS.earlyWarnings}</span>
@@ -189,15 +196,10 @@ function Compare({ subject, onPick }: { subject: number | null; onPick: (i: numb
     <section className="tr-sec tr-cmp" aria-labelledby="tr-cmp">
       <div className="tr-sec-h">
         <h2 id="tr-cmp">So sánh</h2>
-        <Segmented
-          label="So sánh theo"
-          value={by}
-          onChange={setBy}
-          options={[
-            { value: "lop", label: "Lớp" },
-            { value: "gv", label: "Giáo viên" },
-          ]}
-        />
+        <div className="seg" role="group" aria-label="So sánh theo">
+          <button type="button" aria-pressed={by === "lop"} onClick={() => setBy("lop")}>Lớp</button>
+          <button type="button" aria-pressed={by === "gv"} onClick={() => setBy("gv")}>Giáo viên</button>
+        </div>
         <span className="grow" />
         {by === "lop" && (
           <button type="button" className={subject === null ? "chip" : "chip"} aria-pressed={subject !== null} onClick={() => onPick(subject === null ? 1 : null)}>

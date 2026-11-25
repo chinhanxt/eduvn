@@ -1,12 +1,18 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, Route, Routes, useLocation, useParams } from "react-router";
-import { Icon } from "../../ui";
-import { THEME_KEY, toggleTheme, useTheme } from "../../ui/shell/theme";
-import { MockBadge, SCHOOL } from "../kit";
+import { Icon } from "../../ui/Icon";
+import { MockBadge } from "../kit/MockBadge";
+import { SCHOOL } from "../kit/world";
 import { ConHomNay, ToiNay } from "./ConHomNay";
 import { VIEWS, viewFor } from "./data";
-import { HoiCo, KemNgay, Tuan, Zalo } from "./KemCon";
 import { useSpeak } from "./speak";
+import { applyStoredTheme, toggleDark, useDark } from "./theme";
+
+// Phần dưới màn (tuần, hỏi cô, Zalo, kèm ngay) tải sau để JS lần đầu nhẹ.
+const Tuan = lazy(() => import("./KemCon").then((m) => ({ default: m.Tuan })));
+const HoiCo = lazy(() => import("./KemCon").then((m) => ({ default: m.HoiCo })));
+const Zalo = lazy(() => import("./KemCon").then((m) => ({ default: m.Zalo })));
+const KemNgay = lazy(() => import("./KemCon").then((m) => ({ default: m.KemNgay })));
 import "./ph.css";
 
 const BIG_KEY = "eduvn-ph-big";
@@ -15,7 +21,7 @@ function ParentPage() {
   const { con } = useParams();
   const v = viewFor(con);
   const sp = useSpeak();
-  const theme = useTheme();
+  const dark = useDark();
   const [big, setBig] = useState(() => {
     try {
       return localStorage.getItem(BIG_KEY) === "1";
@@ -55,8 +61,8 @@ function ParentPage() {
           <span aria-hidden="true">A</span><span aria-hidden="true">A</span>
           <span className="sr">Chữ thật to</span>
         </button>
-        <button type="button" className="ph-tool" onClick={toggleTheme} title={theme === "dark" ? "Nền sáng" : "Nền tối"}>
-          <Icon name={theme === "dark" ? "sun" : "moon"} />
+        <button type="button" className="ph-tool" onClick={toggleDark} title={dark ? "Nền sáng" : "Nền tối"}>
+          <Icon name={dark ? "sun" : "moon"} />
           <span className="sr">Đổi nền sáng tối</span>
         </button>
       </header>
@@ -64,23 +70,29 @@ function ParentPage() {
       <main className="ph-main">
         <div className="ph-c1">
           <ConHomNay v={v} sp={sp} />
-          <Tuan v={v} />
+          <Suspense fallback={null}>
+            <Tuan v={v} />
+          </Suspense>
         </div>
         <div className="ph-c2">
           <ToiNay v={v} sp={sp} onStart={() => setRun(true)} />
-          <HoiCo v={v} sp={sp} />
-          <Zalo v={v} />
+          <Suspense fallback={null}>
+            <HoiCo v={v} sp={sp} />
+            <Zalo v={v} />
+          </Suspense>
         </div>
       </main>
       {run && (
-        <KemNgay
-          v={v}
-          sp={sp}
-          onClose={() => {
-            sp.stop();
-            setRun(false);
-          }}
-        />
+        <Suspense fallback={null}>
+          <KemNgay
+            v={v}
+            sp={sp}
+            onClose={() => {
+              sp.stop();
+              setRun(false);
+            }}
+          />
+        </Suspense>
       )}
 
       <footer className="ph-foot">
@@ -99,14 +111,7 @@ function ParentPage() {
 
 /** Cổng Phụ huynh (công khai, vào bằng link/QR): /phu-huynh/:con. */
 export default function PhuHuynhApp() {
-  useEffect(() => {
-    try {
-      const t = localStorage.getItem(THEME_KEY);
-      if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
-    } catch {
-      /* bỏ qua */
-    }
-  }, []);
+  useEffect(applyStoredTheme, []);
   return (
     <Routes>
       <Route index element={<ParentPage />} />

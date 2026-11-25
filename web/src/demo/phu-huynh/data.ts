@@ -1,4 +1,4 @@
-import { KHANH_DUY, MINH_ANH, TEACHERS, type Learner } from "../kit";
+import { KHANH_DUY, MINH_ANH, TEACHERS, type Learner } from "../kit/world";
 
 /** Dữ liệu mẫu riêng cổng Phụ huynh (nhất quán với thế giới mẫu: docs/demo/the-gioi-mau.md). */
 export type Light = "xanh" | "vang" | "do";

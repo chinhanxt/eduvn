@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Icon, StreamingText } from "../../ui";
-import { useFakeStream } from "../kit";
+import { Icon } from "../../ui/Icon";
+import { StreamingText } from "../../ui/components/StreamingText";
+import { useFakeStream } from "../kit/useFakeStream";
 import { Karaoke, Loa } from "./bits";
 import { LIGHTS, fmtMin, type ParentView } from "./data";
 import type { useSpeak } from "./speak";

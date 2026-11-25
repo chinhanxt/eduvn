@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Button, Icon, Segmented } from "../../ui";
+import { Button } from "../../ui/components/Button";
+import { Segmented } from "../../ui/components/Chip";
+import { Icon } from "../../ui/Icon";
 import { HIDE_UNDER, WELL_CLASSES, WELL_WEEKS } from "./data";
 
 /* ---------------- Hoạt hình "AI phối hợp": HS → GV → phụ huynh ---------------- */

@@ -103,6 +103,7 @@ body:has(.tr) { background: #fdfcf9; }
 .al-ai-h { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
 .al-ai-t { font: 400 16px / 1.55 var(--font-read); color: var(--ink); text-wrap: pretty; }
 .al-main .btn { justify-self: start; }
+.al-ai-t .caret { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -2px; background: var(--accent); animation: tr-pulse .9s steps(2) infinite; }
 .al-kids { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 16px; row-gap: 8px; align-items: center; padding: 0 4px; }
 .al-n { grid-row: 1 / span 2; font: 800 54px / 1 var(--font-ui); letter-spacing: -.04em; }
 .al-dots { display: flex; gap: 6px; }

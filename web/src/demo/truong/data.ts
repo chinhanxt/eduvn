@@ -1,4 +1,4 @@
-import { CLASSES, NUMBERS, SCHOOL, TEACHERS } from "../kit";
+import { CLASSES, NUMBERS, SCHOOL, TEACHERS } from "../kit/world";
 
 /** Dữ liệu mẫu riêng cổng Nhà trường. Lớp/GV/số gốc lấy từ thế giới mẫu; lớp thêm (6A1, 7A3…) chỉ để bản đồ đủ dày. */
 export const SUBJECTS = ["Toán", "Ngữ văn", "Tiếng Anh", "Hoá học", "Sinh học", "Lịch sử", "Địa lí"] as const;

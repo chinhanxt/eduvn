@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Icon, StreamingText, useToast } from "../../ui";
-import { useFakeStream } from "../kit";
+import { Button } from "../../ui/components/Button";
+import { StreamingText } from "../../ui/components/StreamingText";
+import { useToast } from "../../ui/components/Toast";
+import { Icon } from "../../ui/Icon";
+import { useFakeStream } from "../kit/useFakeStream";
 import { fmt } from "./data";
 
 /* ---------------- Câu trả lời mẫu của AI nhà trường (chỉ số tổng hợp) ---------------- */
