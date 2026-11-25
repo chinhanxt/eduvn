@@ -441,3 +441,110 @@
   .gl-tile { margin-bottom: 20px; }
   .gl-tile-m b { font-size: 13px; }
 }
+
+/* ============ Bạn đồng hành ============ */
+.gl-bdh .page-head.bar .seg { margin-left: 8px; }
+.gl-comp { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 64px; margin-top: 28px; align-items: start; }
+.gl-comp-me { display: grid; justify-items: center; text-align: center; }
+.gl-comp-face { position: relative; animation: gl-rise .5s var(--gl-ease) both; }
+.gl-comp-face::before { content: ""; position: absolute; inset: -14px; border-radius: 50%; border: 1.5px dashed color-mix(in srgb, var(--gl-c3) 45%, transparent); animation: gl-spin 30s linear infinite; }
+.gl-comp-face .gl-face { transform: rotate(calc((var(--hai) - .5) * 8deg)); }
+.gl-comp-me h2 { font: 600 34px/1.1 var(--font-read); margin: 26px 0 4px; }
+.gl-comp-me > p { margin: 0 0 26px; font-size: 13px; }
+.gl-traits { display: grid; gap: 16px; width: 100%; }
+.gl-traits label { display: grid; gap: 6px; text-align: left; font-size: 13px; color: var(--ink-2); }
+.gl-traits label.on span { color: var(--ink); font-weight: 600; }
+.gl-traits input { -webkit-appearance: none; appearance: none; width: 100%; height: 20px; background: none; cursor: pointer; }
+.gl-traits input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent) var(--v), var(--line-2) var(--v)); }
+.gl-traits input::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--accent) var(--v), var(--line-2) var(--v)); }
+.gl-traits input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 2px var(--accent), var(--shadow-1); }
+.gl-traits input::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 2px var(--accent); }
+.gl-comp-chat { display: grid; gap: 14px; align-content: start; padding-top: 18px; }
+.gl-bub { display: flex; align-items: flex-end; gap: 10px; max-width: 560px; animation: gl-rise .35s var(--gl-ease) both; }
+.gl-bub p { margin: 0; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; text-wrap: pretty; }
+.gl-bub.them p { background: var(--bg-sunken); border-bottom-left-radius: 6px; }
+.gl-bub.me { justify-self: end; flex-direction: row; }
+.gl-bub.me p { background: var(--accent-bg); color: var(--ink); border-bottom-right-radius: 6px; min-width: 64px; }
+.gl-bub.me.plain p { background: var(--accent); color: var(--ink-on-accent); }
+.gl-bub time { font-size: 11px; color: var(--ink-3); }
+.gl-dots { display: inline-flex; gap: 4px; padding: 4px 0; }
+.gl-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); animation: th-seq 1s ease-in-out infinite; }
+.gl-dots i:nth-child(2) { animation-delay: .15s; } .gl-dots i:nth-child(3) { animation-delay: .3s; }
+.gl-focus { margin: 34px 0 0; }
+.gl-focus figcaption { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.gl-focus-k { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); }
+.gl-focus-k i { width: 14px; height: 3px; border-radius: 2px; } .gl-focus-k i.a { background: var(--accent); } .gl-focus-k i.b { background: var(--line-input); margin-left: 8px; }
+.gl-focus svg { display: block; width: 100%; height: 120px; overflow: visible; }
+.gl-focus .gl-axis { stroke: var(--line-2); opacity: 1; }
+.gl-focus .gl-guide { stroke: var(--line-input); }
+.gl-focus-a { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke; transition: d .6s var(--gl-ease); }
+.gl-focus-b { fill: none; stroke: var(--line-input); stroke-width: 2; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.gl-focus .gl-pt { fill: var(--accent); animation: none; }
+.gl-focus-x { position: relative; height: 18px; margin-top: 6px; font-size: 11px; color: var(--ink-3); }
+.gl-focus-x span { position: absolute; top: 0; white-space: nowrap; }
+.gl-focus-x span:nth-child(2) { translate: -50% 0; color: var(--accent); font-weight: 500; } .gl-focus-x span:nth-child(3) { translate: 0 0; padding-left: 8px; }
+
+/* Nhóm tranh luận */
+.gl-deb { margin-top: 28px; display: grid; gap: 32px; }
+.gl-deb-topic { text-align: center; display: grid; gap: 8px; justify-items: center; }
+.gl-deb-topic h2 { margin: 0; font: 600 32px/1.2 var(--font-read); text-wrap: balance; max-width: 22ch; }
+.gl-rope { display: grid; grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: center; gap: 20px; max-width: 860px; width: 100%; margin: 0 auto; }
+.gl-rope-side { display: grid; justify-items: center; gap: 6px; font-size: 13px; }
+.gl-rope-side.ung b { color: var(--gl-c3); } .gl-rope-side.phan b { color: var(--gl-c5); }
+.gl-rope-track { position: relative; height: 10px; border-radius: 5px; background: linear-gradient(90deg, color-mix(in srgb, var(--gl-c3) 30%, var(--bg)), var(--bg-sunken) 50%, color-mix(in srgb, var(--gl-c5) 30%, var(--bg))); }
+.gl-rope-mid { position: absolute; left: 50%; top: -10px; bottom: -10px; width: 1.5px; background: var(--line-input); }
+.gl-rope-knot { position: absolute; top: 50%; width: 26px; height: 26px; border-radius: 50%; translate: -50% -50%; background: var(--ink); box-shadow: 0 0 0 5px var(--bg), var(--shadow-2); transition: left .9s var(--gl-ease); }
+.gl-deb-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; max-width: 1000px; width: 100%; margin: 0 auto; }
+.gl-deb-col { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; align-content: start; }
+.gl-deb-col li { padding: 14px 18px; border-radius: 12px; background: var(--bg-sunken); animation: gl-rise .4s var(--gl-ease) both; transition: background var(--dur-3); }
+.gl-deb-col.ung li { border-left: 3px solid var(--gl-c3); } .gl-deb-col.phan li { border-left: 3px solid var(--gl-c5); }
+.gl-deb-col li.now { background: var(--bg); box-shadow: 0 0 0 1px var(--line-2), var(--shadow-1); }
+.gl-deb-col p { margin: 6px 0 0; font: 400 17px/1.5 var(--font-read); }
+.gl-deb-tag { font: 600 11px/1 var(--font-ui); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--ink-3); }
+.gl-deb-judge { display: flex; gap: 14px; align-items: flex-start; max-width: 720px; margin: 0 auto; padding: 18px 22px; border-radius: 14px; background: var(--gl-paper); color: var(--gl-ink); box-shadow: 0 0 0 1px rgb(28 27 26 / .08); filter: var(--gl-paper-filter, none); animation: gl-rise .4s var(--gl-ease) both; }
+.gl-deb-judge p { margin: 4px 0 0; font: italic 400 18px/1.5 var(--font-read); }
+.gl-deb-acts { display: flex; justify-content: center; gap: 8px; }
+
+/* Phòng tập tư vấn */
+.gl-cs { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 56px; margin-top: 28px; align-items: start; }
+.gl-cs-stage { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; align-items: start; }
+.gl-cs-tu { position: relative; display: grid; justify-items: center; text-align: center; gap: 4px; padding-top: 10px; }
+.gl-cs-ring { position: absolute; top: 0; width: 140px; height: 140px; border-radius: 50%; background: conic-gradient(hsl(calc(340deg + (var(--m) + .5) * 130deg) 48% 46%) calc((var(--m) + .5) * 100%), var(--line) 0); mask: radial-gradient(circle, transparent 64px, #000 65px); transition: background .6s; }
+.gl-cs-tu .gl-face { margin: 10px 0 8px; }
+.gl-cs-tu b { font-size: 15px; }
+.gl-cs-tu small { font-size: 12px; color: var(--ink-3); }
+.gl-cs-mood { margin-top: 10px; font: 600 12px/1 var(--font-ui); padding: 6px 10px; border-radius: 999px; background: var(--bg-sunken); color: var(--ink-2); }
+.gl-cs-talk { display: grid; gap: 12px; }
+.gl-cs-turn { display: grid; gap: 12px; }
+.gl-cs-choices { display: grid; gap: 8px; margin-top: 8px; animation: gl-rise .4s var(--gl-ease) both; }
+.gl-cs-choices button { text-align: left; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--bg); color: var(--ink); font: 400 14px/1.5 var(--font-ui); cursor: pointer; transition: border-color var(--dur-1), background var(--dur-1); }
+.gl-cs-choices button:hover { border-color: var(--accent); background: var(--accent-bg); }
+.gl-cs-coach { display: grid; gap: 16px; padding-left: 32px; border-left: 1px solid var(--line); position: sticky; top: 72px; }
+.gl-meter { display: grid; grid-template-columns: 80px 1fr 28px; gap: 10px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.gl-meter i { height: 6px; border-radius: 3px; background: var(--bg-sunken); overflow: hidden; }
+.gl-meter em { display: block; height: 100%; border-radius: 3px; background: var(--accent); }
+.gl-meter b { text-align: right; font-size: 13px; color: var(--ink); }
+.gl-cs-note { margin: 4px 0 0; font: italic 400 15px/1.5 var(--font-read); color: var(--ink-2); }
+.gl-cs-done { display: grid; justify-items: start; gap: 2px; padding-top: 16px; border-top: 1px solid var(--line); animation: gl-rise .4s var(--gl-ease) both; }
+.gl-cs-done b { font: 600 44px/1 var(--font-read); color: var(--accent); }
+.gl-cs-done span { font-size: 12px; color: var(--ink-3); margin-bottom: 8px; }
+
+@media (max-width: 1180px) {
+  .gl-comp { grid-template-columns: 280px minmax(0, 1fr); gap: 40px; }
+  .gl-cs { grid-template-columns: 1fr; gap: 28px; }
+  .gl-cs-coach { position: static; padding-left: 0; border-left: 0; border-top: 1px solid var(--line); padding-top: 20px; }
+}
+@media (max-width: 720px) {
+  .gl-bdh .page-head.bar { flex-wrap: wrap; }
+  .gl-bdh .page-head.bar .seg { order: 3; width: 100%; margin: 0; overflow-x: auto; }
+  .gl-comp { grid-template-columns: 1fr; gap: 24px; margin-top: 16px; }
+  .gl-comp-face .gl-face { width: 120px; height: 120px; }
+  .gl-comp-me h2 { font-size: 28px; margin-top: 18px; }
+  .gl-deb-topic h2 { font-size: 24px; }
+  .gl-rope { grid-template-columns: 64px 1fr 64px; gap: 10px; }
+  .gl-rope .gl-face { width: 44px; height: 44px; }
+  .gl-deb-cols { grid-template-columns: 1fr; gap: 14px; }
+  .gl-cs-stage { grid-template-columns: 1fr; gap: 20px; }
+  .gl-cs-tu .gl-face { width: 88px; height: 88px; }
+  .gl-cs-ring { width: 108px; height: 108px; mask: radial-gradient(circle, transparent 48px, #000 49px); }
+}
