@@ -28,7 +28,7 @@ Nguồn: sơ đồ `toan-bo.html` (148 chức năng, 14 mảng). Mọi mục "M�
 | Lớp học AI | GV AI · trợ giảng · bạn học AI, bàn tròn tranh luận, hỏi bằng giọng, ngắt lời, AI vẽ bảng trắng, AI điều khiển mô phỏng, quiz chấm AI, thẻ kết khoá |
 | Bạn đồng hành | bạn đồng hành, nhóm tranh luận, phòng tập tư vấn |
 | Workbench | chat để soạn khoá, 45 công cụ · 24 skill, công bố · nhân bản, tour, cài như app |
-| Kho công cụ | "Bạn cần công cụ gì?", AI tạo công cụ, khối dựng sẵn, tự kiểm, kho mở (PhET, phân tử, Python · Blockly, bản đồ · thiên văn, nhạc lý), công cụ chuẩn các môn (gồm 5 gói môn), cộng đồng GV |
+| Kho công cụ (ĐỘNG, mọi môn, mọi cấp, KHÔNG gói gọn 5 môn) | Trung tâm là ô "Bạn cần công cụ gì?". Có thì dùng, chưa có thì **AI tạo ngay** từ khối dựng sẵn (thanh trượt, đồ thị, bản đồ, mô phỏng, kéo thả, công thức, 3D, code), tự kiểm, lưu vào kho. Danh mục phải trải đủ **mọi môn**: Toán, Lý, Hoá, Sinh, Văn, Sử, Địa, Tin, Tiếng Anh, GDCD/KTPL, Công nghệ, Âm nhạc, Mỹ thuật, Thể dục, Hoạt động trải nghiệm. Đủ **mọi cấp**: THCS, THPT, đại học (kinh tế, xác suất thống kê, cơ học, mạch, lập trình…). 3 nguồn: Chuẩn (làm tay; 5 gói Văn/Sử/Địa/Hoá/Sinh chỉ là vài công cụ trong số này), Mở (PhET, phân tử, Python · Blockly, bản đồ · thiên văn, nhạc lý…), AI tạo + Cộng đồng GV chia sẻ. Kho tự gợi đúng công cụ theo bài đang soạn. Demo: gõ một yêu cầu lạ, AI dựng công cụ trước mắt. |
 | Giao bài phân hoá | AI chia nhóm theo trình độ, 3 mức bài, giao một chạm |
 | Chống ChatGPT | bài tập chống AI, nhận diện bài làm bằng AI |
 | Trợ lý lớp (AI của GV) | "3 em cần giúp, vì sao" + gợi ý giảng lại |
