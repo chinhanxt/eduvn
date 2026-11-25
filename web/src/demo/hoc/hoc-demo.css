@@ -440,3 +440,53 @@
   .st-pod { padding: var(--s-5); }
 }
 .st-host i { width: 10px; height: 10px; border-radius: 3px; }
+
+/* ---------- Nghiên cứu sâu ---------- */
+.nc-q { display: flex; align-items: center; gap: var(--s-3); padding: 18px 22px; border-radius: 16px; background: var(--bg-raised); box-shadow: var(--shadow-card, var(--shadow-1)); font: 500 clamp(18px, 2vw, 22px)/1.35 var(--font-read); }
+.nc-q .i { color: var(--accent); flex: none; }
+.nc-phase { display: flex; gap: var(--s-2) var(--s-6); flex-wrap: wrap; margin: var(--s-4) 0 0; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.nc-phase span { display: inline-flex; align-items: center; gap: 6px; opacity: .5; transition: opacity .3s, color .3s; }
+.nc-phase span::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.nc-phase .ok { opacity: 1; color: var(--ink-2); }
+.nc-phase .now { opacity: 1; color: var(--accent); }
+.nc-phase .now::before { animation: dm-pulse-s 1s infinite; }
+.nc-main { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: var(--gap); align-items: start; margin-top: var(--s-4); }
+.nc-tree { margin: 0; }
+.nc-tree svg { width: 100%; display: block; overflow: visible; }
+.nc-tree .edge { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .6s var(--ease-out); }
+.nc-tree .edge.on { stroke-dashoffset: 0; }
+.nc-tree .root circle { fill: var(--accent); }
+.nc-tree .root .halo { fill: var(--accent); opacity: .12; transform-box: fill-box; transform-origin: center; animation: nc-breathe 2.4s ease-in-out infinite; }
+@keyframes nc-breathe { 50% { transform: scale(1.15); opacity: .06; } }
+.nc-tree .root .mg { fill: none; stroke: var(--ink-on-accent); stroke-width: 3; stroke-linecap: round; }
+.nc-tree .root { opacity: 0; transform: scale(.6); transform-box: fill-box; transform-origin: center; transition: opacity .4s, transform .5s var(--ease-out); }
+.nc-tree .root.on { opacity: 1; transform: none; }
+.nc-tree .qn { opacity: 0; transition: opacity .4s var(--ease-out) .3s; }
+.nc-tree .qn.on { opacity: 1; }
+.nc-tree .qn circle { fill: var(--bg); stroke: var(--accent); stroke-width: 3; }
+.nc-tree .qn text { font: 600 14px var(--font-ui); fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
+.nc-tree .src { opacity: 0; transition: opacity .35s var(--ease-out); cursor: default; }
+.nc-tree .src.on { opacity: 1; }
+.nc-tree .edge2 { fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .5s var(--ease-out), stroke .3s; }
+.nc-tree .src.on .edge2 { stroke-dashoffset: 0; }
+.nc-tree .src.read .edge2 { stroke: color-mix(in srgb, var(--accent) 45%, var(--line-2)); }
+.nc-tree .chip { fill: var(--bg-raised); stroke: var(--line-2); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
+.nc-tree .src.read .chip { fill: var(--accent-bg); stroke: var(--accent); }
+.nc-tree .src.hl .chip { fill: var(--accent); }
+.nc-tree .kind { font: 700 12px var(--font-ui); fill: var(--ink-2); }
+.nc-tree .src.read .kind { fill: var(--accent); }
+.nc-tree .src.hl .kind { fill: var(--ink-on-accent); }
+.nc-tree .nm { font: 500 13px var(--font-ui); fill: var(--ink-2); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; }
+.nc-tree .src.hl .nm { fill: var(--accent); font-weight: 700; }
+.nc-tree .no { font: 600 10.5px var(--font-ui); fill: var(--ink-3); }
+.nc-report { position: sticky; top: calc(var(--top-h) + var(--s-6)); padding: var(--s-6); border-radius: var(--r-lg); background: var(--bg-raised); box-shadow: var(--shadow-card, var(--shadow-1)); min-height: 380px; }
+.nc-report-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: var(--s-4); }
+.nc-report-h span { font-size: 12px; color: var(--ink-3); }
+.nc-text { font: 400 17px/1.65 var(--font-read); }
+.nc-text p + p { margin-top: 12px; }
+.nc-skel { display: flex; flex-direction: column; gap: 10px; }
+.nc-skel i { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--bg-sunken), var(--bg-hover), var(--bg-sunken)); background-size: 200% 100%; animation: nc-shimmer 1.4s linear infinite; }
+@keyframes nc-shimmer { to { background-position: -200% 0; } }
+@media (max-width: 1100px) { .nc-main { grid-template-columns: minmax(0, 1fr); } .nc-report { position: static; min-height: 0; } }
+.nc-tree .no-m { display: none; }
+@media (max-width: 720px) { .nc-tree { margin: 0 calc(-1 * var(--page-x) + 4px); } .nc-tree .nm, .nc-tree .no { display: none; } .nc-tree .no-m { display: inline; font: 700 18px var(--font-ui); fill: var(--ink-3); } .nc-tree .qn text { font-size: 20px; } }
