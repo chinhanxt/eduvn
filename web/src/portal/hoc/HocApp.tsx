@@ -11,6 +11,7 @@ import { LazyMathKeyboard } from "../MathKeyboardLazy";
 import { goLogin } from "../needLogin";
 import { fetchHocToday, HOC_TODAY_KEY } from "./data";
 import { HocShell, useLearner } from "./HocShell";
+import { hocDemoRoutes } from "../../demo/hoc";
 
 const pick = <M,>(load: () => Promise<M>, f: (m: M) => ComponentType): Page => lazyPage(() => load().then(f));
 // Trang P6 chưa restyle dùng hoc.css (trước đây nạp qua HocLayout cũ).
@@ -102,6 +103,7 @@ export function HocApp() {
           <Route path="/hoc/luyen-tap" element={<NeedUser><Pr /></NeedUser>} />
           <Route path="/hoc/lo-trinh" element={<NeedUser><Pa /></NeedUser>} />
           <Route path="/hoc/giao-trinh" element={<NeedUser legacy><B /></NeedUser>} />
+          {hocDemoRoutes()}
         </Route>
         <Route path="*" element={<Suspense fallback={<PageSkeleton />}><Legacy /></Suspense>} />
       </Routes>
