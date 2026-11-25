@@ -6,6 +6,7 @@ import { MockBadge, SCHOOL } from "../kit";
 import "./tr.css";
 
 const ToanTruong = lazy(() => import("./ToanTruong"));
+const SucKhoe = lazy(() => import("./SucKhoe"));
 
 const NAV = [
   { to: "/truong", label: "Toàn trường", icon: "chart", end: true },
@@ -79,6 +80,7 @@ export default function TruongApp() {
             <Suspense fallback={<Skel />}>
               <Routes>
                 <Route index element={<ToanTruong />} />
+                <Route path="suc-khoe" element={<SucKhoe />} />
                 <Route path="*" element={<ToanTruong />} />
               </Routes>
             </Suspense>
