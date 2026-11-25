@@ -8,6 +8,7 @@ import "./tr.css";
 const ToanTruong = lazy(() => import("./ToanTruong"));
 const SucKhoe = lazy(() => import("./SucKhoe"));
 const QuanTri = lazy(() => import("./QuanTri"));
+const TroLy = lazy(() => import("./TroLy"));
 
 const NAV = [
   { to: "/truong", label: "Toàn trường", icon: "chart", end: true },
@@ -83,6 +84,7 @@ export default function TruongApp() {
                 <Route index element={<ToanTruong />} />
                 <Route path="suc-khoe" element={<SucKhoe />} />
                 <Route path="quan-tri" element={<QuanTri />} />
+                <Route path="tro-ly" element={<TroLy />} />
                 <Route path="*" element={<ToanTruong />} />
               </Routes>
             </Suspense>
