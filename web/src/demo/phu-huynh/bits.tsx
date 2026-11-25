@@ -23,13 +23,3 @@ export function Karaoke({ text, at, className }: { text: string; at: number; cla
     </p>
   );
 }
-
-/** Ảnh đại diện tròn theo sắc của em (thế giới mẫu). */
-export function Face({ name, hue, size = 56 }: { name: string; hue: number; size?: number }) {
-  const ini = name.split(/\s+/).slice(-2).map((w) => w[0]).join("");
-  return (
-    <span className="ph-face" style={{ width: size, height: size, fontSize: size * 0.36, ["--h" as string]: hue }} aria-hidden="true">
-      {ini}
-    </span>
-  );
-}
