@@ -15,7 +15,7 @@
 
 ## 2. Phạm vi: dự án ĐEM ĐI THI, làm "bán mockup"
 - **Lõi chạy thật**, để demo trực tiếp và khi bị hỏi không vỡ.
-- **Phần mở rộng là mockup đẹp**: có dữ liệu mẫu, tự thao tác như thật, chạy không cần server hay AI.
+- **Phần mở rộng là mockup đẹp**: có dữ liệu mẫu, tự thao tác như thật, chạy không cần server hay AI. **Mockup chỉ làm frontend**: không viết backend, API, migration hay test sâu (chủ dự án dặn 2026-11-25: "đừng làm quá kỹ backend").
 - **Trọng tâm là video demo và bài thuyết trình.** Sản phẩm là bằng chứng cho câu chuyện.
 - **Không** đặt mục tiêu làm thật toàn bộ 452 chức năng OpenMAIC/DeepTutor. **395 mục còn lại làm mockup**, gom khoảng 45–55 màn; bảng mục ở `docs/research/2026-11-11-p14-parity.md`.
 
