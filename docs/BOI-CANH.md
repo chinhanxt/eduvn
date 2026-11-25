@@ -57,20 +57,19 @@
 - **Bộ máy demo** (con trỏ tự bấm, kịch bản tự chạy) làm **sau cùng**, khi các màn đã chốt.
 - **Deploy HTTPS và Zalo:** làm cuối cùng.
 
-## 6. Hiện trạng (2026-11-23)
-- `main` có:
-  - Ngân hàng câu hỏi, ra đề CV 7991, giáo án, đề cương, slide, công thức, bảng giảng.
-  - Sơ đồ, hình không gian.
-  - Bài giảng AI ra MP4 (VieNeu, Manim, HyperFrames; 5/28 khuôn nền trắng).
-  - Lớp học, phòng thi, chấm ảnh và viết tay, sổ điểm, màn "Hôm nay", đấu trường kiểu Kahoot.
-  - Gia sư có trích dẫn, lời giải từng bước tự kiểm, luyện tập, lộ trình, giáo trình, OCR.
-  - 2 cổng GV/HS; cổng AI :4340.
-  - Server và skill của 5 gói môn (chưa có giao diện; Văn còn dở).
-- Nhánh dở chưa gộp: `p14-xuat` (PowerPoint/HTML offline), `p14-g1` (giọng, ASR, đọc file), `p14-g6` (gia sư tác tử), `anim-s1` (nền Studio hoạt hình).
-- Sơ đồ dự án cho chủ dự án xem: `.superpowers/xem/index.html` (cục bộ, phục vụ ở :5193).
+## 6. Hiện trạng (2026-11-25)
+- `main` có phần lõi chạy thật (ngân hàng câu hỏi, đề CV 7991, giáo án, slide, bảng giảng, sơ đồ, hình không gian, bài giảng AI ra MP4, lớp học, phòng thi, chấm ảnh, sổ điểm, Hôm nay, đấu trường, gia sư, lời giải từng bước, luyện tập, lộ trình, giáo trình, OCR, 2 cổng GV/HS, cổng AI :4340, server + skill 5 gói môn).
+- **Mockup frontend đã xong 4 gói** (`docs/demo/ke-hoach-mockup.md`, code ở `web/src/demo/`, thế giới mẫu `docs/demo/the-gioi-mau.md`):
+  - A `/gv` (nhóm "Soạn bằng AI"): tạo bài giảng, trình sửa, xuất bản, Studio hoạt hình, Infographic (@antv thật), giấy tờ CV 5512/VNEdu, tổ chuyên môn, dạy theo năng lực.
+  - B `/gv` (nhóm "Lớp học AI"): lớp học AI đa tác tử, kho công cụ động (AI tạo công cụ, 32 công cụ, 15 môn, mọi cấp), bạn đồng hành, workbench, giao bài phân hoá, chống ChatGPT, trợ lý lớp, cài đặt AI local/offline.
+  - C `/hoc` (nhóm "Tự học cùng AI"): hồ sơ AI + "AI biết gì về em" + học bạ sống, gia sư hiểu mình (2 em 2 cách giảng), vòng lặp lỗ hổng, sổ tay học tập + podcast, nghiên cứu sâu, đọc nhập vai/video, lịch, hướng nghiệp.
+  - D cổng mới công khai `/phu-huynh` (làm lại cho ông bà: 3 khối, nút to, 3 tab) và `/truong` (toàn trường, sức khoẻ & AI phối hợp, quản trị, trợ lý AI).
+- JS lần đầu (gzip): GV 96,6 KB · Học 95,8 KB · gốc 90,0 KB (ngân sách 100 KB).
+- Nhánh dở chưa gộp: `p14-xuat`, `p14-g1`, `p14-g6`, `anim-s1` (làm thật; nay phạm vi là mockup nên để sau).
+- Ảnh xem nhanh: `.superpowers/xem/` (cục bộ, :5193): `mock-a/ mock-b/ mock-c/ mock-d/`, sơ đồ `toan-bo.html`, `luong.html`.
 
 ## 7. Lộ trình tiếp theo
-1. Làm đẹp toàn bộ màn hiện có và rà tính trung lập môn.
+1. Làm đẹp toàn bộ màn hiện có, rà tính trung lập môn, gọn nav (nhiều nhóm mới), đồng bộ số liệu thế giới mẫu giữa các gói.
 2. Infographic + Sổ tay học tập (open-notebook) + Kho công cụ 3 tầng + AI hồ sơ.
 3. 11 nỗi đau. Ưu tiên giấy tờ GV, phụ huynh, vòng lặp lỗ hổng, ban giám hiệu.
 4. Mockup đủ 395 mục mở rộng.
