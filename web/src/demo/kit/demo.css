@@ -1,0 +1,2 @@
+.demo-badge{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--font-ui,Inter,system-ui,sans-serif);letter-spacing:.04em;color:var(--ink-3,#7A746B);border:1px dashed currentColor;border-radius:999px;padding:4px 9px;opacity:.75}
+.demo-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
