@@ -1,4 +1,5 @@
 import type { NavEntry, NavItem } from "../../ui/shell/nav";
+import { GV_LOP_NAV } from "../../demo/gv-lop/nav";
 
 /** Mục thanh bên cổng GV (thứ tự theo mockup v2: việc hằng ngày trước, nhóm Soạn, rồi công cụ khác). */
 export function gvNav(counts: { classes?: number; grading?: number } = {}): NavEntry[] {
@@ -7,6 +8,7 @@ export function gvNav(counts: { classes?: number; grading?: number } = {}): NavE
     { to: "/lop-hoc", label: "Lớp học", icon: "users", kbd: "G L", count: counts.classes },
     { to: "/cham-bai", label: "Chấm bài", icon: "inbox", kbd: "G C", count: counts.grading, hot: true },
     { to: "/so-diem", label: "Sổ điểm", icon: "chart", kbd: "G S" },
+    ...GV_LOP_NAV,
     { group: "Soạn" },
     { to: "/ngan-hang", label: "Ngân hàng câu hỏi", icon: "bank", kbd: "G N" },
     { to: "/de-thi", label: "Đề thi", icon: "exam", kbd: "G D" },

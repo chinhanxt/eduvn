@@ -5,6 +5,7 @@ import { ToastProvider } from "../../ui/components/Toast";
 import { prefetch } from "../../ui/data/query";
 import { PageSkeleton } from "../../ui/shell/PageSkeleton";
 import { lazyPage, preloadPath, registerPreload, type Page } from "../../ui/shell/routes";
+import { GV_LOP_ROUTES } from "../../demo/gv-lop";
 import { LazyMathKeyboard } from "../MathKeyboardLazy";
 import { goLogin } from "../needLogin";
 import { fetchGvToday, GV_TODAY_KEY } from "./data";
@@ -47,6 +48,7 @@ const P = {
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
 /** legacy: trang chưa chuyển sang v2 (bọc .legacy giữ kiểu cũ). */
 const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
+  ...GV_LOP_ROUTES, // Gói B mô phỏng (web/src/demo/gv-lop)
   { path: "/cong-cu", page: P.congCu },
   { path: "/video", page: P.sapCo },
   { path: "/to-chuc", page: P.sapCo },
