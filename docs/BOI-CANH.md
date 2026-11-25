@@ -15,7 +15,7 @@
 
 ## 2. Phạm vi: dự án ĐEM ĐI THI, làm "bán mockup"
 - **Lõi chạy thật**, để demo trực tiếp và khi bị hỏi không vỡ.
-- **Phần mở rộng là mockup đẹp**: có dữ liệu mẫu, tự thao tác như thật, chạy không cần server hay AI.
+- **Phần mở rộng là mockup đẹp**: có dữ liệu mẫu, tự thao tác như thật, chạy không cần server hay AI. **Mockup chỉ làm frontend**: không viết backend, API, migration hay test sâu (chủ dự án dặn 2026-11-25: "đừng làm quá kỹ backend").
 - **Trọng tâm là video demo và bài thuyết trình.** Sản phẩm là bằng chứng cho câu chuyện.
 - **Không** đặt mục tiêu làm thật toàn bộ 452 chức năng OpenMAIC/DeepTutor. **395 mục còn lại làm mockup**, gom khoảng 45–55 màn; bảng mục ở `docs/research/2026-11-11-p14-parity.md`.
 
@@ -48,7 +48,7 @@
 - **AI hồ sơ (bộ não của vòng lặp):** mỗi HS/SV, GV, phụ huynh, nhà trường có một AI riêng nắm hồ sơ chủ nhân (năng lực, đường quên, lỗi đặc trưng, nhịp học, mục tiêu), các AI phối hợp có quyền, hồ sơ theo suốt cấp 2 → ĐH. Chi tiết: `docs/design/ai-ho-so.md`.
 - **Chia AI:** trò chuyện cá nhân và hồ sơ dùng **AI local** trên máy chủ riêng (chủ dự án sẽ giới thiệu máy chủ sau; dữ liệu HS không rời trường). Việc nặng/tự động (soạn bài, video, đề, chấm, nghiên cứu, tạo công cụ) vẫn qua **cổng AI :4340**.
 - **Kho công cụ 3 tầng (động, không bao giờ thiếu):** (1) **AI tạo công cụ theo yêu cầu** từ khối dựng sẵn, tự kiểm rồi lưu vào kho; (2) **kho mở** ghép từ nguồn có giấy phép phù hợp (PhET, 3Dmol/smilesDrawer, Pyodide/Blockly, bản đồ, Stellarium, nhạc lý, Infographic), Việt hoá và gắn môn/cấp/chủ đề CTGDPT 2018; (3) **30–40 công cụ chuẩn làm tay** để demo. Màn kho có ô "Bạn cần công cụ gì?" + nút "Để AI tạo", nhãn nguồn Chuẩn/Mở/AI tạo/Cộng đồng GV.
-- **Công cụ môn học là phụ kiện cắm thêm** ("Kho công cụ"), tự hiện đúng chỗ (bài giảng, bài tập, gia sư, bảng giảng). **Không** làm trang môn cố định trên menu. 5 gói Văn/Sử/Địa/Hoá/Sinh là 5 công cụ đầu tiên; code nằm ở `server/src/subjects/`, `anim-skills/`, `services/anim-kit-data/`.
+- **Kho công cụ là ĐỘNG, mọi môn mọi cấp, không cố định số môn.** Công cụ môn học là phụ kiện cắm thêm ("Kho công cụ"), tự hiện đúng chỗ (bài giảng, bài tập, gia sư, bảng giảng). **Không** làm trang môn cố định trên menu. 5 gói Văn/Sử/Địa/Hoá/Sinh chỉ là vài công cụ chuẩn đầu tiên, không phải giới hạn; code nằm ở `server/src/subjects/`, `anim-skills/`, `services/anim-kit-data/`.
 - **Repo ngoài: lấy codebase rồi tinh chỉnh, không tự xây lại.**
   - `antvis/Infographic` (MIT): dùng gói npm `@antv/infographic` + skills/templates, làm theme EDUVN, gắn vào slide, gia sư, báo cáo, tin gửi phụ huynh.
   - `lfnovo/open-notebook` (MIT): chạy nguyên codebase làm dịch vụ "Sổ tay học tập", trỏ AI sang cổng :4340, giọng VieNeu, đổi giao diện theo chuẩn đẹp, dùng chung đăng nhập.

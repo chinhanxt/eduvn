@@ -2,6 +2,7 @@ import type { NavEntry, NavItem } from "../../ui/shell/nav";
 import { HOC_PATH } from "../../student/paths";
 import { subjectColor } from "../hocToday";
 import type { HocToday } from "../today";
+import { HOC_DEMO_NAV } from "../../demo/hoc";
 
 /** Mục điều hướng cổng Học: tài khoản Keycloak đủ điểm đến + Môn học; phiên mã lớp chỉ Hôm nay · Bài tập · Kết quả · Đấu trường. */
 export function hocNav(account: boolean, d: HocToday | undefined): { nav: NavEntry[]; tabs: NavItem[] } {
@@ -11,6 +12,7 @@ export function hocNav(account: boolean, d: HocToday | undefined): { nav: NavEnt
   const arena: NavItem = { to: "/choi", href: "/choi", label: "Vào đấu trường", icon: "game" };
   const subj = (d?.subjects ?? []).map((s, i): NavItem => ({ to: account ? "/hoc/giao-trinh" : `${HOC_PATH.baiTap}?mon=${encodeURIComponent(s.subject)}`, label: s.subject, dot: subjectColor(s.subject, i) }));
   const subjGroup: NavEntry[] = subj.length ? [{ group: "Môn học" }, ...subj] : [];
+  subjGroup.unshift(...HOC_DEMO_NAV); // gói C (mô phỏng): nhóm "Tự học cùng AI" đứng trước Môn học
   if (!account) return { nav: [home, bai, ketQua, arena, ...subjGroup], tabs: [home, bai, ketQua, { ...arena, label: "Đấu trường" }] };
   const luyen: NavItem = { to: "/hoc/luyen-tap", label: "Luyện tập", icon: "layers", count: d?.review?.due };
   const giaSu: NavItem = { to: "/hoc/gia-su", label: "Gia sư", icon: "bot" };
