@@ -25,14 +25,14 @@ GV khác: thầy Phạm Đức Long (Hoá), thầy Hoàng Minh (Tiếng Anh).
   - **Thói quen học:** học tốt 20–22h, thích ví dụ đời thực.
   - **Mục tiêu:** ĐH Bách khoa, ngành CNTT.
   - **Mẹ:** chị **Nguyễn Thị Hồng**.
-- **Trần Gia Bảo** (10A1): cùng câu hỏi với Minh Anh nhưng **thích video, hay nản sau 15 phút**. Dùng cho cảnh "hai em, hai cách giảng".
+- **Trần Khánh Duy** (10A1): cùng câu hỏi với Minh Anh nhưng **thích video, hay nản sau 15 phút**. Dùng cho cảnh "hai em, hai cách giảng".
   - Người kèm học: ông nội **bác Trần Văn Tư**. Không rành công nghệ, cần nghe đọc to, chữ to.
   - Dấu hiệu quá tải 2 tuần nay: thức khuya, điểm tụt.
 - **Lê Thảo Vy** (8A2, THCS).
 - **Phạm Quang Huy**: sinh viên KTPM K23.
 
 ## Số liệu gốc
-- Điểm TB 10A1 học kỳ I là **7,2**. Có **3 em cần giúp** về bất phương trình: Minh Anh, Gia Bảo, Đức Thịnh.
+- Điểm TB 10A1 học kỳ I là **7,2**. Có **3 em cần giúp** về bất phương trình: Minh Anh, Khánh Duy, Đức Thịnh.
 - Toàn trường có 1.240 HS và 86 GV.
   - Lớp 11A3 tụt 0,6 điểm môn Văn so với tháng trước.
   - Có 4 em được cảnh báo sớm.

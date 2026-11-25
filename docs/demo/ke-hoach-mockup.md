@@ -38,7 +38,7 @@ Nguồn: sơ đồ `toan-bo.html` (148 chức năng, 14 mảng). Mọi mục "M�
 | Màn | Mục bao phủ |
 |---|---|
 | Hồ sơ AI của em | bản đồ năng lực, đường quên, lỗi đặc trưng, nhịp học, mục tiêu, "AI biết gì về em" (sửa · quên), học bạ sống cấp 2 → ĐH |
-| Gia sư hiểu mình | gia sư tác tử, trí nhớ dài hạn, hai em – hai cách giảng (Minh Anh / Gia Bảo) |
+| Gia sư hiểu mình | gia sư tác tử, trí nhớ dài hạn, hai em – hai cách giảng (Minh Anh / Khánh Duy) |
 | Vòng lặp lỗ hổng | phát hiện → bài vừa sức → kiểm lại, sổ câu sai |
 | Sổ tay học tập | sổ nguồn, hỏi có trích dẫn, podcast 2 giọng, ghi chú · Co-Writer |
 | Nghiên cứu sâu | câu hỏi → cây truy vấn → nguồn → báo cáo trích dẫn |

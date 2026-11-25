@@ -47,8 +47,8 @@ export const MINH_ANH: Learner = {
   guardian: "ph-hong",
 };
 
-export const GIA_BAO: Learner = {
-  id: "gia-bao", name: "Trần Gia Bảo", short: "Gia Bảo", role: "hs", className: "10A1", avatarHue: 150,
+export const KHANH_DUY: Learner = {
+  id: "khanh-duy", name: "Trần Khánh Duy", short: "Khánh Duy", role: "hs", className: "10A1", avatarHue: 150,
   goal: "Chưa chọn ngành",
   strengths: ["Địa lí", "Thể dục"], weaknesses: ["Bất phương trình bậc hai", "Hoá học"],
   habits: ["Thích học bằng video", "Hay nản sau 15 phút"],
@@ -81,6 +81,9 @@ export const GUARDIANS: Person[] = [
 ];
 
 export const NUMBERS = {
-  class10A1Avg: 7.2, needHelp: ["Minh Anh", "Gia Bảo", "Đức Thịnh"], earlyWarnings: 4, class11A3VanDrop: 0.6,
+  class10A1Avg: 7.2, needHelp: ["Minh Anh", "Khánh Duy", "Đức Thịnh"], earlyWarnings: 4, class11A3VanDrop: 0.6,
   prepBefore: "3 giờ", prepAfter: "25 phút", gradeBefore: "2 giờ / 40 bài", gradeAfter: "3 phút",
 } as const;
+
+/** @deprecated Tên cũ — dùng KHANH_DUY. */
+export const GIA_BAO = KHANH_DUY;
