@@ -102,3 +102,10 @@ export function useTick(ms: number, run = true): number {
 
 export const vn1 = (n: number) => n.toLocaleString("vi-VN", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 export const vn0 = (n: number) => Math.round(n).toLocaleString("vi-VN");
+
+/** Số đếm lên từ 0 khi gắn kết (rồi bám theo target). */
+export function useCountUp(target: number, ms = 900): number {
+  const [t, setT] = useState(0);
+  useEffect(() => setT(target), [target]);
+  return useTween(t, ms);
+}

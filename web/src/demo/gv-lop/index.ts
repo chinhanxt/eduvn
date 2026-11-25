@@ -8,5 +8,6 @@ const pick = <M,>(load: () => Promise<M>, f: (m: M) => ComponentType): Page => l
 export const GV_LOP_ROUTES: { path: string; page: Page }[] = [
   { path: "/lop-hoc-ai", page: pick(() => import("./LopHocAi"), (m) => m.LopHocAi) },
   { path: "/ban-dong-hanh", page: pick(() => import("./BanDongHanh"), (m) => m.BanDongHanh) },
+  { path: "/workbench", page: pick(() => import("./Workbench"), (m) => m.Workbench) },
   { path: "/kho-cong-cu", page: pick(() => import("./KhoCongCu"), (m) => m.KhoCongCu) },
 ];

@@ -4,7 +4,7 @@ import { useFakeStream } from "../kit";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { CAST, type CastId, Portrait } from "./Cast";
-import { Head, reduced, useTween } from "./parts";
+import { Head, reduced, useCountUp, useTween } from "./parts";
 
 /** Lớp học AI đang diễn ra: GV AI · trợ giảng · bạn học AI nói lần lượt, AI vẽ bảng và điều khiển mô phỏng,
  *  HS ngắt lời bằng giọng, chuyển bàn tròn tranh luận, quiz chấm AI, thẻ kết khoá. Kịch bản: Vật lí 10 · Rơi tự do. */
@@ -367,7 +367,7 @@ function QuizCard({ beat }: { beat: number }) {
 
 /* ----------------------------- Thẻ kết khoá ----------------------------- */
 function EndCard({ onAgain }: { onAgain: () => void }) {
-  const pct = useTween(86, 1400);
+  const pct = useCountUp(86, 1400);
   const ideas = ["Không lực cản, mọi vật rơi cùng gia tốc g", "s = ½·g·t²: quãng đường tăng theo bình phương", "Lực cản phụ thuộc hình dạng, không phải khối lượng"];
   return (
     <div className="gl-end">
