@@ -563,3 +563,61 @@
 .dx-notes li em { grid-column: 2; font-style: normal; font-size: 11px; color: var(--c7); font-weight: 600; }
 @media (max-width: 1100px) { .dx-doc, .dx-xem { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 720px) { .dx-paper { padding: var(--s-5) var(--s-4); } .dx-grp { grid-template-columns: 62px minmax(0, 1fr); gap: 8px; } .dx-grp .lb { font-size: 11px; } .dx-grp button { font-size: 17px; padding: 4px 8px; } .dx-paper footer { padding-left: 70px; } }
+
+/* ---------- Lịch học ---------- */
+.lc-main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: var(--gap); align-items: start; }
+.lc-cal { --hh: 40px; background: var(--bg-raised); border-radius: var(--r-lg); box-shadow: var(--shadow-card, var(--shadow-1)); padding: var(--s-4) var(--s-4) var(--s-4) 0; }
+.lc-hd, .lc-body { display: grid; grid-template-columns: 48px minmax(0, 1fr); }
+.lc-hd { grid-template-columns: 48px repeat(7, minmax(0, 1fr)); padding-bottom: var(--s-3); }
+.lc-hd span { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.lc-hd b { font-size: 20px; color: var(--ink); width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; }
+.lc-hd .today { color: var(--accent); }
+.lc-hd .today b { background: var(--accent); color: var(--ink-on-accent); }
+.lc-hours { display: grid; grid-template-rows: repeat(var(--rows), var(--hh)); }
+.lc-hours span { font-size: 11px; color: var(--ink-3); text-align: right; padding-right: 10px; transform: translateY(-7px); }
+.lc-cols { position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); height: calc(var(--rows) * var(--hh)); background: repeating-linear-gradient(var(--line) 0 1px, transparent 1px var(--hh)); }
+.lc-col { position: relative; border-left: 1px solid var(--line); }
+.lc-col.today { background: color-mix(in srgb, var(--accent) 4%, transparent); }
+.lc-best { position: absolute; left: 0; right: 0; background: color-mix(in srgb, var(--accent) 8%, transparent); border-top: 1px dashed var(--accent-line); border-bottom: 1px dashed var(--accent-line); pointer-events: none; }
+.lc-best span { position: absolute; left: 6px; top: -18px; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+.lc-ev { position: absolute; left: 3px; right: 3px; overflow: hidden; border-radius: 8px; padding: 4px 7px; font-size: 11px; line-height: 14px; display: flex; flex-direction: column; gap: 1px; animation: dm-fade .3s both; }
+.lc-ev b { font-weight: 600; }
+.lc-ev small { font-size: 10px; opacity: .8; }
+.lc-ev.lop { background: color-mix(in srgb, var(--bg-sunken) 70%, transparent); color: var(--ink-3); }
+.lc-ev.hd { background: color-mix(in srgb, var(--ink-3) 12%, transparent); color: var(--ink-2); }
+.lc-ev.han { background: var(--danger-bg); color: var(--danger); padding-top: 2px; }
+.lc-ev.on { background: color-mix(in srgb, var(--ec) 16%, var(--bg-raised)); color: var(--ink); box-shadow: inset 3px 0 0 var(--ec), 0 4px 14px color-mix(in srgb, var(--ec) 25%, transparent); animation: lc-drop .6s var(--ease-out) both; z-index: 1; min-height: 34px; }
+.lc-ev.on .i { position: absolute; right: 5px; top: 5px; width: 12px; height: 12px; color: var(--ec); }
+.lc-ev.on b { padding-right: 14px; }
+@keyframes lc-drop { from { opacity: 0; transform: translateY(-36px) scale(.92); } 70% { opacity: 1; } to { opacity: 1; transform: none; } }
+.lc-now { position: absolute; left: -4px; right: 0; height: 2px; background: var(--danger); z-index: 2; }
+.lc-now i { position: absolute; left: -4px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); }
+.lc-agenda { display: none; list-style: none; margin: 0; padding: 0; }
+.lc-side { display: flex; flex-direction: column; gap: var(--s-4); position: sticky; top: calc(var(--top-h) + var(--s-6)); }
+.lc-side ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-4); }
+.lc-side li { display: flex; align-items: center; gap: var(--s-3); }
+.lc-side li b { display: block; font: 600 16px/1.3 var(--font-read); }
+.lc-ring { --p: 50%; --rc: var(--accent); width: 52px; height: 52px; flex: none; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--rc) 0 var(--p), var(--bg-sunken) 0); position: relative; animation: lc-spin .9s var(--ease-out) both; }
+.lc-ring::before { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--bg); }
+.lc-ring b { position: relative; font: 700 14px var(--font-ui) !important; }
+@keyframes lc-spin { from { transform: rotate(-90deg); opacity: 0; } }
+.lc-side .when { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--ink-3); }
+.lc-side .when.on { color: var(--accent); font-weight: 600; animation: dm-in .4s var(--ease-out); }
+.lc-push { display: flex; gap: var(--s-3); align-items: flex-start; margin-top: var(--s-4); padding: 14px 16px; border-radius: 18px; background: var(--bg-raised); box-shadow: var(--shadow-2); opacity: 0; transform: translateY(12px); transition: opacity .45s var(--ease-out), transform .45s var(--ease-out); }
+.lc-push.in { opacity: 1; transform: none; }
+.lc-push .lc-push-ic { width: 32px; height: 32px; flex: none; border-radius: 9px; display: grid; place-items: center; background: var(--accent); color: var(--ink-on-accent); }
+.lc-push b { display: block; font-size: 13px; }
+.lc-push span { font-size: 13px; color: var(--ink-2); }
+@media (max-width: 1180px) { .lc-main { grid-template-columns: minmax(0, 1fr); } .lc-side { position: static; } .lc-cal { --hh: 34px; } }
+@media (max-width: 720px) {
+  .lc-cal { display: none; }
+  .lc-agenda { display: flex; flex-direction: column; gap: var(--s-6); }
+  .lc-agenda h3 { font: 700 16px/1 var(--font-ui); margin-bottom: var(--s-3); }
+  .lc-agenda h3 span { font-size: 12px; color: var(--ink-3); font-weight: 500; margin-left: 4px; }
+  .lc-ag { display: grid; grid-template-columns: 52px 1fr; gap: var(--s-3); padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; background: var(--bg-raised); font-size: 14px; }
+  .lc-ag time { font-weight: 700; color: var(--ink-3); }
+  .lc-ag small { display: block; font-size: 12px; color: var(--ink-3); }
+  .lc-ag.on { box-shadow: inset 3px 0 0 var(--ec); background: color-mix(in srgb, var(--ec) 12%, var(--bg-raised)); animation: lc-drop .6s var(--ease-out) both; }
+  .lc-ag.han { color: var(--danger); }
+  .lc-side { order: -1; }
+}
