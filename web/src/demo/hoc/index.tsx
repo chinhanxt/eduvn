@@ -10,6 +10,7 @@ const PAGES: [path: string, page: Page][] = [
   ["/hoc/ho-so", pick(() => import("./HoSo"), (m) => m.HoSo)],
   ["/hoc/gia-su-hieu-minh", pick(() => import("./GiaSuHieuMinh"), (m) => m.GiaSuHieuMinh)],
   ["/hoc/lo-hong", pick(() => import("./LoHong"), (m) => m.LoHong)],
+  ["/hoc/so-tay", pick(() => import("./SoTay"), (m) => m.SoTay)],
 ];
 
 registerPreload(PAGES.map(([path, p]) => ({ path, preload: p.preload })));
@@ -27,4 +28,5 @@ export const HOC_DEMO_NAV: NavEntry[] = [
   { to: "/hoc/ho-so", label: "Hồ sơ AI", icon: "user" },
   { to: "/hoc/gia-su-hieu-minh", label: "Gia sư hiểu mình", icon: "bot" },
   { to: "/hoc/lo-hong", label: "Vòng lỗ hổng", icon: "repeat" },
+  { to: "/hoc/so-tay", label: "Sổ tay", icon: "book" },
 ];
