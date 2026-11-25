@@ -9,6 +9,7 @@ import "../../ui/styles/tokens.css";
 import "../../ui/styles/ui.css";
 import "../../ui/styles/skin-hoc.css";
 import "../../ui/styles/legacy.css";
+import "./dep.css";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
