@@ -11,6 +11,8 @@ const Play = lazy(() => import("../live/Play").then((m) => ({ default: m.Play })
 // P13 — thư viện lời giải công khai (không cần đăng nhập; meta/OG đặt trong trang, bản cho máy quét ở /chia-se/loi-giai/:slug của server)
 const SolutionLibrary = lazy(() => import("../solution/SolutionLibrary").then((m) => ({ default: m.SolutionLibrary })));
 const SolutionPublicPage = lazy(() => import("../solution/SolutionLibrary").then((m) => ({ default: m.SolutionPublicPage })));
+// Gói D — cổng Phụ huynh + Nhà trường (mô phỏng, công khai, không gọi server)
+const PhuHuynh = lazy(() => import("../demo/phu-huynh"));
 
 /** "/": đăng nhập Keycloak → theo vai trò (GV/owner/admin/assistant → /gv, còn lại → /hoc); chỉ có phiên HS P9a → /hoc/hs; chưa có → Đăng nhập. */
 function Landing() {
@@ -66,6 +68,7 @@ export function RootApp() {
         <Route path="/choi" element={<Play />} />
         <Route path="/loi-giai" element={<SolutionLibrary />} />
         <Route path="/loi-giai/:slug" element={<SolutionPublicPage />} />
+        <Route path="/phu-huynh/*" element={<PhuHuynh />} />
         <Route index element={<Landing />} />
         <Route path="*" element={<Fallback />} />
       </Routes>
