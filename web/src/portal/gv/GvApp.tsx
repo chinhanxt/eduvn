@@ -50,6 +50,7 @@ const P = {
   gsInfo: pick(() => import("../../demo/gv-soan/Infographic"), (m) => m.InfographicPage),
   gsGiayTo: pick(() => import("../../demo/gv-soan/GiayTo"), (m) => m.GiayTo),
   gsTo: pick(() => import("../../demo/gv-soan/ToChuyenMon"), (m) => m.ToChuyenMon),
+  gsNangLuc: pick(() => import("../../demo/gv-soan/NangLuc"), (m) => m.NangLuc),
 };
 
 /** Đường trong cổng (sau basename /gv) → trang: dùng cho Routes, tải trước khi rê link. */
@@ -87,6 +88,7 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/infographic", page: P.gsInfo },
   { path: "/giay-to", page: P.gsGiayTo },
   { path: "/to-chuyen-mon", page: P.gsTo },
+  { path: "/day-theo-nang-luc", page: P.gsNangLuc },
 ];
 /** Màn toàn màn hình (không khung): bảng giảng, sơ đồ, màn chiếu đấu trường. */
 const FULL_ROUTES: { path: string; page: Page }[] = [
