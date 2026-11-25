@@ -18,6 +18,7 @@ export function gvNav(counts: { classes?: number; grading?: number } = {}): NavE
     { to: "/de-cuong", label: "Đề cương học phần", icon: "list" },
     { group: "Soạn bằng AI" },
     { to: "/bai-giang-ai/tao", label: "Tạo bài giảng", icon: "spark" },
+    { to: "/studio", label: "Studio hoạt hình", icon: "play" },
     { to: "/xuat-ban", label: "Xuất bản", icon: "upload" },
     { group: "Ôn tập & tư liệu" },
     { to: "/tro-choi", label: "Trò chơi ôn tập", icon: "game" },
