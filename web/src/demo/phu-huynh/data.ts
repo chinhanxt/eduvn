@@ -1,129 +1,100 @@
-import { KHANH_DUY, MINH_ANH, TEACHERS, type Learner } from "../kit/world";
+import { KHANH_DUY, MINH_ANH, type Learner } from "../kit/world";
 
-/** Dữ liệu mẫu riêng cổng Phụ huynh (nhất quán với thế giới mẫu: docs/demo/the-gioi-mau.md). */
+/** Dữ liệu mẫu riêng cổng Phụ huynh (nhất quán với thế giới mẫu: docs/demo/the-gioi-mau.md). Câu ngắn, lời đời thường. */
 export type Light = "xanh" | "vang" | "do";
-export type Fact = { icon: string; text: string; tone?: "ok" | "warn" | "down" | "up" };
-export type Step = { min: number; text: string; hint?: string };
-export type Day = { d: string; min: number; bed: string; late: boolean };
-export type Trend = { subject: string; score: number; dir: "len" | "xuong" | "giu" };
+export type Step = { text: string; tip?: string };
+export type Day = { d: string; light: Light; note: string };
 
 export type ParentView = {
   slug: string;
   child: Learner;
-  /** Cách gọi người kèm trong câu: "bác", "chị". */
+  /** Cách xưng: "bác", "chị". */
   you: string;
-  guardian: string;
+  /** "bác Tư", "chị Hồng". */
+  hi: string;
   relation: string;
   light: Light;
-  headline: string;
-  facts: Fact[];
-  /** Đoạn đọc to cho phần "Con hôm nay". */
+  /** Một dòng lý do, tối đa 6 từ. */
+  reason: string;
+  /** Tóm tắt đọc to khi bấm Nghe. */
   read: string;
+  /** Kèm con 10 phút: mỗi bước tối đa 12 từ. */
   steps: Step[];
-  calm: string;
   week: Day[];
-  trends: Trend[];
+  weekSay: string;
   ask: { q: string; a: string; from: string };
   zalo: string;
 };
-
-const ha = TEACHERS.find((t) => t.id === "ha")!;
 
 export const VIEWS: ParentView[] = [
   {
     slug: KHANH_DUY.id,
     child: KHANH_DUY,
     you: "bác",
-    guardian: "bác Trần Văn Tư",
+    hi: "bác Tư",
     relation: "Ông nội",
     light: "vang",
-    headline: "Cần để ý một chút",
-    facts: [
-      { icon: "check", text: "Đi học đủ", tone: "ok" },
-      { icon: "book", text: "Làm 2 / 3 bài" },
-      { icon: "trenddn", text: "Toán hơi xuống", tone: "down" },
-      { icon: "moon", text: "Thức khuya 4 tối", tone: "warn" },
-    ],
-    read:
-      "Chào bác Tư. Hôm nay Khánh Duy đi học đủ, làm được hai trên ba bài. Môn Toán đang hơi xuống, con còn lúng túng phần bất phương trình. Mấy tối nay con thức khuya. Tối nay bác chỉ cần ngồi cùng con mười phút.",
+    reason: "Toán hơi xuống · ngủ muộn",
+    read: "Chào bác Tư. Hôm nay Khánh Duy đi học đủ. Môn Toán đang hơi xuống. Mấy tối nay con ngủ muộn. Tối nay bác ngồi cùng con mười phút nhé.",
     steps: [
-      { min: 3, text: "Hỏi con: “Hôm nay học Toán có chỗ nào khó không?”", hint: "Bác chỉ cần nghe con kể." },
-      { min: 5, text: "Cùng con xem video ngắn cô Hà gửi.", hint: "Con hiểu nhanh hơn khi được xem." },
-      { min: 2, text: "Nhắc con cất điện thoại, đi ngủ trước 11 giờ.", hint: "Ngủ đủ thì mai học vào hơn." },
+      { text: "Hỏi con: hôm nay Toán có chỗ nào khó?", tip: "Bác chỉ cần nghe con kể." },
+      { text: "Cùng con xem video ngắn cô Hà gửi." },
+      { text: "Nhắc con cất điện thoại, ngủ trước 11 giờ." },
     ],
-    calm: "Bác không cần biết Toán. Ngồi cạnh con là đủ.",
     week: [
-      { d: "T2", min: 40, bed: "22:40", late: false },
-      { d: "T3", min: 30, bed: "23:10", late: false },
-      { d: "T4", min: 20, bed: "23:50", late: true },
-      { d: "T5", min: 10, bed: "00:15", late: true },
-      { d: "T6", min: 20, bed: "23:45", late: true },
-      { d: "T7", min: 0, bed: "00:30", late: true },
-      { d: "CN", min: 30, bed: "22:50", late: false },
+      { d: "T2", light: "xanh", note: "Học tốt" },
+      { d: "T3", light: "xanh", note: "Học tốt" },
+      { d: "T4", light: "vang", note: "Ngủ muộn" },
+      { d: "T5", light: "vang", note: "Ngủ muộn" },
+      { d: "T6", light: "vang", note: "Ngủ muộn" },
+      { d: "T7", light: "do", note: "Không học" },
+      { d: "CN", light: "xanh", note: "Học tốt" },
     ],
-    trends: [
-      { subject: "Địa lí", score: 8.4, dir: "len" },
-      { subject: "Toán", score: 5.6, dir: "xuong" },
-      { subject: "Hoá học", score: 5.2, dir: "xuong" },
-    ],
+    weekSay: "3 ngày tốt. 4 tối con ngủ muộn.",
     ask: {
-      q: "Cô ơi, dạo này cháu Duy học Toán có theo kịp các bạn không?",
-      a: "Thưa bác, Duy đang chậm ở phần bất phương trình, nhưng con hiểu rất nhanh khi xem video. Tuần này cô gửi con ba video ngắn, mỗi cái năm phút. Bác nhắc con xem giúp cô, xem xong con kể lại cho bác nghe là được ạ.",
-      from: `${ha.short.replace(/^c/, "C")} · chủ nhiệm 10A1`,
+      q: "Cô ơi, cháu Duy học Toán có theo kịp không?",
+      a: "Duy đang chậm phần bất phương trình. Cô gửi con 3 video ngắn. Bác nhắc con xem giúp cô nhé.",
+      from: "Cô Hà",
     },
-    zalo: "Khánh Duy hôm nay: cần để ý. Toán hơi xuống, con thức khuya 4 tối. Tối nay bác ngồi cùng con 10 phút nhé.",
+    zalo: "Khánh Duy hôm nay: Để ý. Toán hơi xuống, con ngủ muộn. Tối nay bác ngồi cùng con 10 phút nhé.",
   },
   {
     slug: MINH_ANH.id,
     child: MINH_ANH,
     you: "chị",
-    guardian: "chị Nguyễn Thị Hồng",
+    hi: "chị Hồng",
     relation: "Mẹ",
     light: "xanh",
-    headline: "Con đang học tốt",
-    facts: [
-      { icon: "check", text: "Đi học đủ", tone: "ok" },
-      { icon: "book", text: "Làm đủ 3 / 3 bài", tone: "ok" },
-      { icon: "flag", text: "Hoá được 9 điểm", tone: "up" },
-      { icon: "trend", text: "Toán đang lên", tone: "up" },
-    ],
-    read:
-      "Chào chị Hồng. Hôm nay Minh Anh học tốt. Con được chín điểm bài kiểm tra Hoá. Môn Toán, phần bất phương trình đang tiến bộ dần. Tối nay chị dành mười phút hỏi bài con nhé.",
+    reason: "Hoá được 9 điểm",
+    read: "Chào chị Hồng. Hôm nay Minh Anh học tốt. Con được chín điểm bài kiểm tra Hoá. Môn Toán đang tiến bộ. Tối nay chị hỏi bài con mười phút nhé.",
     steps: [
-      { min: 4, text: "Hỏi con: “Nhân hai vế với số âm thì dấu lớn bé đổi thế nào?”", hint: "Con đúng nếu nói: phải đổi chiều." },
-      { min: 4, text: "Nhắc con ôn công thức lượng giác.", hint: "Mai là lúc con dễ quên phần này." },
-      { min: 2, text: "Khen con bài Hoá được 9 điểm.", hint: "Một lời khen làm con học hăng hơn." },
+      { text: "Hỏi con: nhân với số âm thì dấu đổi thế nào?", tip: "Con đúng nếu nói: đổi chiều." },
+      { text: "Nhắc con ôn công thức lượng giác." },
+      { text: "Khen con bài Hoá được 9 điểm." },
     ],
-    calm: "Chị không cần giảng. Hỏi và khen là đủ.",
     week: [
-      { d: "T2", min: 50, bed: "22:10", late: false },
-      { d: "T3", min: 40, bed: "22:20", late: false },
-      { d: "T4", min: 60, bed: "22:30", late: false },
-      { d: "T5", min: 40, bed: "22:00", late: false },
-      { d: "T6", min: 50, bed: "22:40", late: false },
-      { d: "T7", min: 30, bed: "23:00", late: false },
-      { d: "CN", min: 40, bed: "22:15", late: false },
+      { d: "T2", light: "xanh", note: "Học tốt" },
+      { d: "T3", light: "xanh", note: "Học tốt" },
+      { d: "T4", light: "xanh", note: "Học tốt" },
+      { d: "T5", light: "xanh", note: "Học tốt" },
+      { d: "T6", light: "xanh", note: "Học tốt" },
+      { d: "T7", light: "vang", note: "Học ít" },
+      { d: "CN", light: "xanh", note: "Học tốt" },
     ],
-    trends: [
-      { subject: "Hoá học", score: 8.6, dir: "len" },
-      { subject: "Tiếng Anh", score: 8.2, dir: "giu" },
-      { subject: "Toán", score: 6.4, dir: "len" },
-    ],
+    weekSay: "6 ngày tốt. Con học đều, ngủ sớm.",
     ask: {
-      q: "Cô ơi, Minh Anh muốn thi Bách khoa thì Toán cần cố thêm phần nào ạ?",
-      a: "Thưa chị, Minh Anh nắm chắc hàm số rồi. Con cần cố thêm phần bất phương trình và lượng giác. Cô đã xếp cho con mỗi tối hai mươi phút luyện đúng hai phần này. Chị cứ hỏi con mỗi tối một câu như hướng dẫn là đủ ạ.",
-      from: `${ha.short.replace(/^c/, "C")} · chủ nhiệm 10A1`,
+      q: "Cô ơi, Minh Anh muốn thi Bách khoa thì cần cố phần nào?",
+      a: "Minh Anh cần cố thêm bất phương trình và lượng giác. Chị hỏi con mỗi tối một câu là đủ ạ.",
+      from: "Cô Hà",
     },
-    zalo: "Minh Anh hôm nay: học tốt. Hoá được 9 điểm, Toán đang lên. Tối nay chị hỏi con 1 câu bất phương trình nhé.",
+    zalo: "Minh Anh hôm nay: Ổn. Hoá được 9 điểm. Tối nay chị hỏi con 1 câu nhé.",
   },
 ];
 
 export const viewFor = (slug: string | undefined): ParentView => VIEWS.find((v) => v.slug === slug) ?? VIEWS[0]!;
 
-export const LIGHTS: { id: Light; label: string; icon: string }[] = [
-  { id: "xanh", label: "Ổn", icon: "check" },
-  { id: "vang", label: "Để ý", icon: "eye" },
-  { id: "do", label: "Cần giúp", icon: "alert" },
-];
-
-export const fmtMin = (m: number) => (m >= 60 ? `${Math.floor(m / 60)} giờ${m % 60 ? ` ${m % 60} phút` : ""}` : `${m} phút`);
+export const LIGHTS: Record<Light, { word: string; icon: string }> = {
+  xanh: { word: "Ổn", icon: "check" },
+  vang: { word: "Để ý", icon: "eye" },
+  do: { word: "Cần giúp", icon: "alert" },
+};
