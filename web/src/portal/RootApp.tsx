@@ -13,6 +13,7 @@ const SolutionLibrary = lazy(() => import("../solution/SolutionLibrary").then((m
 const SolutionPublicPage = lazy(() => import("../solution/SolutionLibrary").then((m) => ({ default: m.SolutionPublicPage })));
 // Gói D — cổng Phụ huynh + Nhà trường (mô phỏng, công khai, không gọi server)
 const PhuHuynh = lazy(() => import("../demo/phu-huynh"));
+const Truong = lazy(() => import("../demo/truong"));
 
 /** "/": đăng nhập Keycloak → theo vai trò (GV/owner/admin/assistant → /gv, còn lại → /hoc); chỉ có phiên HS P9a → /hoc/hs; chưa có → Đăng nhập. */
 function Landing() {
@@ -69,6 +70,7 @@ export function RootApp() {
         <Route path="/loi-giai" element={<SolutionLibrary />} />
         <Route path="/loi-giai/:slug" element={<SolutionPublicPage />} />
         <Route path="/phu-huynh/*" element={<PhuHuynh />} />
+        <Route path="/truong/*" element={<Truong />} />
         <Route index element={<Landing />} />
         <Route path="*" element={<Fallback />} />
       </Routes>

@@ -196,7 +196,7 @@ body:has(> #root > .ph), body:has(.ph) { background: var(--bg, #fdfcf9); }
 .ph-mic-hint { font-size: calc(17px * var(--k)); color: var(--ink-3); }
 .ph-chat { display: grid; gap: 14px; }
 .ph-chat .bub { max-width: 92%; padding: 16px 18px; border-radius: 22px; animation: ph-rise var(--dur-3) var(--ease-out) both; }
-.ph-chat .bub.me { justify-self: end; background: var(--accent); color: var(--ink-on-accent); border-bottom-right-radius: 8px; display: flex; gap: 12px; align-items: center; }
+.ph-chat .bub.me { margin: 0; justify-self: end; background: var(--accent); color: var(--ink-on-accent); border-bottom-right-radius: 8px; display: flex; gap: 12px; align-items: center; }
 .ph-chat .bub.me p { font-size: calc(19px * var(--k)); line-height: 1.4; font-weight: 500; }
 .ph-chat .bub.co { justify-self: start; background: var(--bg-sunken); border-bottom-left-radius: 8px; display: grid; gap: 8px; }
 .ph-chat .who { font-size: calc(14px * var(--k)); font-weight: 700; color: var(--accent); }
