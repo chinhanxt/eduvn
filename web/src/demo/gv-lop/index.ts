@@ -7,4 +7,5 @@ const pick = <M,>(load: () => Promise<M>, f: (m: M) => ComponentType): Page => l
 /** Đường trong cổng GV (sau basename /gv) → trang mô phỏng; GvApp trải vào SHELL_ROUTES (tự có preload khi rê link). */
 export const GV_LOP_ROUTES: { path: string; page: Page }[] = [
   { path: "/lop-hoc-ai", page: pick(() => import("./LopHocAi"), (m) => m.LopHocAi) },
+  { path: "/kho-cong-cu", page: pick(() => import("./KhoCongCu"), (m) => m.KhoCongCu) },
 ];

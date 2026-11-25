@@ -4,7 +4,7 @@
   --gl-c1: #2F5D8A; --gl-c2: #0B7285; --gl-c3: #2B7A3B; --gl-c4: #6F42C1; --gl-c5: #B8336A; --gl-c6: #8A6200; --gl-c7: #B42318;
   --gl-ease: cubic-bezier(.16, 1, .3, 1);
 }
-:root[data-theme="dark"][data-portal="gv"] { --gl-paper-filter: brightness(.93); }
+:root[data-theme="dark"][data-portal="gv"] { --gl-paper-filter: brightness(.9); }
 
 .gl-h1 { display: inline-flex; align-items: center; gap: 12px; }
 .gl-h1 .demo-badge { font-size: 10px; }
@@ -194,4 +194,250 @@
 
 @media (prefers-reduced-motion: reduce) {
   .gl *, .gl *::before, .gl *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+}
+
+/* ============ Hình thu nhỏ sống (Kho công cụ) ============ */
+.gl-th { display: block; width: 100%; height: 100%; background: var(--gl-paper); filter: var(--gl-paper-filter, none); }
+.gl-th .th-ink { fill: none; stroke: var(--gl-ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: .75; }
+.gl-th .th-ink.thin, .gl-th .thin { stroke-width: 1.6; }
+.gl-th .th-ink-f { fill: var(--gl-ink); opacity: .6; }
+.gl-th .th-axis { fill: none; stroke: var(--gl-ink); stroke-width: 1.4; opacity: .35; }
+.gl-th .th-staff { stroke: var(--gl-ink); stroke-width: 1; opacity: .25; }
+.gl-th .th-line { fill: none; stroke: var(--k); stroke-width: 3.2; stroke-linecap: round; }
+.gl-th .th-line.k2 { stroke: var(--gl-ink2); opacity: .7; }
+.gl-th .th-ghost { fill: none; stroke: var(--gl-ink); stroke-width: 1.2; opacity: .18; stroke-dasharray: 3 4; }
+.gl-th .th-fill { fill: var(--k); }
+.gl-th .th-soft { fill: color-mix(in srgb, var(--k) 24%, var(--gl-paper)); stroke: color-mix(in srgb, var(--k) 60%, var(--gl-paper)); stroke-width: 1.2; }
+.gl-th .th-soft-a { fill: color-mix(in srgb, var(--k) 16%, transparent); }
+.gl-th .th-paper { fill: var(--gl-paper); }
+.gl-th .th-land { fill: color-mix(in srgb, var(--k) 14%, var(--gl-paper)); stroke: color-mix(in srgb, var(--k) 45%, var(--gl-paper)); stroke-width: 1.4; }
+.gl-th .th-route { fill: none; stroke: var(--k); stroke-width: 2.6; stroke-dasharray: 5 5; animation: th-dash 1.4s linear infinite; }
+.gl-th .th-dark { fill: #23262d; }
+.gl-th .th-type { fill: color-mix(in srgb, var(--k) 70%, #fff); transform-box: fill-box; transform-origin: left; animation: th-type 3.2s steps(8) infinite; }
+.gl-th .th-caret { fill: #fff; animation: th-blink 1s steps(1) infinite; }
+.gl-th .th-line-t { fill: var(--gl-ink); opacity: .13; }
+.gl-th .th-hl { fill: color-mix(in srgb, var(--k) 30%, transparent); transform-box: fill-box; transform-origin: left; animation: th-hl 3s var(--gl-ease) infinite; }
+.gl-th .th-ecg { fill: none; stroke: var(--k); stroke-width: 2.6; stroke-linejoin: round; stroke-dasharray: 260; animation: th-ecg 2.2s linear infinite; }
+.gl-th .th-current { fill: none; stroke: var(--k); stroke-width: 3; stroke-dasharray: 3 14; stroke-linecap: round; animation: th-dash 1s linear infinite; }
+.gl-th .th-sun { fill: #E9B949; }
+.gl-th .th-draw { stroke-dasharray: 200; animation: th-drawl 3s ease-out infinite; }
+.th-swing { transform-origin: 80px 14px; animation: th-swing 1.8s ease-in-out infinite alternate; }
+.th-shift { animation: th-shift 3s ease-in-out infinite alternate; }
+.th-pulse { transform-box: fill-box; transform-origin: center; animation: th-pulse 1.6s ease-in-out infinite; }
+.th-ride { offset-rotate: 0deg; animation: th-ride 3s ease-in-out infinite alternate; }
+.th-ride.slow { animation: th-ride 6s linear infinite; }
+.th-spin { animation: gl-spin 9s linear infinite; }
+.th-spin.slow { animation-duration: 18s; }
+.th-spin.rev { animation-direction: reverse; animation-duration: 6.3s; }
+.th-breathe { transform-box: fill-box; transform-origin: center; animation: th-breathe 3s ease-in-out infinite alternate; }
+.th-split-a { animation: th-split-a 3s ease-in-out infinite alternate; }
+.th-split-b { animation: th-split-b 3s ease-in-out infinite alternate; }
+.th-seq { animation: th-seq 2.6s ease-in-out infinite; }
+.th-snap { animation: th-snap 2.4s var(--gl-ease) infinite; }
+.th-bob { animation: th-bob 1.2s ease-in-out infinite alternate; }
+.th-flow { animation: th-flow 2s linear infinite; }
+.th-flip { animation: th-flip 3.4s ease-in-out infinite; }
+.th-grow { transform-box: fill-box; transform-origin: bottom; animation: th-grow 2.8s ease-in-out infinite alternate; }
+.th-scan { animation: th-scan 3s ease-in-out infinite alternate; }
+.th-tilt { animation: th-tilt 2.6s ease-in-out infinite alternate; }
+.th-tick { animation: gl-spin 4s steps(12) infinite; }
+.th-glow { animation: th-glow 1.6s ease-in-out infinite alternate; }
+.th-twinkle { animation: th-blink 1.6s ease-in-out infinite; }
+@keyframes th-swing { from { transform: rotate(24deg); } to { transform: rotate(-24deg); } }
+@keyframes th-shift { to { transform: translateY(-14px); } }
+@keyframes th-pulse { 50% { transform: scale(1.35); } }
+@keyframes th-ride { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+@keyframes th-breathe { to { transform: scaleX(1.12) scaleY(.94); } }
+@keyframes th-split-a { to { transform: translateX(-20px); } }
+@keyframes th-split-b { to { transform: translateX(20px); } }
+@keyframes th-seq { 0%, 100% { opacity: .25; } 30%, 60% { opacity: 1; } }
+@keyframes th-snap { 0% { transform: translate(30px, 20px); opacity: 0; } 40%, 100% { transform: none; opacity: 1; } }
+@keyframes th-bob { to { transform: translateY(-5px); } }
+@keyframes th-flow { to { transform: translateX(40px); } }
+@keyframes th-flip { 0%, 30% { transform: rotateY(0); } 50%, 80% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
+@keyframes th-grow { from { transform: scaleY(.55); } }
+@keyframes th-scan { from { transform: translateX(-40px); } to { transform: translateX(40px); } }
+@keyframes th-tilt { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+@keyframes th-glow { to { fill: #F6D67A; } }
+@keyframes th-dash { to { stroke-dashoffset: -20; } }
+@keyframes th-type { 0% { transform: scaleX(0); } 60%, 100% { transform: scaleX(1); } }
+@keyframes th-blink { 50% { opacity: 0; } }
+@keyframes th-hl { 0% { transform: scaleX(0); } 40%, 85% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(1); opacity: 0; } }
+@keyframes th-ecg { from { stroke-dashoffset: 260; } to { stroke-dashoffset: -260; } }
+@keyframes th-drawl { from { stroke-dashoffset: 200; } 60%, 100% { stroke-dashoffset: 0; } }
+
+/* ============ Kho công cụ ============ */
+.gl-ask { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 18px; padding: 40px 0 36px; text-align: center; transition: padding var(--dur-3); }
+.gl-ask.small { padding: 8px 0 20px; }
+.gl-ask-t { font: 600 44px/1.1 var(--font-read); letter-spacing: -.015em; margin: 0; text-wrap: balance; animation: gl-rise .5s var(--gl-ease) both; }
+.gl-ask-box { position: relative; display: flex; align-items: center; gap: 6px; width: min(720px, 100%); height: 60px; padding: 0 8px 0 50px; border-radius: 999px; background: var(--bg); box-shadow: 0 0 0 1px var(--line-2), 0 6px 24px rgb(16 24 40 / .07); transition: box-shadow var(--dur-2); }
+.gl-ask-box:focus-within { box-shadow: 0 0 0 2px var(--accent), 0 6px 24px rgb(16 24 40 / .08); }
+.gl-ask-ic { position: absolute; left: 20px; color: var(--accent); }
+.gl-ask-box input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; font: 400 18px/1 var(--font-ui); color: var(--ink); }
+.gl-ask-box input::placeholder { color: var(--ink-3); }
+.gl-ask-mic { width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: var(--ink-3); display: grid; place-items: center; cursor: pointer; }
+.gl-ask-mic:hover { background: var(--bg-hover); color: var(--ink); }
+.btn.gl-ask-go { height: 44px; padding: 0 20px; border-radius: 999px; font-size: 14px; }
+.gl-ask-try { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; }
+.gl-ask-try button { border: 0; background: none; padding: 4px 0; font: italic 400 16px/1.3 var(--font-read); color: var(--ink-2); cursor: pointer; border-bottom: 1px dashed var(--line-input); }
+.gl-ask-try button:hover { color: var(--accent); border-color: var(--accent); }
+.gl-ask-n { margin: 0; font-size: 13px; color: var(--ink-3); }
+.gl-ask-n b { color: var(--ink); font-weight: 600; }
+.gl-have { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; font-size: 13px; animation: gl-fade .2s both; }
+.gl-have > span { color: var(--ink-3); }
+.gl-have a { color: var(--accent); text-decoration: none; }
+.gl-have a:hover { text-decoration: underline; }
+
+/* Xưởng AI tạo */
+.gl-ws { margin: 0 0 40px; padding: 22px 26px 26px; border-radius: 16px; background: var(--gl-paper); color: var(--gl-ink); box-shadow: 0 0 0 1px rgb(28 27 26 / .08), 0 10px 40px rgb(16 24 40 / .07); animation: gl-rise .45s var(--gl-ease) both; }
+:root[data-theme="dark"] .gl-ws { filter: var(--gl-paper-filter); }
+.gl-ws .gl-eyebrow { color: var(--gl-ink2); }
+.gl-ws-head { display: flex; align-items: flex-start; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid rgb(28 27 26 / .08); }
+.gl-ws-q { display: grid; gap: 4px; flex: 1; min-width: 0; }
+.gl-ws-q q { font: italic 500 24px/1.3 var(--font-read); text-wrap: balance; }
+.gl-ws-tags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; max-width: 46%; padding-top: 18px; }
+.gl-ws-tags span { font: 500 12px/1 var(--font-ui); padding: 6px 10px; border-radius: 999px; background: rgb(47 93 138 / .08); color: var(--gl-c1); animation: gl-pop .35s var(--gl-ease) both; }
+.gl-x { flex: none; width: 30px; height: 30px; border: 0; border-radius: 50%; background: none; color: var(--gl-ink2); display: grid; place-items: center; cursor: pointer; }
+.gl-x:hover { background: rgb(28 27 26 / .06); }
+.gl-ws-body { display: grid; grid-template-columns: 150px minmax(0, 1fr) 250px; gap: 32px; padding-top: 22px; align-items: start; }
+.gl-ws-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; position: relative; }
+.gl-ws-steps li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--gl-ink2); opacity: .55; transition: opacity var(--dur-3), color var(--dur-3); }
+.gl-ws-steps li.on, .gl-ws-steps li.done { opacity: 1; }
+.gl-ws-steps li.on { color: var(--gl-ink); font-weight: 600; }
+.gl-ws-steps i { width: 20px; height: 20px; flex: none; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px rgb(28 27 26 / .2); color: var(--gl-c1); }
+.gl-ws-steps li.done i { background: var(--gl-c3); color: #fff; box-shadow: none; }
+.gl-ws-steps li.on i { box-shadow: inset 0 0 0 1.5px var(--gl-c1); }
+.gl-ws-steps svg.i { width: 13px; height: 13px; }
+.gl-spin { animation: gl-spin 1s linear infinite; }
+.gl-ws-canvas { position: relative; min-height: 330px; }
+.gl-ws-think { position: absolute; inset: 0; display: grid; place-content: center; grid-auto-flow: column; gap: 8px; align-items: center; color: var(--gl-ink2); font: italic 400 17px var(--font-read); animation: gl-fade .3s both; }
+.gl-ws-think svg { color: var(--gl-c4); animation: th-pulse 1.2s ease-in-out infinite; }
+.gl-ws-try { position: absolute; right: 0; top: -6px; display: inline-flex; gap: 6px; align-items: center; font: 500 12px/1 var(--font-ui); color: var(--gl-c4); background: rgb(111 66 193 / .08); padding: 6px 10px; border-radius: 999px; animation: gl-fade .3s both; }
+.gl-tool { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); grid-template-areas: "sim graph" "sim formula" "ctrl ctrl"; gap: 14px; }
+.gl-reg { position: relative; min-height: 84px; border-radius: 12px; opacity: 0; transform: translateY(14px) scale(.97); transition: opacity .45s var(--gl-ease), transform .55s var(--gl-ease); }
+.gl-reg.in { opacity: 1; transform: none; }
+.gl-reg-block { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; border-radius: 12px; border: 1.5px dashed color-mix(in srgb, var(--gl-c4) 55%, transparent); background: rgb(111 66 193 / .05); color: var(--gl-c4); font: 600 13px/1 var(--font-ui); transition: opacity .5s ease .1s; }
+.gl-reg.live .gl-reg-block { opacity: 0; pointer-events: none; }
+.gl-reg-body { opacity: 0; height: 100%; transition: opacity .6s ease .2s; }
+.gl-reg.live .gl-reg-body { opacity: 1; }
+.gl-reg.live { background: #fff; box-shadow: 0 0 0 1px rgb(28 27 26 / .07); }
+.gl-sim { display: block; width: 100%; height: auto; }
+.gl-mini { display: block; width: 100%; height: auto; padding: 8px 8px 0; }
+.gl-sim text, .gl-mini text { font-family: var(--font-ui); }
+.gl-cap.sm { font-size: 10px; }
+.gl-arc { fill: none; stroke: var(--gl-ink); stroke-width: 1; opacity: .18; stroke-dasharray: 3 4; }
+.gl-string { stroke: var(--gl-ink); stroke-width: 1.6; }
+.gl-bob { fill: var(--gl-c2); stroke: #fff; stroke-width: 2; }
+.gl-curve.thin { stroke-width: 2.6; }
+.gl-dem { stroke: var(--gl-c1); stroke-width: 3.4; stroke-linecap: round; }
+.gl-sup { stroke: var(--gl-c3); stroke-width: 3.4; stroke-linecap: round; }
+.gl-guide.dash { stroke-dasharray: 4 4; }
+.gl-formula { height: 100%; display: grid; align-content: center; gap: 6px; padding: 14px 18px; font: italic 500 22px/1.2 var(--font-read); color: var(--gl-c1); }
+.gl-formula b { font: 600 15px/1 var(--font-ui); color: var(--gl-ink); font-style: normal; }
+.gl-formula.sm { font-size: 17px; }
+.gl-readout { height: 100%; display: grid; align-content: center; padding: 14px 18px; gap: 2px; }
+.gl-readout span { font-size: 12px; color: var(--gl-ink2); }
+.gl-readout b { font: 600 40px/1.05 var(--font-read); color: var(--gl-ink); letter-spacing: -.01em; }
+.gl-readout small { font-size: 12px; color: var(--gl-ink2); }
+.gl-ctrl2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.gl-slider { display: grid; gap: 8px; padding: 14px 18px; }
+.gl-slider-l { display: flex; justify-content: space-between; font-size: 13px; color: var(--gl-ink2); }
+.gl-slider-l b { color: var(--gl-ink); font-weight: 600; }
+.gl-slider-e { display: flex; justify-content: space-between; font-size: 11px; color: var(--gl-ink2); opacity: .8; }
+.gl-slider input { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: none; cursor: pointer; }
+.gl-slider input::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--gl-c1) var(--v), rgb(28 27 26 / .12) var(--v)); }
+.gl-slider input::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--gl-c1) var(--v), rgb(28 27 26 / .12) var(--v)); }
+.gl-slider input::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--gl-c1), 0 2px 6px rgb(0 0 0 / .18); }
+.gl-slider input::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px var(--gl-c1), 0 2px 6px rgb(0 0 0 / .18); }
+.gl-slider input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.gl-ws-side { display: grid; gap: 22px; }
+.gl-ws-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.gl-ws-checks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; font-size: 13px; line-height: 1.45; color: var(--gl-ink2); opacity: .45; transition: opacity var(--dur-3); }
+.gl-ws-checks li.ok, .gl-ws-checks li.run { opacity: 1; }
+.gl-ws-checks li.ok { color: var(--gl-ink); }
+.gl-ws-checks i { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px rgb(28 27 26 / .2); }
+.gl-ws-checks li.ok i { background: var(--gl-c3); color: #fff; box-shadow: none; animation: gl-pop .3s var(--gl-ease) both; }
+.gl-ws-checks li.run i { box-shadow: inset 0 0 0 1.5px var(--gl-c3); animation: th-pulse 1s ease-in-out infinite; }
+.gl-ws-checks svg.i { width: 13px; height: 13px; }
+.gl-ws-saved { display: grid; gap: 10px; justify-items: start; padding-top: 18px; border-top: 1px solid rgb(28 27 26 / .08); animation: gl-rise .4s var(--gl-ease) both; }
+.gl-ws-made { display: flex; gap: 12px; align-items: center; animation: gl-land .8s var(--gl-ease) both; }
+.gl-ws-made .gl-th { width: 84px; height: 54px; border-radius: 8px; box-shadow: 0 0 0 2px var(--gl-c4); flex: none; }
+.gl-ws-made > span { display: grid; gap: 4px; }
+.gl-ws-made b { font: 600 16px/1.25 var(--font-read); }
+.gl-ws-savedt { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; color: var(--gl-c3); font-weight: 600; }
+.gl-ws-acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.gl-ws-pending { min-height: 20px; font-size: 13px; color: var(--gl-ink2); }
+
+.gl-src-tag { display: inline-flex; align-items: center; gap: 6px; font: 500 11px/1 var(--font-ui); color: var(--ink-2); }
+.gl-src-tag::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--gl-c1)); }
+.gl-src-tag.chuan { --c: var(--gl-c1); } .gl-src-tag.mo { --c: var(--gl-c3); } .gl-src-tag.ai { --c: var(--gl-c4); } .gl-src-tag.cd { --c: var(--gl-c5); }
+.gl-ws .gl-src-tag { color: var(--gl-ink2); }
+
+/* Gợi ý theo bài + bộ lọc */
+.gl-forlesson { display: flex; align-items: center; gap: 24px; padding: 16px 0; border-block: 1px solid var(--line); margin-bottom: 28px; }
+.gl-forlesson .gl-eyebrow { flex: none; max-width: 120px; }
+.gl-forlesson-row { display: flex; gap: 28px; overflow-x: auto; scrollbar-width: none; }
+.gl-fl { display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0; text-align: left; cursor: pointer; color: var(--ink); }
+.gl-fl .gl-th { width: 72px; height: 46px; border-radius: 6px; box-shadow: 0 0 0 1px var(--line); }
+.gl-fl span { display: grid; gap: 2px; }
+.gl-fl b { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.gl-fl small { font-size: 11px; color: var(--ink-3); }
+.gl-fl:hover b { color: var(--accent); }
+.gl-filt { display: grid; gap: 14px; margin-bottom: 24px; }
+.gl-subj { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent); padding-right: 40px; }
+.gl-subj button { flex: none; height: 30px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--ink-2); font: 500 13px/1 var(--font-ui); cursor: pointer; white-space: nowrap; }
+.gl-subj button:hover { background: var(--bg-hover); }
+.gl-subj button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.gl-filt2 { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.gl-srcs { display: flex; gap: 4px; flex-wrap: wrap; }
+.gl-srcs button { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: none; color: var(--ink-2); font: 500 12px/1 var(--font-ui); cursor: pointer; }
+.gl-srcs button i { width: 8px; height: 8px; border-radius: 50%; background: var(--k); }
+.gl-srcs button:hover { background: var(--bg-hover); }
+.gl-srcs button[aria-pressed="true"] { background: color-mix(in srgb, var(--k) 12%, var(--bg)); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 40%, transparent); }
+
+/* Tường công cụ (masonry, hình thu nhỏ sống) */
+.gl-wall { columns: 4 220px; column-gap: 24px; }
+.gl-tile { display: block; break-inside: avoid; margin-bottom: 28px; color: inherit; text-decoration: none; animation: gl-rise .4s var(--gl-ease) both; }
+.gl-tile-th { border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); transition: transform var(--dur-3) var(--gl-ease), box-shadow var(--dur-3); }
+.gl-tile-th .gl-th { height: 100%; }
+.gl-tile:hover .gl-tile-th { transform: translateY(-3px); box-shadow: 0 0 0 1px var(--line-2), var(--shadow-2); }
+.gl-tile-m { display: grid; gap: 3px; padding: 10px 2px 0; }
+.gl-tile-m b { font-size: 14px; font-weight: 600; line-height: 1.35; }
+.gl-tile-m > span:not(.gl-src-tag) { font-size: 12px; color: var(--ink-3); }
+.gl-tile-m .gl-src-tag { margin-top: 3px; }
+.gl-tile.new .gl-tile-th { box-shadow: 0 0 0 2px var(--gl-c4), 0 8px 30px rgb(111 66 193 / .22); animation: gl-land .9s var(--gl-ease) both; }
+.gl-tile.new .gl-src-tag { color: var(--gl-c4); font-weight: 600; }
+@keyframes gl-land { from { transform: translateY(-40px) scale(.9); opacity: 0; } }
+.gl-tile-make { width: 100%; display: grid; place-items: center; gap: 8px; padding: 40px 0; border: 1.5px dashed var(--line-input); border-radius: 10px; background: none; color: var(--accent); cursor: pointer; font: inherit; }
+
+@media (max-width: 1180px) {
+  .gl-ws-body { grid-template-columns: minmax(0, 1fr) 220px; }
+  .gl-ws-steps { grid-column: 1 / -1; grid-auto-flow: column; justify-content: start; gap: 20px; }
+}
+@media (max-width: 720px) {
+  .gl-ask { padding: 16px 0 24px; gap: 14px; }
+  .gl-ask-t { font-size: 30px; }
+  .gl-ask-box { height: 52px; padding-left: 42px; }
+  .gl-ask-ic { left: 14px; }
+  .gl-ask-box input { font-size: 16px; }
+  .gl-ask-mic { display: none; }
+  .btn.gl-ask-go { height: 38px; padding: 0 14px; font-size: 13px; }
+  .gl-ask-try { flex-direction: column; gap: 6px; }
+  .gl-ws { padding: 16px; margin-left: calc(var(--page-x) * -.5); margin-right: calc(var(--page-x) * -.5); }
+  .gl-ws-head { flex-wrap: wrap; }
+  .gl-ws-q q { font-size: 19px; }
+  .gl-ws-tags { max-width: none; justify-content: flex-start; padding-top: 0; order: 3; width: 100%; }
+  .gl-ws-body { grid-template-columns: 1fr; gap: 20px; }
+  .gl-ws-steps { overflow-x: auto; scrollbar-width: none; gap: 14px; }
+  .gl-ws-steps li { white-space: nowrap; font-size: 12px; }
+  .gl-tool { grid-template-columns: 1fr 1fr; grid-template-areas: "sim sim" "graph formula" "ctrl ctrl"; }
+  .gl-ctrl2 { grid-template-columns: 1fr; gap: 0; }
+  .gl-tool .gl-sim { max-height: 240px; }
+  .gl-formula { font-size: 17px; padding: 10px 12px; }
+  .gl-readout b { font-size: 28px; }
+  .gl-forlesson { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .gl-forlesson .gl-eyebrow { max-width: none; }
+  .gl-wall { columns: 2; column-gap: 14px; }
+  .gl-tile { margin-bottom: 20px; }
+  .gl-tile-m b { font-size: 13px; }
 }
