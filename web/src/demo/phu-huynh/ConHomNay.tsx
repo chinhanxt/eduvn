@@ -64,7 +64,7 @@ export function ConHomNay({ v, sp }: { v: ParentView; sp: Speak }) {
 export function ToiNay({ v, sp, onStart }: { v: ParentView; sp: Speak; onStart?: () => void }) {
   const total = v.steps.reduce((a, s) => a + s.min, 0);
   return (
-    <section className="ph-tonight" aria-labelledby="ph-tn">
+    <section className="ph-tonight" id="kem-con" aria-labelledby="ph-tn">
       <div className="ph-sec-h">
         <Icon name="moon" />
         <h2 id="ph-tn">Tối nay kèm con {total} phút</h2>

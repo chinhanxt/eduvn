@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, Route, Routes, useParams } from "react-router";
+import { Link, Route, Routes, useLocation, useParams } from "react-router";
 import { Icon } from "../../ui";
 import { THEME_KEY, toggleTheme, useTheme } from "../../ui/shell/theme";
 import { MockBadge, SCHOOL } from "../kit";
 import { ConHomNay, ToiNay } from "./ConHomNay";
 import { VIEWS, viewFor } from "./data";
+import { HoiCo, KemNgay, Tuan, Zalo } from "./KemCon";
 import { useSpeak } from "./speak";
 import "./ph.css";
 
@@ -31,7 +32,13 @@ function ParentPage() {
       }
       return !b;
     });
+  const [run, setRun] = useState(false);
+  const { pathname } = useLocation();
   useEffect(() => {
+    if (pathname.endsWith("/kem-con")) document.getElementById("kem-con")?.scrollIntoView({ block: "start" });
+  }, [pathname]);
+  useEffect(() => {
+    setRun(false);
     sp.stop();
     document.title = `${v.child.short} hôm nay · EDUVN`;
   }, [v.slug]);
@@ -55,9 +62,26 @@ function ParentPage() {
       </header>
 
       <main className="ph-main">
-        <ConHomNay v={v} sp={sp} />
-        <ToiNay v={v} sp={sp} />
+        <div className="ph-c1">
+          <ConHomNay v={v} sp={sp} />
+          <Tuan v={v} />
+        </div>
+        <div className="ph-c2">
+          <ToiNay v={v} sp={sp} onStart={() => setRun(true)} />
+          <HoiCo v={v} sp={sp} />
+          <Zalo v={v} />
+        </div>
       </main>
+      {run && (
+        <KemNgay
+          v={v}
+          sp={sp}
+          onClose={() => {
+            sp.stop();
+            setRun(false);
+          }}
+        />
+      )}
 
       <footer className="ph-foot">
         <MockBadge />
