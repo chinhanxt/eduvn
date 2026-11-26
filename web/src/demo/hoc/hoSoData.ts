@@ -1,7 +1,12 @@
 /** Dữ liệu mẫu riêng màn Hồ sơ AI (gói C) — nhất quán với thế giới mẫu (MINH_ANH trong demo/kit/world.ts). */
 
+import { GUARDIANS, MINH_ANH_MORE, SCHOOL, TEACHERS } from "../kit/world";
+
+const HA = TEACHERS.find((t) => t.id === "ha")!;
+const SHORT = SCHOOL.name.replace("Trường Liên cấp ", "");
+
 /** Điểm 3 tháng trước (để radar có lớp so sánh). */
-export const SCORES_BEFORE: Record<string, number> = { Toán: 5.7, "Ngữ văn": 6.3, "Hoá học": 8.2, "Tiếng Anh": 7.9, "Lịch sử": 7.3, "Địa lí": 7.1, "Sinh học": 6.5 };
+export const SCORES_BEFORE: Record<string, number> = MINH_ANH_MORE.scores3MonthsAgo;
 
 export type Evidence = { icon: string; t: string; s: string; when: string };
 export type Insight = {
@@ -116,9 +121,9 @@ export const MEMORY: { group: string; icon: string; items: Memory[] }[] = [
 
 export const WHO_SEES = [
   { name: "Minh Anh", role: "Em", hue: 205, sees: "Tất cả" },
-  { name: "Lê Thu Hà", role: "Cô Hà · chủ nhiệm", hue: 28, sees: "Năng lực, lỗi môn Toán" },
-  { name: "Nguyễn Thị Hồng", role: "Mẹ", hue: 340, sees: "Tóm tắt mỗi tuần" },
-  { name: "Bình Minh", role: "Nhà trường", hue: 230, sees: "Số tổng hợp" },
+  { name: HA.name, role: `${HA.short.replace(/^c/, "C")} · chủ nhiệm`, hue: 28, sees: "Năng lực, lỗi môn Toán" },
+  { name: GUARDIANS[0]!.name, role: "Mẹ", hue: 340, sees: "Tóm tắt mỗi tuần" },
+  { name: SHORT, role: "Nhà trường", hue: 230, sees: "Số tổng hợp" },
 ];
 
 export const ACCESS_LOG = [
@@ -130,12 +135,12 @@ export const ACCESS_LOG = [
 /** Học bạ sống: lớp 6 → đại học. `v` = năng lực tổng (0–10), `proj` = dự kiến. */
 export type Year = { k: string; label: string; year: string; place: string; v: number; proj?: boolean; now?: boolean; best: string; moment: string; note: string };
 export const YEARS: Year[] = [
-  { k: "6", label: "Lớp 6", year: "2022", place: "THCS Bình Minh", v: 6.1, best: "Toán hình", moment: "Lần đầu tự giải bài toán chuyển động", note: "Hồ sơ bắt đầu từ đây" },
-  { k: "7", label: "Lớp 7", year: "2023", place: "THCS Bình Minh", v: 6.5, best: "Khoa học tự nhiên", moment: "Mê thí nghiệm đổi màu quỳ tím", note: "Hiểu nhanh khi có thí nghiệm" },
-  { k: "8", label: "Lớp 8", year: "2024", place: "THCS Bình Minh", v: 7.0, best: "Hoá học 9,0", moment: "Giải Ba Hoá học cấp trường", note: "Bắt đầu học tốt buổi tối" },
-  { k: "9", label: "Lớp 9", year: "2025", place: "THCS Bình Minh", v: 7.3, best: "Tiếng Anh", moment: "Vào lớp 10 với 41,5 điểm", note: "Vững dần đọc hiểu" },
-  { k: "10", label: "Lớp 10", year: "2026", place: "THPT Bình Minh · 10A1", v: 7.4, now: true, best: "Hoá học 8,6", moment: "AI bàn giao hồ sơ cho cô Hà ngay ngày đầu năm", note: "Đang vá bất phương trình" },
-  { k: "11", label: "Lớp 11", year: "2027", place: "THPT Bình Minh", v: 7.8, proj: true, best: "—", moment: "Chọn tổ hợp thi", note: "Dự kiến" },
-  { k: "12", label: "Lớp 12", year: "2028", place: "THPT Bình Minh", v: 8.2, proj: true, best: "—", moment: "Thi tốt nghiệp THPT", note: "Dự kiến" },
+  { k: "6", label: "Lớp 6", year: "2022", place: `THCS ${SHORT}`, v: 6.1, best: "Toán hình", moment: "Lần đầu tự giải bài toán chuyển động", note: "Hồ sơ bắt đầu từ đây" },
+  { k: "7", label: "Lớp 7", year: "2023", place: `THCS ${SHORT}`, v: 6.5, best: "Khoa học tự nhiên", moment: "Mê thí nghiệm đổi màu quỳ tím", note: "Hiểu nhanh khi có thí nghiệm" },
+  { k: "8", label: "Lớp 8", year: "2024", place: `THCS ${SHORT}`, v: 7.0, best: "Hoá học 9,0", moment: "Giải Ba Hoá học cấp trường", note: "Bắt đầu học tốt buổi tối" },
+  { k: "9", label: "Lớp 9", year: "2025", place: `THCS ${SHORT}`, v: 7.3, best: "Tiếng Anh", moment: "Vào lớp 10 với 41,5 điểm", note: "Vững dần đọc hiểu" },
+  { k: "10", label: "Lớp 10", year: "2026", place: `THPT ${SHORT} · 10A1`, v: 7.4, now: true, best: "Hoá học 8,6", moment: "AI bàn giao hồ sơ cho cô Hà ngay ngày đầu năm", note: "Đang vá bất phương trình" },
+  { k: "11", label: "Lớp 11", year: "2027", place: `THPT ${SHORT}`, v: 7.8, proj: true, best: "—", moment: "Chốt tổ hợp D07", note: "Dự kiến" },
+  { k: "12", label: "Lớp 12", year: "2028", place: `THPT ${SHORT}`, v: 8.2, proj: true, best: "—", moment: "Thi tốt nghiệp THPT", note: "Dự kiến" },
   { k: "ĐH", label: "Đại học", year: "2029", place: "ĐH Bách khoa · CNTT", v: 8.5, proj: true, best: "—", moment: "Mục tiêu của em", note: "Hồ sơ thành hồ sơ năng lực" },
 ];

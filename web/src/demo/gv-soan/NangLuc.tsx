@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../ui/components/Button";
 import { Icon } from "../../ui/Icon";
-import { useFakeStream, useCount } from "../kit";
+import { CLASSES, NUMBERS, fmt1, useFakeStream, useCount } from "../kit";
 import { Head } from "./common";
+
+const C10A1 = CLASSES.find((c) => c.id === "10A1")!;
 
 const CHUNG = ["Tự chủ và tự học", "Giao tiếp và hợp tác", "Giải quyết vấn đề và sáng tạo"];
 const PHAM_CHAT = ["Yêu nước", "Nhân ái", "Chăm chỉ", "Trung thực", "Trách nhiệm"];
@@ -18,7 +20,7 @@ type Subj = { id: string; label: string; cls: string; dac: string[]; why: string
 const SUBJ: Subj[] = [
   {
     id: "toan", label: "Toán 10 · Bất phương trình", cls: "10A1", dac: ["Tư duy và lập luận", "Mô hình hoá", "Giải quyết vấn đề", "Giao tiếp toán học", "Công cụ, phương tiện"],
-    why: "Lớp 42 em, 3 em hay quên đổi chiều bất đẳng thức. Ưu tiên nhóm nhỏ có vai trò rõ và trạm theo trình độ.",
+    why: `Lớp ${C10A1.size} em, ${NUMBERS.needHelp.length} em cần giúp bất phương trình. Ưu tiên nhóm nhỏ có vai trò rõ và trạm theo trình độ.`,
     acts: [
       { n: "Đoán số vé", how: "Cặp đôi đoán khoảng số vé có lãi, kiểm lại bằng đồ thị", ph: 0, ch: [1], dt: [1], pc: [2] },
       { n: "Khăn trải bàn", how: "Nhóm 4, mỗi em xét dấu một tam thức rồi ghép thành quy tắc", ph: 1, ch: [1, 0], dt: [0, 3], pc: [4] },
@@ -28,7 +30,7 @@ const SUBJ: Subj[] = [
   },
   {
     id: "van", label: "Ngữ văn 11 · Nghị luận", cls: "11A3", dac: ["Đọc", "Viết", "Nói và nghe", "Văn học"],
-    why: "Lớp 11A3 tụt 0,6 điểm môn Văn so với tháng trước. Tăng hoạt động đọc có mục đích và nói trước nhóm.",
+    why: `Lớp 11A3 tụt ${fmt1(NUMBERS.class11A3VanDrop)} điểm môn Văn so với tháng trước. Tăng hoạt động đọc có mục đích và nói trước nhóm.`,
     acts: [
       { n: "Tranh biện 60 giây", how: "Hai bạn tranh luận nhanh một nhận định gây tranh cãi", ph: 0, ch: [1], dt: [2], pc: [3] },
       { n: "Mảnh ghép luận điểm", how: "Mỗi nhóm chuyên sâu một luận điểm rồi ghép lại", ph: 1, ch: [1, 0], dt: [0], pc: [4] },

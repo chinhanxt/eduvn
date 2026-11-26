@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import { CLASSES, KHANH_DUY, MINH_ANH, useCountUp } from "../kit";
+import { CLASSES, DUC_THINH, KHANH_DUY, MINH_ANH, THAO_VY, useCountUp } from "../kit";
 import { Segmented } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { Head } from "./parts";
@@ -12,7 +12,7 @@ const SETS: Record<ClassId, { subject: string; topic: string; known: Record<numb
   "10A1": {
     subject: "Toán",
     topic: "Bất phương trình bậc hai",
-    known: { 0: MINH_ANH.short, 1: KHANH_DUY.short, 2: "Đức Thịnh" },
+    known: { 0: MINH_ANH.short, 1: KHANH_DUY.short, 2: DUC_THINH.short },
     levels: [
       { name: "Nền tảng", task: "Xét dấu tam thức có gợi ý", items: ["x² − 5x + 6 > 0 (cho sẵn hai nghiệm)", "Điền dấu vào bảng xét dấu"] },
       { name: "Vững", task: "Giải bất phương trình đầy đủ", items: ["−x² + 6x − 5 > 0", "2x² − 3x − 2 ≤ 0"] },
@@ -32,7 +32,7 @@ const SETS: Record<ClassId, { subject: string; topic: string; known: Record<numb
   "8A2": {
     subject: "Sinh học",
     topic: "Tế bào",
-    known: { 0: "Thảo Vy" },
+    known: { 0: THAO_VY.short },
     levels: [
       { name: "Nền tảng", task: "Ghép bào quan với chức năng", items: ["Kéo thả 6 bào quan", "Tô màu sơ đồ tế bào"] },
       { name: "Vững", task: "So sánh tế bào động – thực vật", items: ["Lập bảng 4 điểm khác", "Giải thích vì sao lá có màu xanh"] },
@@ -48,7 +48,7 @@ function roster(cls: ClassId) {
   let x = cls.charCodeAt(0) * 97 + cls.length * 13;
   const rnd = () => ((x = (x * 1103515245 + 12345) & 0x7fffffff), x / 0x7fffffff);
   return Array.from({ length: size }, (_, i) => {
-    const preset = cls === "10A1" ? [0.42, 0.35, 0.3][i] : cls === "8A2" && i === 0 ? 0.92 : undefined;
+    const preset = cls === "10A1" ? [MINH_ANH, KHANH_DUY, DUC_THINH][i]?.mastery[0]?.level : cls === "8A2" && i === 0 ? THAO_VY.mastery[0]!.level : undefined;
     const m = preset ?? Math.min(0.97, Math.max(0.12, 0.62 + (rnd() + rnd() + rnd() - 1.5) * 0.42));
     return { i, m, sx: 4 + rnd() * 92, sy: 8 + rnd() * 80 };
   });

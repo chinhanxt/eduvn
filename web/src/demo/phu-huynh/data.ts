@@ -1,4 +1,7 @@
-import { KHANH_DUY, MINH_ANH, type Learner } from "../kit/world";
+import { KHANH_DUY, KHANH_DUY_MORE, MINH_ANH, MINH_ANH_MORE, TEACHERS, type Learner } from "../kit/world";
+
+const HOA = MINH_ANH_MORE.lastTest.score.toLocaleString("vi-VN");
+const CO_HA = (TEACHERS.find((t) => t.id === "ha")?.short ?? "cô Hà").replace(/^c/, "C");
 
 /** Dữ liệu mẫu riêng cổng Phụ huynh (nhất quán với thế giới mẫu: docs/demo/the-gioi-mau.md). Câu ngắn, lời đời thường. */
 export type Light = "xanh" | "vang" | "do";
@@ -50,11 +53,11 @@ export const VIEWS: ParentView[] = [
       { d: "T7", light: "do", note: "Không học" },
       { d: "CN", light: "xanh", note: "Học tốt" },
     ],
-    weekSay: "3 ngày tốt. 4 tối con ngủ muộn.",
+    weekSay: `3 ngày tốt. ${KHANH_DUY_MORE.lateNights} tối con ngủ muộn.`,
     ask: {
       q: "Cô ơi, cháu Duy học Toán có theo kịp không?",
-      a: "Duy đang chậm phần bất phương trình. Cô gửi con 3 video ngắn. Bác nhắc con xem giúp cô nhé.",
-      from: "Cô Hà",
+      a: "Duy đang chậm phần bất phương trình. Cô gửi con 3 video ngắn, mỗi video một phút. Bác nhắc con xem giúp cô nhé.",
+      from: CO_HA,
     },
     zalo: "Khánh Duy hôm nay: Để ý. Toán hơi xuống, con ngủ muộn. Tối nay bác ngồi cùng con 10 phút nhé.",
   },
@@ -65,12 +68,12 @@ export const VIEWS: ParentView[] = [
     hi: "chị Hồng",
     relation: "Mẹ",
     light: "xanh",
-    reason: "Hoá được 9 điểm",
-    read: "Chào chị Hồng. Hôm nay Minh Anh học tốt. Con được chín điểm bài kiểm tra Hoá. Môn Toán đang tiến bộ. Tối nay chị hỏi bài con mười phút nhé.",
+    reason: `Hoá được ${HOA} điểm`,
+    read: "Chào chị Hồng. Hôm nay Minh Anh học tốt. Con được chín phẩy năm điểm bài kiểm tra Hoá. Môn Toán đang tiến bộ. Tối nay chị hỏi bài con mười phút nhé.",
     steps: [
       { text: "Hỏi con: nhân với số âm thì dấu đổi thế nào?", tip: "Con đúng nếu nói: đổi chiều." },
       { text: "Nhắc con ôn công thức lượng giác." },
-      { text: "Khen con bài Hoá được 9 điểm." },
+      { text: `Khen con bài Hoá được ${HOA} điểm.` },
     ],
     week: [
       { d: "T2", light: "xanh", note: "Học tốt" },
@@ -85,9 +88,9 @@ export const VIEWS: ParentView[] = [
     ask: {
       q: "Cô ơi, Minh Anh muốn thi Bách khoa thì cần cố phần nào?",
       a: "Minh Anh cần cố thêm bất phương trình và lượng giác. Chị hỏi con mỗi tối một câu là đủ ạ.",
-      from: "Cô Hà",
+      from: CO_HA,
     },
-    zalo: "Minh Anh hôm nay: Ổn. Hoá được 9 điểm. Tối nay chị hỏi con 1 câu nhé.",
+    zalo: `Minh Anh hôm nay: Ổn. Hoá được ${HOA} điểm. Tối nay chị hỏi con 1 câu nhé.`,
   },
 ];
 

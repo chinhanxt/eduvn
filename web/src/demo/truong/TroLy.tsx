@@ -5,6 +5,7 @@ import { useToast } from "../../ui/components/Toast";
 import { Icon } from "../../ui/Icon";
 import { useFakeStream } from "../kit/useFakeStream";
 import { fmt } from "./data";
+import { DEMO_DAY } from "../kit/world";
 
 /* ---------------- Câu trả lời mẫu của AI nhà trường (chỉ số tổng hợp) ---------------- */
 type Viz = "ky-nang" | "khoi-10" | "du-gio" | "chung";
@@ -26,7 +27,7 @@ const PRESET: Ans[] = [
     q: "Lớp nào cần dự giờ tuần này?",
     a: "Đề xuất dự giờ 2 lớp. Lịch trống của thầy phù hợp với cả hai tiết dưới đây.",
     viz: "du-gio",
-    src: "Bản đồ điểm tháng 11 · thời khoá biểu tuần 13",
+    src: `Bản đồ điểm tháng 11 · thời khoá biểu tuần ${DEMO_DAY.week}`,
   },
 ];
 const fallback = (q: string): Ans => ({
@@ -52,7 +53,7 @@ const K10 = [
 ];
 const VISITS = [
   { cls: "11A3", sub: "Ngữ văn", why: "tụt 0,6 điểm", slot: "Thứ Năm · tiết 3" },
-  { cls: "10A2", sub: "Toán", why: "TB 6,4, thấp nhất trường", slot: "Thứ Sáu · tiết 2" },
+  { cls: "10A2", sub: "Toán", why: "TB 6,4, thấp nhất khối 10", slot: "Thứ Sáu · tiết 2" },
 ];
 
 const sgn = (d: number) => (Math.abs(d) < 0.05 ? "±0" : `${d > 0 ? "+" : "−"}${fmt(Math.abs(d))}`);

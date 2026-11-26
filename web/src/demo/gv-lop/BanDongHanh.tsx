@@ -47,10 +47,10 @@ function Companion() {
   const s = useFakeStream(REPLY[mood], { key: `${mood}-${ver}`, cps: 46, delayMs: 700 });
   const set = (k: keyof Traits, v: number) => setT((x) => ({ ...x, [k]: v }));
   const focus = useTween(t.kien * 0.5 + t.hai * 0.35 + t.hoi * 0.15, 700);
-  // đường tập trung 0–20 phút của Khánh Duy: tụt quanh phút 14; có Nhú gợi nghỉ ở phút 11 thì giữ được nhịp
+  // đường tập trung 0–20 phút của Khánh Duy: tụt quanh phút 15; có Nhú gợi nghỉ ở phút 11 thì giữ được nhịp
   const sig = (x: number) => 1 / (1 + Math.exp(-x));
   const f = (m: number, boost: number) => {
-    const base = 0.82 - 0.012 * m - 0.46 * sig((m - 14) * 0.9) + 0.035 * Math.sin(m * 1.4);
+    const base = 0.82 - 0.012 * m - 0.46 * sig((m - 15) * 0.9) + 0.035 * Math.sin(m * 1.4);
     const lift = boost * (0.5 * sig((m - 11.5) * 1.6) - 0.12 * Math.exp(-((m - 11.3) ** 2) / 0.4));
     return Math.max(0.08, Math.min(0.95, base + lift));
   };
@@ -104,7 +104,7 @@ function Companion() {
           </figcaption>
           <svg viewBox="0 0 680 120" preserveAspectRatio="none" aria-hidden="true">
             <path d="M0 112H680" className="gl-axis" />
-            <path d={`M${X(14)} 4V112`} className="gl-guide dash" />
+            <path d={`M${X(15)} 4V112`} className="gl-guide dash" />
             <path d={line(0)} className="gl-focus-b" />
             <path d={line(focus)} className="gl-focus-a" />
             <circle cx={X(11)} cy={Y(f(11, focus))} r="5" className="gl-pt" />
@@ -112,7 +112,7 @@ function Companion() {
           <div className="gl-focus-x">
             <span>0′</span>
             <span style={{ left: "55%" }}>Nhú gợi nghỉ</span>
-            <span style={{ left: "70%" }}>mốc hay nản</span>
+            <span style={{ left: "75%" }}>mốc hay nản</span>
             <span style={{ right: 0 }}>20′</span>
           </div>
         </figure>

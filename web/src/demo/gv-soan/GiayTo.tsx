@@ -4,9 +4,11 @@ import { Button } from "../../ui/components/Button";
 import { Tabs } from "../../ui/components/Tabs";
 import { useToast } from "../../ui/components/Toast";
 import { Icon } from "../../ui/Icon";
-import { useFakeStream, useCount } from "../kit";
+import { CLASSES, DEMO_DAY, NUMBERS, ROSTER_10A1, useFakeStream, useCount } from "../kit";
 import { Head } from "./common";
 import { HA, LESSON, SCHOOL } from "./data";
+
+const HELP = NUMBERS.needHelp.length;
 
 type Tab = "khbd" | "sdb" | "bc" | "dong-bo";
 
@@ -59,7 +61,7 @@ const KHBD = [
   "d) Tổ chức thực hiện: GV chiếu slide, HS thảo luận cặp đôi 2 phút.",
   "## Hoạt động 2: Hình thành kiến thức (15 phút)",
   "a) Mục tiêu: nắm quy tắc xét dấu và ba bước giải.",
-  "d) Tổ chức thực hiện: kĩ thuật khăn trải bàn; GV chú ý 3 em hay quên đổi chiều khi nhân số âm.",
+  `d) Tổ chức thực hiện: kĩ thuật khăn trải bàn; GV chú ý ${HELP} em cần giúp (${NUMBERS.needHelp.join(", ")}).`,
   "## Hoạt động 3: Luyện tập (15 phút)",
   "Phiếu 3 mức, AI giao theo trình độ từng em.",
   "## Hoạt động 4: Vận dụng (10 phút)",
@@ -115,11 +117,11 @@ function Khbd() {
 }
 
 /* ---------- Sổ đầu bài ---------- */
-const DAYS = ["Thứ Hai 24/11", "Thứ Ba 25/11", "Thứ Tư 26/11", "Thứ Năm 27/11", "Thứ Sáu 28/11"];
+const DAYS = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu"].map((d, i) => `${d} ${DEMO_DAY.monday + i}/${DEMO_DAY.month}`);
 const TKB: [string, string, string, number, string][][] = [
   [
     ["Chào cờ", "Sinh hoạt dưới cờ", "", 0, ""],
-    ["Toán", "Bất phương trình bậc hai (t1)", "cô Hà", 0, "Lớp sôi nổi, 3 em cần ôn đổi chiều BĐT"],
+    ["Toán", "Bất phương trình bậc hai (t1)", "cô Hà", 0, `Lớp sôi nổi, ${HELP} em cần giúp bất phương trình`],
     ["Ngữ văn", "Đọc hiểu văn bản nghị luận", "thầy Bảo", 1, "Vắng: Đức Thịnh (có phép)"],
     ["Hoá học", "Phản ứng oxi hoá – khử", "thầy Long", 0, "Thí nghiệm an toàn, đúng giờ"],
     ["Tiếng Anh", "Unit 6 · Present perfect", "thầy Minh", 0, "Nói tốt, cần luyện nghe"],
@@ -153,7 +155,7 @@ function SoDauBai() {
       </div>
       <div className="gs-ledger">
         <div className="gs-ledger-hd">
-          <span className="eyebrow">Sổ đầu bài · 10A1 · Tuần 14</span>
+          <span className="eyebrow">Sổ đầu bài · 10A1 · Tuần {DEMO_DAY.week}</span>
           {fill === 0 ? (
             <Button variant="primary" icon="spark" onClick={() => setFill((f) => f + 1)} data-testid="gt-dien">Tự điền</Button>
           ) : (
@@ -187,10 +189,10 @@ function SoDauBai() {
 }
 
 /* ---------- Báo cáo tổ ---------- */
-const BC_TEXT = "Tháng 11, tổ Toán – Tin dạy đủ 100% số tiết theo kế hoạch. Thời gian soạn một bài giảm từ 3 giờ còn 25 phút nhờ soạn bằng AI. Tổ chia sẻ 48 học liệu, duyệt 6 đề kiểm tra. Lớp 10A1 có 3 em cần hỗ trợ bất phương trình; tổ đề xuất tiết phụ đạo chung vào thứ Bảy.";
+const BC_TEXT = `Tháng 11, tổ Toán – Tin dạy đủ 100% số tiết theo kế hoạch. Thời gian soạn một bài giảm từ ${NUMBERS.prepBefore} còn ${NUMBERS.prepAfter} nhờ soạn bằng AI. Tổ chia sẻ 48 học liệu, duyệt 6 đề kiểm tra. Lớp 10A1 có ${HELP} em cần hỗ trợ bất phương trình; tổ đề xuất tiết phụ đạo chung vào thứ Bảy.`;
 const BARS = [
   { n: "cô Hà", v: 32, s: 14 },
-  { n: "thầy Khải", v: 28, s: 11 },
+  { n: "TS. Khải", v: 28, s: 11 },
   { n: "cô Thu", v: 30, s: 9 },
   { n: "thầy Tâm", v: 26, s: 8 },
   { n: "cô Ngọc", v: 24, s: 6 },
@@ -246,14 +248,16 @@ function Count({ to, suffix = "" }: { to: number; suffix?: string }) {
 }
 
 /* ---------- Đồng bộ VNEdu / SMAS ---------- */
-const NAMES = ["Nguyễn Minh Anh", "Trần Khánh Duy", "Phạm Đức Thịnh", "Lê Bảo Châu", "Hoàng Gia Hân", "Vũ Quốc Huy", "Đặng Thu Trang", "Bùi Nhật Nam", "Đỗ Khánh Linh", "Ngô Tuấn Kiệt"];
-const SIZE = 42;
+const NAMES = ROSTER_10A1;
+const SIZE = CLASSES.find((c) => c.id === "10A1")!.size;
+/** 3 em đầu sổ khớp thế giới mẫu (Toán: Minh Anh 6,4 · Khánh Duy 5,6 · Đức Thịnh 5,8). */
+const FIRST: { tx: number[]; gk: number }[] = [{ tx: [6, 7, 6], gk: 6.5 }, { tx: [6, 6, 5], gk: 5.5 }, { tx: [6, 5, 6], gk: 6 }];
 function DongBo() {
   const [to, setTo] = useState<"vnedu" | "smas">("vnedu");
   const [run, setRun] = useState(0);
   const sent = useCount(SIZE, 3200, run > 0, `${to}${run}`);
   const done = run > 0 && sent >= SIZE;
-  const rows = useMemo(() => NAMES.map((n, i) => ({ n, tx: [7 + ((i * 3) % 3), 6 + ((i * 7) % 4), 8 - (i % 3)], gk: 6 + ((i * 5) % 4) + 0.5 })), []);
+  const rows = useMemo(() => NAMES.map((n, i) => ({ n, ...(FIRST[i] ?? { tx: [7 + (i % 3), 6 + ((i * 7) % 4), 8 - (i % 3)], gk: 6 + ((i * 5) % 4) + 0.5 }) })), []);
   return (
     <div className="gs-sync">
       <section className="gs-sync-src">

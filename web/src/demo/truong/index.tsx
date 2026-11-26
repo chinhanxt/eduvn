@@ -7,6 +7,8 @@ import { SCHOOL } from "../kit/world";
 import { applyStoredTheme, toggleDark, useDark } from "../phu-huynh/theme";
 import "./tr.css";
 
+const PRINCIPAL = SCHOOL.principal.replace(/^thầy /, "");
+
 const ToanTruong = lazy(() => import("./ToanTruong"));
 const SucKhoe = lazy(() => import("./SucKhoe"));
 const QuanTri = lazy(() => import("./QuanTri"));
@@ -44,7 +46,7 @@ export default function TruongApp() {
           <div className="tr-brand">
             <span className="tr-mark" aria-hidden="true" />
             <span className="tr-bname">
-              <b>Bình Minh</b>
+              <b>{SCHOOL.name.replace("Trường Liên cấp ", "")}</b>
               <small>Nhà trường</small>
             </span>
           </div>
@@ -57,9 +59,9 @@ export default function TruongApp() {
             ))}
           </div>
           <div className="tr-me">
-            <span className="tr-av" aria-hidden="true">TC</span>
+            <span className="tr-av" aria-hidden="true">{PRINCIPAL.split(" ").slice(-2).map((w) => w[0]).join("")}</span>
             <span className="tr-mename">
-              <b>Lý Thành Công</b>
+              <b>{PRINCIPAL}</b>
               <small>Hiệu trưởng</small>
             </span>
           </div>

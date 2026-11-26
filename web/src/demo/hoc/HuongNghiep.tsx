@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { useFakeProgress, fmt1, useCountUp } from "../kit";
+import { EXAM_GOAL, useFakeProgress, fmt1, useCountUp } from "../kit";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { DemoHead } from "./parts";
 
 /** Ôn thi & hướng nghiệp: điểm dự kiến theo tổ hợp, "nếu vá lỗ hổng" thì sao, ôn đúng chỗ lợi nhất, gợi ý ngành – trường từ hồ sơ. */
-const NEED = 27.5;
+const NEED = EXAM_GOAL.need;
 const MIN = 18, MAX = 30;
 const SUBJ = [
-  { s: "Toán", now: 7.4, fix: 8.6, color: "var(--c1)" },
-  { s: "Hoá học", now: 8.7, fix: 9.0, color: "var(--c3)" },
-  { s: "Tiếng Anh", now: 8.5, fix: 8.6, color: "var(--c7)" },
+  { s: "Toán", now: EXAM_GOAL.projected["Toán"]!, fix: 8.6, color: "var(--c1)" },
+  { s: "Hoá học", now: EXAM_GOAL.projected["Hoá học"]!, fix: 9.0, color: "var(--c3)" },
+  { s: "Tiếng Anh", now: EXAM_GOAL.projected["Tiếng Anh"]!, fix: 8.6, color: "var(--c7)" },
 ];
 const GAINS = [
   { t: "Bất phương trình bậc hai", s: "Toán", gain: 0.6, h: 4, color: "var(--c1)" },
@@ -70,7 +70,7 @@ export function HuongNghiep() {
           </div>
         </figure>
         <div className="hn-subj">
-          <div className="dm-eyebrow">Tổ hợp D07</div>
+          <div className="dm-eyebrow">Tổ hợp {EXAM_GOAL.combo}</div>
           {SUBJ.map((x) => {
             const val = fix ? x.fix : x.now;
             return (

@@ -46,7 +46,7 @@ function AntiAi({ run }: { run: number }) {
     <div className="gl-aa">
       <Gauge v={risk} />
       <div className="gl-aa-task">
-        <span className="gl-eyebrow">Ngữ văn 12 · bài viết ở nhà</span>
+        <span className="gl-eyebrow">Ngữ văn 11 · bài viết ở nhà</span>
         <p className={n ? "gl-aa-before dim" : "gl-aa-before"}>{BEFORE}</p>
         <ol className="gl-aa-adds">
           {STEPS.slice(0, n).map((s) => (
@@ -117,7 +117,7 @@ function Detect() {
     <div className="gl-dt">
       <article className={scan ? "gl-dt-essay scan" : "gl-dt-essay"}>
         <header>
-          <span className="gl-eyebrow">Bài nộp · 11A3 · Lê Gia Hân</span>
+          <span className="gl-eyebrow">Bài nộp · 11A3 · Lê Ngọc Diệp</span>
           <span className="gl-dt-when">Nộp 21:31 · 612 chữ</span>
         </header>
         <p>

@@ -3,6 +3,7 @@ import { Button } from "../../ui/components/Button";
 import { Segmented } from "../../ui/components/Chip";
 import { Icon } from "../../ui/Icon";
 import { HIDE_UNDER, WELL_CLASSES, WELL_WEEKS } from "./data";
+import { KHANH_DUY, KHANH_DUY_MORE, NUMBERS } from "../kit/world";
 
 /* ---------------- Hoạt hình "AI phối hợp": HS → GV → phụ huynh ---------------- */
 type Hop = { title: string; text: string };
@@ -10,13 +11,13 @@ type Scene = { hs: Hop; gv: Hop; ph: Hop; pay: [string, string]; blocked?: boole
 const SCENES: Record<"hoc" | "tai", Scene> = {
   hoc: {
     hs: { title: "Bí 3 ngày", text: "Bất phương trình bậc hai, lặp lỗi đổi chiều dấu." },
-    gv: { title: "Vào “3 em cần giúp”", text: "Kèm gợi ý giảng lại bằng ví dụ đời thực và video 5 phút." },
+    gv: { title: `Vào “${NUMBERS.needHelp.length} em cần giúp”`, text: `Kèm gợi ý giảng lại bằng ví dụ đời thực và video ${KHANH_DUY_MORE.videoSeconds} giây.` },
     ph: { title: "Tối nay hỏi con 1 câu", text: "Lời đời thường, có đọc to, gửi qua Zalo." },
     pay: ["chủ đề · số ngày bí", "1 câu hỏi kèm con"],
     log: "2 lần chia sẻ · chỉ phần được phép · đã ghi nhật ký",
   },
   tai: {
-    hs: { title: "Dấu hiệu quá tải", text: "Thức khuya 2 tuần, điểm tụt, bỏ dở bài liên tục." },
+    hs: { title: "Dấu hiệu quá tải", text: `${KHANH_DUY.wellbeing!.replace(/^2 tuần nay thức khuya/, "Thức khuya 2 tuần")}, bỏ dở bài liên tục.` },
     gv: { title: "Chỉ GV chủ nhiệm nhận", text: "Gợi ý trò chuyện riêng. Không gắn nhãn, không chẩn đoán." },
     ph: { title: "Không tự gửi", text: "GV chủ nhiệm quyết định có báo gia đình hay không." },
     pay: ["tín hiệu · không chẩn đoán", "dừng ở GV"],

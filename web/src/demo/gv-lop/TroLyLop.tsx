@@ -1,9 +1,12 @@
 import { type ReactNode, useMemo, useState } from "react";
-import { KHANH_DUY, MINH_ANH, NUMBERS, useFakeStream, usePhases } from "../kit";
+import { CLASSES, DUC_THINH, KHANH_DUY, MINH_ANH, NUMBERS, TEACHERS, fmt1, useFakeStream, usePhases } from "../kit";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { type CastId, Portrait } from "./Cast";
 import { Head } from "./parts";
+
+const C10A1 = CLASSES.find((c) => c.id === "10A1")!;
+const HA = TEACHERS.find((t) => t.id === "ha")!.short;
 
 /** Trợ lý lớp (AI của GV): sáng nay 3 em cần giúp — các em "tách" khỏi chòm sao lớp 10A1, mỗi em kèm lý do có bằng chứng;
  *  bấm một em thì AI gợi ý cách giảng lại vừa đúng chỗ hổng. */
@@ -27,7 +30,7 @@ const KIDS: Kid[] = [
   },
   {
     id: "ducThinh",
-    name: "Đức Thịnh",
+    name: DUC_THINH.short,
     why: "Bỏ dở 3 bài liền ở bước tìm nghiệm",
     proof: <Skips done={[1, 1, 0, 0, 0, 1]} label="dừng ở bước 2 cả 3 lần" />,
     plan: "Em kẹt ở tìm nghiệm. Ngồi cạnh em 5 phút giờ tự học, cho bảng 3 bước có ô trống: tính Δ, tìm nghiệm, xét dấu. Làm xong bước nào tích bước đó.",
@@ -38,7 +41,7 @@ const KIDS: Kid[] = [
 export function TroLyLop() {
   const p = usePhases([500, 1300, 900], true);
   const [sel, setSel] = useState(0);
-  const hi = useFakeStream("Chào cô Hà. Sáng nay 10A1 có 3 em cần giúp.", { cps: 60, delayMs: 200 });
+  const hi = useFakeStream(`Chào ${HA}. Sáng nay 10A1 có ${NUMBERS.needHelp.length} em cần giúp.`, { cps: 60, delayMs: 200 });
   const kid = KIDS[sel]!;
   const plan = useFakeStream(kid.plan, { run: p >= 3, key: sel, cps: 80, delayMs: 300 });
   const stars = useMemo(() => {
@@ -57,7 +60,7 @@ export function TroLyLop() {
       <h2 className={hi.state === "streaming" ? "gl-tl-hi caret" : "gl-tl-hi"}>{hi.text}</h2>
 
       <div className="gl-tl-stage">
-        <div className="gl-tl-sky" aria-label={`10A1 · 42 em · điểm trung bình ${String(NUMBERS.class10A1Avg).replace(".", ",")}`}>
+        <div className="gl-tl-sky" aria-label={`10A1 · ${C10A1.size} em · điểm trung bình ${fmt1(NUMBERS.class10A1Avg)}`}>
           {stars.map((s, i) => (
             <i key={i} style={{ left: `${s.x}%`, top: `${s.y}%`, opacity: out ? 0.35 + s.m * 0.3 : 0.5 + s.m * 0.5, animationDelay: `${(i % 9) * 0.3}s` }} />
           ))}
@@ -66,7 +69,7 @@ export function TroLyLop() {
             return <b key={k.id} className={out ? "gl-tl-star out" : p >= 1 ? "gl-tl-star hot" : "gl-tl-star"} style={{ left: out ? "41%" : `${from.x}%`, top: out ? `${17 + i * 33}%` : `${from.y}%`, transitionDelay: `${i * 140}ms` }} />;
           })}
           <span className="gl-tl-cls">
-            <b>10A1</b> 42 em
+            <b>10A1</b> {C10A1.size} em
           </span>
         </div>
         <ol className="gl-tl-kids">

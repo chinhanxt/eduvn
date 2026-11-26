@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { MINH_ANH, useFakeProgress, Face, fmt1, useCountUp } from "../kit";
+import { EXAM_GOAL, MINH_ANH, useFakeProgress, Face, fmt1, useCountUp } from "../kit";
 import { Button, IconButton, Segmented, useToast } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { ACCESS_LOG, CURVES, HOURS, INSIGHTS, type Insight, MEMORY, type Memory, SCORES_BEFORE, THRESHOLD, WHO_SEES, YEARS } from "./hoSoData";
@@ -19,7 +19,7 @@ export function HoSo() {
   const view = (VIEWS.some((v) => v.value === sp.get("xem")) ? sp.get("xem") : "ban-do") as View;
   return (
     <div className="dm hs">
-      <DemoHead title="Hồ sơ của Minh Anh" eyebrow={<span>Lớp 10A1 · AI của em</span>} lead={<Face name={MINH_ANH.name} hue={MINH_ANH.avatarHue} size={56} ring />}>
+      <DemoHead title="Hồ sơ của Minh Anh" eyebrow={<span>Lớp {MINH_ANH.className} · AI của em</span>} lead={<Face name={MINH_ANH.name} hue={MINH_ANH.avatarHue} size={56} ring />}>
         <Segmented label="Phần hồ sơ" options={VIEWS} value={view} onChange={(v) => setSp(v === "ban-do" ? {} : { xem: v }, { replace: true })} />
       </DemoHead>
       {view === "ban-do" && <BanDo />}
@@ -277,18 +277,18 @@ function Rhythm() {
 }
 
 function Goal() {
-  const now = useCountUp(24.6, 1300);
+  const now = useCountUp(EXAM_GOAL.now, 1300);
   return (
     <div className="hs-goal">
       <h2>Mục tiêu</h2>
-      <div className="hs-goal-t">Bách khoa · CNTT</div>
-      <div className="hs-goal-bar" aria-label="Điểm dự kiến 24,6 trên mức cần 27,5">
+      <div className="hs-goal-t">{EXAM_GOAL.school.replace("ĐH ", "")} · {EXAM_GOAL.major}</div>
+      <div className="hs-goal-bar" aria-label={`Điểm dự kiến ${fmt1(EXAM_GOAL.now)} trên mức cần ${fmt1(EXAM_GOAL.need)}`}>
         <i style={{ width: `${((now - 18) / (30 - 18)) * 100}%` }} />
-        <span className="mark" style={{ left: `${((27.5 - 18) / 12) * 100}%` }} />
+        <span className="mark" style={{ left: `${((EXAM_GOAL.need - 18) / 12) * 100}%` }} />
       </div>
       <div className="hs-goal-x num">
         <span><b>{fmt1(now)}</b> dự kiến</span>
-        <span>cần 27,5</span>
+        <span>cần {fmt1(EXAM_GOAL.need)}</span>
       </div>
       <Link to="/hoc/huong-nghiep" className="hs-link">Lộ trình đạt mục tiêu <Icon name="right" size="sm" /></Link>
     </div>

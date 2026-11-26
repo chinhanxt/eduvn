@@ -5,7 +5,7 @@ import { Link } from "react-router";
 import { Button } from "../../ui/components/Button";
 import { Tabs } from "../../ui/components/Tabs";
 import { Icon } from "../../ui/Icon";
-import { useFakeProgress, useCount, usePhases } from "../kit";
+import { SCHOOL, useFakeProgress, useCount, usePhases } from "../kit";
 import { Head } from "./common";
 import { LESSON, SLIDES } from "./data";
 import { PaperSlide } from "./Paper";
@@ -247,7 +247,7 @@ function OldSlide({ title, points }: { title: string; points: string[] }) {
       <b>{title.toUpperCase()}</b>
       <ul>{points.map((p) => <li key={p}>{p}</li>)}</ul>
       <span className="gs-old-clip" />
-      <span className="gs-old-foot">{LESSON.subject} — Trường Bình Minh — Năm 2023</span>
+      <span className="gs-old-foot">{LESSON.subject} — {SCHOOL.name} — Năm 2023</span>
     </div>
   );
 }

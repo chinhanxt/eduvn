@@ -131,7 +131,7 @@ function Alerts() {
             setTimeout(() => {
               setBusy(false);
               setSent(true);
-              toast({ title: "Đã giao tổ Văn", msg: "Thầy Bảo và tổ trưởng nhận việc kèm số liệu.", kind: "ok" });
+              toast({ title: "Đã giao tổ Văn", msg: "Thầy Bảo (tổ trưởng Văn) nhận việc kèm số liệu.", kind: "ok" });
             }, 700);
           }}
         >

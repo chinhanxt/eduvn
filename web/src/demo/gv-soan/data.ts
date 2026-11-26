@@ -80,9 +80,9 @@ export function parseOutline(text: string): OutlineSec[] {
 export const SOURCES = [
   { host: "sgk", name: "SGK Toán 10 — Kết nối tri thức", quote: "Bài 18. Phương trình quy về phương trình bậc hai", hue: 210 },
   { host: "ctgdpt", name: "Chương trình GDPT 2018 — Môn Toán", quote: "Giải được bất phương trình bậc hai một ẩn", hue: 150 },
-  { host: "hoso", name: "Hồ sơ lớp 10A1", quote: "3 em hay quên đổi chiều khi nhân số âm", hue: 265 },
+  { host: "hoso", name: "Hồ sơ lớp 10A1", quote: `${NUMBERS.needHelp.length} em cần giúp bất phương trình`, hue: 265 },
   { host: "de", name: "Đề minh hoạ tốt nghiệp THPT", quote: "Câu 12: tập nghiệm của bất phương trình…", hue: 330 },
-  { host: "kho", name: "Kho học liệu tổ Toán – Tin", quote: "Giáo án mẫu của thầy Long, 2025", hue: 30 },
+  { host: "kho", name: "Kho học liệu tổ Toán – Tin", quote: "Giáo án mẫu của cô Thu, 2025", hue: 30 },
 ];
 
 /** Giọng đọc có sẵn + giọng nhân bản của cô Hà. */
