@@ -4,8 +4,8 @@ import { Button } from "../../ui/components/Button";
 import { Tabs } from "../../ui/components/Tabs";
 import { useToast } from "../../ui/components/Toast";
 import { Icon } from "../../ui/Icon";
-import { useFakeStream } from "../kit";
-import { Head, useCount } from "./common";
+import { useFakeStream, useCount } from "../kit";
+import { Head } from "./common";
 import { HA, LESSON, SCHOOL } from "./data";
 
 type Tab = "khbd" | "sdb" | "bc" | "dong-bo";

@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
-import { CLASSES, KHANH_DUY, MINH_ANH } from "../kit";
+import { CLASSES, KHANH_DUY, MINH_ANH, useCountUp } from "../kit";
 import { Segmented } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { Head, useCountUp } from "./parts";
+import { Head } from "./parts";
 
 /** Giao bài phân hoá: cả lớp là một trường chấm; AI gom các em thành 3 nhóm theo trình độ, mỗi nhóm một mức bài, giao một chạm. */
 type ClassId = "10A1" | "11A3" | "8A2";

@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../ui/components/Button";
 import { Icon } from "../../ui/Icon";
-import { useFakeStream } from "../kit";
-import { Head, useCount } from "./common";
+import { useFakeStream, useCount } from "../kit";
+import { Head } from "./common";
 
 const CHUNG = ["Tự chủ và tự học", "Giao tiếp và hợp tác", "Giải quyết vấn đề và sáng tạo"];
 const PHAM_CHAT = ["Yêu nước", "Nhân ái", "Chăm chỉ", "Trung thực", "Trách nhiệm"];

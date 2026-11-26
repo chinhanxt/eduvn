@@ -5,8 +5,8 @@ import { Link } from "react-router";
 import { Button } from "../../ui/components/Button";
 import { Tabs } from "../../ui/components/Tabs";
 import { Icon } from "../../ui/Icon";
-import { useFakeProgress } from "../kit";
-import { Head, useCount, usePhases } from "./common";
+import { useFakeProgress, useCount, usePhases } from "../kit";
+import { Head } from "./common";
 import { LESSON, SLIDES } from "./data";
 import { PaperSlide } from "./Paper";
 

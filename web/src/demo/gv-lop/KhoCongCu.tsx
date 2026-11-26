@@ -2,9 +2,10 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Icon } from "../../ui/Icon";
 import { FOR_LESSON, type Level, SRC, type Src, SUBJECT_COLOR, SUBJECTS, subjectGroup, type Tool, TOOLS, TOTAL_TOOLS } from "./khoData";
-import { Head, useTween, vn0 } from "./parts";
+import { Head } from "./parts";
 import { Thumb } from "./Thumb";
 import { Workshop } from "./TaoCongCu";
+import { useTween, fmt0 } from "../kit";
 
 /** Kho công cụ ĐỘNG: ô "Bạn cần công cụ gì?" ở trung tâm; có thì dùng, chưa có thì AI dựng ngay; danh mục mọi môn, mọi cấp, 4 nguồn. */
 const ASK = ["mô phỏng cung cầu giá lúa", "con lắc đơn có thanh trượt chiều dài dây"];
@@ -102,7 +103,7 @@ export function KhoCongCu() {
         )}
         {!building && (
           <p className="gl-ask-n">
-            <b className="num">{vn0(total)}</b> công cụ · 15 môn · THCS → đại học
+            <b className="num">{fmt0(total)}</b> công cụ · 15 môn · THCS → đại học
           </p>
         )}
       </section>

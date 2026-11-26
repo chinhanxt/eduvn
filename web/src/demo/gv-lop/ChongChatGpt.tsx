@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
-import { useFakeStream } from "../kit";
+import { useFakeStream, useCountUp, usePhases, useTween } from "../kit";
 import { Segmented } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { Head, useCountUp, usePhases, useTween } from "./parts";
+import { Head } from "./parts";
 
 /** Chống ChatGPT làm hộ: (1) AI biến đề dễ chép thành đề chống AI, đồng hồ "ChatGPT làm hộ được" tụt dần;
  *  (2) nhận diện bài nghi AI viết bằng tín hiệu (quá trình viết, giọng văn), không kết luận thay GV. */

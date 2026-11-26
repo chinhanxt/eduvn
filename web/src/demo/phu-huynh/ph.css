@@ -85,8 +85,7 @@ body:has(.ph) { background: #f3efe8; }
 .ph-state .verdict b { font-size: calc(56px * var(--k)); line-height: 1; font-weight: 800; letter-spacing: -.03em; }
 .ph-state .why { font-size: calc(22px * var(--k)); font-weight: 700; color: var(--ink-2); text-wrap: balance; }
 .ph-state .why span { white-space: nowrap; }
-.ph-face { display: grid; place-items: center; border-radius: 50%; flex: none; font-weight: 800; color: hsl(var(--h) 50% 22%); background: hsl(var(--h) 50% 84%); }
-:root[data-theme="dark"] .ph-face { color: hsl(var(--h) 60% 88%); background: hsl(var(--h) 28% 26%); }
+.ph-face { font-weight: 800; }
 
 /* ---------- Trang phụ ---------- */
 .ph-page { display: grid; gap: 26px; padding-top: 4px; animation: ph-in 400ms ease-out both; }

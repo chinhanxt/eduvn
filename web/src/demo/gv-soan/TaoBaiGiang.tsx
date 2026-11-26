@@ -3,8 +3,8 @@ import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import { Button } from "../../ui/components/Button";
 import { Icon } from "../../ui/Icon";
-import { useFakeStream, useFakeProgress } from "../kit";
-import { Head, Rail, Wave, useCount, usePhases } from "./common";
+import { useFakeStream, useFakeProgress, useCount, usePhases } from "../kit";
+import { Head, Rail, Wave } from "./common";
 import { LESSON, NUMBERS, OUTLINE_TEXT, type OutlineSec, SLIDES, SOURCES, VOICES, type VoiceId, parseOutline } from "./data";
 import { PaperSlide } from "./Paper";
 

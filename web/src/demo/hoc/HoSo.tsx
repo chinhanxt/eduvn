@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
-import { MINH_ANH, useFakeProgress } from "../kit";
+import { MINH_ANH, useFakeProgress, Face, fmt1, useCountUp } from "../kit";
 import { Button, IconButton, Segmented, useToast } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { ACCESS_LOG, CURVES, HOURS, INSIGHTS, type Insight, MEMORY, type Memory, SCORES_BEFORE, THRESHOLD, WHO_SEES, YEARS } from "./hoSoData";
-import { Conf, DemoHead, Face, fmt1, useCount } from "./parts";
+import { Conf, DemoHead } from "./parts";
 
 type View = "ban-do" | "ai-biet" | "hoc-ba";
 const VIEWS: { value: View; label: string }[] = [
@@ -277,7 +277,7 @@ function Rhythm() {
 }
 
 function Goal() {
-  const now = useCount(24.6, 1300);
+  const now = useCountUp(24.6, 1300);
   return (
     <div className="hs-goal">
       <h2>Mục tiêu</h2>

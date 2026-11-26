@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { useFakeProgress } from "../kit";
+import { useFakeProgress, fmt1, useCountUp } from "../kit";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { DemoHead, fmt1, useCount } from "./parts";
+import { DemoHead } from "./parts";
 
 /** Ôn thi & hướng nghiệp: điểm dự kiến theo tổ hợp, "nếu vá lỗ hổng" thì sao, ôn đúng chỗ lợi nhất, gợi ý ngành – trường từ hồ sơ. */
 const NEED = 27.5;
@@ -30,7 +30,7 @@ const MAJORS = [
 export function HuongNghiep() {
   const [fix, setFix] = useState(false);
   const total = SUBJ.reduce((a, x) => a + (fix ? x.fix : x.now), 0);
-  const v = useCount(total, 1100);
+  const v = useCountUp(total, 1100);
   const p = useFakeProgress(1400);
   const [sel, setSel] = useState(0);
   const ang = (x: number) => -180 + ((Math.min(MAX, Math.max(MIN, x)) - MIN) / (MAX - MIN)) * 180;

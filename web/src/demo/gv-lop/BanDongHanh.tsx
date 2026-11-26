@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
-import { useFakeStream } from "../kit";
+import { useFakeStream, useTween, usePhases } from "../kit";
 import { Button, Segmented } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { type CastId, Portrait } from "./Cast";
-import { Head, useTween, usePhases } from "./parts";
+import { Head } from "./parts";
 
 /** Bạn đồng hành AI cho HS: GV nặn tính cách bạn đồng hành, mở nhóm tranh luận AI, và phòng tập tư vấn (AI đóng vai phụ huynh). */
 type Tab = "ban" | "tranh-luan" | "tu-van";

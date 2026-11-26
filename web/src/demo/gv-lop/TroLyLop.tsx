@@ -1,9 +1,9 @@
 import { type ReactNode, useMemo, useState } from "react";
-import { KHANH_DUY, MINH_ANH, NUMBERS, useFakeStream } from "../kit";
+import { KHANH_DUY, MINH_ANH, NUMBERS, useFakeStream, usePhases } from "../kit";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { type CastId, Portrait } from "./Cast";
-import { Head, usePhases } from "./parts";
+import { Head } from "./parts";
 
 /** Trợ lý lớp (AI của GV): sáng nay 3 em cần giúp — các em "tách" khỏi chòm sao lớp 10A1, mỗi em kèm lý do có bằng chứng;
  *  bấm một em thì AI gợi ý cách giảng lại vừa đúng chỗ hổng. */
