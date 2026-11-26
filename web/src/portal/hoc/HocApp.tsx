@@ -99,7 +99,7 @@ export function HocApp() {
           <Route path="/hoc/lam-bai/:id" element={<LB />} />
           <Route path="/hoc/ket-qua" element={<NeedLearner><KQ /></NeedLearner>} />
           <Route path="/hoc/ket-qua/:sid" element={<KQB />} />
-          <Route path="/hoc/gia-su" element={<NeedUser legacy><T /></NeedUser>} />
+          <Route path="/hoc/gia-su" element={<NeedUser><T /></NeedUser>} />
           <Route path="/hoc/luyen-tap" element={<NeedUser><Pr /></NeedUser>} />
           <Route path="/hoc/lo-trinh" element={<NeedUser><Pa /></NeedUser>} />
           <Route path="/hoc/giao-trinh" element={<NeedUser legacy><B /></NeedUser>} />

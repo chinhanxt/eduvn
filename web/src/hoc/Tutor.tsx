@@ -29,17 +29,31 @@ export function Tutor() {
   };
 
   return (
-    <>
+    <div className="ts">
+      <header className="hh">
+        <div className="hh-t">
+          <div>
+            <div className="hh-eyebrow">Hỏi bất cứ môn nào · gợi ý trước, không giải hộ</div>
+            <h1 className="hh-title">Gia sư</h1>
+          </div>
+        </div>
+        <div className="hh-acts">
+          <label className="ts-kb">
+            <Icon name="book" size={16} />
+            <select value={kbId} onChange={(e) => setKbId(e.target.value)} aria-label="Kho tri thức" data-testid="kb-select">
+              <option value="">Không dùng tài liệu</option>
+              {kbs.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}
+            </select>
+          </label>
+          <button className="btn primary" onClick={() => setSid(null)}><Icon name="plus" size={18} /><span>Hỏi mới</span></button>
+        </div>
+      </header>
       {error && <div className="err">{error}</div>}
       <div className="chat">
-        <div className="chat-side">
-          <select className="inp" value={kbId} onChange={(e) => setKbId(e.target.value)} aria-label="Kho tri thức" data-testid="kb-select">
-            <option value="">Không dùng tài liệu</option>
-            {kbs.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}
-          </select>
-          <button className="btn" onClick={() => setSid(null)}><Icon name="plus" size={18} />Cuộc trò chuyện mới</button>
+        <nav className="chat-side" aria-label="Các cuộc trò chuyện">
+          <div className="ts-side-h">Đã hỏi</div>
           <div className="list">
-            {sessions.length === 0 && <div className="empty">Chưa có cuộc trò chuyện</div>}
+            {sessions.length === 0 && <div className="empty">Câu hỏi của em sẽ nằm ở đây.</div>}
             {sessions.map((s) => (
               <button key={s.id} className={`sess${s.id === sid ? " on" : ""}`} title={s.title} onClick={() => { setSid(s.id); if (s.kbId) setKbId(s.kbId); }}>
                 <span>{s.title}</span>
@@ -47,7 +61,7 @@ export function Tutor() {
               </button>
             ))}
           </div>
-        </div>
+        </nav>
         <ChatPanel
           ctx={{ kbId: kbId || null }}
           sessionId={sid}
@@ -56,6 +70,6 @@ export function Tutor() {
           onTitle={(id, title) => setSessions((l) => l.map((s) => (s.id === id ? { ...s, title } : s)))}
         />
       </div>
-    </>
+    </div>
   );
 }

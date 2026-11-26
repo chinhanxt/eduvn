@@ -4,11 +4,14 @@ import { Icon } from "../Icon";
 import { StreamingText } from "../ui/components/StreamingText";
 import { MathText } from "../math/MathText";
 import { Markdown } from "./Markdown";
+import { Mascot } from "../portal/hoc/Mascot";
 import { type Citation, type Msg, fileToDataUrl, streamChat, tutorApi } from "./client";
 
 // P13: chế độ "Lời giải đầy đủ" — lời giải từng bước có hình + tự kiểm (tải trình xem khi dùng lần đầu)
 const FullSolution = lazy(() => import("../solution/FullSolution").then((m) => ({ default: m.FullSolution })));
 type ChatMsg = Msg & { solve?: string };
+// Câu hỏi mẫu khi máy chủ chưa gợi ý: trải nhiều môn.
+const EXAMPLES = ["Vì sao lá cây có màu xanh?", "Khi nào dùng thì hiện tại hoàn thành?", "Cân bằng giúp em: Fe + HNO₃ loãng", "Ý nghĩa của chiến thắng Điện Biên Phủ là gì?"];
 
 export type ChatCtx = { kbId: string | null; bookPageId?: string };
 
@@ -112,20 +115,24 @@ export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starter
 
   const cited = (m: Msg) => m.citations;
   return (
-    <div className={compact ? "chat-main mini-chat" : "chat-main"} style={compact ? { borderRadius: 16 } : undefined}>
+    <div className={compact ? "chat-main mini-chat" : "chat-main"}>
       <div className="chat-top">
         <div className="tabs" role="group" aria-label="Chế độ">
           <button className={mode === "chat" ? "on" : ""} onClick={() => setMode("chat")}>Hỏi đáp</button>
           <button className={mode === "hint" ? "on" : ""} onClick={() => { setMode("hint"); setLevel(1); }} data-testid="mode-hint">Gợi ý từng bước</button>
           <button className={mode === "full" ? "on" : ""} onClick={() => setMode("full")} data-testid="mode-full">Lời giải đầy đủ</button>
         </div>
-        {mode === "hint" && <span className="tag amber">Mức gợi ý {level}/3 · thầy cô sẽ không giải hộ</span>}
-        {mode === "full" && <span className="tag green">Lời giải từng bước có hình · đáp số được tự kiểm</span>}
+        {mode === "hint" && <span className="chat-note">Mức gợi ý {level}/3</span>}
+        {mode === "full" && <span className="chat-note">Có hình · đáp số tự kiểm</span>}
       </div>
       <div className="chat-log" ref={log} onScroll={(e) => { const el = e.currentTarget; stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80; }} data-testid="chat-log">
         {msgs.length === 0 && (
-          <div className="starters">
-            {(starters ?? []).map((s) => <button key={s} onClick={() => void send(s)}>{s}</button>)}
+          <div className="chat-hello">
+            {!compact && <Mascot mood="chao" size={84} />}
+            <p className="q">{mode === "full" ? "Dán đề, em sẽ thấy lời giải từng bước." : mode === "hint" ? "Gửi bài, gia sư gợi ý từng chút một." : "Hôm nay em muốn hỏi gì?"}</p>
+            <div className="starters">
+              {(starters && starters.length ? starters : EXAMPLES).slice(0, 4).map((s) => <button key={s} onClick={() => void send(s)}>{s}</button>)}
+            </div>
           </div>
         )}
         {msgs.map((m, i) => m.solve ? (
@@ -159,14 +166,14 @@ export function ChatPanel({ ctx, sessionId, onSession, onTitle, compact, starter
         <div className="box">
           <label className="btn ghost sm" style={{ cursor: "pointer" }} title="Chụp/đính kèm ảnh bài tập"><Icon name="upload" size={18} /><input type="file" accept="image/*" multiple hidden onChange={(e) => void attach(e.target.files)} /></label>
           <textarea value={input} rows={1} placeholder={mode === "full" ? "Dán đề bài — gia sư trả lời giải từng bước có hình." : "Em muốn hỏi gì? Dùng $…$ để gõ công thức."} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(input); } }} data-testid="chat-input" />
-          {busy ? <button type="button" className="btn ghost" onClick={() => abort.current?.abort()}>Dừng</button> : <button className="btn" disabled={!input.trim()} data-testid="chat-send">Gửi</button>}
+          {busy ? <button type="button" className="btn ghost" onClick={() => abort.current?.abort()}>Dừng</button> : <button className="btn primary" disabled={!input.trim()} data-testid="chat-send" aria-label="Gửi"><Icon name="send" size={18} /></button>}
         </div>
       </form>
       {pop && (
         <div className="src-pop" role="dialog">
           <button className="xbtn" style={{ float: "right" }} onClick={() => setPop(null)} aria-label="Đóng"><Icon name="x" size={16} /></button>
           <h3>[{pop.n}] {pop.doc} · trang {pop.page}</h3>
-          <div style={{ color: "var(--muted)" }}>{pop.snippet}</div>
+          <div style={{ color: "var(--ink-3)" }}>{pop.snippet}</div>
         </div>
       )}
     </div>
