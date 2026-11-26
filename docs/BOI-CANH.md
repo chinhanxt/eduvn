@@ -64,7 +64,8 @@
   - B `/gv` (nhóm "Lớp học AI"): lớp học AI đa tác tử, kho công cụ động (AI tạo công cụ, 32 công cụ, 15 môn, mọi cấp), bạn đồng hành, workbench, giao bài phân hoá, chống ChatGPT, trợ lý lớp, cài đặt AI local/offline.
   - C `/hoc` (nhóm "Tự học cùng AI"): hồ sơ AI + "AI biết gì về em" + học bạ sống, gia sư hiểu mình (2 em 2 cách giảng), vòng lặp lỗ hổng, sổ tay học tập + podcast, nghiên cứu sâu, đọc nhập vai/video, lịch, hướng nghiệp.
   - D cổng mới công khai `/phu-huynh` (làm lại cho ông bà: 3 khối, nút to, 3 tab) và `/truong` (toàn trường, sức khoẻ & AI phối hợp, quản trị, trợ lý AI).
-- JS lần đầu (gzip): GV 96,6 KB · Học 95,8 KB · gốc 90,0 KB (ngân sách 100 KB).
+- **Làm đẹp + đồng bộ xong (2026-11-26):** menu GV 3 nhóm × 6 mục, menu Học 2 nhóm, trang "Tất cả công cụ" mới; thế giới mẫu khớp giữa các gói (GV AI tên "Cô Mây"); mọi màn GV/Học chạy thật đã làm đẹp, trạng thái trống = bản xem trước đa môn; trang gốc `/` = trang giới thiệu EDUVN ("Mỗi em một lối học."), đăng nhập chuyển sang `/dang-nhap`.
+- JS lần đầu (gzip): GV 97,8 KB · Học 96,4 KB · gốc 90,9 KB (ngân sách 100 KB, còn ít dư địa).
 - Nhánh dở chưa gộp: `p14-xuat`, `p14-g1`, `p14-g6`, `anim-s1` (làm thật; nay phạm vi là mockup nên để sau).
 - Ảnh xem nhanh: `.superpowers/xem/` (cục bộ, :5193): `mock-a/ mock-b/ mock-c/ mock-d/`, sơ đồ `toan-bo.html`, `luong.html`.
 
