@@ -26,7 +26,6 @@ export function Classes({ d }: { d: GvToday }) {
       </table>
       <div className="ghd" style={{ justifyContent: "space-between", borderBottom: 0, height: "auto", minHeight: 32, flexWrap: "wrap", gap: 8, padding: "6px 12px" }}>
         <GradeLegend />
-        <span className="caption" style={{ fontWeight: 400 }}>ĐTB tạm tính theo sổ điểm; lớp chưa có sổ điểm tính theo bài giao.</span>
       </div>
     </>
   );

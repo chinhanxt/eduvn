@@ -199,3 +199,27 @@
   .omr-page svg { width: 210mm; height: 297mm; }
   @page { size: A4; margin: 0; }
 }
+
+/* ---- Cổng GV (đợt "dep-gv"): trang cũ còn trong vỏ .legacy theo chuẩn đẹp — phẳng, viền sợi tóc, ít khung ---- */
+[data-portal="gv"] .legacy h1 { font-size: 20px; line-height: 28px; font-weight: 650; letter-spacing: -.012em; margin: 0 0 20px; }
+[data-portal="gv"] .legacy h2 { font-size: 14px; font-weight: 600; }
+[data-portal="gv"] .legacy .card { box-shadow: none; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+[data-portal="gv"] .legacy .btn { border-radius: 6px; box-shadow: none; min-height: 34px; padding: 0 14px; font-weight: 550; transition: background var(--dur-1), border-color var(--dur-1); }
+[data-portal="gv"] .legacy .btn:hover { box-shadow: none; background: var(--accent-hover); }
+[data-portal="gv"] .legacy .btn.ghost { background: var(--bg); border: 1px solid var(--line-2); color: var(--ink); }
+[data-portal="gv"] .legacy .btn.ghost:hover { background: var(--bg-hover); }
+[data-portal="gv"] .legacy .btn.sm { min-height: 30px; padding: 0 10px; border-radius: 6px; font-size: 13px; }
+[data-portal="gv"] .legacy .inp, [data-portal="gv"] .legacy select.inp { border-color: var(--line-input); border-radius: 6px; min-height: 34px; }
+[data-portal="gv"] .legacy select.inp { min-width: 180px; }
+[data-portal="gv"] .legacy .inp:focus { outline: 0; box-shadow: 0 0 0 3px var(--accent-bg); }
+[data-portal="gv"] .legacy .tabs { box-shadow: none; background: var(--bg-sunken); border-radius: 8px; padding: 3px; }
+[data-portal="gv"] .legacy .tabs button { padding: 5px 14px; border-radius: 6px; font-size: 13px; }
+[data-portal="gv"] .legacy .tabs button.on { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+[data-portal="gv"] .legacy .err { background: var(--danger-bg); color: var(--danger); border-radius: 8px; }
+[data-portal="gv"] .legacy .ok-box, [data-portal="gv"] .legacy .ok-msg { background: var(--ok-bg); color: var(--ok); border-radius: 8px; }
+[data-portal="gv"] .legacy .warn { border-radius: 8px; }
+[data-portal="gv"] .legacy .tag { border-radius: 4px; }
+[data-portal="gv"] .legacy .ail-stage, [data-portal="gv"] .legacy .ail-canvas { box-shadow: none; border-radius: 10px; }
+[data-portal="gv"] .legacy .ail-band { background: var(--ink); color: var(--bg); border-radius: 8px; }
+[data-portal="gv"] .legacy .ail-props, [data-portal="gv"] .legacy .ail-row, [data-portal="gv"] .legacy .ail-th { background: var(--bg); border-color: var(--line); }
+@media (max-width: 720px) { [data-portal="gv"] .legacy .grid2, [data-portal="gv"] .legacy .row { grid-template-columns: minmax(0, 1fr); } }

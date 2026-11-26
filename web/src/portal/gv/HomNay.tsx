@@ -42,7 +42,6 @@ function TaskRow({ t, selected, onPick }: { t: GvTask; selected: boolean; onPick
   return (
     <div className="rowi" role="option" aria-selected={selected} tabIndex={selected ? 0 : -1} onClick={onPick} data-key={t.id}>
       <span className={`st ${st.cls}`} style={{ ["--p" as string]: `${st.pct}%` }} title={st.label} />
-      <span className="mono id">{t.id}</span>
       <span className="t" title={t.title}>{t.title}</span>
       <span className="cls">{t.className}</span>
       <span className="pr">
@@ -288,15 +287,6 @@ export function HomNay() {
               </>
             )}
           </section>
-          <div className="keys">
-            <span><kbd>J</kbd> <kbd>K</kbd> lên/xuống</span>
-            <span><kbd>↵</kbd> mở</span>
-            <span><kbd>C</kbd> chấm</span>
-            <span><kbd>O</kbd> mở tiết</span>
-            <span><kbd>N</kbd> tạo đề</span>
-            <span><kbd>G</kbd> <kbd>L</kbd> lớp học</span>
-            <span><kbd>Ctrl</kbd> <kbd>K</kbd> lệnh</span>
-          </div>
         </div>
 
         <aside className={q.stale ? "pane detail is-stale" : "pane detail"} aria-label="Chi tiết" aria-live="polite">
@@ -307,7 +297,6 @@ export function HomNay() {
               cur ? (
                 <>
                   <div className="dhd">
-                    <span className="mono">{cur.id}</span>
                     <h2>{cur.title}</h2>
                   </div>
                   <Suspense fallback={<DetailSkel body />}>
