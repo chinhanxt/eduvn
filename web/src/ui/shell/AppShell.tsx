@@ -299,7 +299,7 @@ export function AppShell(p: AppShellProps) {
             <span className="tag">{p.tag}</span>
           </a>
           <nav className="nav">
-            {p.nav.map((n, i) =>
+            {p.nav.filter((n) => !isItem(n) || !n.hidden).map((n, i) =>
               isItem(n) ? (
                 <NavA key={n.label + n.to} n={n} onNavigate={() => setDrawer(false)} />
               ) : (
