@@ -268,6 +268,7 @@ function ExamRoomInner() {
         )}
         <Button variant="primary" className="hide-sm" onClick={() => setAsk(true)} disabled={busy} data-testid="hs-submit-top">Nộp bài</Button>
       </header>
+      <div className="exam-prog" aria-hidden="true"><i style={{ width: `${(100 * done) / Math.max(1, nos.length)}%` }} /></div>
       {status === "offline" && (
         <div className="banner" role="status">
           <Icon name="offline" size="sm" />
@@ -282,7 +283,7 @@ function ExamRoomInner() {
       )}
 
       <main className="room" id="main">
-        <nav className="card navq" aria-label="Danh sách câu">
+        <nav className="navq" aria-label="Danh sách câu">
           <div className="caption"><b data-testid="hs-done">{done} / {nos.length}</b> câu đã làm</div>
           <div className="grid10">
             {qs.map((x, i) => {
@@ -331,11 +332,10 @@ function ExamRoomInner() {
           />
         )}
 
-        <aside className="card sub-card" aria-label="Tình trạng bài">
+        <aside className="sub-card" aria-label="Tình trạng bài">
           <div className="caption">Còn chưa làm</div>
-          <div className="big">{missing.length} câu</div>
+          <div className="big">{missing.length}<small> câu</small></div>
           <p className="caption">{missing.length ? `Câu ${missText}.` : "Em đã trả lời hết."} {flags.length ? `${flags.length} câu đánh dấu xem lại.` : ""} {Number.isFinite(left) ? "Hết giờ bài tự nộp." : ""}</p>
-          <Button variant="primary" className="block" icon="send" onClick={() => setAsk(true)} disabled={busy}>Nộp bài</Button>
         </aside>
       </main>
 

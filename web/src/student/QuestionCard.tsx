@@ -11,7 +11,7 @@ type Props = { q: PublicItem; index: number; part: string; value: AnswerValue | 
 /** Một câu trong phòng làm bài (mỗi lần một câu, như mockup hoc/lam-bai). */
 export function QuestionCard({ q, index, part, value, flagged, onAnswer, onFlag, foot }: Props) {
   return (
-    <article className="card qc" data-testid={`hs-q-${q.no}`} aria-label={`Câu ${index + 1}`}>
+    <article className="qc" data-testid={`hs-q-${q.no}`} aria-label={`Câu ${index + 1}`}>
       <div className="row">
         <span className="part">{part.toUpperCase()}</span>
         <span className="pt">{vn(q.maxPoints)} điểm</span>

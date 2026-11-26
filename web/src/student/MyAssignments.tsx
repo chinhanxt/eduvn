@@ -9,7 +9,7 @@ import { subjectColor } from "../portal/hocToday";
 import { Badge, Segmented } from "../ui/components/Chip";
 import { Meter } from "../ui/components/Progress";
 import { Skeleton } from "../ui/components/Skeleton";
-import { EmptyState, ErrorState } from "../ui/components/States";
+import { ErrorState } from "../ui/components/States";
 import { Icon } from "../ui/Icon";
 import { useQuery } from "../ui/data/query";
 import { useUrlState } from "../ui/data/urlState";
@@ -20,6 +20,13 @@ import { HOC_PATH } from "./paths";
 import { clearSession, loadSession } from "./session";
 import type { MyAssignment } from "./types";
 import "./hs.css";
+
+// Hàng mẫu mờ dưới trạng thái trống (nhiều môn, không dữ liệu thật).
+const GHOST: [string, string, string][] = [
+  ["Hoá học", "Cân bằng phản ứng oxi hoá – khử", "Luyện tập · 8 câu"],
+  ["Tiếng Anh", "Unit 5 · Reading", "Luyện tập · 10 câu"],
+  ["Lịch sử", "Kháng chiến chống Pháp 1945–1954", "Kiểm tra · 15 phút"],
+];
 
 const VIEW_VI: Record<AsgView, string> = { "can-lam": "Cần làm", "da-nop": "Đã nộp", "tat-ca": "Tất cả" };
 const STATE: Record<MyAssignment["state"], [tone: "neutral" | "ok" | "warn" | "danger" | "accent" | "outline", icon: string, label: string]> = {
@@ -48,37 +55,43 @@ function Card({ a, now, i, hue }: { a: MyAssignment; now: number; i: number; hue
   const [bt, bi, bl] = STATE[a.state];
   const due = a.state === "da_nop" ? `Nộp xong · hạn ${at(a.dueAt)}` : a.state === "qua_han" ? `Hạn ${at(a.dueAt)} đã qua` : a.state === "chua_mo" ? `Mở lúc ${at(a.opensAt)}` : formatCountdown(Date.parse(a.dueAt) - now);
   return (
-    <article className="asg" style={{ ["--h" as string]: hue, ["--i" as string]: Math.min(i, 8) }} data-testid="hs-asg">
-      <div className="asg-top">
-        <span className="asg-subj">{a.subject}</span>
-        <span className="grow" />
-        <Badge tone={bt} icon={bi}>{bl}</Badge>
-      </div>
-      <h3>{a.title}</h3>
-      <div className="asg-meta">
-        <span>{a.kind === "test" ? "Kiểm tra" : "Luyện tập"}</span>
-        <span>{a.questionCount} câu</span>
-        <span>{a.durationMinutes ? `${a.durationMinutes} phút` : "Không giới hạn giờ"}</span>
-        <span>Lượt {a.attemptsUsed}/{a.attemptsAllowed}</span>
-      </div>
-      {a.state === "dang_lam" && (
-        <div className="asg-prog">
-          <Meter value={(100 * a.answered) / Math.max(1, a.questionCount)} label={`Đã làm ${a.answered} trên ${a.questionCount} câu`} />
-          <small>Đã làm {a.answered}/{a.questionCount} câu</small>
+    <article className={`asg st-${a.state}`} style={{ ["--h" as string]: hue, ["--i" as string]: Math.min(i, 8) }} data-testid="hs-asg">
+      <div className="asg-main">
+        <div className="asg-top">
+          <span className="asg-subj">{a.subject}</span>
+          <Badge tone={bt} icon={bi}>{bl}</Badge>
         </div>
-      )}
-      <div className="asg-foot">
-        <span className={`asg-due ${tone}`}>
-          <Icon name={tone === "late" ? "alert" : tone === "ok" ? "checkc" : "clock"} size="sm" />
-          {due}
-        </span>
+        <h3>{a.title}</h3>
+        <div className="asg-meta">
+          <span>{a.kind === "test" ? "Kiểm tra" : "Luyện tập"}</span>
+          <span>{a.questionCount} câu</span>
+          <span>{a.durationMinutes ? `${a.durationMinutes} phút` : "Không giới hạn giờ"}</span>
+          <span>Lượt {a.attemptsUsed}/{a.attemptsAllowed}</span>
+        </div>
+      </div>
+      <div className="asg-side">
+        {a.state === "dang_lam" && (
+          <div className="asg-prog">
+            <Meter value={(100 * a.answered) / Math.max(1, a.questionCount)} label={`Đã làm ${a.answered} trên ${a.questionCount} câu`} />
+            <small>{a.answered}/{a.questionCount} câu</small>
+          </div>
+        )}
         {a.score10 !== null && (
           <span className="asg-score" aria-label={`Điểm ${vn(a.score10)} trên 10`}>
             <b>{vn(a.score10)}</b>/10
           </span>
         )}
+        <span className={`asg-due ${tone}`}>
+          <Icon name={tone === "late" ? "alert" : tone === "ok" ? "checkc" : "clock"} size="sm" />
+          {due}
+        </span>
       </div>
       <div className="asg-acts">
+        {a.state === "da_nop" && a.canStart && a.lastSubmissionId && (
+          <Link className="btn ghost" to={HOC_PATH.ketQua(a.lastSubmissionId)}>
+            <span>Lượt trước</span>
+          </Link>
+        )}
         {act.to ? (
           <Link className={act.primary ? "btn primary" : "btn"} to={act.to} data-testid="hs-start">
             <span>{act.label}</span>
@@ -90,26 +103,23 @@ function Card({ a, now, i, hue }: { a: MyAssignment; now: number; i: number; hue
             <span>{act.label}</span>
           </button>
         )}
-        {a.state === "da_nop" && a.canStart && a.lastSubmissionId && (
-          <Link className="btn ghost" to={HOC_PATH.ketQua(a.lastSubmissionId)}>
-            <span>Kết quả lượt trước</span>
-          </Link>
-        )}
       </div>
     </article>
   );
 }
 
-export function AsgSkeleton({ n = 6 }: { n?: number }) {
+export function AsgSkeleton({ n = 4 }: { n?: number }) {
   return (
-    <div className="asg-grid" aria-busy="true" aria-label="Đang tải bài tập">
+    <div className="asg-list" aria-busy="true" aria-label="Đang tải bài tập">
       {Array.from({ length: n }, (_, i) => (
         <div className="asg skel-card" key={i}>
-          <div className="asg-top"><Skeleton w={64} h={12} /><span className="grow" /><Skeleton w={72} h={22} style={{ borderRadius: 6 }} /></div>
-          <Skeleton w={`${[78, 64, 70][i % 3]}%`} h={20} style={{ marginTop: 10 }} />
-          <Skeleton w="88%" h={12} style={{ marginTop: 12 }} />
-          <div className="asg-foot"><Skeleton w={150} h={14} /></div>
-          <div className="asg-acts"><Skeleton w={120} h={36} style={{ borderRadius: 10 }} /></div>
+          <div className="asg-main">
+            <Skeleton w={64} h={12} />
+            <Skeleton w={`${[58, 44, 50][i % 3]}%`} h={22} style={{ marginTop: 10 }} />
+            <Skeleton w="40%" h={12} style={{ marginTop: 10 }} />
+          </div>
+          <div className="asg-side"><Skeleton w={140} h={14} /></div>
+          <div className="asg-acts"><Skeleton w={120} h={40} style={{ borderRadius: 10 }} /></div>
         </div>
       ))}
     </div>
@@ -140,14 +150,15 @@ export function MyAssignments() {
   const say = mood === "chuoi" ? `${mascotLine("chuoi", { streak, name })} ${left > 0 ? `Còn ${left} bài.` : ""}`.trim() : mascotLine(mood, { name, left });
   return (
     <div className="ba">
-      <div className="ba-head">
-        <div>
-          <h1 className="page-title">Bài tập</h1>
-          <p className="caption">{rows ? `${left > 0 ? `${left} bài cần làm` : "Không còn bài cần làm"} · ${rows.length} bài trong lớp` : " "}</p>
+      <header className="hh">
+        <div className="hh-t">
+          <div>
+            <div className="hh-eyebrow">{rows ? `${left > 0 ? `${left} bài cần làm` : "Không còn bài cần làm"} · ${rows.length} bài trong lớp` : " "}</div>
+            <h1 className="hh-title">Bài tập</h1>
+          </div>
         </div>
-        <span className="grow" />
-        {rows && <Mascot key={mood} mood={mood} size={52} say={say} className="hide-sm" />}
-      </div>
+        {rows && <Mascot key={mood} mood={mood} size={56} say={say} className="hide-sm" />}
+      </header>
       <div className="ba-bar">
         <Segmented label="Lọc bài" value={v} onChange={(x) => setView(x)} options={ASG_VIEWS.map((k) => ({ value: k, label: <>{VIEW_VI[k]}{counts && <span className="num muted"> {counts[k]}</span>}</> }))} />
         {subjects.length > 1 && (
@@ -167,14 +178,27 @@ export function MyAssignments() {
       ) : !rows ? (
         <AsgSkeleton />
       ) : shown.length === 0 ? (
-        <EmptyState
-          icon={v === "can-lam" ? "check" : "inbox"}
-          title={v === "can-lam" ? "Em đã làm hết bài rồi!" : v === "da-nop" ? "Chưa nộp bài nào" : "Chưa có bài nào"}
-          text={v === "can-lam" ? "Bài mới thầy cô giao sẽ hiện ở đây." : mon ? `Môn ${mon} chưa có bài trong mục này.` : "Thầy cô giao bài là em thấy ngay."}
-          action={v !== "tat-ca" ? <button type="button" className="btn" onClick={() => setView("tat-ca")}>Xem tất cả bài</button> : undefined}
-        />
+        <section className="ba-empty-w">
+          <div className="ba-empty">
+            <Mascot mood={v === "can-lam" ? "khen" : "chao"} size={88} />
+            <h2>{v === "can-lam" ? "Em đã làm hết bài rồi!" : v === "da-nop" ? "Chưa nộp bài nào" : "Chưa có bài nào"}</h2>
+            <p>{v === "can-lam" ? "Bài mới thầy cô giao sẽ hiện ở đây." : mon ? `Môn ${mon} chưa có bài trong mục này.` : "Thầy cô giao bài là em thấy ngay."}</p>
+            {v !== "tat-ca" && <button type="button" className="btn" onClick={() => setView("tat-ca")}>Xem tất cả bài</button>}
+          </div>
+          <div className="asg-list ba-ghost" aria-hidden="true">
+            {GHOST.map(([subject, title, meta], i) => (
+              <div className="asg" key={title} style={{ ["--h" as string]: `var(--c${[5, 3, 7][i]})` }}>
+                <div className="asg-main">
+                  <div className="asg-top"><span className="asg-subj">{subject}</span></div>
+                  <h3>{title}</h3>
+                  <div className="asg-meta"><span>{meta}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       ) : (
-        <div className={q.stale ? "asg-grid enter-list is-stale" : "asg-grid enter-list"} key={`${v}:${mon}`}>
+        <div className={q.stale ? "asg-list enter-list is-stale" : "asg-list enter-list"} key={`${v}:${mon}`}>
           {shown.map((a, i) => <Card key={a.id} a={a} now={now} i={i} hue={subjectColor(a.subject, Math.max(0, subjects.indexOf(a.subject)))} />)}
         </div>
       )}
