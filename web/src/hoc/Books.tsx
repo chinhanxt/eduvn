@@ -17,6 +17,9 @@ type Book = BookRow & { scope: string; pages: PageRow[] };
 type Block = { type: string; title?: string; markdown?: string; data?: Record<string, unknown>; citations?: Citation[] };
 type Page = PageRow & { blocks: Block[]; bookTitle: string };
 
+// Bìa mẫu mờ khi kệ trống (nhiều môn).
+const GHOST: [string, string][] = [["Quang hợp", "Sinh học 11 · 6 chương"], ["Truyện Kiều", "Ngữ văn 10 · 5 chương"], ["Chiến tranh lạnh", "Lịch sử 12 · 4 chương"], ["Python nhập môn", "KTPM K23 · 8 chương"]];
+
 const CALLOUT_VI: Record<string, string> = { key_idea: "Ý chính", warning: "Lưu ý", tip: "Mẹo", common_pitfall: "Lỗi hay gặp", insight: "Hiểu sâu hơn", connection: "Liên hệ" };
 
 function BlockView({ b }: { b: Block }) {
@@ -117,36 +120,56 @@ export function Books() {
 
   if (!book)
     return (
-      <div className="stack">
+      <div className="bk">
+        <header className="hh">
+          <div>
+            <div className="hh-eyebrow">Sách sống viết từ kho tài liệu</div>
+            <h1 className="hh-title">Giáo trình</h1>
+          </div>
+        </header>
         {error && <div className="err">{error}</div>}
-        {teacher && (
-          <div className="card">
-            <h2>Tạo giáo trình sống từ kho tri thức</h2>
-            <div className="formrow">
-              <label className="lbl">Kho<select className="inp" value={form.kbId} onChange={(e) => setForm({ ...form, kbId: e.target.value })}>{kbs.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}</select></label>
-              <label className="lbl" style={{ flex: 1 }}>Em/thầy cô muốn cuốn giáo trình về điều gì?<input className="inp w-l" value={form.intent} onChange={(e) => setForm({ ...form, intent: e.target.value })} placeholder="vd Giáo trình hằng đẳng thức đáng nhớ cho học sinh lớp 8" data-testid="book-intent" /></label>
-              <button className="btn" disabled={!form.kbId || form.intent.trim().length < 3 || !!busy} onClick={() => void create()}>{busy === "create" ? "AI đang lên dàn chương…" : "Tạo giáo trình"}</button>
+        {books.length > 0 ? (
+          <div className="bk-shelf">
+            {books.map((b, i) => (
+              <button key={b.id} className="bk-cover hh-in" style={{ ["--h" as string]: `var(--c${(i % 8) + 1})`, ["--i" as string]: Math.min(i, 8) }} onClick={() => void openBook(b.id)} data-testid="book-row">
+                <span className="band" />
+                <b>{b.title}</b>
+                <small>{b.description}</small>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="bk-empty">
+            <div className="bk-shelf bk-ghost" aria-hidden="true">
+              {GHOST.map(([t, d], i) => (
+                <div key={t} className="bk-cover" style={{ ["--h" as string]: `var(--c${[6, 2, 7, 8][i]})` }}><span className="band" /><b>{t}</b><small>{d}</small></div>
+              ))}
             </div>
+            <p className="bk-empty-t">{teacher ? "Kệ còn trống — viết cuốn đầu tiên bên dưới." : "Thầy cô viết xong giáo trình là em thấy ở đây."}</p>
           </div>
         )}
-        {books.length === 0 && <div className="card"><div className="empty">Chưa có giáo trình nào.</div></div>}
-        {books.map((b) => (
-          <button key={b.id} className="card" style={{ textAlign: "left", border: 0 }} onClick={() => void openBook(b.id)} data-testid="book-row">
-            <b>{b.title}</b><div style={{ color: "var(--muted)" }}>{b.description}</div>
-          </button>
-        ))}
+        {teacher && (
+          <section className="bk-make">
+            <h2 className="hh-sec">Viết giáo trình mới</h2>
+            <div className="bk-form">
+              <label className="bk-f"><span>Kho</span><select className="select" value={form.kbId} onChange={(e) => setForm({ ...form, kbId: e.target.value })}>{kbs.length === 0 && <option value="">Chưa có kho</option>}{kbs.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}</select></label>
+              <label className="bk-f grow"><span>Cuốn giáo trình về điều gì?</span><input className="input" value={form.intent} onChange={(e) => setForm({ ...form, intent: e.target.value })} placeholder="vd Quang hợp cho học sinh lớp 11" data-testid="book-intent" /></label>
+              <button className="btn primary" disabled={!form.kbId || form.intent.trim().length < 3 || !!busy} onClick={() => void create()}>{busy === "create" ? "AI đang lên dàn chương…" : "Viết giáo trình"}</button>
+            </div>
+          </section>
+        )}
       </div>
     );
 
   const ready = book.pages.filter((p) => p.status === "ready").length;
   return (
-    <div className="stack">
+    <div className="bk">
       <button className="back" onClick={() => { setBook(null); void load(); }}><Icon name="left" size={16} />Các giáo trình</button>
       {error && <div className="err">{error}</div>}
       <div className="book-read">
-        <div className="card toc">
+        <nav className="toc" aria-label="Mục lục">
           <h2>{book.title}</h2>
-          <small style={{ color: "var(--muted)" }}>{book.description}</small>
+          <small>{book.description}</small>
           <div style={{ marginTop: 10 }}>
             {book.pages.map((p) => (
               <button key={p.id} className={page?.idx === p.idx ? "on" : ""} onClick={() => void openPage(book, p.idx)}>
@@ -155,8 +178,8 @@ export function Books() {
             ))}
           </div>
           {teacher && ready < book.pages.length && <button className="btn" style={{ marginTop: 10 }} disabled={!!busy} onClick={() => void compileAll()}>{busy?.startsWith("c") ? "Đang biên soạn…" : "Biên soạn các chương còn lại"}</button>}
-        </div>
-        <div className="card page-body" data-testid="book-page">
+        </nav>
+        <article className="page-body" data-testid="book-page">
           {!page && <div className="empty">{busy === "open" || busy === "page" ? "…" : "Chọn một chương để đọc."}</div>}
           {page && page.status !== "ready" && (
             <div className="empty">
@@ -166,15 +189,15 @@ export function Books() {
           )}
           {page && page.status === "ready" && (
             <>
-              <h1 style={{ marginTop: 0 }}>{page.idx + 1}. {page.title}</h1>
+              <h1 className="bk-h1"><small>Chương {page.idx + 1}</small>{page.title}</h1>
               {page.objectives.length > 0 && <div className="callout blk"><b>Sau chương này em sẽ: </b><ul style={{ margin: "4px 0 0" }}>{page.objectives.map((o, i) => <li key={i}><MathText value={o} /></li>)}</ul></div>}
               {page.blocks.map((b, i) => <BlockView key={i} b={b} />)}
             </>
           )}
-        </div>
+        </article>
         {page && page.status === "ready" ? (
           <div>
-            <h2 style={{ margin: "0 0 8px" }}>Hỏi gia sư về trang này</h2>
+            <h2 className="hh-sec">Hỏi gia sư về trang này</h2>
             <ChatPanel compact ctx={{ kbId: book.kbId, bookPageId: page.id }} sessionId={sid} onSession={setSid} starters={["Em chưa hiểu đoạn này, giải thích lại đơn giản hơn nhé.", "Cho em thêm một ví dụ nữa."]} />
           </div>
         ) : <div />}
