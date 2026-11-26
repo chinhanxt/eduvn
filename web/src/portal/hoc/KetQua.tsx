@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { type ReactNode, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
 import { vn } from "../../api";
 import { ApiError } from "../../apiCore";
@@ -7,9 +7,8 @@ import { HOC_PATH } from "../../student/paths";
 import { clearSession } from "../../student/session";
 import { ChartFrame, ChartTable, vnShort } from "../../ui/charts/core";
 import { Skeleton } from "../../ui/components/Skeleton";
-import { EmptyState, ErrorState } from "../../ui/components/States";
+import { ErrorState } from "../../ui/components/States";
 import { type Column, parseSort, Table } from "../../ui/components/Table";
-import { Icon } from "../../ui/Icon";
 import { useQuery } from "../../ui/data/query";
 import { useUrlState } from "../../ui/data/urlState";
 import { usePageMeta } from "../../ui/shell/AppShell";
@@ -24,7 +23,7 @@ const sgn = (x: number) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${vn(Math.abs(x))
 
 /** Đường điểm các bài theo thời gian, thang 0–10, vạch 5,0; điểm cuối đậm + có số. */
 function ScoreLine({ rows }: { rows: readonly Scored[] }) {
-  const H = 168;
+  const H = 220;
   const table = <ChartTable caption="Điểm từng bài" head={["Bài", "Ngày", "Điểm"]} rows={rows.map((r) => [r.title, ddmm(r.dueAt), vnShort(r.score10)])} />;
   return (
     <ChartFrame height={H} table={table}>
@@ -67,13 +66,30 @@ function ScoreLine({ rows }: { rows: readonly Scored[] }) {
 
 function Skel() {
   return (
-    <div className="kqt" aria-busy="true" aria-label="Đang tải kết quả">
-      <div className="kqt-stats">{[0, 1, 2, 3].map((i) => <div className="card" key={i}><Skeleton w={90} h={12} /><Skeleton w={70} h={34} style={{ marginTop: 10 }} /></div>)}</div>
-      <div className="kqt-grid">
-        <section className="card"><Skeleton w={160} h={18} /><Skeleton w="100%" h={168} style={{ marginTop: 16, borderRadius: 12 }} /></section>
-        <section className="card"><Skeleton w={120} h={18} />{[0, 1, 2].map((i) => <Skeleton key={i} w="90%" h={14} style={{ marginTop: 16 }} />)}</section>
+    <div aria-busy="true" aria-label="Đang tải kết quả">
+      <div className="kqt-top">
+        <div className="kqt-fig"><Skeleton w={120} h={12} /><Skeleton w={140} h={64} style={{ marginTop: 10 }} /><Skeleton w="90%" h={40} style={{ marginTop: 20 }} /></div>
+        <Skeleton w="100%" h={200} style={{ borderRadius: 12 }} />
       </div>
     </div>
+  );
+}
+
+// Bản xem trước khi chưa có điểm: đường điểm mẫu, mờ.
+const GHOST: Scored[] = [6.5, 7, 5.5, 7.5, 8, 7.25, 8.5].map((v, i) => ({ id: `g${i}`, title: "", subject: "", dueAt: new Date(Date.UTC(2026, 10, 10 + i * 2)).toISOString(), score10: v, lastSubmissionId: "" }) as unknown as Scored);
+
+/** Trống = đường điểm mẫu mờ + một nút chính. */
+function Empty({ title, text, action }: { title: string; text: string; action: ReactNode }) {
+  return (
+    <section className="kqt-empty">
+      <div className="kqt-ghost" aria-hidden="true"><ScoreLine rows={GHOST} /></div>
+      <div className="kqt-empty-t">
+        <Mascot mood="chao" size={72} />
+        <h2>{title}</h2>
+        <p>{text}</p>
+        {action}
+      </div>
+    </section>
   );
 }
 
@@ -117,10 +133,8 @@ export function KetQua() {
   if (!session)
     return (
       <div className="kqt">
-        <h1 className="page-title">Kết quả</h1>
-        <section className="card" style={{ marginTop: "var(--s-5)" }}>
-          <EmptyState icon="key" title="Vào lớp để xem kết quả" text="Kết quả bài làm gắn với lớp của em. Nhập mã tham gia hoặc mã lớp + PIN một lần là xong." action={<Link className="btn primary" to={HOC_PATH.baiTap}><span>Vào lớp</span></Link>} />
-        </section>
+        <header className="hh"><div><div className="hh-eyebrow">Điểm và nhận xét</div><h1 className="hh-title">Kết quả</h1></div></header>
+        <Empty title="Vào lớp để xem kết quả" text="Nhập mã lớp + PIN một lần là xong." action={<Link className="btn primary" to={HOC_PATH.baiTap}><span>Vào lớp</span></Link>} />
       </div>
     );
 
@@ -128,14 +142,13 @@ export function KetQua() {
   const mood = s.delta !== null && s.delta > 0 ? "khen" : moodForScore(s.last);
   return (
     <div className={q.stale ? "kqt is-stale" : "kqt"}>
-      <div className="ba-head">
+      <header className="hh">
         <div>
-          <h1 className="page-title">Kết quả</h1>
-          <p className="caption">{all ? `${s.n} bài đã có điểm${mon ? ` · ${mon}` : ""}` : " "}</p>
+          <div className="hh-eyebrow">{all ? `${s.n} bài đã có điểm${mon ? ` · ${mon}` : ""}` : " "}</div>
+          <h1 className="hh-title">Kết quả</h1>
         </div>
-        <span className="grow" />
-        {all && s.n > 0 && <Mascot key={mood} mood={mood} size={52} className="hide-sm" say={s.delta !== null && s.delta > 0 ? `Tiến bộ ${sgn(s.delta)} điểm${name ? `, ${name}` : ""}!` : mascotLine(mood, { name })} />}
-      </div>
+        {all && s.n > 0 && <Mascot key={mood} mood={mood} size={56} className="hide-sm" say={s.delta !== null && s.delta > 0 ? `Tiến bộ ${sgn(s.delta)} điểm${name ? `, ${name}` : ""}!` : mascotLine(mood, { name })} />}
+      </header>
       {subjects.length > 1 && (
         <div className="ba-bar">
           <div className="ba-subj" role="group" aria-label="Môn">
@@ -154,44 +167,41 @@ export function KetQua() {
       ) : !all ? (
         <Skel />
       ) : s.n === 0 ? (
-        <section className="card">
-          <EmptyState icon="chart" title="Chưa có bài nào có điểm" text="Nộp bài xong, điểm và nhận xét sẽ hiện ở đây." action={<Link className="btn primary" to={HOC_PATH.baiTap}><span>Xem bài cần làm</span></Link>} />
-        </section>
+        <Empty title="Chưa có bài nào có điểm" text="Nộp bài xong, điểm sẽ hiện ở đây." action={<Link className="btn primary" to={HOC_PATH.baiTap}><span>Xem bài cần làm</span></Link>} />
       ) : (
         <>
-          <div className="kqt-stats enter">
-            <div className="card stat-c"><span className="caption">Điểm trung bình</span><b className="big">{vn(s.avg ?? 0)}</b><small>{s.n} bài</small></div>
-            <div className="card stat-c">
-              <span className="caption">Bài gần nhất</span>
-              <b className="big">{vn(s.last ?? 0)}</b>
-              <small>{s.delta === null ? "bài đầu tiên" : <span className={s.delta > 0 ? "up" : s.delta < 0 ? "dn" : undefined}>{sgn(s.delta)} so với bài trước</span>}</small>
+          <section className="kqt-top hh-in" aria-label="Diễn biến điểm">
+            <div className="kqt-fig">
+              <span className="hh-eyebrow">Điểm trung bình</span>
+              <b className="kqt-avg">{vn(s.avg ?? 0)}</b>
+              <dl className="kqt-stats">
+                <div><dt>Gần nhất</dt><dd>{vn(s.last ?? 0)}{s.delta !== null && <small className={s.delta > 0 ? "up" : s.delta < 0 ? "dn" : undefined}>{sgn(s.delta)}</small>}</dd></div>
+                <div><dt>Cao nhất</dt><dd>{vn(s.best ?? 0)}</dd></div>
+                <div><dt>Dưới 5</dt><dd className={s.below ? "dn" : undefined}>{s.below}</dd></div>
+              </dl>
             </div>
-            <div className="card stat-c"><span className="caption">Cao nhất</span><b className="big">{vn(s.best ?? 0)}</b><small>trên 10</small></div>
-            <div className="card stat-c"><span className="caption">Dưới 5,0</span><b className={s.below ? "big dn" : "big"}>{s.below}</b><small>{s.below ? "bài cần xem lại" : "không có bài nào"}</small></div>
-          </div>
-          <div className="kqt-grid">
-            <section className="card" aria-label="Diễn biến điểm">
-              <div className="hd"><h2>Diễn biến điểm</h2><span className="grow" /><span className="caption">thang 0–10 · vạch 5,0</span></div>
+            <div className="kqt-chart">
               <ScoreLine rows={rows.slice(-16)} />
-            </section>
-            <section className="card" aria-label="Theo môn">
-              <div className="hd"><h2>Theo môn</h2></div>
+            </div>
+          </section>
+          {subj.length > 0 && (
+            <section className="kqt-subj-w" aria-label="Theo môn">
+              <h2 className="hh-sec">Theo môn</h2>
               <ul className="kqt-subj">
                 {subj.map((x, i) => (
-                  <li key={x.subject}>
+                  <li key={x.subject} style={{ ["--h" as string]: subjectColor(x.subject, Math.max(0, subjects.indexOf(x.subject) >= 0 ? subjects.indexOf(x.subject) : i)) }}>
                     <button type="button" aria-pressed={mon === x.subject} onClick={() => setMon(mon === x.subject ? "" : x.subject)}>
-                      <i className="dot" style={{ background: subjectColor(x.subject, Math.max(0, subjects.indexOf(x.subject))) }} />
                       <span className="t">{x.subject}<small>{x.n} bài · gần nhất {vn(x.last)}</small></span>
+                      <span className="bar"><i style={{ width: `${x.avg * 10}%` }} /></span>
                       <b className={x.avg < 5 ? "dn" : undefined}>{vn(x.avg)}</b>
                     </button>
-                    <span className="bar" style={{ ["--v" as string]: `${x.avg * 10}%`, ["--h" as string]: subjectColor(x.subject, i) }} />
                   </li>
                 ))}
               </ul>
             </section>
-          </div>
-          <section className="panel kqt-table" aria-label="Các bài đã chấm">
-            <div className="hd"><h2>Các bài đã chấm</h2></div>
+          )}
+          <section className="kqt-table" aria-label="Các bài đã chấm">
+            <h2 className="hh-sec">Các bài đã chấm<small>bấm để xem từng câu</small></h2>
             <Table
               label="Các bài đã chấm"
               columns={cols}
@@ -203,7 +213,6 @@ export function KetQua() {
               stale={q.stale}
               page={sorted.length > PAGE ? { page, pageSize: PAGE, total: sorted.length, onPage: setTrang } : undefined}
             />
-            <p className="caption kqt-hint"><Icon name="info" size="sm" /> Bấm một bài để xem từng câu và lời giải.</p>
           </section>
         </>
       )}

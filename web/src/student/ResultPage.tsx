@@ -38,14 +38,14 @@ function Skel() {
   return (
     <div className="kq" aria-busy="true" aria-label="Đang tải kết quả">
       <div style={{ minWidth: 0 }}>
-        <section className="page-head hero-field kq-hero" aria-hidden="true">
-          <div className="score"><Skeleton w={200} h={12} className="on-field" /><Skeleton w={180} h={80} className="on-field" style={{ marginTop: 10 }} /></div>
-          <div className="parts">{[0, 1, 2].map((i) => <Skeleton key={i} w="100%" h={14} className="on-field" style={{ gridColumn: "1 / -1" }} />)}</div>
+        <section className="kq-top" aria-hidden="true">
+          <div className="kq-score"><Skeleton w={80} h={80} style={{ borderRadius: "50%" }} /><div><Skeleton w={200} h={12} /><Skeleton w={160} h={72} style={{ marginTop: 10 }} /></div></div>
+          <div className="kq-dots-w"><Skeleton w="100%" h={36} /></div>
         </section>
         <div className="seg-f"><Skeleton w={120} h={22} /></div>
         {[0, 1, 2, 3].map((i) => <div className="rq" key={i} style={{ padding: 16 }}><Skeleton w={`${[60, 45, 52, 38][i]}%`} h={16} /></div>)}
       </div>
-      <aside className="rail">{[0, 1].map((i) => <section className="card" key={i}><Skeleton w={140} h={18} /><Skeleton w="90%" h={14} style={{ marginTop: 14 }} /></section>)}</aside>
+      <aside className="rail kq-rail">{[0, 1].map((i) => <section key={i}><Skeleton w={140} h={18} /><Skeleton w="90%" h={14} style={{ marginTop: 14 }} /></section>)}</aside>
     </div>
   );
 }
@@ -93,34 +93,50 @@ function ResultPageInner() {
   return (
     <div className={q.stale ? "kq is-stale" : "kq"}>
       <div style={{ minWidth: 0 }}>
-        <section className="page-head hero-field kq-hero" aria-label="Điểm">
-          <div className="score">
-            <div className="eyebrow">{r.title}{when ? ` · ${when}` : ""}{r.status === "auto_submitted" ? " · tự nộp khi hết giờ" : ""}</div>
-            <div className="v" data-testid="hs-score">{s10 === null ? "—" : vn(s10)}<small>/ 10</small></div>
-            <div className="chips">
-              {s10 !== null && <span className="chip-f">{band(s10)}</span>}
-              {r.pending > 0 && <span className="chip-f">{r.pending} câu tự luận chờ thầy cô chấm</span>}
-              <span className="chip-f">Lượt {r.attempt}/{r.attemptsAllowed}</span>
+        <section className="kq-top" aria-label="Điểm">
+          <div className="kq-score">
+            <Mascot key={`${sid}:${mood}`} mood={mood} size={80} />
+            <div>
+              <div className="hh-eyebrow">{r.title}{when ? ` · ${when}` : ""}{r.status === "auto_submitted" ? " · tự nộp khi hết giờ" : ""}</div>
+              <div className="v" data-testid="hs-score">{s10 === null ? "—" : vn(s10)}<small>/10</small></div>
+              <div className="kq-chips">
+                {s10 !== null && <span className="chipc ok">{band(s10)}</span>}
+                {r.pending > 0 && <span className="chipc">{r.pending} câu chờ thầy cô chấm</span>}
+                <span className="chipc">Lượt {r.attempt}/{r.attemptsAllowed}</span>
+                {!["0″", "—"].includes(spent(r.startedAt, r.submittedAt)) && <span className="chipc">{spent(r.startedAt, r.submittedAt)}</span>}
+              </div>
             </div>
           </div>
-          {parts.length > 0 && r.level !== "score" ? (
-            <div className="parts" aria-label="Điểm theo phần">
-              <div className="h"><span>Theo phần</span><span>{r.correctCount}/{r.items.length} câu đúng hoàn toàn · {spent(r.startedAt, r.submittedAt)}</span></div>
-              {parts.map((p) => (
-                <div className="p" key={p.label}>
-                  <span>{p.label}</span>
-                  <div className="m" role="img" aria-label={`${vn(p.got)} trên ${vn(p.max)} điểm`}><i style={{ ["--v" as string]: `${p.max ? (100 * p.got) / p.max : 0}%` }} /></div>
-                  <b>{p.pending ? `${vn(p.got)} + ${p.pending} chờ` : `${vn(p.got)} / ${vn(p.max)}`}</b>
+          {r.level !== "score" && r.items.length > 0 && (
+            <div className="kq-dots-w">
+              <div className="kq-dots" role="img" aria-label={`${r.correctCount}/${r.items.length} câu đúng hoàn toàn`}>
+                {r.items.map((it, i) => {
+                  const v = verdictOf(it);
+                  return (
+                    <button type="button" key={it.no} className={`d ${v}`} style={{ ["--i" as string]: Math.min(i, 30) }} title={`Câu ${i + 1}: ${V_TEXT[v]}`} onClick={() => { setLoc("tat-ca"); setOpen(it.no); }}>
+                      {i + 1}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="hh-quiet"><b>{r.correctCount}/{r.items.length}</b> câu đúng hoàn toàn</div>
+              {parts.length > 1 && (
+                <div className="kq-parts" aria-label="Điểm theo phần">
+                  {parts.map((p) => (
+                    <div className="p" key={p.label}>
+                      <span>{p.label}</span>
+                      <div className="m" role="img" aria-label={`${vn(p.got)} trên ${vn(p.max)} điểm`}><i style={{ ["--v" as string]: `${p.max ? (100 * p.got) / p.max : 0}%` }} /></div>
+                      <b>{p.pending ? `${vn(p.got)} + ${p.pending} chờ` : `${vn(p.got)}/${vn(p.max)}`}</b>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          ) : (
-            <div className="parts"><div className="h"><span>Điểm bài</span><span>{spent(r.startedAt, r.submittedAt)}</span></div><b className="tot">{vn(r.score)} / {vn(r.maxScore)}</b></div>
           )}
         </section>
 
         {r.level === "score" || r.items.length === 0 ? (
-          <section className="card" style={{ marginTop: "var(--s-6)" }}>
+          <section style={{ marginTop: "var(--s-6)" }}>
             <EmptyState icon="lock" title={LEVEL_VI.score} text="Bài này chỉ hiện điểm, không hiện từng câu." />
           </section>
         ) : (
@@ -131,11 +147,11 @@ function ResultPageInner() {
               <Segmented label="Lọc câu" value={loc === "chua-dung" ? "chua-dung" : "tat-ca"} onChange={(v) => setLoc(v)} options={[{ value: "tat-ca", label: `Tất cả ${r.items.length}` }, { value: "chua-dung", label: `Chưa đúng ${wrong.length}` }]} />
             </div>
             {shown.length === 0 ? (
-              <section className="card" style={{ marginTop: "var(--s-3)" }}>
+              <section style={{ marginTop: "var(--s-3)" }}>
                 <EmptyState icon="ok" title="Em đúng hết!" text="Không còn câu nào cần xem lại." />
               </section>
             ) : (
-              <div className="enter-list" key={loc}>
+              <div className="enter-list rq-list" key={loc}>
                 {shown.map((it, i) => {
                   const v = verdictOf(it);
                   const n = r.items.indexOf(it) + 1;
@@ -177,27 +193,25 @@ function ResultPageInner() {
         )}
       </div>
 
-      <aside className="rail" aria-label="Bên cạnh">
-        <section className="card kq-mam">
-          <Mascot key={`${sid}:${mood}`} mood={mood} size={72} say={s10 === null ? "Thầy cô chấm xong là em thấy điểm nhé!" : mascotLine(mood, { name })} />
-        </section>
+      <aside className="rail kq-rail" aria-label="Bên cạnh">
+        <p className="kq-say">{s10 === null ? "Thầy cô chấm xong là em thấy điểm nhé!" : mascotLine(mood, { name })}</p>
         {weakest && weakest.got < weakest.max && (
-          <section className="card">
-            <div className="hd"><h2>Nên ôn tiếp</h2></div>
+          <section>
+            <h2 className="hh-sec">Nên ôn tiếp</h2>
             <div className="row" style={{ alignItems: "flex-start" }}>
               <Icon name="alert" size="sm" style={{ color: "var(--warn)", marginTop: 2 }} />
               <span className="grow">{weakest.label}<br /><span className="caption">{vn(weakest.got)}/{vn(weakest.max)} điểm · {wrong.length} câu chưa đúng</span></span>
             </div>
             {user ? (
-              <Link className="btn primary block" style={{ marginTop: 14 }} to="/hoc/luyen-tap"><Icon name="layers" size="sm" /><span>Luyện câu tương tự</span></Link>
+              <Link className="btn block" style={{ marginTop: 14 }} to="/hoc/luyen-tap"><Icon name="layers" size="sm" /><span>Luyện câu tương tự</span></Link>
             ) : (
               wrong.length > 0 && <button type="button" className="btn block" style={{ marginTop: 14 }} onClick={() => setLoc("chua-dung")}><Icon name="eye" size="sm" /><span>Xem {wrong.length} câu chưa đúng</span></button>
             )}
           </section>
         )}
         {past.length > 1 && idx >= 0 && (
-          <section className="card">
-            <div className="hd"><h2>So với các bài trước</h2></div>
+          <section>
+            <h2 className="hh-sec">So với các bài trước</h2>
             <Track vals={past.map((p) => p.score10)} labels={past.map((p) => ddmm(p.dueAt))} threshold={5} height={34} showAxis />
             <p className="caption" style={{ marginTop: 8 }}>
               {past.length} bài {self?.subject ?? ""} gần nhất, thang 0–10, vạch 5,0. Bài này <b>{vn(s10 ?? 0)}</b>
@@ -210,7 +224,7 @@ function ResultPageInner() {
             </p>
           </section>
         )}
-        <section className="card kq-acts">
+        <section className="kq-acts">
           {r.canRetry ? (
             <Link className="btn primary block" to={HOC_PATH.lamBai(r.assignmentId)}><Icon name="repeat" size="sm" /><span>Làm lại · còn {r.attemptsAllowed - r.attemptsUsed} lượt</span></Link>
           ) : (
