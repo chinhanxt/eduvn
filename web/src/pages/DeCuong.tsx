@@ -5,7 +5,6 @@ import { Button } from "../ui/components/Button";
 import { Badge } from "../ui/components/Chip";
 import { Field, Input, Textarea } from "../ui/components/Field";
 import { Skeleton } from "../ui/components/Skeleton";
-import { EmptyState } from "../ui/components/States";
 import { usePageMeta } from "../ui/shell/AppShell";
 
 type Syllabus = {
@@ -62,7 +61,7 @@ export function DeCuong() {
             testId="dc-form"
             footer={<Button variant="primary" icon="spark" disabled={!f.name.trim()} busy={busy} onClick={go} data-testid="dc-run">{s ? "Soạn lại" : "Soạn đề cương"}</Button>}
           >
-            <Field label="Tên học phần"><Input value={f.name} placeholder="Cấu trúc dữ liệu và giải thuật" onChange={(e) => setF({ ...f, name: e.target.value })} data-testid="dc-name" /></Field>
+            <Field label="Tên học phần"><Input value={f.name} placeholder="vd: Kinh tế vi mô" onChange={(e) => setF({ ...f, name: e.target.value })} data-testid="dc-name" /></Field>
             <div className="fgrid two">
               <Field label="Tín chỉ"><Input type="number" min={1} max={15} value={f.credits} onChange={(e) => setF({ ...f, credits: Number(e.target.value) || 3 })} /></Field>
               <Field label="Số tuần"><Input type="number" min={4} max={30} value={f.weeks} onChange={(e) => setF({ ...f, weeks: Number(e.target.value) || 15 })} /></Field>
@@ -109,7 +108,25 @@ export function DeCuong() {
               )}
             </div>
           ) : (
-            <EmptyState icon="list" title="Chưa có đề cương" text="Điền tên học phần và số tín chỉ bên trái — AI viết mô tả, CLO gắn PLO, đánh giá và kế hoạch từng tuần." />
+            <div className="paper dc-ghost" aria-hidden="true" inert>
+              <span className="dc-tag">Ví dụ</span>
+              <div className="hdr">
+                <div><b>KTE201</b>Đại học năm 2</div>
+                <div className="c"><b>ĐỀ CƯƠNG HỌC PHẦN</b>Kinh tế vi mô</div>
+                <div className="rt"><b>3 tín chỉ</b>LT 30 · TH 15 · tự học 90</div>
+              </div>
+              <h2>1. Mô tả học phần</h2>
+              <p>Hành vi của người tiêu dùng và doanh nghiệp, cung – cầu, cấu trúc thị trường và vai trò của nhà nước qua tình huống thị trường Việt Nam.</p>
+              <h2>2. Chuẩn đầu ra học phần (CLO)</h2>
+              <table><thead><tr><th>Mã</th><th>Nội dung</th><th>Bloom</th><th>PLO</th></tr></thead>
+                <tbody>
+                  <tr><td>CLO1</td><td>Giải thích cơ chế hình thành giá cân bằng</td><td>Hiểu</td><td>PLO1 (I)</td></tr>
+                  <tr><td>CLO2</td><td>Phân tích độ co giãn của cầu theo giá</td><td>Phân tích</td><td>PLO2 (R)</td></tr>
+                  <tr><td>CLO3</td><td>Đánh giá chính sách giá trần, giá sàn</td><td>Đánh giá</td><td>PLO4 (M)</td></tr>
+                </tbody></table>
+              <h2>3. Kế hoạch giảng dạy</h2>
+              <table><tbody><tr><td>1</td><td>Cung, cầu và giá cả</td><td>CLO1</td></tr><tr><td>2</td><td>Độ co giãn</td><td>CLO2</td></tr></tbody></table>
+            </div>
           )}
         </article>
       </div>

@@ -587,3 +587,30 @@
 [data-portal="gv"] .gv-ghost { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 1080px; margin-left: auto; margin-right: auto; }
 [data-portal="gv"] .gv-ghost { -webkit-mask-image: linear-gradient(#000 72%, transparent); mask-image: linear-gradient(#000 72%, transparent); }
 @media (max-width: 720px) { [data-portal="gv"] .gv-ghost { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } }
+/* Đề cương: bản xem trước mờ khi chưa soạn */
+[data-portal="gv"] .dc-ghost { position: relative; opacity: .62; pointer-events: none; user-select: none; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); animation: rise var(--dur-3) var(--ease-out) both; }
+[data-portal="gv"] .dc-tag { position: absolute; top: 12px; right: 14px; font: 600 11px/16px var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+
+/* ---- Kết nối AI (pages/Connect.tsx) ---- */
+[data-portal="gv"] .cn-hero { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 72px); align-items: center; padding: 16px 0 40px; }
+[data-portal="gv"] .cn-flow { display: grid; grid-template-columns: auto minmax(60px, 1fr) auto; align-items: center; padding: 32px; border-radius: 14px; background: color-mix(in srgb, var(--bg-sunken) 60%, var(--bg)); animation: rise var(--dur-3) var(--ease-out) both; }
+[data-portal="gv"] .cn-apps { display: grid; gap: 28px; }
+[data-portal="gv"] .cn-apps span { padding: 10px 16px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line-2); font-weight: 600; font-size: 14px; text-align: center; }
+[data-portal="gv"] .cn-wire { width: 100%; height: 80px; overflow: visible; }
+[data-portal="gv"] .cn-wire path { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+[data-portal="gv"] .cn-wire circle { fill: var(--accent); }
+[data-portal="gv"] .cn-core { display: grid; justify-items: center; gap: 6px; padding: 18px; border-radius: 14px; background: var(--bg); border: 1px solid var(--accent); min-width: 150px; }
+[data-portal="gv"] .cn-core .mark { width: 40px; height: 40px; border-radius: 10px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+[data-portal="gv"] .cn-core b { font-size: 15px; letter-spacing: .02em; }
+[data-portal="gv"] .cn-can { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; }
+[data-portal="gv"] .cn-can i { font-style: normal; font-size: 11px; color: var(--ink-2); background: var(--bg-sunken); border-radius: 4px; padding: 2px 6px; text-align: center; }
+[data-portal="gv"] .cn-body { display: grid; gap: 18px; }
+[data-portal="gv"] .cn-body h2 { font: 600 clamp(24px, 2.6vw, 32px)/1.2 var(--font-read); letter-spacing: -.01em; text-wrap: balance; }
+[data-portal="gv"] .cn-url { display: grid; gap: 6px; } [data-portal="gv"] .cn-url .lbl-sm { display: flex; align-items: center; gap: 8px; }
+[data-portal="gv"] .cn-more { max-width: 640px; }
+[data-portal="gv"] .cn-more .rows { list-style: none; margin: 0; padding: 0; }
+[data-portal="gv"] .cn-more .rows li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+[data-portal="gv"] .cn-more .g { flex: 1; } [data-portal="gv"] .cn-more .g b { display: block; font-weight: 550; } [data-portal="gv"] .cn-more .g small { color: var(--ink-3); font-size: 12px; }
+[data-portal="gv"] .cn-more .lead { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--bg-sunken); color: var(--ink-2); }
+@media (max-width: 1024px) { [data-portal="gv"] .cn-hero { grid-template-columns: minmax(0, 1fr); } [data-portal="gv"] .cn-flow { max-width: 560px; } }
+@media (max-width: 720px) { [data-portal="gv"] .cn-flow { padding: 18px; } [data-portal="gv"] .cn-core { min-width: 0; padding: 12px; } [data-portal="gv"] .cn-apps span { padding: 8px 10px; font-size: 13px; } }
