@@ -2,12 +2,21 @@ import { useMemo } from "react";
 import { Link } from "react-router";
 import type { VanBanSummary } from "../api";
 import { DocList } from "../portal/gv/DocList";
+import { MiniPaper } from "../portal/gv/Preview";
+
 import { dateVi, get, openLink, useRun } from "../portal/gv/kit";
 import { Button } from "../ui/components/Button";
 import { Badge } from "../ui/components/Chip";
 import type { Column } from "../ui/components/Table";
 import { useQuery } from "../ui/data/query";
 import { usePageMeta } from "../ui/shell/AppShell";
+
+const VB_SAMPLES: [string, string, string][] = [
+  ["Thông báo", "Họp phụ huynh cuối học kì I", "Chủ nhiệm 10A1"],
+  ["Kế hoạch", "Ngày hội đọc sách toàn trường", "Tổ Ngữ văn"],
+  ["Biên bản", "Sinh hoạt tổ chuyên môn tháng 11", "Tổ Sử – Địa"],
+  ["Báo cáo", "Kết quả thi đua tháng 11", "Đoàn trường"],
+];
 
 const LOAI: Record<string, { ten: string; ma: string }> = {
   thong_bao: { ten: "Thông báo", ma: "TB" },
@@ -47,7 +56,8 @@ export function VanBan() {
       facet={{ key: "loai", label: "Loại văn bản", of: (v) => v.loai, name: loaiVi }}
       searchHint="Tìm trích yếu, số ký hiệu…"
       testId="vb-list"
-      empty={{ icon: "clip", title: "Chưa có văn bản", text: "Nhờ trợ lý AI (Claude, ChatGPT) soạn thông báo, kế hoạch, biên bản… đúng thể thức — văn bản lưu ở đây để tải Word.", action: <Link className="btn primary sm" to="/ket-noi">Kết nối trợ lý AI</Link> }}
+      empty={{ icon: "clip", title: "Giấy tờ đúng thể thức", text: "Nhờ trợ lý AI soạn thông báo, kế hoạch, biên bản — lưu ở đây, tải Word.", action: <Link className="btn primary" to="/ket-noi">Kết nối trợ lý AI</Link> }}
+      preview={VB_SAMPLES.map(([kind, title, who]) => <MiniPaper key={title} kind={kind} s={{ subj: who, cls: "Trường Liên cấp Bình Minh", title, art: "van" }} />)}
     />
   );
 }

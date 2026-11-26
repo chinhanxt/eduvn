@@ -122,7 +122,7 @@ function NewClass({ onClose, onDone }: { onClose: () => void; onDone: (id: strin
       <form className="fgrid" onSubmit={(e) => (e.preventDefault(), void save())}>
         <Field label="Tên lớp" error={err}><Input autoFocus placeholder="10A1" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} data-testid="c-name" /></Field>
         <Field label="Năm học"><Input value={f.schoolYear} onChange={(e) => setF({ ...f, schoolYear: e.target.value })} data-testid="c-year" /></Field>
-        <Field label="Môn" hint="Để lọc ngân hàng câu hỏi khi giao bài"><Input placeholder="Toán" value={f.subject} onChange={(e) => setF({ ...f, subject: e.target.value })} data-testid="c-subject" /></Field>
+        <Field label="Môn" hint="Để lọc ngân hàng câu hỏi khi giao bài"><Input placeholder="vd: Ngữ văn" value={f.subject} onChange={(e) => setF({ ...f, subject: e.target.value })} data-testid="c-subject" /></Field>
         <Field label="Thông tư đánh giá">
           <Select value={f.scale} onChange={(e) => setF({ ...f, scale: e.target.value })} data-testid="c-scale">
             <option value="TT22">TT22 · THCS, THPT</option>

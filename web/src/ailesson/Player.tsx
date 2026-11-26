@@ -204,7 +204,12 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
   useEffect(() => {
     const on = thumbs.current?.querySelector<HTMLElement>(".ail-th.on");
     const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    on?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: reduce ? "auto" : "smooth" });
+    // chỉ cuộn ngang dải cảnh (scrollIntoView cuộn cả trang xuống khi dải nằm dưới mép màn hình)
+    const box = thumbs.current;
+    if (on && box) {
+      const l = on.offsetLeft - box.offsetLeft;
+      if (l < box.scrollLeft || l + on.offsetWidth > box.scrollLeft + box.clientWidth) box.scrollTo({ left: Math.max(0, l - 24), behavior: reduce ? "auto" : "smooth" });
+    }
   }, [idx]);
   if (!scene) return <div className="empty">Bài giảng chưa có cảnh nào</div>;
 
@@ -266,15 +271,15 @@ export function Player({ lessonId, scenes }: { lessonId: string; scenes: Scene[]
         <button className="btn ghost sm" onClick={() => go(idx - 1)} disabled={idx === 0} aria-label="Cảnh trước"><Icon name="left" size={16} /></button>
         <button className="btn sm" onClick={toggle} data-testid="ail-play"><Icon name={playing ? "pause" : "play"} size={16} />{playing ? "Tạm dừng" : "Phát"}</button>
         <button className="btn ghost sm" onClick={() => go(idx + 1)} disabled={idx >= scenes.length - 1} aria-label="Cảnh sau" data-testid="ail-next"><Icon name="right" size={16} /></button>
-        <span className="ail-cnt">Cảnh {idx + 1}/{scenes.length} · {scene.title}</span>
+        <span className="ail-cnt"><b>{idx + 1}</b>/{scenes.length} · {scene.title}</span>
         <span className="sp" style={{ flex: 1 }} />
         <label className="ail-cc"><input type="checkbox" checked={showSub} onChange={(e) => setShowSub(e.target.checked)} />Phụ đề</label>
       </div>
       <div className="ail-thumbs" ref={thumbs}>
         {scenes.map((s, i) => (
-          <button key={s.id} className={`ail-th${i === idx ? " on" : ""}`} onClick={() => go(i)} data-testid="ail-scene-btn">
+          <button key={s.id} className={`ail-th${i === idx ? " on" : ""}${i < idx ? " past" : ""}`} onClick={() => go(i)} data-testid="ail-scene-btn">
             <span>{i + 1}</span>
-            {s.title}
+            <em>{s.title}</em>
             <small>{s.type === "slide" ? (s.animation?.status === "xong" ? "Slide + hoạt hình" : "Slide") : s.type === "quiz" ? "Quiz" : "Tương tác"}</small>
           </button>
         ))}

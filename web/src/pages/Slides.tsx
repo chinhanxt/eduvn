@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import type { DeckSummary } from "../api";
 import { DocList } from "../portal/gv/DocList";
+import { samples, Thumb } from "../portal/gv/Preview";
 import { fetchLessons, LESSONS_KEY, dateVi, del, FormPane, get, gradeVi, openLink, post, useKeyN, useOpenParam, useRun } from "../portal/gv/kit";
 import { Button, IconButton } from "../ui/components/Button";
 import { Badge } from "../ui/components/Chip";
@@ -54,7 +55,8 @@ export function Slides() {
         form={open && <FromLesson onClose={() => setOpen(false)} />}
         searchHint="Tìm tên bộ slide…"
         testId="slide-list"
-        empty={{ icon: "slide", title: "Chưa có bộ slide", text: "Chọn một giáo án — hệ thống dựng slide theo 4 hoạt động, tải về PowerPoint để chỉnh.", action: <Button size="sm" variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo từ giáo án</Button> }}
+        empty={{ icon: "slide", title: "Giáo án thành slide", text: "Chọn một giáo án, slide dựng theo 4 hoạt động, tải về PowerPoint.", action: <Button variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo từ giáo án</Button> }}
+        preview={samples(4, 0).map((s, i) => <Thumb key={s.title} s={s} badge={`${[12, 9, 14, 10][i]} slide`} />)}
       />
       <ConfirmDialog open={!!toDel} title={`Xoá bộ slide “${toDel?.title ?? ""}”?`} text="Tệp .pptx đã tải về máy không bị ảnh hưởng. Không hoàn tác được." confirmLabel="Xoá" onClose={() => setToDel(null)} onConfirm={() => toDel && run(async () => { await del(`/api/slides/${toDel.id}`); invalidate(KEY); }, "Đã xoá bộ slide")} />
     </>

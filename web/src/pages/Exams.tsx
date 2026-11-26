@@ -179,7 +179,7 @@ function Compose({ onClose }: { onClose: () => void }) {
           <section className="pane" aria-label="AI lập ma trận" data-testid="ai-matrix">
             <div className="ghd"><Icon name="spark" size="sm" /> AI lập ma trận <span className="n">CV 7991</span></div>
             <div className="fp-bd">
-              <Field label="Mô tả đề" hint="vd: Giữa kì 1 Toán 10, 45 phút, Mệnh đề + Tập hợp, NB 40% TH 30% VD 30%">
+              <Field label="Mô tả đề" hint="vd: Giữa kì 1 Lịch sử 12, 45 phút, Kháng chiến chống Pháp, NB 40% TH 30% VD 30%">
                 <Input value={aiText} onChange={(e) => setAiText(e.target.value)} data-testid="ai-matrix-text" />
               </Field>
               <Button size="sm" icon="spark" disabled={aiText.trim().length < 5} onClick={askAi} data-testid="ai-matrix-run">Lập ma trận</Button>
@@ -189,7 +189,7 @@ function Compose({ onClose }: { onClose: () => void }) {
           <section className="pane" aria-label="Thông tin đề">
             <div className="ghd">Thông tin đề</div>
             <div className="fp-bd fgrid two">
-              <div className="full"><Field label="Tên đề"><Input value={title} placeholder="KT giữa kỳ I · Toán 10" onChange={(e) => setTitle(e.target.value)} data-testid="e-title" /></Field></div>
+              <div className="full"><Field label="Tên đề"><Input value={title} placeholder="KT giữa kỳ I · Ngữ văn 11" onChange={(e) => setTitle(e.target.value)} data-testid="e-title" /></Field></div>
               <Field label="Môn"><Input value={subject} onChange={(e) => (setSubject(e.target.value), setShortages(null))} /></Field>
               <Field label="Lớp"><Select value={grade} onChange={(e) => (setGrade(Number(e.target.value)), setShortages(null))}>{Array.from({ length: 16 }, (_, i) => <option key={i} value={i + 1}>{gradeVi(i + 1)}</option>)}</Select></Field>
               <Field label="Số mã đề"><Input type="number" min={1} max={24} value={variants} onChange={(e) => setVariants(Math.max(1, Math.min(24, Number(e.target.value) || 1)))} data-testid="e-variants" /></Field>

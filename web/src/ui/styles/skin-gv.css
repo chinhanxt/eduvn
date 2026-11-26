@@ -123,3 +123,19 @@
   [data-portal="gv"] .rowi.att .cls { display: none; } [data-portal="gv"] .rowi.att .pr { display: block; grid-column: 2; grid-row: 2; white-space: normal; }
   [data-portal="gv"] .rowi.att .due { grid-column: 3; grid-row: 1 / 3; }
 }
+
+/* ---- Làm đẹp đợt "dep-gv" (2026-11-26): lề trang thoáng hơn (≥ 40 px ở desktop), tiêu đề có nhịp ---- */
+[data-portal="gv"] { --page-x: clamp(16px, 3.6vw, 56px); }
+[data-portal="gv"] .page { padding-top: 20px; }
+[data-portal="gv"] .page-head.bar { min-height: 36px; margin-bottom: var(--s-5); }
+[data-portal="gv"] .page-head.bar h1 { font-size: 20px; line-height: 28px; font-weight: 650; letter-spacing: -.012em; }
+[data-portal="gv"] .page-head.bar .caption { color: var(--ink-3); }
+[data-portal="gv"] .pane { border-color: var(--line); }
+[data-portal="gv"] .top { border-bottom-color: var(--line); }
+/* Hôm nay: bỏ cột mã việc nội bộ (KT-2511-…) — tiêu đề việc tự nói */
+[data-portal="gv"] .rowi { grid-template-columns: 18px minmax(0, 1fr) 64px 132px 84px 28px; height: 40px; }
+[data-portal="gv"] .rowi.att { grid-template-columns: 24px minmax(0, 1fr) 64px minmax(0, 1.3fr) 44px; }
+[data-portal="gv"] .ghd { background: transparent; text-transform: none; color: var(--ink-3); }
+[data-portal="gv"] .dhd h2 { font: 600 17px/24px var(--font-read); margin-top: 0; text-wrap: balance; }
+@media (max-width: 1180px) { [data-portal="gv"] .rowi { grid-template-columns: 18px minmax(0, 1fr) 56px 110px 76px; } }
+@media (max-width: 720px) { [data-portal="gv"] .rowi { grid-template-columns: 18px minmax(0, 1fr) 70px; height: auto; } [data-portal="gv"] .rowi.att { grid-template-columns: 24px minmax(0, 1fr) 44px; } }

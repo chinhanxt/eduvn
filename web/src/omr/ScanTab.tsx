@@ -6,7 +6,7 @@ import { fileToImageData } from "./image";
 import { SavedList, useSaved } from "./Saved";
 import { type Roster, type SeatState, matchSeat, seatLabel } from "./seat";
 import { type Group, type Template, buildTemplate } from "./template";
-import { Btn, Dropzone, num, useLock, useToast } from "./ui";
+import { Btn, Dropzone, num, SheetArt, useLock, useToast } from "./ui";
 
 type Page = { warped: Warped; reads: GroupRead[]; thumb: string };
 type Sheet = {
@@ -199,14 +199,14 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
     <>
       <div className="pg-tools">
         <label className="pg-field">
-          Lớp (ghép SBD với số thứ tự HS)
+          Lớp
           <select className="pg-in" value={classId} onChange={(e) => setClassId(e.target.value)} data-testid="s-class">
             <option value="">Không ghép lớp</option>
             {classes.map((c) => <option key={c.id} value={c.id}>{c.name} · {c.schoolYear}</option>)}
           </select>
         </label>
         <label className="pg-field">
-          Mã đề dự phòng (khi không đọc được QR)
+          Mã đề khi thiếu QR
           <select className="pg-in" value={code} onChange={(e) => setCode(e.target.value)} data-testid="s-code">
             {codes.map((c) => <option key={c} value={c}>Mã đề {c}</option>)}
           </select>
@@ -229,7 +229,7 @@ export function ScanTab({ exams, examId, classId, setClassId }: { exams: ExamSum
         )}
       </div>
 
-      <Dropzone testId="s" capture compact={sheets.length > 0} title="Kéo thả ảnh phiếu vào đây" hint="Nhiều ảnh cùng lúc · chụp thẳng, thấy đủ 4 ô vuông đen ở góc · ảnh xử lý ngay trong trình duyệt, không gửi lên máy chủ" onFiles={onFiles} />
+      <Dropzone testId="s" capture compact={sheets.length > 0} hero={<SheetArt />} title={sheets.length > 0 ? "Thêm ảnh phiếu" : "Chụp phiếu, có điểm ngay"} hint={sheets.length > 0 ? "Kéo thả hoặc chọn thêm ảnh" : "Thả nhiều ảnh một lúc · thấy đủ 4 ô vuông góc · ảnh không rời máy"} onFiles={onFiles} />
 
       {sheets.length > 0 && (
         <div className="pg-kpis" data-testid="s-kpis">
