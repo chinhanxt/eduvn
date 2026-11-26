@@ -192,14 +192,16 @@ export function MiniPaper({ s, kind, lines = 6 }: { s: Sample; kind: string; lin
  * Trạng thái trống = bản xem trước: tiêu đề serif ngắn · (một dòng phụ) · một nút chính · lưới mẫu mờ dần bên dưới.
  * `children` là bản xem trước (aria-hidden, không bấm được).
  */
-export function EmptyHero({ title, sub, action, children, tag = "Ví dụ", className, style }: { title: ReactNode; sub?: ReactNode; action?: ReactNode; children?: ReactNode; tag?: string; className?: string; style?: CSSProperties }) {
+export function EmptyHero({ title, sub, action, children, tag = "Ví dụ", className, style }: { title?: ReactNode; sub?: ReactNode; action?: ReactNode; children?: ReactNode; tag?: string; className?: string; style?: CSSProperties }) {
   return (
     <section className={["gv-hero", className].filter(Boolean).join(" ")} style={style}>
-      <div className="in">
-        <h2>{title}</h2>
-        {sub && <p>{sub}</p>}
-        {action && <div className="acts">{action}</div>}
-      </div>
+      {(title || sub || action) && (
+        <div className="in">
+          {title && <h2>{title}</h2>}
+          {sub && <p>{sub}</p>}
+          {action && <div className="acts">{action}</div>}
+        </div>
+      )}
       {children && (
         <div className="gv-ghost" aria-hidden="true" inert>
           <span className="tag">{tag}</span>
