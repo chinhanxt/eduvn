@@ -5,6 +5,7 @@ import { Tabs } from "../../ui/components/Tabs";
 import { useToast } from "../../ui/components/Toast";
 import { Icon } from "../../ui/Icon";
 import { GUARDIANS, KHANH_DUY, MINH_ANH, QUANG_HUY, SCHOOL, TEACHERS, THAO_VY, DUC_THINH, SCHOOL_MORE } from "../kit/world";
+import { MockBadge } from "../kit/MockBadge";
 
 const PRINCIPAL = SCHOOL.principal.replace(/^thầy /, "");
 
@@ -224,7 +225,10 @@ export default function QuanTri() {
     <div className="tr-page">
       <div className="tr-head">
         <p className="eyebrow">Tài khoản · nhật ký</p>
-        <h1>Quản trị</h1>
+        <h1>
+          Quản trị
+          <MockBadge />
+        </h1>
       </div>
       <div className="qt">
         <Tabs

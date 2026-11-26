@@ -4,6 +4,7 @@ import { Loa } from "./bits";
 import { LIGHTS, type ParentView } from "./data";
 import type { useSpeak } from "./speak";
 import { Face } from "../kit/Face";
+import { MockBadge } from "../kit/MockBadge";
 
 export type Speak = ReturnType<typeof useSpeak>;
 
@@ -27,7 +28,10 @@ export function HomNay({ v, sp, onKem }: { v: ParentView; sp: Speak; onKem: () =
       <section className={`ph-state is-${v.light}`} aria-label={`${v.child.short}: ${L.word}. ${v.reason}`}>
         <div className="who">
           <Face name={v.child.name} hue={v.child.avatarHue} size={64} className="ph-face" />
-          <h1>{v.child.short}</h1>
+          <h1>
+            {v.child.short}
+            <MockBadge />
+          </h1>
         </div>
         <div className="verdict">
           <span className="disc" aria-hidden="true">

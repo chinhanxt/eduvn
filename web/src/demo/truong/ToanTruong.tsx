@@ -5,6 +5,7 @@ import { useFakeStream } from "../kit/useFakeStream";
 import { NUMBERS } from "../kit/world";
 import { KPIS, ROWS, SUBJECTS, TEACHER_ROWS, avg, fmt, schoolAvg, type ClassRow } from "./data";
 import { useAfter, useCountUp } from "../kit/motion";
+import { MockBadge } from "../kit/MockBadge";
 
 const SPAN = 1.2; // ±1,2 điểm quanh TB toàn trường là màu đậm nhất
 
@@ -228,7 +229,10 @@ export default function ToanTruong() {
     <div className="tr-page">
       <div className="tr-head">
         <p className="eyebrow">Học kỳ I · tháng 11</p>
-        <h1>Toàn trường</h1>
+        <h1>
+          Toàn trường
+          <MockBadge />
+        </h1>
       </div>
       <div className="tr-kpis">
         {KPIS.map((k, i) => (

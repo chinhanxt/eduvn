@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Icon } from "../../ui/Icon";
 import type { ParentView } from "./data";
 import { NgheBtn, type Speak } from "./HomNay";
+import { MockBadge } from "../kit/MockBadge";
 
 type St = "cho" | "nghe" | "doi" | "xong";
 
@@ -33,7 +34,10 @@ export default function HoiCo({ v, sp }: { v: ParentView; sp: Speak }) {
   if (st === "cho" || st === "nghe")
     return (
       <div className="ph-page ph-ask">
-        <h1 className="ph-h1">Hỏi cô</h1>
+        <h1 className="ph-h1">
+        Hỏi cô
+        <MockBadge />
+      </h1>
         <button type="button" className={st === "nghe" ? "ph-mic on" : "ph-mic"} onClick={() => st === "cho" && (sp.stop(), setSt("nghe"))} aria-label="Bấm rồi nói câu hỏi">
           <span className="ring r1" aria-hidden="true" />
           <span className="ring r2" aria-hidden="true" />
@@ -49,7 +53,10 @@ export default function HoiCo({ v, sp }: { v: ParentView; sp: Speak }) {
 
   return (
     <div className="ph-page ph-ask">
-      <h1 className="ph-h1">Hỏi cô</h1>
+      <h1 className="ph-h1">
+        Hỏi cô
+        <MockBadge />
+      </h1>
       <p className="ph-q">“{v.ask.q}”</p>
       {st === "doi" ? (
         <p className="ph-wait-a" aria-live="polite">

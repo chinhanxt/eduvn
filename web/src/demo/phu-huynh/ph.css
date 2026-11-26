@@ -1,4 +1,4 @@
-/* Cổng Phụ huynh — cho ông bà 60–70 tuổi: ít chữ, chữ to, nút to, một cột ~480 px. Nhấn tím dịu #8A4FA0.
+/* Cổng Phụ huynh — cho ông bà 60–70 tuổi: ít chữ, chữ to, nút to, một cột ~480 px. Nhấn tím dịu #704285 (chữ trên nút ≥ 7:1).
    Khai báo lại nền/mực trong .ph vì styles.css cũ đặt ở :root. */
 @import "../../ui/styles/fonts.css";
 @import "../../ui/styles/tokens.css";
@@ -8,7 +8,8 @@
   --k: 1;
   --out: #f3efe8; --bg: #fdfcf9; --bg-sunken: #f4f0ea; --bg-raised: #ffffff; --bg-hover: #f1ece4;
   --ink: #1c1b1a; --ink-2: #3f3b36; --ink-3: #5c564e; --line: #e8e2d8; --line-2: #d6cfc3;
-  --accent: #8a4fa0; --accent-hover: #7a428f; --accent-ink: #5e2f70; --accent-bg: #f3e9f7; --accent-line: #d9c2e4; --focus: #8a4fa0; --ink-on-accent: #fff;
+  /* nút có chữ ≥ 7:1: chữ trắng trên #704285 = 7,5:1 · #5e2f70 trên #f3e9f7 = 8,4:1 · trên trắng 9,9:1 */
+  --accent: #704285; --accent-hover: #643a78; --accent-ink: #5e2f70; --accent-bg: #f3e9f7; --accent-line: #d9c2e4; --focus: #704285; --ink-on-accent: #fff;
   --go: #1f8a4c; --go-bg: #e2f2e8; --go-on: #fff;
   --wait: #e3ae00; --wait-bg: #fbf0cc; --wait-on: #2a2000;
   --stop: #c9363a; --stop-bg: #fbe5e5; --stop-on: #fff;
@@ -169,7 +170,6 @@ body:has(.ph) { background: #f3efe8; }
 .ph-who a { min-height: 64px; display: inline-flex; align-items: center; padding: 0 20px; border-radius: 999px; border: 2px solid var(--line-2); color: var(--ink); text-decoration: none; font-weight: 700; }
 .ph-who a[aria-current="page"] { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-ink); }
 .ph-sheet > .ph-big { margin-top: 10px; }
-.ph-badge { justify-self: center; }
 
 @keyframes ph-in { from { opacity: 0; transform: translateY(10px); } }
 @keyframes ph-fade { from { opacity: 0; } }

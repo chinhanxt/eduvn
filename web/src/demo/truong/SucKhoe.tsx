@@ -4,6 +4,7 @@ import { Segmented } from "../../ui/components/Chip";
 import { Icon } from "../../ui/Icon";
 import { HIDE_UNDER, WELL_CLASSES, WELL_WEEKS } from "./data";
 import { KHANH_DUY, KHANH_DUY_MORE, NUMBERS } from "../kit/world";
+import { MockBadge } from "../kit/MockBadge";
 
 /* ---------------- Hoạt hình "AI phối hợp": HS → GV → phụ huynh ---------------- */
 type Hop = { title: string; text: string };
@@ -240,7 +241,10 @@ export default function SucKhoe() {
     <div className="tr-page">
       <div className="tr-head">
         <p className="eyebrow">Tuần 12 · số tổng hợp</p>
-        <h1>Sức khoẻ & phối hợp</h1>
+        <h1>
+          Sức khoẻ & phối hợp
+          <MockBadge />
+        </h1>
       </div>
       <Coordinate />
       <div className="tr-grid even">

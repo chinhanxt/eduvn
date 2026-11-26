@@ -6,6 +6,7 @@ import { Icon } from "../../ui/Icon";
 import { useFakeStream } from "../kit/useFakeStream";
 import { fmt } from "./data";
 import { DEMO_DAY } from "../kit/world";
+import { MockBadge } from "../kit/MockBadge";
 
 /* ---------------- Câu trả lời mẫu của AI nhà trường (chỉ số tổng hợp) ---------------- */
 type Viz = "ky-nang" | "khoi-10" | "du-gio" | "chung";
@@ -166,7 +167,10 @@ export default function TroLy() {
     <div className="tr-page ai">
       <div className="tr-head">
         <p className="eyebrow">AI nhà trường</p>
-        <h1>Hỏi số liệu</h1>
+        <h1>
+          Hỏi số liệu
+          <MockBadge />
+        </h1>
         <p className="ai-local"><Icon name="lock" size="sm" /> Chạy trên máy chủ của trường · chỉ số tổng hợp</p>
       </div>
       <div className="ai-thread">

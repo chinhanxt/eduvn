@@ -11,11 +11,11 @@ export function DemoHead({ title, eyebrow, lead, children }: { title: string; ey
       <div className="dm-head-t">
         {lead}
         <div>
-          <div className="dm-eyebrow">
-            {eyebrow}
+          {eyebrow && <div className="dm-eyebrow">{eyebrow}</div>}
+          <h1 className="dm-title">
+            {title}
             <MockBadge />
-          </div>
-          <h1 className="dm-title">{title}</h1>
+          </h1>
         </div>
       </div>
       {children && <div className="dm-head-acts">{children}</div>}

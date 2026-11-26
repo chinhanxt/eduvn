@@ -2,7 +2,6 @@ import { lazy, Suspense, useEffect } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router";
 import { ToastProvider } from "../../ui/components/Toast";
 import { Icon } from "../../ui/Icon";
-import { MockBadge } from "../kit/MockBadge";
 import { SCHOOL } from "../kit/world";
 import { applyStoredTheme, toggleDark, useDark } from "../phu-huynh/theme";
 import "./tr.css";
@@ -70,7 +69,6 @@ export default function TruongApp() {
           <header className="tr-top">
             <span className="tr-school">{SCHOOL.name}</span>
             <span className="grow" />
-            <MockBadge />
             <button type="button" className="btn ghost icon" onClick={toggleDark} aria-label="Đổi nền sáng tối">
               <Icon name={dark ? "sun" : "moon"} />
             </button>
