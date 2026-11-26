@@ -552,3 +552,32 @@
 [data-portal="gv"] .ail-run { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--line); border-radius: 0 0 10px 10px; overflow: hidden; }
 [data-portal="gv"] .ail-run i { display: block; height: 100%; background: var(--accent); transition: width var(--dur-3) var(--ease-out); }
 @media (max-width: 720px) { [data-portal="gv"] .ail-opts > .btn.primary { flex-basis: 100%; } [data-portal="gv"] .ail-card .del { opacity: 1; } [data-portal="gv"] .ail-list { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- Chấm bài: vùng thả ảnh dạng hình (omr/ui.tsx Dropzone hero) ---- */
+[data-portal="gv"] .pg-drop.hero { display: grid; grid-template-columns: minmax(260px, 420px) minmax(0, 1fr); grid-template-areas: "art txt" "art acts"; align-items: end; column-gap: clamp(24px, 4vw, 64px); row-gap: 20px; padding: clamp(28px, 4vw, 56px) clamp(24px, 4vw, 64px); border-radius: 14px; border-width: 1.5px; background: color-mix(in srgb, var(--bg-sunken) 60%, var(--bg)); margin: 8px 0 24px; }
+[data-portal="gv"] .pg-drop.hero .art { grid-area: art; align-self: center; }
+[data-portal="gv"] .pg-drop.hero .txt { grid-area: txt; }
+[data-portal="gv"] .pg-drop.hero .acts { grid-area: acts; margin: 0; align-self: start; }
+[data-portal="gv"] .pg-drop.hero b { display: block; font: 600 clamp(26px, 3vw, 36px)/1.2 var(--font-read); letter-spacing: -.01em; text-wrap: balance; }
+[data-portal="gv"] .pg-drop.hero p { font-size: 14px; margin-top: 8px; text-wrap: pretty; }
+[data-portal="gv"] .pg-drop.hero .acts .btn { height: 40px; padding: 0 18px; font-size: 14px; }
+[data-portal="gv"] .pg-art { display: block; width: 100%; height: auto; }
+[data-portal="gv"] .pg-art .paper { fill: var(--bg); stroke: var(--line-2); }
+[data-portal="gv"] .pg-art .ink { fill: var(--ink); }
+[data-portal="gv"] .pg-art .qr { fill: none; stroke: var(--ink); stroke-width: 3; stroke-dasharray: 3 2; }
+[data-portal="gv"] .pg-art .ln { fill: var(--line-2); }
+[data-portal="gv"] .pg-art .no { font: 600 7px var(--font-ui); fill: var(--ink-3); text-anchor: end; }
+[data-portal="gv"] .pg-art .off { fill: none; stroke: var(--line-input); stroke-width: 1; }
+[data-portal="gv"] .pg-art .on { fill: var(--ink); animation: pg-fill var(--dur-3) var(--ease-out) both; animation-delay: var(--d); }
+@keyframes pg-fill { from { opacity: 0; transform: scale(.4); transform-box: fill-box; transform-origin: center; } }
+[data-portal="gv"] .pg-art .arrow { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+[data-portal="gv"] .pg-art .card { fill: var(--bg); stroke: var(--accent); stroke-width: 1.5; }
+[data-portal="gv"] .pg-art .lbl { font: 600 10px var(--font-ui); fill: var(--ink-3); text-anchor: middle; letter-spacing: .06em; text-transform: uppercase; }
+[data-portal="gv"] .pg-art .score { font: 700 34px var(--font-read); fill: var(--accent); text-anchor: middle; }
+[data-portal="gv"] .pg-art .ok { fill: var(--ok); }
+[data-portal="gv"] .pg-drop.hero.over { background: var(--accent-bg); }
+@media (max-width: 900px) {
+  [data-portal="gv"] .pg-drop.hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "art" "txt" "acts"; text-align: center; justify-items: center; }
+  [data-portal="gv"] .pg-drop.hero .art { width: min(320px, 100%); }
+  [data-portal="gv"] .pg-drop.hero .acts { width: 100%; justify-content: center; }
+}
