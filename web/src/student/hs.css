@@ -50,21 +50,22 @@
 }
 
 /* ---------- Vào lớp (mã lớp + PIN, QR, tài khoản) ---------- */
-.lgn { min-height: 100dvh; display: grid; grid-template-columns: minmax(380px, 5fr) minmax(0, 6fr); background: var(--bg); }
-.lgn-hero { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: var(--s-6); padding: var(--s-12) clamp(32px, 6vw, 96px); color: #fff; background: linear-gradient(150deg, #075149 0%, #0b7466 55%, #12857a 100%); }
-.lgn-hero::after { content: ""; position: absolute; right: -90px; top: -110px; width: 380px; height: 380px; border-radius: 50%; background: rgb(255 255 255 / .07); }
-.lgn-hero::before { content: ""; position: absolute; left: -60px; bottom: -150px; width: 300px; height: 300px; border-radius: 50%; background: rgb(255 255 255 / .05); }
+.lgn { min-height: 100dvh; display: grid; grid-template-columns: minmax(380px, 5fr) minmax(0, 6fr); background: var(--bg-raised); }
+.lgn-hero { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: var(--s-6); padding: var(--s-12) clamp(32px, 6vw, 96px); color: var(--ink); background: var(--bg); border-right: 1px solid var(--line); }
+
+
 .lgn-hero > * { position: relative; z-index: 1; }
 .lgn-brand { position: absolute; top: var(--s-8); left: clamp(32px, 6vw, 96px); display: flex; align-items: center; gap: var(--s-2); font-weight: 800; font-size: 17px; }
-.lgn-brand .mark { background: #fff; color: #0b7466; }
-.lgn-brand small { font-weight: 500; opacity: .75; font-size: 14px; }
-.lgn-hero h1 { font-size: 44px; line-height: 50px; font-weight: 800; letter-spacing: -.025em; }
-.lgn-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); font-size: 16px; color: #dcf3ef; }
+.lgn-brand .mark { background: var(--accent); color: #fff; }
+.lgn-brand small { font-weight: 500; color: var(--ink-3); font-size: 14px; }
+.lgn-hero h1 { font: 600 clamp(34px, 3.6vw, 48px)/1.1 var(--font-read); letter-spacing: -.025em; }
+.lgn-hero .lgn-mam svg { width: 120px; height: 120px; }
+.lgn-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3); font-size: 16px; color: var(--ink-2); }
 .lgn-steps li { display: flex; align-items: center; gap: var(--s-3); }
-.lgn-steps b { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgb(255 255 255 / .16); color: #fff; font-size: 13px; flex: none; }
+.lgn-steps b { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--accent-bg); color: var(--accent); font: 600 14px var(--font-read); flex: none; }
 .lgn-side { display: flex; flex-direction: column; justify-content: center; gap: var(--s-4); width: min(480px, 100%); margin: 0 auto; padding: var(--s-10) var(--s-6); }
-.lgn-card { display: grid; gap: var(--s-4); padding: var(--s-6); border-radius: var(--r-lg); background: var(--bg-raised); box-shadow: var(--shadow-card); animation: rise var(--dur-3) var(--ease-out) both; }
-.lgn-card.alt { animation-delay: 60ms; gap: var(--s-3); }
+.lgn-card { display: grid; gap: var(--s-4); padding: 0; animation: rise var(--dur-3) var(--ease-out) both; }
+.lgn-card.alt { animation-delay: 60ms; gap: var(--s-3); box-shadow: none; background: none; border-top: 1px solid var(--line); border-radius: 0; padding: var(--s-6) 0 0; }
 .lgn-card > .seg { width: 100%; } .lgn-card > .seg button { flex: 1; height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .lgn-form { display: grid; gap: var(--s-4); }
 .lgn-row { display: grid; grid-template-columns: minmax(0, 1fr) 112px; gap: var(--s-3); }
@@ -102,13 +103,13 @@
 }
 @media (max-width: 720px) {
   .lgn { grid-template-columns: minmax(0, 1fr); align-content: start; }
-  .lgn-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--s-3); padding: var(--s-16) var(--s-5) var(--s-6); border-radius: 0 0 24px 24px; }
+  .lgn-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--s-3); padding: var(--s-16) var(--s-5) var(--s-5); border-right: 0; border-bottom: 1px solid var(--line); }
   .lgn-brand { top: var(--s-5); left: var(--s-5); }
   .lgn-hero h1 { font-size: 26px; line-height: 32px; grid-row: 1; grid-column: 1; }
-  .lgn-mam { grid-row: 1; grid-column: 2; } .lgn-mam svg { width: 72px; height: 72px; }
+  .lgn-mam { grid-row: 1; grid-column: 2; } .lgn-hero .lgn-mam svg { width: 80px; height: 80px; }
   .lgn-steps { display: none; }
-  .lgn-side { padding: var(--s-4) var(--s-4) var(--s-10); margin-top: calc(-1 * var(--s-2)); }
-  .lgn-card { padding: var(--s-5); }
+  .lgn-side { padding: var(--s-6) var(--s-4) var(--s-10); }
+
   .lgn-row { grid-template-columns: minmax(0, 1fr) 96px; }
   .lgn-pins { gap: 6px; } .lgn-pins input, .lgn-big { height: 52px; font-size: 22px; }
 }
