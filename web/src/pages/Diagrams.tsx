@@ -5,6 +5,7 @@ import type { DiagramSummary } from "../api";
 import { makeNode, sampleDoc } from "../diagram/ops";
 import type { DiagramDoc, DiagramKind } from "../diagram/types";
 import { DocList } from "../portal/gv/DocList";
+import { samples, Thumb } from "../portal/gv/Preview";
 import { dateVi, del, FormPane, get, GRADE_OPTS, gradeVi, post, SUBJECT_DEFAULT, useKeyN, useOpenParam, useRun } from "../portal/gv/kit";
 import { Button, IconButton } from "../ui/components/Button";
 import { Badge, Segmented } from "../ui/components/Chip";
@@ -51,7 +52,8 @@ export function Diagrams() {
         form={open && <NewDiagram onClose={() => setOpen(false)} onDone={(to) => nav(to)} />}
         onRowClick={(d) => nav(`/so-do/${d.id}`)}
         searchHint="Tìm tên, chủ đề…"
-        empty={{ icon: "graph", title: "Chưa có sơ đồ", text: "Vẽ sơ đồ tư duy, lưu đồ, hoặc để AI vẽ sơ đồ công thức theo chủ đề (vd: Công thức lượng giác lớp 10).", action: <Button size="sm" variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo sơ đồ</Button> }}
+        empty={{ icon: "graph", title: "Một chủ đề, một sơ đồ", text: "Sơ đồ tư duy, lưu đồ, hoặc để AI vẽ theo chủ đề bất kì môn nào.", action: <Button variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo sơ đồ</Button> }}
+        preview={samples(4, 1).map((s, i) => <Thumb key={s.title} s={s} art={(["code", "moc", "phan-tu", "ban-do"] as const)[i]} meta={`${["Sơ đồ tư duy", "Dòng thời gian", "Sơ đồ công thức", "Lưu đồ"][i]} · ${s.subj}`} />)}
       />
       <ConfirmDialog open={!!toDel} title={`Xoá sơ đồ “${toDel?.title ?? ""}”?`} text="Không hoàn tác được." confirmLabel="Xoá" onClose={() => setToDel(null)} onConfirm={() => toDel && run(async () => { await del(`/api/diagrams/${toDel.id}`); invalidate(KEY); }, "Đã xoá sơ đồ")} />
     </>
@@ -87,7 +89,7 @@ function NewDiagram({ onClose, onDone }: { onClose: () => void; onDone: (to: str
       <Segmented label="Cách tạo" value={how} onChange={setHow} options={[{ value: "trong", label: "Trống" }, { value: "mau", label: "Từ mẫu" }, { value: "cong-thuc", label: "Sơ đồ công thức (AI)" }]} />
       <form className="fgrid" onSubmit={(e) => (e.preventDefault(), void save())}>
         {formula ? (
-          <div className="full"><Field label="Chủ đề công thức" error={err}><Input autoFocus placeholder="Công thức lượng giác lớp 10, Đạo hàm" value={f.topic} onChange={(e) => setF({ ...f, topic: e.target.value })} data-testid="sd-formula-topic" /></Field></div>
+          <div className="full"><Field label="Chủ đề công thức" error={err}><Input autoFocus placeholder="Phản ứng oxi hoá – khử, Định luật Newton" value={f.topic} onChange={(e) => setF({ ...f, topic: e.target.value })} data-testid="sd-formula-topic" /></Field></div>
         ) : (
           <>
             <div className="wide"><Field label="Tên sơ đồ" error={err}><Input autoFocus value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="sd-title" /></Field></div>

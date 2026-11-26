@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { exportGame, type GameSummary } from "../api";
 import { DocList } from "../portal/gv/DocList";
+import { samples, Thumb } from "../portal/gv/Preview";
 import { dateVi, del, EXAMS_KEY, fetchExams, FormPane, get, GRADE_OPTS, post, SUBJECT_DEFAULT, useKeyN, useOpenParam, useRun } from "../portal/gv/kit";
 import { Icon } from "../ui/Icon";
 import { Button, IconButton } from "../ui/components/Button";
@@ -61,7 +62,8 @@ export function Games() {
         form={open && <Create onClose={() => setOpen(false)} />}
         searchHint="Tìm tên trò chơi…"
         testId="game-list"
-        empty={{ icon: "game", title: "Chưa có trò chơi", text: "Lấy câu từ ngân hàng hoặc một đề — chơi đố vui tính giờ cả lớp, hoặc thẻ lật ôn bài.", action: <Button size="sm" variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo trò chơi</Button> }}
+        empty={{ icon: "game", title: "Ôn bài thành trò chơi", text: "Lấy câu từ ngân hàng hoặc một đề — đố vui tính giờ cả lớp, hoặc thẻ lật.", action: <Button variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo trò chơi</Button> }}
+        preview={samples(4, 6).map((s, i) => <Thumb key={s.title} s={s} art={i % 2 ? "the" : s.art} badge={i % 2 ? "Thẻ lật · 24 thẻ" : "Đố vui · 15 câu · 20 giây"} />)}
       />
       <ConfirmDialog open={!!toDel} title={`Xoá trò chơi “${toDel?.title ?? ""}”?`} text="Tệp .html đã tải về vẫn chơi được. Không hoàn tác được." confirmLabel="Xoá" onClose={() => setToDel(null)} onConfirm={() => toDel && run(async () => { await del(`/api/games/${toDel.id}`); invalidate(KEY); }, "Đã xoá trò chơi")} />
     </>
@@ -99,7 +101,7 @@ function Create({ onClose }: { onClose: () => void }) {
         <div><span className="lbl-sm">Nguồn câu hỏi</span><Segmented label="Nguồn" value={src} onChange={setSrc} options={[{ value: "bank", label: "Ngân hàng" }, { value: "exam", label: "Một đề" }]} /></div>
       </div>
       <div className="fgrid">
-        <div className="wide"><Field label="Tên trò chơi"><Input autoFocus value={f.title} placeholder={src === "exam" && exam ? `Ôn tập · ${exam.title}` : "Đua về đích · Hàm số bậc hai"} onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="g-title" /></Field></div>
+        <div className="wide"><Field label="Tên trò chơi"><Input autoFocus value={f.title} placeholder={src === "exam" && exam ? `Ôn tập · ${exam.title}` : "Đua về đích · Từ vựng Unit 3"} onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="g-title" /></Field></div>
         {kind === "quiz" && <Field label="Giây mỗi câu" hint="0 = không tính giờ"><Input type="number" min={0} max={300} value={f.timer} onChange={(e) => setF({ ...f, timer: Math.max(0, Math.min(300, Number(e.target.value) || 0)) })} data-testid="g-timer" /></Field>}
         {src === "bank" ? (
           <>

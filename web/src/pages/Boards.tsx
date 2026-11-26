@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import type { BoardSummary } from "../api";
 import { DocList } from "../portal/gv/DocList";
+import { samples, Thumb } from "../portal/gv/Preview";
 import { GRADE_OPTS, SUBJECT_DEFAULT, dateVi, del, FormPane, get, gradeVi, post, useKeyN, useOpenParam, useRun } from "../portal/gv/kit";
 import { Button, IconButton } from "../ui/components/Button";
 import { ConfirmDialog } from "../ui/components/Dialog";
@@ -46,7 +47,8 @@ export function Boards() {
         form={open && <NewBoard onClose={() => setOpen(false)} onDone={(id) => nav(`/bang-giang/${id}`)} />}
         onRowClick={(b) => nav(`/bang-giang/${b.id}`)}
         searchHint="Tìm tên bài, chủ đề…"
-        empty={{ icon: "board", title: "Chưa có bài giảng", text: "Bảng giảng: viết tay, chèn công thức, hình không gian, câu hỏi từ ngân hàng — chiếu lên lớp.", action: <Button size="sm" variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo bài giảng</Button> }}
+        empty={{ icon: "board", title: "Bảng trắng để giảng", text: "Viết tay, chèn công thức, hình, câu hỏi từ ngân hàng — chiếu lên lớp.", action: <Button variant="primary" icon="plus" onClick={() => setOpen(true)}>Tạo bảng giảng</Button> }}
+        preview={samples(4, 2).map((s, i) => <Thumb key={s.title} s={s} badge={`${[3, 5, 2, 4][i]} trang`} />)}
       />
       <ConfirmDialog open={!!toDel} title={`Xoá bài giảng “${toDel?.title ?? ""}”?`} text="Mọi trang trên bảng của bài này sẽ mất. Không hoàn tác được." confirmLabel="Xoá" onClose={() => setToDel(null)} onConfirm={() => toDel && run(async () => { await del(`/api/boards/${toDel.id}`); invalidate(KEY); }, "Đã xoá bài giảng")} />
     </>

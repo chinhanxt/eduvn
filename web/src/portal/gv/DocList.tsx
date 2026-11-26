@@ -8,6 +8,7 @@ import type { QueryState } from "../../ui/data/query";
 import { useUrlState } from "../../ui/data/urlState";
 import { type Primary, PageHead } from "../../ui/shell/PageHead";
 import { errorOf, FilterBar, SearchBox, statusOf, useListView } from "./kit";
+import { EmptyHero } from "./Preview";
 
 type Sorter<T> = (r: T) => string | number | null | undefined;
 export type DocListProps<T> = {
@@ -26,6 +27,8 @@ export type DocListProps<T> = {
   form?: ReactNode;
   onRowClick?: (r: T) => void;
   empty: { icon: string; title: string; text: string; action?: ReactNode };
+  /** Trạng thái trống = bản xem trước (chưa có mục nào): thay bảng rỗng bằng tiêu đề + nút + mẫu mờ. */
+  preview?: ReactNode;
   searchHint: string;
   testId?: string;
 };
@@ -38,6 +41,16 @@ export function DocList<T>(p: DocListProps<T>) {
   const v = useListView(p.q.data, { text: p.text, sorts: p.sorts, defSort: p.defSort, filter });
   const st = statusOf(p.q);
   const clear = () => (v.setQ(""), setFacet(""));
+  if (p.preview && p.q.data && p.q.data.length === 0)
+    return (
+      <>
+        <PageHead title={p.title} primary={p.form ? p.primary : undefined}>{p.acts}</PageHead>
+        {p.form}
+        <EmptyHero title={p.empty.title} sub={p.empty.text} action={p.form ? undefined : p.empty.action} className="doc-hero">
+          {p.preview}
+        </EmptyHero>
+      </>
+    );
   return (
     <>
       <PageHead title={p.title} primary={p.primary}>

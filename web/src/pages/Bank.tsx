@@ -241,7 +241,7 @@ function AddForm({ subject, grade, topic: topic0, onClose, onDone }: { subject: 
       footer={<>{err && <span className="caption" style={{ color: "var(--danger)" }}>{err}</span>}<Button onClick={onClose}>Đóng</Button><Button variant="primary" icon="check" onClick={save} data-testid="q-save">Lưu câu</Button></>}
     >
       <div className="fgrid">
-        <Field label="Chủ đề"><Input value={topic} placeholder="Hàm số bậc hai" onChange={(e) => setTopic(e.target.value)} data-testid="q-topic" /></Field>
+        <Field label="Chủ đề"><Input value={topic} placeholder="vd: Quang hợp" onChange={(e) => setTopic(e.target.value)} data-testid="q-topic" /></Field>
         <div className="wide"><span className="lbl-sm">Mức độ</span><Segmented label="Mức độ" value={level} onChange={setLevel} options={(["NB", "TH", "VD"] as const).map((l) => ({ value: l, label: LEVEL_VI[l] }))} /></div>
       </div>
       <div>

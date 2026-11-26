@@ -90,7 +90,7 @@ function AiLessonForm({ onClose }: { onClose: () => void }) {
       footer={<><span className="caption">{busy ? "AI soạn từng mục, khoảng 1–3 phút — có thể mở trang khác, giáo án vẫn được lưu." : "Bản nháp để cô/thầy sửa, không dùng nguyên văn."}</span><Button onClick={onClose}>Huỷ</Button><Button variant="primary" icon="spark" disabled={!f.title.trim() || !f.subject.trim()} onClick={go} data-testid="ai-lesson-run">Soạn</Button></>}
     >
       <div className="fgrid">
-        <div className="wide"><Field label="Tên bài / chủ đề"><Input autoFocus value={f.title} placeholder="Hàm số bậc hai" onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="ai-lesson-title" /></Field></div>
+        <div className="wide"><Field label="Tên bài / chủ đề"><Input autoFocus value={f.title} placeholder="vd: Chiến dịch Điện Biên Phủ" onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="ai-lesson-title" /></Field></div>
         <Field label="Môn"><Input value={f.subject} onChange={(e) => setF({ ...f, subject: e.target.value })} /></Field>
         <Field label="Lớp"><Select value={f.grade} onChange={(e) => setF({ ...f, grade: Number(e.target.value) })}>{Array.from({ length: 16 }, (_, i) => <option key={i} value={i + 1}>{gradeVi(i + 1)}</option>)}</Select></Field>
         <Field label="Số tiết"><Input type="number" min={1} max={20} value={f.periods} onChange={(e) => setF({ ...f, periods: Math.max(1, Math.min(20, Number(e.target.value) || 1)) })} /></Field>

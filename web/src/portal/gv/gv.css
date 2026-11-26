@@ -581,3 +581,9 @@
   [data-portal="gv"] .pg-drop.hero .art { width: min(320px, 100%); }
   [data-portal="gv"] .pg-drop.hero .acts { width: 100%; justify-content: center; }
 }
+[data-portal="gv"] .gv-hero .acts .btn { height: 40px; padding: 0 18px; font-size: 14px; }
+[data-portal="gv"] .doc-hero { padding-top: clamp(24px, 5vw, 56px); }
+[data-portal="gv"] .formpane + .doc-hero { padding-top: 16px; }
+[data-portal="gv"] .gv-ghost { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 1080px; margin-left: auto; margin-right: auto; }
+[data-portal="gv"] .gv-ghost { -webkit-mask-image: linear-gradient(#000 72%, transparent); mask-image: linear-gradient(#000 72%, transparent); }
+@media (max-width: 720px) { [data-portal="gv"] .gv-ghost { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } }

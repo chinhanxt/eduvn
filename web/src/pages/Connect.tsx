@@ -7,7 +7,7 @@ import { PageHead } from "../ui/shell/PageHead";
 const STEPS = [
   ["Claude", "Cài đặt → Connectors → Add custom connector → dán địa chỉ bên trên → đăng nhập EDUVN."],
   ["ChatGPT", "Settings → Connectors (chế độ nhà phát triển) → Create → dán địa chỉ → đăng nhập EDUVN."],
-  ["Thử", "Nhắn: “Tạo đề 15 phút Toán 10 chủ đề Hàm số bậc hai, 2 mã đề” — đề hiện ở mục Đề thi."],
+  ["Thử", "Nhắn: “Tạo đề 15 phút Địa lí 12 chủ đề Khí hậu Việt Nam, 2 mã đề” — đề hiện ở mục Đề thi."],
 ] as const;
 
 /** /ket-noi — kết nối EDUVN với trợ lý AI qua MCP: địa chỉ (chép có toast), các bước, kênh sắp có. */
