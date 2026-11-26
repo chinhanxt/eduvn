@@ -139,6 +139,13 @@ export function Art({ name, className }: { name: ArtName; className?: string }) 
   );
 }
 
+const SUBJ_ART: [RegExp, ArtName][] = [
+  [/sinh/i, "la"], [/sử/i, "moc"], [/lí|lý|vật/i, "song"], [/văn/i, "van"], [/hoá|hóa/i, "phan-tu"], [/địa/i, "ban-do"],
+  [/anh|ngữ/i, "hoi-thoai"], [/tin|lập trình|cntt/i, "code"], [/toán/i, "parabol"], [/nhạc/i, "not-nhac"],
+];
+/** Hình theo tên môn (không rõ môn → biểu đồ cột trung tính). */
+export const artFor = (subject: string | null | undefined): ArtName => SUBJ_ART.find(([r]) => r.test(subject ?? ""))?.[1] ?? "cot";
+
 /** Dữ liệu mẫu trung lập môn (thế giới mẫu Trường Liên cấp Bình Minh). */
 export type Sample = { subj: string; cls: string; title: string; art: ArtName };
 export const SAMPLES: Sample[] = [

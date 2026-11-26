@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { api, errText } from "../api";
 import { Icon } from "../Icon";
 import { Editor } from "../ailesson/Editor";
@@ -142,24 +142,23 @@ export function AiLessonPage() {
     }
   };
 
-  if (!d) return <div className="center">{error ?? "…"}</div>;
+  if (!d) return error ? <div className="err">{error}</div> : <div className="ailp-sk" aria-busy="true"><i /><i /><i /></div>;
   const pct = st && st.total ? Math.round((st.done / st.total) * 100) : 0;
   const quizzes = scenes.filter((s) => s.type === "quiz");
   const file = (ext: string) => `bai-giang.${ext}`;
 
   return (
-    <>
-      <div className="bar">
-        <Link to="/bai-giang-ai" className="btn ghost sm"><Icon name="left" size={16} />Danh sách</Link>
-        {tab === "edit" ? <input className="inp" style={{ minWidth: 320 }} value={title} onChange={(e) => { setTitle(e.target.value); setDirty(true); }} aria-label="Tên bài giảng" /> : <h1 style={{ margin: 0 }}>{title}</h1>}
+    <div className="ailp">
+      <div className="ailp-hd">
+        {tab === "edit" ? <input className="inp ailp-title" value={title} onChange={(e) => { setTitle(e.target.value); setDirty(true); }} aria-label="Tên bài giảng" /> : <h1>{title}</h1>}
         <span className="sp" />
         {!active && scenes.length > 0 && (
           <>
-            <div className="seg">
-              <button className={`btn sm ${tab === "play" ? "" : "ghost"}`} onClick={() => setTab("play")} data-testid="ail-tab-play"><Icon name="play" size={16} />Trình chiếu</button>
-              <button className={`btn sm ${tab === "edit" ? "" : "ghost"}`} onClick={() => setTab("edit")} data-testid="ail-tab-edit"><Icon name="pen" size={16} />Sửa nhanh</button>
-            </div>
             {dirty && <button className="btn sm" disabled={busy} onClick={() => void save()} data-testid="ail-save"><Icon name="save" size={16} />Lưu</button>}
+            <div className="ailp-seg" role="group" aria-label="Chế độ">
+              <button aria-pressed={tab === "play"} onClick={() => setTab("play")} data-testid="ail-tab-play"><Icon name="play" size={16} />Trình chiếu</button>
+              <button aria-pressed={tab === "edit"} onClick={() => setTab("edit")} data-testid="ail-tab-edit"><Icon name="pen" size={16} />Sửa</button>
+            </div>
           </>
         )}
       </div>
@@ -167,10 +166,11 @@ export function AiLessonPage() {
       {msg && <div className="ok-msg" data-testid="ail-msg">{msg}</div>}
 
       {active && (
-        <div className="card" data-testid="ail-progress">
-          <b>{st?.stage ?? d.progress.stage}</b> — {st?.done ?? d.progress.done}/{st?.total || d.progress.total || "…"} cảnh
+        <div className="ailp-gen" data-testid="ail-progress">
+          <div className="steps" aria-hidden="true">{Array.from({ length: Math.max(st?.total || d.progress.total || 7, 1) }, (_, i) => <i key={i} className={i < (st?.done ?? d.progress.done) ? "on" : undefined} style={{ ["--i" as string]: i }} />)}</div>
+          <b>{st?.stage ?? d.progress.stage}</b>
+          <span>{st?.done ?? d.progress.done}/{st?.total || d.progress.total || "…"} cảnh · thường 3–8 phút, rời trang vẫn soạn tiếp</span>
           <div className="ail-bar"><div style={{ width: `${pct}%` }} /></div>
-          <small style={{ color: "var(--muted)" }}>AI soạn từng cảnh (slide, câu hỏi, mô phỏng, lời giảng và giọng đọc) — thường 3–8 phút. Có thể rời trang, bài vẫn được soạn.</small>
         </div>
       )}
       {d.status === "error" && (
@@ -190,26 +190,26 @@ export function AiLessonPage() {
       {scenes.length > 0 && tab === "edit" && <Editor scenes={scenes} busy={busy} onChange={(s) => { setScenes(s); setDirty(true); }} onRegenerate={(sid, dir) => void regen(sid, dir)} onAnimate={(sid, sp) => void animate(sid, sp)} onRemoveAnim={(sid) => void unanimate(sid)} />}
 
       {!active && scenes.length > 0 && (
-        <div className="card" style={{ marginTop: 16 }} data-testid="ail-export">
-          <b>Xuất bài giảng</b>
-          <div className="bar" style={{ marginTop: 10, marginBottom: 0 }}>
+        <div className="ailp-export" data-testid="ail-export">
+          <b>Xuất</b>
+          <div className="bar">
             <button className="btn" onClick={() => void downloadBlob(`${BASE}/${id}/pptx`, file("pptx")).catch((e: unknown) => setError(errText(e)))} data-testid="ail-pptx"><Icon name="down" size={18} />Tải .pptx</button>
             {video?.status === "done" ? (
               <>
-                <button className="btn" onClick={() => void downloadBlob(`${BASE}/${id}/video/bai-giang.mp4`, file("mp4")).catch((e: unknown) => setError(errText(e)))} data-testid="ail-mp4"><Icon name="video" size={18} />Tải .mp4</button>
+                <button className="btn ghost" onClick={() => void downloadBlob(`${BASE}/${id}/video/bai-giang.mp4`, file("mp4")).catch((e: unknown) => setError(errText(e)))} data-testid="ail-mp4"><Icon name="video" size={18} />Tải .mp4</button>
                 <button className="btn ghost" onClick={() => void downloadBlob(`${BASE}/${id}/video/phu-de.srt`, file("srt")).catch((e: unknown) => setError(errText(e)))}><Icon name="down" size={18} />Phụ đề .srt</button>
                 <button className="btn ghost" onClick={() => void startVideo()}>Dựng lại video</button>
               </>
             ) : (
-              <button className="btn" disabled={video?.status === "running"} onClick={() => void startVideo()} data-testid="ail-video"><Icon name="video" size={18} />{video?.status === "running" ? `Đang dựng video… ${video.done}/${video.total}` : "Dựng video .mp4"}</button>
+              <button className="btn ghost" disabled={video?.status === "running"} onClick={() => void startVideo()} data-testid="ail-video"><Icon name="video" size={18} />{video?.status === "running" ? `Đang dựng video… ${video.done}/${video.total}` : "Video .mp4"}</button>
             )}
             {quizzes.map((q) => (
-              <button key={q.id} className="btn ghost" onClick={() => void toBank(q.id)} data-testid="ail-bank"><Icon name="bank" size={18} />Lưu "{q.title}" vào ngân hàng câu hỏi</button>
+              <button key={q.id} className="btn ghost" onClick={() => void toBank(q.id)} data-testid="ail-bank" title={`Lưu "${q.title}" vào ngân hàng câu hỏi`}><Icon name="bank" size={18} />{quizzes.length > 1 ? q.title : "Vào ngân hàng"}</button>
             ))}
           </div>
           {video?.status === "error" && <div className="err" style={{ marginTop: 10 }}>{video.error}</div>}
         </div>
       )}
-    </>
+    </div>
   );
 }

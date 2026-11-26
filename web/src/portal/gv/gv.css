@@ -527,3 +527,28 @@
 }
 [data-portal="gv"] .lv-stage .p { font-size: 10px; letter-spacing: -.02em; margin-left: -6px; }
 @media (max-width: 720px) { [data-portal="gv"] .lv-stage { order: 2; } [data-portal="gv"] .lv-hero { padding-bottom: 24px; } }
+
+/* ---- Bài giảng AI: danh sách + khung soạn (pages/AiLessons.tsx) ---- */
+[data-portal="gv"] .ail-new { display: grid; gap: 14px; max-width: 880px; margin: 8px auto 40px; animation: rise var(--dur-3) var(--ease-out) both; }
+[data-portal="gv"] .ail-ask { display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; border: 1px solid var(--line-2); border-radius: 14px; background: var(--bg); box-shadow: 0 6px 24px -14px rgb(20 30 80 / .2); transition: border-color var(--dur-2), box-shadow var(--dur-2); }
+[data-portal="gv"] .ail-ask:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-bg); }
+[data-portal="gv"] .ail-ask > svg { color: var(--accent); margin-top: 6px; flex: none; }
+[data-portal="gv"] .ail-ask textarea { flex: 1; border: 0; outline: 0; resize: none; background: transparent; color: var(--ink); font: 400 20px/1.45 var(--font-read); min-height: 58px; }
+[data-portal="gv"] .ail-ideas { display: flex; flex-wrap: wrap; gap: 4px 20px; justify-content: center; }
+[data-portal="gv"] .ail-ideas button { border: 0; background: none; padding: 2px 0; font: italic 15px/22px var(--font-read); color: var(--ink-2); border-bottom: 1px dashed var(--line-input); cursor: pointer; }
+[data-portal="gv"] .ail-ideas button:hover { color: var(--accent); border-color: var(--accent); }
+[data-portal="gv"] .ail-opts { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; padding-top: 6px; }
+[data-portal="gv"] .ail-opts label, [data-portal="gv"] .ail-opts .file { display: grid; gap: 4px; flex: 1 1 120px; min-width: 0; }
+[data-portal="gv"] .ail-opts .sm { flex: 0 0 80px; } [data-portal="gv"] .ail-opts .wide { flex: 2 1 200px; } [data-portal="gv"] .ail-opts .file { flex: 0 1 auto; }
+[data-portal="gv"] .ail-opts span { font-size: 12px; color: var(--ink-3); }
+[data-portal="gv"] .ail-opts .file .btn { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+[data-portal="gv"] .ail-opts > .btn.primary { margin-left: auto; }
+[data-portal="gv"] .ail-card { position: relative; min-width: 0; animation: rise var(--dur-3) var(--ease-out) both; }
+[data-portal="gv"] .ail-card .del { position: absolute; top: 8px; right: 8px; opacity: 0; background: var(--bg); transition: opacity var(--dur-1); }
+[data-portal="gv"] .ail-card:hover .del, [data-portal="gv"] .ail-card .del:focus-visible { opacity: 1; }
+[data-portal="gv"] .ail-card .pic { display: block; }
+[data-portal="gv"] .ail-card .tb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px 2px 6px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); color: var(--ink-2); }
+[data-portal="gv"] .ail-card .tb.error { color: var(--danger); } [data-portal="gv"] .ail-card .tb.running, [data-portal="gv"] .ail-card .tb.queued { color: var(--accent); }
+[data-portal="gv"] .ail-run { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--line); border-radius: 0 0 10px 10px; overflow: hidden; }
+[data-portal="gv"] .ail-run i { display: block; height: 100%; background: var(--accent); transition: width var(--dur-3) var(--ease-out); }
+@media (max-width: 720px) { [data-portal="gv"] .ail-opts > .btn.primary { flex-basis: 100%; } [data-portal="gv"] .ail-card .del { opacity: 1; } [data-portal="gv"] .ail-list { grid-template-columns: minmax(0, 1fr); } }

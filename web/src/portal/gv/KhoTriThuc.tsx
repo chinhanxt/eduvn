@@ -8,7 +8,7 @@ import { Icon } from "../../ui/Icon";
 import { Button, IconButton } from "../../ui/components/Button";
 import { Skeleton } from "../../ui/components/Skeleton";
 import { PageHead } from "../../ui/shell/PageHead";
-import { Art, type ArtName, EmptyHero } from "./Preview";
+import { Art, artFor, EmptyHero } from "./Preview";
 import "./gv.css";
 
 type KbFull = Kb & { docs: KbDoc[] };
@@ -17,11 +17,6 @@ type Draft = { id: string; topic: string; body: { type: string; stem: string; le
 type LessonRow = { id: string; title: string };
 
 const SRC = { upload: "Tệp tải lên", lesson: "Giáo án", text: "Ghi chú" } as const;
-const SUBJ_ART: [RegExp, ArtName][] = [
-  [/sinh/i, "la"], [/sử/i, "moc"], [/lí|lý|vật/i, "song"], [/văn/i, "van"], [/hoá|hóa/i, "phan-tu"], [/địa/i, "ban-do"],
-  [/anh|ngữ/i, "hoi-thoai"], [/tin|lập trình|cntt/i, "code"], [/toán/i, "parabol"], [/nhạc/i, "not-nhac"],
-];
-const artFor = (subject: string): ArtName => SUBJ_ART.find(([r]) => r.test(subject))?.[1] ?? "cot";
 const LEVEL_VI: Record<string, string> = { NB: "Nhận biết", TH: "Thông hiểu", VD: "Vận dụng", VDC: "Vận dụng cao" };
 const SAMPLE_KB = [
   { name: "Sinh học 8 · Cô Lan", subject: "Sinh học", grade: 8, docs: 12 },

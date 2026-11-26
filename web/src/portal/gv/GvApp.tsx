@@ -72,7 +72,7 @@ const SHELL_ROUTES: { path: string; page: Page; legacy?: true }[] = [
   { path: "/giao-an/:id", page: P.lessonDetail },
   { path: "/de-cuong", page: P.deCuong },
   { path: "/slide", page: P.slides },
-  { path: "/bai-giang-ai", page: P.aiLessons, legacy: true },
+  { path: "/bai-giang-ai", page: P.aiLessons },
   { path: "/bai-giang-ai/:id", page: P.aiLesson, legacy: true },
   { path: "/bang-giang", page: P.boards },
   { path: "/so-do", page: P.diagrams },
