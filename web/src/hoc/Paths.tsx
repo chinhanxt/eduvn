@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { ApiError } from "../apiCore";
 import { MathText } from "../math/MathText";
 import { Button } from "../ui/components/Button";
-import { Meter, RingBig } from "../ui/components/Progress";
+import { Meter } from "../ui/components/Progress";
 import { Skeleton } from "../ui/components/Skeleton";
-import { EmptyState, ErrorState } from "../ui/components/States";
+import { ErrorState } from "../ui/components/States";
 import { type StreamState, StreamingText } from "../ui/components/StreamingText";
 import { useToast } from "../ui/components/Toast";
 import { Icon } from "../ui/Icon";
@@ -14,6 +14,7 @@ import { useUrlState } from "../ui/data/urlState";
 import { usePageMeta } from "../ui/shell/AppShell";
 import type { Citation, Kb } from "./client";
 import { Markdown } from "./Markdown";
+import { Mascot } from "../portal/hoc/Mascot";
 import "./luyen.css";
 
 type Pt = { id: string; name: string; type: string; mastery: number; attempts: number; status: "new" | "learning" | "mastered"; nextReviewAt: number | null };
@@ -80,31 +81,38 @@ function PathList({ onOpen }: { onOpen: (id: string) => void }) {
       setCreating(false);
     }
   };
+  const empty = rows.data?.length === 0;
   return (
     <div className="lt">
-      <h1 className="page-title">Lộ trình</h1>
-      <p className="caption">Gia sư AI chia chủ đề thành các mục nhỏ, chẩn đoán đầu vào rồi dẫn em tới thành thạo.</p>
+      <header className="hh">
+        <div>
+          <div className="hh-eyebrow">Chia nhỏ · chẩn đoán · dẫn tới thành thạo</div>
+          <h1 className="hh-title">Lộ trình</h1>
+        </div>
+      </header>
       {rows.error && !rows.data ? (
         <ErrorState title="Không tải được lộ trình" onRetry={() => rows.refetch()} />
       ) : !rows.data ? (
         <ListSkel />
-      ) : rows.data.length === 0 ? null : (
-        <div className="lt-grid enter-list">
+      ) : empty ? (
+        <RouteDemo />
+      ) : (
+        <div className="lt-list enter-list">
           {rows.data.map((r, i) => (
-            <button type="button" key={r.id} className="lt-card" style={{ ["--i" as string]: Math.min(i, 8) }} onClick={() => onOpen(r.id)}>
+            <button type="button" key={r.id} className="lt-row" style={{ ["--i" as string]: Math.min(i, 8) }} onClick={() => onOpen(r.id)}>
               <h3><MathText value={r.name} /></h3>
-              <span className="pct"><b>{r.progress.percent}%</b>thành thạo · {r.progress.mastered}/{r.progress.total} mục</span>
               <Meter value={r.progress.percent} label={`${r.progress.percent}% thành thạo`} />
+              <span className="pct"><b>{r.progress.percent}%</b>{r.progress.mastered}/{r.progress.total} mục</span>
+              <Icon name="right" size="sm" />
             </button>
           ))}
         </div>
       )}
-      <section className="card" style={{ marginTop: "var(--s-6)" }} aria-label="Tạo lộ trình mới">
-        <div className="hd"><h2>{rows.data?.length ? "Thêm lộ trình" : "Tạo lộ trình đầu tiên"}</h2></div>
-        {rows.data?.length === 0 && <EmptyState icon="target" title="Chưa có lộ trình nào" text="Nhập chủ đề và mục tiêu, gia sư sẽ dựng lộ trình cho em." />}
+      <section className="lt-make" aria-label="Tạo lộ trình mới">
+        <h2 className="hh-sec">{empty ? "Dựng lộ trình đầu tiên" : "Thêm lộ trình"}</h2>
         <form className="lt-new" onSubmit={(e) => { e.preventDefault(); void go(); }}>
-          <label className="field"><span className="lbl">Chủ đề</span><input className="input" value={form.name} placeholder="vd Hằng đẳng thức" onChange={(e) => setForm({ ...form, name: e.target.value })} data-testid="path-name" /></label>
-          <label className="field wide"><span className="lbl">Mục tiêu của em</span><input className="input" value={form.goal} placeholder="vd Làm được mọi bài khai triển trong bài 15 phút" onChange={(e) => setForm({ ...form, goal: e.target.value })} /></label>
+          <label className="field"><span className="lbl">Chủ đề</span><input className="input" value={form.name} placeholder="vd Quang hợp" onChange={(e) => setForm({ ...form, name: e.target.value })} data-testid="path-name" /></label>
+          <label className="field wide"><span className="lbl">Mục tiêu của em</span><input className="input" value={form.goal} placeholder="vd Giải thích được vì sao cây cần ánh sáng" onChange={(e) => setForm({ ...form, goal: e.target.value })} /></label>
           <label className="field"><span className="lbl">Môn</span><input className="input" value={f.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} /></label>
           <label className="field"><span className="lbl">Lớp</span>
             <select className="select" value={f.grade} onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })}>{Array.from({ length: 16 }, (_, i) => i + 1).map((g) => <option key={g} value={g}>{g <= 12 ? `Lớp ${g}` : `ĐH năm ${g - 12}`}</option>)}</select>
@@ -112,10 +120,42 @@ function PathList({ onOpen }: { onOpen: (id: string) => void }) {
           <label className="field wide"><span className="lbl">Kho tài liệu</span>
             <select className="select" value={f.kbId} onChange={(e) => setForm({ ...form, kbId: e.target.value })}><option value="">Không dùng tài liệu</option>{kbs.data?.map((k) => <option key={k.id} value={k.id}>{k.name}</option>)}</select>
           </label>
-          <div className="acts"><Button type="submit" variant="primary" icon="spark" busy={creating} disabled={!form.name.trim() || !form.goal.trim()} data-testid="path-create">{creating ? "AI đang dựng lộ trình…" : "Dựng lộ trình"}</Button></div>
+          <div className="acts"><Button type="submit" variant="primary" icon="spark" busy={creating} disabled={!form.name.trim() || !form.goal.trim()} data-testid="path-create">{creating ? "AI đang dựng…" : "Dựng lộ trình"}</Button></div>
         </form>
       </section>
     </div>
+  );
+}
+
+// Bản xem trước khi chưa có lộ trình: một con đường mẫu (Sinh học) với các trạm, mờ nhẹ.
+const DEMO = [
+  { n: "Diệp lục & ánh sáng", m: 1 },
+  { n: "Pha sáng", m: 0.8 },
+  { n: "Pha tối", m: 0.45 },
+  { n: "Yếu tố ảnh hưởng", m: 0.1 },
+  { n: "Ứng dụng trồng trọt", m: 0 },
+];
+function RouteDemo() {
+  const W = 880;
+  const xs = DEMO.map((_, i) => 90 + (i * (W - 180)) / (DEMO.length - 1));
+  const ys = [120, 60, 120, 60, 120];
+  const d = xs.map((x, i) => `${i ? "S" : "M"}${i ? `${(xs[i - 1]! + x) / 2},${ys[i]!} ` : ""}${x},${ys[i]!}`).join(" ");
+  return (
+    <figure className="lt-demo" aria-label="Ví dụ một lộ trình: Quang hợp, 5 trạm">
+      <figcaption><span className="chipc">Ví dụ</span> Quang hợp · Sinh học 11</figcaption>
+      <svg viewBox={`0 0 ${W} 190`} role="img" aria-hidden="true">
+        <path d={d} className="road" />
+        <path d={d} className="road-done" pathLength={100} style={{ strokeDasharray: "52 100" }} />
+        {DEMO.map((p, i) => (
+          <g key={p.n} className="stop" style={{ ["--i" as string]: i }} transform={`translate(${xs[i]},${ys[i]})`}>
+            <circle r="20" className="bg" />
+            <circle r="20" className="fill" pathLength={100} style={{ strokeDasharray: `${p.m * 100} 100` }} transform="rotate(-90)" />
+            <text y="5" textAnchor="middle" className="pc">{Math.round(p.m * 100)}</text>
+            <text y={ys[i]! > 90 ? 46 : -32} textAnchor="middle" className="nm">{p.n}</text>
+          </g>
+        ))}
+      </svg>
+    </figure>
   );
 }
 
@@ -200,34 +240,39 @@ function PathDetail({ id, onBack }: { id: string; onBack: () => void }) {
   if (!path)
     return (
       <div className="lt" aria-busy="true">
-        <section className="page-head hero-field lt-head"><div><Skeleton w="50%" h={36} className="on-field" /><Skeleton w="80%" h={16} className="on-field" style={{ marginTop: 12 }} /></div></section>
-        <div className="lt-body"><section className="card"><Skeleton w="40%" h={18} />{[0, 1, 2, 3].map((i) => <Skeleton key={i} w="90%" h={14} style={{ marginTop: 16 }} />)}</section></div>
+        <section className="lt-head"><div><Skeleton w="50%" h={40} /><Skeleton w="80%" h={16} style={{ marginTop: 12 }} /></div></section>
+        <div className="lt-body"><section><Skeleton w="40%" h={18} />{[0, 1, 2, 3].map((i) => <Skeleton key={i} w="90%" h={14} style={{ marginTop: 16 }} />)}</section></div>
       </div>
     );
   const pts = path.modules.flatMap((m) => m.points);
   return (
     <div className="lt">
       <Button variant="ghost" size="sm" icon="left" onClick={onBack} style={{ marginBottom: "var(--s-3)" }}>Các lộ trình</Button>
-      <section className="page-head hero-field lt-head" aria-label="Lộ trình">
-        <div style={{ position: "relative", zIndex: 1, minWidth: 0 }}>
-          <div className="eyebrow">{path.subject} · {path.grade <= 12 ? `lớp ${path.grade}` : `ĐH năm ${path.grade - 12}`}</div>
-          <h1><MathText value={path.name} /></h1>
-          <div className="sub"><MathText value={path.description || path.goal} /></div>
+      <section className="lt-head" aria-label="Lộ trình">
+        <div style={{ minWidth: 0 }}>
+          <div className="hh-eyebrow">{path.subject} · {path.grade <= 12 ? `lớp ${path.grade}` : `ĐH năm ${path.grade - 12}`}</div>
+          <h1 className="hh-title"><MathText value={path.name} /></h1>
+          <p className="sub"><MathText value={path.description || path.goal} /></p>
+          <div className="acts">
+            {!path.diagnosed ? (
+              <Button variant="primary" size="lg" icon="target" busy={busy === "diag"} disabled={!!busy && busy !== "diag"} onClick={diagnostic}>Chẩn đoán đầu vào</Button>
+            ) : null}
+            <Button variant={path.diagnosed ? "primary" : undefined} size="lg" icon="refresh" busy={busy === "rev"} disabled={!!busy && busy !== "rev"} onClick={review}>Ôn · {path.due.length} mục</Button>
+            {path.next && <span className="next">Tiếp theo: <b><MathText value={path.next.name} /></b></span>}
+          </div>
         </div>
-        <RingBig value={path.progress.mastered} max={Math.max(1, path.progress.total)} label={`${path.progress.mastered} trên ${path.progress.total} mục thành thạo`}>
-          <b>{path.progress.percent}%</b>
-          <span>{path.progress.mastered}/{path.progress.total} mục</span>
-        </RingBig>
-        <div className="acts">
-          {!path.diagnosed && <Button className="on-field" icon="target" busy={busy === "diag"} disabled={!!busy && busy !== "diag"} onClick={diagnostic}>Làm bài chẩn đoán đầu vào</Button>}
-          <Button className="ghost-field" icon="refresh" busy={busy === "rev"} disabled={!!busy && busy !== "rev"} onClick={review}>Ôn tập · {path.due.length} mục đến hạn</Button>
-          {path.next && <span className="next">Nên học tiếp: <b><MathText value={path.next.name} /></b></span>}
+        <div className="hn-ring" role="img" aria-label={`${path.progress.mastered} trên ${path.progress.total} mục thành thạo`}>
+          <svg viewBox="0 0 184 184" aria-hidden="true">
+            <circle className="tr" cx="92" cy="92" r="80" />
+            <circle className="v" cx="92" cy="92" r="80" strokeDasharray={2 * Math.PI * 80} strokeDashoffset={2 * Math.PI * 80 * (1 - path.progress.percent / 100)} style={{ ["--c" as string]: 2 * Math.PI * 80 }} />
+          </svg>
+          <div><b>{path.progress.percent}<small>%</small></b><span>{path.progress.mastered}/{path.progress.total} mục</span></div>
         </div>
       </section>
       <div className="lt-body">
         <div className="lt-mods" style={{ display: "grid", gap: "var(--s-4)" }}>
           {path.modules.map((m) => (
-            <section className="card lt-mod" key={m.name}>
+            <section className="lt-mod" key={m.name}>
               <h2><MathText value={m.name} /></h2>
               <div className="obj"><MathText value={m.objective} /></div>
               {m.points.map((p) => (
@@ -249,13 +294,13 @@ function PathDetail({ id, onBack }: { id: string; onBack: () => void }) {
         </div>
         <aside className="lt-side" aria-label="Gia sư">
           {r.ai && (
-            <section className="card">
+            <section className="lt-box">
               <div className="hd"><h2>Gia sư giảng</h2></div>
               <StreamingText className="read" text={r.ai.md} state={r.ai.state} onStop={r.stop} render={(t) => <Markdown text={t} cites={r.ai?.cites ?? []} />} />
             </section>
           )}
           {fey && (
-            <section className="card">
+            <section className="lt-box">
               <div className="hd"><h2>Tự giải thích: <MathText value={pts.find((p) => p.id === fey.pointId)?.name ?? ""} /></h2></div>
               <textarea className="textarea" style={{ width: "100%", minHeight: 140 }} placeholder="Em thử giải thích bằng lời của mình, như đang dạy một bạn nhỏ hơn…" value={fey.text} onChange={(e) => setFey({ ...fey, text: e.target.value })} />
               <Button variant="primary" style={{ marginTop: 10 }} busy={busy === "fey"} disabled={fey.text.trim().length < 10 || (!!busy && busy !== "fey")} onClick={feynman}>Nhờ gia sư nhận xét</Button>
@@ -263,7 +308,7 @@ function PathDetail({ id, onBack }: { id: string; onBack: () => void }) {
             </section>
           )}
           {path.pending && !graded && (
-            <section className="card" data-testid="path-quiz">
+            <section className="lt-box" data-testid="path-quiz">
               <div className="hd"><h2>{path.pending.kind === "diagnostic" ? "Bài chẩn đoán đầu vào" : "Bài luyện"}</h2></div>
               {path.pending.questions.map((x, i) => (
                 <label key={i} className="lt-q">
@@ -275,7 +320,7 @@ function PathDetail({ id, onBack }: { id: string; onBack: () => void }) {
             </section>
           )}
           {graded && (
-            <section className="card" data-testid="path-graded">
+            <section className="lt-box" data-testid="path-graded">
               <div className="hd"><h2>Kết quả</h2></div>
               {graded.results.map((x, i) => (
                 <div key={i} className={`lt-res ${x.correct ? "ok" : "no"}`}>
@@ -295,7 +340,7 @@ function PathDetail({ id, onBack }: { id: string; onBack: () => void }) {
             </section>
           )}
           {!r.ai && !fey && !path.pending && !graded && (
-            <section className="card"><EmptyState icon="bot" title="Chọn một mục để học" text="Bấm Học để gia sư giảng, Luyện để làm 3 câu, hoặc Tự giải thích để kiểm tra mình hiểu chưa." /></section>
+            <section className="lt-pick"><Mascot mood="chao" size={72} /><p>Chọn một mục: <b>Học</b>, <b>Luyện</b> hoặc <b>Tự giải thích</b>.</p></section>
           )}
         </aside>
       </div>
