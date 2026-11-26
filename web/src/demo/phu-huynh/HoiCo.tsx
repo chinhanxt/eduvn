@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Icon } from "../../ui/Icon";
+import { Face } from "../kit/Face";
 import type { ParentView } from "./data";
 import { NgheBtn, type Speak } from "./HomNay";
-import { MockBadge } from "../kit/MockBadge";
 
 type St = "cho" | "nghe" | "doi" | "xong";
 
-/** Hỏi cô: một nút micro thật lớn (mô phỏng nhận giọng nói), câu trả lời chữ to + nút Nghe. */
+/** Hỏi cô: nút micro tròn lớn kiểu Siri (mô phỏng nhận giọng nói), câu trả lời trong nhóm thẻ + Nghe. */
 export default function HoiCo({ v, sp }: { v: ParentView; sp: Speak }) {
   const [st, setSt] = useState<St>("cho");
   const [n, setN] = useState(0);
@@ -31,52 +31,53 @@ export default function HoiCo({ v, sp }: { v: ParentView; sp: Speak }) {
     }
   }, [st, qw.length]);
 
-  if (st === "cho" || st === "nghe")
-    return (
-      <div className="ph-page ph-ask">
-        <h1 className="ph-h1">
-        Hỏi cô
-        <MockBadge />
-      </h1>
-        <button type="button" className={st === "nghe" ? "ph-mic on" : "ph-mic"} onClick={() => st === "cho" && (sp.stop(), setSt("nghe"))} aria-label="Bấm rồi nói câu hỏi">
-          <span className="ring r1" aria-hidden="true" />
-          <span className="ring r2" aria-hidden="true" />
-          <Icon name="mic" />
-        </button>
-        {st === "cho" ? (
-          <p className="ph-mic-say">Bấm rồi nói</p>
-        ) : (
-          <p className="ph-heard" aria-live="polite">{qw.slice(0, Math.max(1, n)).join(" ")}</p>
-        )}
-      </div>
-    );
-
+  const listening = st === "cho" || st === "nghe";
   return (
-    <div className="ph-page ph-ask">
-      <h1 className="ph-h1">
-        Hỏi cô
-        <MockBadge />
-      </h1>
-      <p className="ph-q">“{v.ask.q}”</p>
-      {st === "doi" ? (
-        <p className="ph-wait-a" aria-live="polite">
-          <span aria-hidden="true"><i /><i /><i /></span>
-          {v.ask.from} đang trả lời
-        </p>
+    <div className="ph-page">
+      <div className="ph-title">
+        <h1>Hỏi cô</h1>
+      </div>
+      {listening ? (
+        <div className="ph-siri">
+          <div className={st === "nghe" ? "ph-orb on" : "ph-orb"}>
+            <span className="glow" aria-hidden="true" />
+            <button type="button" className="ph-mic" onClick={() => st === "cho" && (sp.stop(), setSt("nghe"))} aria-label="Bấm rồi nói câu hỏi">
+              <Icon name="mic" />
+            </button>
+          </div>
+          {st === "cho" ? (
+            <p className="hint">Bấm rồi nói</p>
+          ) : (
+            <p className="heard" aria-live="polite">{qw.slice(0, Math.max(1, n)).join(" ")}</p>
+          )}
+        </div>
       ) : (
-        <div className="ph-a" aria-live="polite">
-          <p className="from">{v.ask.from} trả lời</p>
-          <p className="txt">{v.ask.a}</p>
-        </div>
-      )}
-      {st === "xong" && (
-        <div className="ph-pair">
-          <NgheBtn id="ask" text={`${v.ask.from} trả lời. ${v.ask.a}`} sp={sp} />
-          <button type="button" className="ph-big soft" onClick={() => (sp.stop(), setSt("cho"))}>
-            <Icon name="mic" />
-            <span>Hỏi tiếp</span>
-          </button>
-        </div>
+        <>
+          <p className="ph-q">{v.ask.q}</p>
+          <section className="ph-card ph-answer" aria-live="polite">
+            <div className="who">
+              <Face name="Lê Thu Hà" hue={340} size={40} />
+              <span>
+                <b>{v.ask.from}</b>
+                <small>Chủ nhiệm lớp {v.child.className}</small>
+              </span>
+            </div>
+            {st === "doi" ? (
+              <p className="typing" aria-label="Cô đang trả lời"><i /><i /><i /></p>
+            ) : (
+              <p className="txt">{v.ask.a}</p>
+            )}
+          </section>
+          {st === "xong" && (
+            <div className="ph-pair">
+              <NgheBtn id="ask" text={`${v.ask.from} trả lời. ${v.ask.a}`} sp={sp} />
+              <button type="button" className="ph-btn tint" onClick={() => (sp.stop(), setSt("cho"))}>
+                <Icon name="mic" />
+                <span>Hỏi tiếp</span>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
