@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from "react-router";
 import { Icon } from "../../ui/Icon";
+import { MockBadge } from "../kit/MockBadge";
 import { viewFor } from "./data";
 import { HomNay } from "./HomNay";
 import { useSpeak } from "./speak";
@@ -54,10 +55,12 @@ function Shell() {
     <div className={big ? "ph xl" : "ph"}>
       <div className="ph-app">
         <header className="ph-top">
-          <p className="ph-hello">Chào {v.hi}</p>
-          <button type="button" className="ph-set" onClick={() => setSet(true)}>
-            <Icon name="sliders" />
-            <span>Cài đặt</span>
+          <p className="ph-hello">
+            Chào {v.hi}
+            <MockBadge />
+          </p>
+          <button type="button" className="ph-set" onClick={() => setSet(true)} aria-label="Cài đặt">
+            <Icon name="more" />
           </button>
         </header>
 
