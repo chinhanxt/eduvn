@@ -38,6 +38,28 @@
 .lgv-center { min-height: 100dvh; display: grid; place-content: center; justify-items: center; gap: var(--s-3); padding: var(--s-6); background: var(--bg); color: var(--ink-2); font: 500 15px/1.5 var(--font-ui); }
 @keyframes lgv-rise { from { opacity: 0; transform: translateY(6px); } }
 @keyframes lgv-spin { to { transform: rotate(360deg); } }
+/* Nút Google theo hướng dẫn thương hiệu: logo "G" 4 màu, nền trắng, viền xám mảnh #747775, chữ #1F1F1F (tối: #131314 / #8E918F / #E3E3E3). */
+.lgv-btn.lgv-google { justify-content: center; gap: 12px; background: #fff; border-color: #747775; color: #1f1f1f; font: 500 15px/20px Roboto, var(--font-ui); }
+.lgv-btn.lgv-google > span { flex: none; }
+.lgv-btn.lgv-google:hover { background: #f8f9fa; }
+:root[data-theme="dark"] .lgv-btn.lgv-google { background: #131314; border-color: #8e918f; color: #e3e3e3; }
+:root[data-theme="dark"] .lgv-btn.lgv-google:hover { background: #1f1f20; }
+.lgv-g { width: 20px; height: 20px; flex: none; }
+/* Dùng thử nhanh: 4 nút lớn màu theo vai (chữ trắng ≥ 5,5:1 trên nền nút). */
+.lgv-try { width: min(400px, 100%); display: grid; gap: var(--s-2); padding-bottom: var(--s-6); border-bottom: 1px solid var(--line); animation: lgv-rise var(--dur-3) var(--ease-out) both; }
+.lgv-try h2 { margin: 0; font: 600 24px/1.2 var(--font-read); letter-spacing: -.01em; }
+.lgv-try .lgv-sub { margin: 0 0 var(--s-2); }
+.lgv-try-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.lgv-try-b { --a: #3346d1; all: unset; box-sizing: border-box; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "i n" "i w"; column-gap: 10px; align-items: center; min-height: 72px; padding: 12px 14px; border-radius: 12px; background: var(--a); color: #fff; cursor: pointer; transition: transform var(--dur-1), box-shadow var(--dur-2), filter var(--dur-1); }
+.lgv-try-b > svg.i, .lgv-try-b > .lgv-spin { grid-area: i; width: 24px; height: 24px; }
+.lgv-try-b b { grid-area: n; font: 700 16px/1.25 var(--font-ui); }
+.lgv-try-b small { grid-area: w; font: 500 12.5px/1.35 var(--font-ui); color: #fff; opacity: .92; text-wrap: balance; }
+.lgv-try-b:hover { transform: translateY(-1px); box-shadow: 0 8px 22px color-mix(in srgb, var(--a) 32%, transparent); filter: brightness(1.06); }
+.lgv-try-b:active { transform: scale(.99); }
+.lgv-try-b:focus-visible { outline: 2px solid var(--a); outline-offset: 3px; }
+.lgv-try-b:disabled { opacity: .5; cursor: default; }
+.lgv-try-b.t-hs { --a: #0b7466; } .lgv-try-b.t-ph { --a: #704285; } .lgv-try-b.t-tr { --a: #a3364f; }
+.lgv-err { margin: 0; color: var(--danger, #b42318); font-size: 13px; }
 @media (max-width: 720px) {
   .lgv { grid-template-columns: minmax(0, 1fr); align-content: start; }
   .lgv-art { padding: var(--s-5) var(--s-5) var(--s-6); gap: var(--s-3); border-right: 0; border-bottom: 1px solid var(--line); }

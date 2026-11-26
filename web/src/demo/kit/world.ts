@@ -152,6 +152,3 @@ export const SCHOOL_MORE = { parents: 1105, principals: 4, admins: 2, tools: 128
 
 /** Khánh Duy: video ngắn 60 giây; tuần này 3 tối ngủ muộn, nghỉ học thứ Bảy. */
 export const KHANH_DUY_MORE = { videoSeconds: 60, focusMinutes: 15, lateNights: 3, toanBefore: 6.8 } as const;
-
-/** @deprecated Tên cũ — dùng KHANH_DUY. */
-export const GIA_BAO = KHANH_DUY;

@@ -78,6 +78,9 @@ body:has(.ph) { background: #f3efe8; }
 .ph-state.is-vang { --c: var(--wait); --cb: var(--wait-bg); --on: var(--wait-on); }
 .ph-state.is-do { --c: var(--stop); --cb: var(--stop-bg); --on: var(--stop-on); }
 .ph-state .who { display: flex; align-items: center; gap: 14px; }
+/* Nhãn "Bản mô phỏng": góc trên phải khối trạng thái, một dòng, không chen vào tên con. */
+.ph-state { position: relative; padding-top: 40px; }
+.ph-state > .ph-mock { position: absolute; top: 14px; right: 22px; margin: 0; font-size: 11px; padding: 3px 8px; opacity: 1; }
 .ph-state h1 { font-size: calc(38px * var(--k)); line-height: 1.1; font-weight: 800; letter-spacing: -.02em; }
 .ph-state .verdict { display: grid; justify-items: center; gap: 20px; }
 .ph-state .disc { width: 116px; height: 116px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: var(--on);

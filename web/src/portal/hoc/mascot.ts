@@ -10,7 +10,7 @@ export function moodForScore(score10: number | null): Mood {
   return "chao";
 }
 
-/** Câu nói ngắn của Mầm. `name` = tên gọi của em (chữ cuối họ tên). */
+/** Câu nói ngắn của Mầm. `name` = tên gọi của em (xem `givenName`). */
 export function mascotLine(mood: Mood, o: { name?: string; streak?: number; left?: number } = {}): string {
   const em = o.name ? `, ${o.name}` : "";
   if (mood === "khen") return `Giỏi quá${em}!`;
@@ -20,5 +20,15 @@ export function mascotLine(mood: Mood, o: { name?: string; streak?: number; left
   return `Chào em${em}!`;
 }
 
-/** Gọi tên thân mật: chữ cuối họ tên ("Nguyễn Minh Anh" → "Anh"). */
-export const givenName = (fullName: string | null | undefined): string => (fullName ?? "").trim().split(/\s+/).pop() ?? "";
+/** Tên đệm chỉ giới tính, không gọi kèm tên ("Nguyễn Thị Hồng" → "Hồng"). */
+const PLAIN_MIDDLE = new Set(["thị", "văn"]);
+/**
+ * Gọi tên thân mật theo kiểu Việt: tên đệm + tên ("Nguyễn Minh Anh" → "Minh Anh", "Trần Khánh Duy" → "Khánh Duy"),
+ * trừ tên đệm Thị/Văn chỉ gọi tên ("Trần Văn Tư" → "Tư"). Họ tên 1–2 chữ giữ nguyên.
+ */
+export const givenName = (fullName: string | null | undefined): string => {
+  const w = (fullName ?? "").trim().split(/\s+/).filter(Boolean);
+  if (w.length <= 2) return w.join(" ");
+  const mid = w[w.length - 2]!;
+  return PLAIN_MIDDLE.has(mid.toLocaleLowerCase("vi")) ? w[w.length - 1]! : w.slice(-2).join(" ");
+};

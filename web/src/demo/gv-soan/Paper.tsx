@@ -42,20 +42,26 @@ function Fig({ kind, illus }: { kind: Slide["kind"]; illus?: "gen" | "done" }) {
     case "story":
       return (
         <svg viewBox="0 0 400 300" className="pp-fig">
+          {/* Quầy nước chanh của lớp: mái che sọc, quầy, cốc chanh; parabol lãi P(x) = −x² + 6x − 5 (nghiệm 1 và 5). */}
           <g className={`pp-illus ${illus ?? "done"}`}>
-            <rect x={70} y={22} width={260} height={92} rx={6} className="pp-screen" />
-            <path className="draw pp-c2" pathLength={1} d="M110 92 C150 40, 190 40, 220 70 S 280 96, 300 50" style={d(0.6)} />
-            {[0, 1, 2].map((r) => (
-              <g key={r} className="rise" style={d(0.9 + r * 0.12)}>
-                {Array.from({ length: 7 - r }, (_, i) => (
-                  <rect key={i} x={98 + r * 16 + i * 30} y={134 + r * 22} width={22} height={14} rx={4} className="pp-seat" />
-                ))}
-              </g>
+            <rect x={96} y={24} width={208} height={22} rx={4} className="pp-screen" />
+            <path className="draw pp-c2" pathLength={1} d={`M96 46${Array.from({ length: 8 }, (_, i) => ` a13 13 0 0 0 26 0`).join("")}`} style={d(0.5)} />
+            <path className="pp-seat" d="M106 52V112M294 52V112" />
+            {[0, 1, 2].map((i) => (
+              <path key={i} className="pp-seat" d={`M${122 + i * 52} 24V46`} />
             ))}
+            <circle className="draw pp-c3" pathLength={1} cx={282} cy={97} r={14} style={d(0.8)} />
+            <path className="draw pp-c3" pathLength={1} d="M282 84V110M269 97H295M273 88l18 18M291 88l-18 18" style={d(1)} />
+            <rect x={90} y={112} width={220} height={40} rx={4} className="pp-screen" />
+            <g className="rise" style={d(1.1)}>
+              {[0, 1, 2, 3].map((i) => (
+                <path key={i} className="pp-seat" d={`M${118 + i * 36} 112l-4-24h22l-4 24Z`} />
+              ))}
+            </g>
           </g>
           <Axes y={280} delay={1.2} noY />
-          <path className="pp-area fade" d={`${parabola(1, 3, -2.6, 280, 52, true)} Z`} style={d(2.4)} />
-          <path className="draw pp-c1" pathLength={1} d={parabola(1, 3, -2.6, 280, 52)} style={d(1.6)} />
+          <path className="pp-area fade" d={`${parabola(1, 5, -0.9, 280, 40, true)} Z`} style={d(2.4)} />
+          <path className="draw pp-c1" pathLength={1} d={parabola(1, 5, -0.9, 280, 40)} style={d(1.6)} />
         </svg>
       );
     case "sign":

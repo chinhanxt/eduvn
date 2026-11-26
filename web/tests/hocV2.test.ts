@@ -135,7 +135,9 @@ describe("linh vật Mầm", () => {
     expect(mascotLine("chuoi", { streak: 5 })).toBe("5 ngày liên tiếp rồi!");
     expect(mascotLine("chao", { left: 2, name: "Anh" })).toBe("Còn 2 bài cần làm, Anh.");
     expect(mascotLine("chao", { left: 0 })).toBe("Xong hết bài rồi!");
-    expect(givenName(" Nguyễn Minh  Anh ")).toBe("Anh");
+    expect(givenName(" Nguyễn Minh  Anh ")).toBe("Minh Anh");
+    for (const [full, call] of [["Trần Khánh Duy", "Khánh Duy"], ["Lê Thảo Vy", "Thảo Vy"], ["Phạm Quang Huy", "Quang Huy"], ["Đỗ Đức Thịnh", "Đức Thịnh"], ["Nguyễn Thị Hồng", "Hồng"], ["Trần Văn Tư", "Tư"], ["Minh Anh", "Minh Anh"], ["An", "An"]])
+      expect(givenName(full)).toBe(call);
     expect(givenName(null)).toBe("");
   });
 });

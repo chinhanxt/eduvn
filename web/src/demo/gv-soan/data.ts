@@ -22,8 +22,8 @@ export const SLIDES: Slide[] = [
     say: ["Chào các em, hôm nay chúng ta học bất phương trình bậc hai một ẩn.", "Cuối buổi, các em sẽ tự giải được mọi bài dạng này chỉ với ba bước."],
   },
   {
-    id: "s2", kind: "story", eyebrow: "Khởi động", title: "Bán bao nhiêu vé thì có lãi?", points: ["Lãi P(x) = −x² + 40x − 300", "Có lãi khi P(x) > 0"],
-    say: ["Rạp phim của trường bán x vé mỗi suất.", "Tiền lãi là P của x bằng trừ x bình cộng bốn mươi x trừ ba trăm.", "Vậy bán bao nhiêu vé thì rạp có lãi?"],
+    id: "s2", kind: "story", eyebrow: "Khởi động", title: "Bán bao nhiêu cốc thì có lãi?", points: ["Lãi P(x) = −x² + 6x − 5", "x chục cốc · P trăm nghìn đồng", "Có lãi khi P(x) > 0"],
+    say: ["Quầy nước chanh của lớp bán x chục cốc mỗi buổi.", "Tiền lãi là P của x bằng trừ x bình cộng sáu x trừ năm, tính bằng trăm nghìn đồng.", "Vậy bán bao nhiêu cốc thì quầy có lãi?"],
   },
   {
     id: "s3", kind: "sign", eyebrow: "Kiến thức", title: "Dấu của tam thức bậc hai", points: ["a > 0: trong trái, ngoài cùng", "Giữa hai nghiệm: trái dấu với a"],
@@ -49,9 +49,9 @@ export const SLIDES: Slide[] = [
 
 /** Dàn ý AI viết (dòng bắt đầu bằng "#" là mục, "-" là ý con). Dùng chung cho Tạo và Giấy tờ. */
 export const OUTLINE_TEXT = [
-  "# Khởi động: bán bao nhiêu vé thì có lãi?",
-  "- Bài toán rạp phim của trường, lãi P(x) = −x² + 40x − 300",
-  "- Cả lớp đoán khoảng số vé có lãi",
+  "# Khởi động: bán bao nhiêu cốc thì có lãi?",
+  "- Bài toán quầy nước chanh của lớp, lãi P(x) = −x² + 6x − 5",
+  "- Cả lớp đoán khoảng số cốc bán ra thì có lãi",
   "# Dấu của tam thức bậc hai",
   "- Nhắc lại định lí, quy tắc “trong trái, ngoài cùng”",
   "- Hình parabol cắt trục hoành",

@@ -22,10 +22,10 @@ const SUBJ: Subj[] = [
     id: "toan", label: "Toán 10 · Bất phương trình", cls: "10A1", dac: ["Tư duy và lập luận", "Mô hình hoá", "Giải quyết vấn đề", "Giao tiếp toán học", "Công cụ, phương tiện"],
     why: `Lớp ${C10A1.size} em, ${NUMBERS.needHelp.length} em cần giúp bất phương trình. Ưu tiên nhóm nhỏ có vai trò rõ và trạm theo trình độ.`,
     acts: [
-      { n: "Đoán số vé", how: "Cặp đôi đoán khoảng số vé có lãi, kiểm lại bằng đồ thị", ph: 0, ch: [1], dt: [1], pc: [2] },
+      { n: "Đoán số cốc", how: "Cặp đôi đoán khoảng số cốc bán ra có lãi, kiểm lại bằng đồ thị", ph: 0, ch: [1], dt: [1], pc: [2] },
       { n: "Khăn trải bàn", how: "Nhóm 4, mỗi em xét dấu một tam thức rồi ghép thành quy tắc", ph: 1, ch: [1, 0], dt: [0, 3], pc: [4] },
       { n: "Trạm 3 mức", how: "Ba trạm dễ, vừa, khó; AI xếp từng em vào trạm vừa sức", ph: 2, ch: [0, 2], dt: [2, 4], pc: [2, 3] },
-      { n: "Định giá vé", how: "Nhóm lập phương án giá vé cho buổi chiếu phim của trường", ph: 3, ch: [2], dt: [1, 2], pc: [4] },
+      { n: "Định giá cốc chanh", how: "Nhóm lập phương án giá bán cho quầy nước chanh hội trại của lớp", ph: 3, ch: [2], dt: [1, 2], pc: [4] },
     ],
   },
   {

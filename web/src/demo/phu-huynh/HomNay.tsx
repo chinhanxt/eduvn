@@ -26,12 +26,10 @@ export function HomNay({ v, sp, onKem }: { v: ParentView; sp: Speak; onKem: () =
   return (
     <div className="ph-today">
       <section className={`ph-state is-${v.light}`} aria-label={`${v.child.short}: ${L.word}. ${v.reason}`}>
+        <MockBadge className="ph-mock" />
         <div className="who">
           <Face name={v.child.name} hue={v.child.avatarHue} size={64} className="ph-face" />
-          <h1>
-            {v.child.short}
-            <MockBadge />
-          </h1>
+          <h1>{v.child.short}</h1>
         </div>
         <div className="verdict">
           <span className="disc" aria-hidden="true">

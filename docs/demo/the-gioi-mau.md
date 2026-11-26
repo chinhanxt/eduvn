@@ -66,3 +66,11 @@ GV khác: thầy Phạm Đức Long (Hoá), thầy Hoàng Minh (Tiếng Anh).
 
 - **TB các lớp gốc:** 8A2 7,4 · 10A1 **7,2** · 11A3 6,8 · 12A1 7,6 · KTPM K23 7,9. Văn 11A3: 6,7 → 6,1.
 - **Toàn trường:** 1.240 HS (tính cả 56 SV KTPM K23), 86 GV, 1.105 phụ huynh, 4 ban giám hiệu, 2 quản trị. Kho có 1.284 công cụ, 15 môn; Studio hoạt hình 87 skill; AI tại trường chạy mô hình 14B trên 1 GPU.
+
+## Ví dụ đời thực dùng chung (2026-11-26)
+- Bài **Bất phương trình bậc hai** chỉ dùng **một** ví dụ đời thực: **quầy nước chanh của lớp**. Bán x chục cốc thì lãi **P(x) = −x² + 6x − 5** (trăm nghìn đồng); có lãi khi **1 < x < 5**.
+- Dùng ở mọi chỗ: cảnh "hai em, hai cách giảng" (Minh Anh), bài giảng AI và giáo án 5512 của cô Hà, Dạy theo năng lực, Giao phân hoá, Trợ lý lớp. Không dùng ví dụ khác (rạp phim, bán vé…).
+
+## Dữ liệu chạy thật (server demo)
+- `server/scripts/serve-demo-v2.ts` dựng dữ liệu theo thế giới này: GV đăng nhập là **cô Lê Thu Hà**; lớp 10A1, 11A3, 8A2, KTPM K23; ngân hàng câu hỏi, bài tập và điểm đủ các môn (Toán, Vật lí, Hoá học, Sinh học, Lịch sử, Địa lí, Tiếng Anh, Tin học, Ngữ văn, Lập trình).
+- Minh Anh có tài khoản liên kết, chuỗi ngày học, bài sắp tới nhiều môn và thẻ ôn đến hạn.

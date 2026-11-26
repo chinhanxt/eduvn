@@ -6,6 +6,7 @@ import { Icon } from "../ui/Icon";
 import { Button } from "../ui/components/Button";
 import { Skeleton } from "../ui/components/Skeleton";
 import { PageHead } from "../ui/shell/PageHead";
+import { ROSTER_10A1 } from "../demo/kit/world";
 import "../portal/gv/gv.css";
 
 // ---------- Trang "Đấu trường": mở phòng + phòng đang mở + kết quả cũ ----------
@@ -19,7 +20,8 @@ const SRC: { k: Src; label: string; icon: string }[] = [
   { k: "bank", label: "Ngân hàng", icon: "bank" },
   { k: "ai", label: "AI tạo câu", icon: "spark" },
 ];
-const PLAYERS = ["Minh Anh", "Khánh Duy", "Thảo Vy", "Quang Huy", "Đức Thịnh", "Ngọc Hân", "Gia Bảo"];
+/** HS 10A1 của thế giới mẫu (tên gọi = 2 chữ cuối): Minh Anh, Khánh Duy, Đức Thịnh, Bảo Châu, Gia Hân, Quốc Huy, Thu Trang. */
+const PLAYERS = ROSTER_10A1.slice(0, 7).map((n) => n.split(" ").slice(-2).join(" "));
 const ini = (n: string) => n.split(" ").map((w) => w[0]).join("").slice(-2).toUpperCase();
 
 /** Hình sân khấu: màn chiếu lên lớp (PIN + QR) và HS lần lượt vào phòng. */
