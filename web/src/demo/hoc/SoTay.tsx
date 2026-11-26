@@ -1,8 +1,8 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { useFakeProgress, useFakeStream } from "../kit";
+import { useFakeProgress, useFakeStream, Face, useClock } from "../kit";
 import { Button, StreamingText } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { DemoHead, Face, useClock } from "./parts";
+import { DemoHead } from "./parts";
 
 /** Sổ tay học tập (kiểu open-notebook): sổ nguồn, hỏi có trích dẫn, podcast 2 giọng có sóng âm, ghi chú + Co-Writer. */
 const SOURCES = [

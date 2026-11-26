@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
-import { SCHOOL } from "../kit";
+import { SCHOOL, useTick, useTween } from "../kit";
 import { Icon } from "../../ui/Icon";
-import { Head, useTick, useTween } from "./parts";
+import { Head } from "./parts";
 
 /** Cài đặt AI & hệ thống: bản đồ luồng dữ liệu thiết bị → máy chủ AI tại trường → cổng AI :4340.
  *  Mỗi việc chọn chạy tại trường hay qua cổng; "Thử rút mạng" thì đường lên mây đứt, việc tự dồn về máy trường. */

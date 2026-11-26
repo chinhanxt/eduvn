@@ -3,8 +3,8 @@ import { type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import { Button } from "../../ui/components/Button";
 import { Icon } from "../../ui/Icon";
-import { useFakeStream, useFakeProgress } from "../kit";
-import { Head, Rail, Wave, useCount, usePhases } from "./common";
+import { CLASSES, useFakeStream, useFakeProgress, useCount, usePhases } from "../kit";
+import { Head, Rail, Wave } from "./common";
 import { LESSON, NUMBERS, OUTLINE_TEXT, type OutlineSec, SLIDES, SOURCES, VOICES, type VoiceId, parseOutline } from "./data";
 import { PaperSlide } from "./Paper";
 
@@ -50,7 +50,7 @@ function Ask({ onGo }: { onGo: () => void }) {
     <section className="gs-ask enter">
       <textarea className="gs-ask-in" value={text} onChange={(e) => setText(e.target.value)} rows={2} aria-label="Bài muốn soạn" />
       <div className="gs-ctx">
-        <span><Icon name="users" size="sm" />10A1 · 42 em</span>
+        <span><Icon name="users" size="sm" />10A1 · {CLASSES.find((c) => c.id === "10A1")!.size} em</span>
         <span><Icon name="target" size="sm" />{NUMBERS.needHelp.length} em cần giúp</span>
         <button type="button" aria-pressed={web} onClick={() => setWeb(!web)}><Icon name="search" size="sm" />Tìm web</button>
         <button type="button" aria-pressed={img} onClick={() => setImg(!img)}><Icon name="image" size="sm" />Ảnh AI</button>

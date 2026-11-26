@@ -6,9 +6,6 @@
 .dm-head-acts { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
 .dm-eyebrow { display: flex; align-items: center; gap: var(--s-3); font: 600 12px/16px var(--font-ui); letter-spacing: .04em; color: var(--ink-3); }
 .dm-title { font: 600 clamp(28px, 3.2vw, 40px)/1.12 var(--font-read); letter-spacing: -.02em; margin-top: 6px; text-wrap: balance; }
-.dm-face { --h: 200; display: inline-grid; place-items: center; flex: none; border-radius: 50%; font-weight: 700; letter-spacing: -.02em; color: hsl(var(--h) 55% 28%); background: hsl(var(--h) 60% 90%); }
-.dm-face.ring { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent); }
-:root[data-theme="dark"] .dm-face { color: hsl(var(--h) 70% 82%); background: hsl(var(--h) 35% 24%); }
 .dm-conf { display: inline-flex; align-items: center; gap: 8px; }
 .dm-conf .tr { display: block; width: 56px; height: 4px; border-radius: 4px; background: var(--bg-sunken); overflow: hidden; }
 .dm-conf .tr i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
@@ -415,7 +412,7 @@
 .st-speakers { display: flex; justify-content: center; gap: var(--s-8); }
 .st-speakers > span { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-3); border-radius: 50%; transition: transform .25s var(--ease-out), opacity .25s; opacity: .55; }
 .st-speakers > span.talk { opacity: 1; color: var(--wc); }
-.st-speakers > span.talk .dm-face { transform: scale(1.1); transition: transform .25s var(--ease-out); }
+.st-speakers > span.talk .demo-face { transform: scale(1.1); transition: transform .25s var(--ease-out); }
 .st-speakers > span.talk::after { content: ""; position: absolute; left: 50%; top: 0; width: 56px; height: 56px; margin: -4px 0 0 -28px; border-radius: 50%; border: 2px solid var(--wc); animation: st-ring 1.4s var(--ease-out) infinite; }
 @keyframes st-ring { from { transform: scale(.95); opacity: .7; } to { transform: scale(1.3); opacity: 0; } }
 .st-ctl { display: flex; align-items: center; gap: var(--s-3); font-size: 12px; color: var(--ink-3); }

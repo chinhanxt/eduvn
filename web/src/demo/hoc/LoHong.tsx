@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { DemoHead, Face, useClock } from "./parts";
+import { DemoHead } from "./parts";
+import { Face, useClock } from "../kit";
 
 /** Vòng lặp lỗ hổng: Phát hiện → Bài vừa sức → Kiểm lại → Ghi nhớ, tự chạy thành vòng; mỗi vòng vá một lỗ hổng (Toán rồi Văn). */
 const STATIONS = [

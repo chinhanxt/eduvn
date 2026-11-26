@@ -1,2 +1,6 @@
-.demo-badge{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--font-ui,Inter,system-ui,sans-serif);letter-spacing:.04em;color:var(--ink-3,#7A746B);border:1px dashed currentColor;border-radius:999px;padding:4px 9px;opacity:.75}
+/* Nhãn "Bản mô phỏng": LUÔN ngay sau tiêu đề trang (h1), cùng dòng, cỡ cố định 11px — mọi gói, mọi cổng. */
+.demo-badge{display:inline-flex;align-items:center;gap:6px;margin-left:12px;vertical-align:middle;position:relative;top:-.12em;font:500 11px/1 var(--font-ui,Inter,system-ui,sans-serif);letter-spacing:.04em;text-transform:none;white-space:nowrap;color:var(--ink-3,#7A746B);border:1px dashed currentColor;border-radius:999px;padding:4px 9px;opacity:.75}
 .demo-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6}
+.demo-face{--h:200;display:inline-grid;place-items:center;flex:none;border-radius:50%;font-weight:700;letter-spacing:-.02em;color:hsl(var(--h) 55% 26%);background:hsl(var(--h) 60% 89%)}
+.demo-face.ring{box-shadow:0 0 0 3px var(--bg,#fff),0 0 0 5px var(--accent,#3346D1)}
+:root[data-theme="dark"] .demo-face{color:hsl(var(--h) 70% 84%);background:hsl(var(--h) 35% 24%)}

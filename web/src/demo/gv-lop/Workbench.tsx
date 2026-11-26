@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { useFakeStream } from "../kit";
+import { useFakeStream, useCountUp, usePhases } from "../kit";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { Head, useCountUp, usePhases } from "./parts";
+import { Head } from "./parts";
 
 /** Workbench: GV chat để AI soạn cả khoá; AI gọi công cụ/skill (sáng dần trong hộp 45 công cụ · 24 skill), khung khoá dựng dần;
  *  công bố có link + QR + cài như app, nhân bản sang lớp khác, tour hướng dẫn. Ví dụ: TS. Khải, KTPM K23. */

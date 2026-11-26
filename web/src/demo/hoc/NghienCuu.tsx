@@ -1,8 +1,8 @@
 import { type ReactNode, useState } from "react";
-import { useFakeStream } from "../kit";
+import { useFakeStream, useClock } from "../kit";
 import { Button, StreamingText } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { DemoHead, useClock } from "./parts";
+import { DemoHead } from "./parts";
 
 /** Nghiên cứu sâu: câu hỏi → cây truy vấn toả ra → nguồn (đọc, đánh dấu) → báo cáo có trích dẫn. */
 const QUESTION = "Vì sao Điện Biên Phủ trở thành trận quyết chiến?";

@@ -85,5 +85,73 @@ export const NUMBERS = {
   prepBefore: "3 giờ", prepAfter: "25 phút", gradeBefore: "2 giờ / 40 bài", gradeAfter: "3 phút",
 } as const;
 
+/* ---------------- Bổ sung 2026-11-26 (gom từ 5 gói mô phỏng, dùng chung) ---------------- */
+
+/** Lịch của mọi màn: hôm nay Thứ Tư 25/11/2026, tuần học 12 (T2 23/11 – CN 29/11). */
+export const DEMO_DAY = { label: "Thứ Tư 25/11", iso: "2026-11-25", week: 12, monday: 23, month: 11 } as const;
+
+/** Em thứ ba cần giúp bất phương trình (cùng Minh Anh, Khánh Duy). */
+export const DUC_THINH: Learner = {
+  id: "duc-thinh", name: "Đỗ Đức Thịnh", short: "Đức Thịnh", role: "hs", className: "10A1", avatarHue: 30,
+  goal: "Chưa chọn ngành", strengths: ["Tin học"], weaknesses: ["Bất phương trình bậc hai"], habits: ["Làm nhanh, hay bỏ dở giữa bài"],
+  errors: ["Dừng ở bước tìm nghiệm tam thức"],
+  forgetting: [], mastery: [{ subject: "Toán", topic: "Bất phương trình bậc hai", level: 0.3, trend: "xuong" }], scores: { Toán: 5.8, "Tin học": 8.4 },
+};
+
+/** Thêm vào hồ sơ Minh Anh: Vật lí (Lớp học AI · Rơi tự do), bài Hoá gần nhất, điểm 3 tháng trước, các năm học. */
+export const MINH_ANH_MORE = {
+  physics: { subject: "Vật lí", topic: "Rơi tự do", level: 0.86, score: 7.8 },
+  lastTest: { subject: "Hoá học", title: "Kiểm tra 15′ · Oxi hoá – khử", score: 9.5, date: "18/11" },
+  scores3MonthsAgo: { Toán: 5.7, "Ngữ văn": 6.3, "Hoá học": 8.2, "Tiếng Anh": 7.9, "Lịch sử": 7.3, "Địa lí": 7.1, "Sinh học": 6.5 } as Record<string, number>,
+  /** Điểm vào lớp 10 và TB các năm (lớp 6 → 10). */
+  entrance10: 41.5,
+  yearly: [ { grade: 6, avg: 6.1 }, { grade: 7, avg: 6.5 }, { grade: 8, avg: 7.0 }, { grade: 9, avg: 7.3 }, { grade: 10, avg: 7.4 } ],
+} as const;
+
+/** Mục tiêu thi ĐH của Minh Anh: tổ hợp D07 (Toán · Hoá · Anh), Bách khoa CNTT. Điểm thi dự kiến khác điểm TB lớp. */
+export const EXAM_GOAL = {
+  combo: "D07", subjects: ["Toán", "Hoá học", "Tiếng Anh"], school: "ĐH Bách khoa", major: "CNTT",
+  need: 27.5, now: 24.6, afterFix: 26.2,
+  projected: { Toán: 7.4, "Hoá học": 8.7, "Tiếng Anh": 8.5 } as Record<string, number>,
+} as const;
+
+/** GV khác (tổ Toán – Tin và GV chủ nhiệm các lớp thêm của cổng Nhà trường). TS. Khải sinh hoạt tổ Toán – Tin. */
+export const MORE_TEACHERS: Person[] = [
+  { id: "thu", name: "Đinh Hoài Thu", short: "cô Thu", role: "gv", subject: "Toán" },
+  { id: "tam", name: "Lương Văn Tâm", short: "thầy Tâm", role: "gv", subject: "Toán" },
+  { id: "ngoc", name: "Hồ Bích Ngọc", short: "cô Ngọc", role: "gv", subject: "Tin học" },
+  { id: "mai", name: "Đỗ Thị Mai", short: "cô Mai", role: "gv", className: "6A1" },
+  { id: "hung", name: "Vũ Văn Hưng", short: "thầy Hưng", role: "gv", className: "7A3" },
+  { id: "trang", name: "Bùi Thu Trang", short: "cô Trang", role: "gv", className: "9A1" },
+  { id: "binh", name: "Ngô Thanh Bình", short: "cô Bình", role: "gv", className: "11A1" },
+];
+
+/** Tổ chuyên môn. Thầy Bảo là tổ trưởng Văn. */
+export const DEPARTMENTS = [
+  { id: "toan-tin", name: "Tổ Toán – Tin", members: ["ha", "khai", "thu", "tam", "ngoc"] },
+  { id: "van", name: "Tổ Ngữ văn", members: ["bao-gv"], lead: "bao-gv" },
+  { id: "khtn", name: "Tổ Khoa học tự nhiên", members: ["long", "lan"] },
+  { id: "xa-hoi", name: "Tổ Xã hội", members: ["phuong", "minh"] },
+] as const;
+
+/** Lớp thêm (chỉ để bản đồ toàn trường đủ dày). GV chủ nhiệm theo id trong TEACHERS / MORE_TEACHERS. */
+export const MORE_CLASSES = [
+  { id: "6A1", level: "THCS", homeroom: "mai", size: 40, avg: 7.6 },
+  { id: "7A3", level: "THCS", homeroom: "hung", size: 39, avg: 7.1 },
+  { id: "9A1", level: "THCS", homeroom: "trang", size: 41, avg: 7.5 },
+  { id: "10A2", level: "THPT", homeroom: "long", size: 43, avg: 7.0 },
+  { id: "11A1", level: "THPT", homeroom: "binh", size: 42, avg: 7.4 },
+  { id: "12A2", level: "THPT", homeroom: "minh", size: 40, avg: 7.3 },
+] as const;
+
+/** Một phần danh sách 10A1 (10 em đầu sổ điểm). */
+export const ROSTER_10A1 = ["Nguyễn Minh Anh", "Trần Khánh Duy", "Đỗ Đức Thịnh", "Lê Bảo Châu", "Hoàng Gia Hân", "Vũ Quốc Huy", "Đặng Thu Trang", "Bùi Nhật Nam", "Đỗ Khánh Linh", "Ngô Tuấn Kiệt"];
+
+/** Số liệu toàn trường bổ sung. 1.240 HS tính cả 56 SV KTPM K23. */
+export const SCHOOL_MORE = { parents: 1105, principals: 4, admins: 2, tools: 1284, toolSubjects: 15, animSkills: 87, aiModel: "14B · 1 GPU" } as const;
+
+/** Khánh Duy: video ngắn 60 giây; tuần này 3 tối ngủ muộn, nghỉ học thứ Bảy. */
+export const KHANH_DUY_MORE = { videoSeconds: 60, focusMinutes: 15, lateNights: 3, toanBefore: 6.8 } as const;
+
 /** @deprecated Tên cũ — dùng KHANH_DUY. */
 export const GIA_BAO = KHANH_DUY;

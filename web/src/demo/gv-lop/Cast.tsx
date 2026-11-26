@@ -1,9 +1,11 @@
 /** Dàn nhân vật tự vẽ (nguyên bản) cho Lớp học AI và Bạn đồng hành: chân dung bán thân SVG, mắt chớp, miệng mấp máy khi nói. */
+import { DUC_THINH } from "../kit";
+
 export type CastId = "lam" | "bon" | "su" | "tun" | "minhAnh" | "khanhDuy" | "bacTu" | "nhu" | "ducThinh";
 export type CastMember = { id: CastId; name: string; role: string; hue: number; ai: boolean };
 
 export const CAST: Record<CastId, CastMember> = {
-  lam: { id: "lam", name: "Cô Lam", role: "GV AI", hue: 228, ai: true },
+  lam: { id: "lam", name: "Cô Mây", role: "GV AI", hue: 228, ai: true },
   bon: { id: "bon", name: "Bon", role: "Trợ giảng", hue: 160, ai: true },
   su: { id: "su", name: "Su", role: "Bạn học AI", hue: 320, ai: true },
   tun: { id: "tun", name: "Tũn", role: "Bạn học AI", hue: 40, ai: true },
@@ -11,7 +13,7 @@ export const CAST: Record<CastId, CastMember> = {
   khanhDuy: { id: "khanhDuy", name: "Khánh Duy", role: "Học sinh", hue: 150, ai: false },
   bacTu: { id: "bacTu", name: "Bác Tư", role: "Phụ huynh (AI đóng vai)", hue: 25, ai: true },
   nhu: { id: "nhu", name: "Nhú", role: "Bạn đồng hành", hue: 95, ai: true },
-  ducThinh: { id: "ducThinh", name: "Đức Thịnh", role: "Học sinh", hue: 265, ai: false },
+  ducThinh: { id: "ducThinh", name: DUC_THINH.short, role: "Học sinh", hue: DUC_THINH.avatarHue, ai: false },
 };
 
 const SKIN: Record<CastId, string> = { lam: "#F2D3B8", bon: "#E9C29E", su: "#F6DCC6", tun: "#DDB08A", minhAnh: "#F4D6BE", khanhDuy: "#E3B892", bacTu: "#D9A982", nhu: "#CDEBB4", ducThinh: "#EBC6A2" };

@@ -2,8 +2,8 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import type { Level, ThumbKind, Tool } from "./khoData";
-import { usePhases, useClock, useTween, vn1 } from "./parts";
 import { Thumb } from "./Thumb";
+import { usePhases, useClock, useTween, fmt1 } from "../kit";
 
 /** Xưởng AI tạo công cụ ngay trước mắt: hiểu yêu cầu → khối hiện dần → lắp lại thành công cụ chạy được → tự kiểm → lưu vào kho. */
 export type Blueprint = "conlac" | "cungcau" | "chung";
@@ -176,7 +176,7 @@ function Slider({ label, value, min, max, step, onChange, fmt, ends }: { label: 
 /** Giá trị do AI tự kéo khi chạy thử; người dùng chạm vào thì trả quyền điều khiển. */
 function useDriven(init: number, auto: boolean, f: (t: number) => number): [number, (v: number) => void] {
   const [v, setV] = useState<number | null>(null);
-  const t = useClock(auto);
+  const [t] = useClock(auto);
   const frozen = useRef(init);
   if (auto && v === null) frozen.current = f(t);
   return [v ?? frozen.current, setV];
@@ -187,7 +187,7 @@ const G = 9.8;
 function Pendulum({ blocks, live, auto, spec }: { blocks: number; live: boolean; auto: boolean; spec: Spec }) {
   const [l, setL] = useDriven(1, auto, (t) => 1.15 + 0.55 * Math.sin(t * 0.9 - 0.4));
   const T = 2 * Math.PI * Math.sqrt(l / G);
-  const t = useClock(live);
+  const [t] = useClock(live);
   const th = 0.38 * Math.cos((2 * Math.PI * t) / T);
   const L = 44 + l * 86;
   const bx = 150 + L * Math.sin(th);
@@ -207,7 +207,7 @@ function Pendulum({ blocks, live, auto, spec }: { blocks: number; live: boolean;
           <path d={`M150 22 A${L} ${L} 0 0 1 ${150 + L * Math.sin(0.38)} ${22 + L * Math.cos(0.38)}`} className="gl-arc" />
           <path d={`M150 22 L${bx} ${by}`} className="gl-string" />
           <circle cx={bx} cy={by} r="13" className="gl-bob" />
-          <text x="160" y={22 + L / 2} className="gl-cap">l = {vn1(l)} m</text>
+          <text x="160" y={22 + L / 2} className="gl-cap">l = {fmt1(l)} m</text>
         </svg>
       </Region>
       <Region area="graph" i={1} blocks={blocks} live={live} spec={spec}>
@@ -226,7 +226,7 @@ function Pendulum({ blocks, live, auto, spec }: { blocks: number; live: boolean;
         </div>
       </Region>
       <Region area="ctrl" i={3} blocks={blocks} live={live} spec={spec}>
-        <Slider label="Chiều dài dây" value={l} min={0.2} max={2} step={0.01} onChange={setL} fmt={(v) => `${vn1(v)} m`} ends={["0,2 m", "2,0 m"]} />
+        <Slider label="Chiều dài dây" value={l} min={0.2} max={2} step={0.01} onChange={setL} fmt={(v) => `${fmt1(v)} m`} ends={["0,2 m", "2,0 m"]} />
       </Region>
     </div>
   );
@@ -261,13 +261,13 @@ function Market({ blocks, live, auto, spec }: { blocks: number; live: boolean; a
         <div className="gl-readout">
           <span>Giá cân bằng</span>
           <b className="num">{Math.round(price / 50) * 50 > 0 ? (Math.round(price / 50) * 50).toLocaleString("vi-VN") : "0"}</b>
-          <small>đ/kg · {vn1(Q)} triệu tấn</small>
+          <small>đ/kg · {fmt1(Q)} triệu tấn</small>
         </div>
       </Region>
       <Region area="formula" i={2} blocks={blocks} live={live} spec={spec}>
         <div className="gl-formula sm">
-          <span>Cầu: P = {vn1(a)} − 0,8Q</span>
-          <span>Cung: P = {vn1(c)} + 0,6Q</span>
+          <span>Cầu: P = {fmt1(a)} − 0,8Q</span>
+          <span>Cung: P = {fmt1(c)} + 0,6Q</span>
         </div>
       </Region>
       <Region area="ctrl" i={3} blocks={blocks} live={live} spec={spec}>
@@ -284,7 +284,7 @@ function Market({ blocks, live, auto, spec }: { blocks: number; live: boolean; a
 function Generic({ blocks, live, auto, spec }: { blocks: number; live: boolean; auto: boolean; spec: Spec }) {
   const [A, setA] = useDriven(1, auto, (t) => 1.2 + 0.6 * Math.sin(t));
   const [B, setB] = useDriven(1, auto, (t) => 1.4 + 0.7 * Math.sin(t * 0.7));
-  const ph = useClock(live);
+  const [ph] = useClock(live);
   const pts = Array.from({ length: 121 }, (_, i) => {
     const xx = (i / 120) * 4 * Math.PI;
     return `${i ? "L" : "M"}${(20 + i * 2.33).toFixed(1)} ${(120 - A * 40 * Math.sin(B * xx - ph)).toFixed(1)}`;
@@ -300,8 +300,8 @@ function Generic({ blocks, live, auto, spec }: { blocks: number; live: boolean; 
       <Region area="graph" i={1} blocks={blocks} live={live} spec={spec}>
         <div className="gl-readout">
           <span>Chu kì</span>
-          <b className="num">{vn1((2 * Math.PI) / B)}</b>
-          <small>biên độ {vn1(A)}</small>
+          <b className="num">{fmt1((2 * Math.PI) / B)}</b>
+          <small>biên độ {fmt1(A)}</small>
         </div>
       </Region>
       <Region area="formula" i={2} blocks={blocks} live={live} spec={spec}>
@@ -311,8 +311,8 @@ function Generic({ blocks, live, auto, spec }: { blocks: number; live: boolean; 
       </Region>
       <Region area="ctrl" i={3} blocks={blocks} live={live} spec={spec}>
         <div className="gl-ctrl2">
-          <Slider label="A" value={A} min={0.2} max={2} step={0.01} onChange={setA} fmt={vn1} />
-          <Slider label="B" value={B} min={0.3} max={3} step={0.01} onChange={setB} fmt={vn1} />
+          <Slider label="A" value={A} min={0.2} max={2} step={0.01} onChange={setA} fmt={fmt1} />
+          <Slider label="B" value={B} min={0.3} max={3} step={0.01} onChange={setB} fmt={fmt1} />
         </div>
       </Region>
     </div>

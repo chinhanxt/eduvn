@@ -13,6 +13,8 @@ export type NavItem = {
   /** Chấm màu môn học (nhóm Môn học cổng Học). */
   dot?: string;
   end?: boolean;
+  /** Không vẽ trên thanh bên (vẫn dùng cho breadcrumb, tiêu đề tab, Ctrl K, phím G): công cụ ít dùng nằm ở trang Tất cả công cụ. */
+  hidden?: boolean;
 };
 export type NavEntry = NavItem | { group: string };
 export type Crumb = { label: string; to?: string };

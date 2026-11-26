@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
-import { useFakeStream } from "../kit";
+import { useFakeStream, useCountUp, usePhases, useTween } from "../kit";
 import { Segmented } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { Head, useCountUp, usePhases, useTween } from "./parts";
+import { Head } from "./parts";
 
 /** Chống ChatGPT làm hộ: (1) AI biến đề dễ chép thành đề chống AI, đồng hồ "ChatGPT làm hộ được" tụt dần;
  *  (2) nhận diện bài nghi AI viết bằng tín hiệu (quá trình viết, giọng văn), không kết luận thay GV. */
@@ -46,7 +46,7 @@ function AntiAi({ run }: { run: number }) {
     <div className="gl-aa">
       <Gauge v={risk} />
       <div className="gl-aa-task">
-        <span className="gl-eyebrow">Ngữ văn 12 · bài viết ở nhà</span>
+        <span className="gl-eyebrow">Ngữ văn 11 · bài viết ở nhà</span>
         <p className={n ? "gl-aa-before dim" : "gl-aa-before"}>{BEFORE}</p>
         <ol className="gl-aa-adds">
           {STEPS.slice(0, n).map((s) => (
@@ -117,7 +117,7 @@ function Detect() {
     <div className="gl-dt">
       <article className={scan ? "gl-dt-essay scan" : "gl-dt-essay"}>
         <header>
-          <span className="gl-eyebrow">Bài nộp · 11A3 · Lê Gia Hân</span>
+          <span className="gl-eyebrow">Bài nộp · 11A3 · Lê Ngọc Diệp</span>
           <span className="gl-dt-when">Nộp 21:31 · 612 chữ</span>
         </header>
         <p>
