@@ -55,7 +55,7 @@ function Hero({ d, name }: { d: HocToday; name: string }) {
   const n = d.next;
   const eyebrow = `${longDay(d.date.weekday, d.date.day)}${d.student.className ? ` · Lớp ${d.student.className}` : ""}`;
   const today = d.days[d.days.length - 1]?.count ?? 0;
-  const mood: Mood = !n ? "khen" : n.answered > 0 ? "dong-vien" : d.streak.current >= 2 ? "chuoi" : "chao";
+  const mood: Mood = !n ? "khen" : d.streak.current >= 2 ? "chuoi" : "chao";
   return (
     <section className="hn-hero" aria-label="Việc tiếp theo">
       <div className="hn-hero-t">
