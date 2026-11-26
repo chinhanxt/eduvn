@@ -12,9 +12,9 @@
 .luyen .setup .lbl { font-size: var(--fs-sm); font-weight: 600; color: var(--ink-2); }
 .qcard { padding: var(--s-8) !important; animation: rise var(--dur-3) var(--ease-out) both; }
 .qcard .qhead { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.qcard .stem { font-family: var(--font-read); font-size: 24px; line-height: 36px; margin-top: var(--s-5); overflow-wrap: anywhere; }
+.qcard .stem { font-family: var(--font-read); font-size: 26px; line-height: 38px; letter-spacing: -.01em; margin-top: var(--s-5); overflow-wrap: anywhere; }
 .qcard .opts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); margin-top: var(--s-6); }
-.qcard .opt { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: var(--s-3); min-height: 72px; padding: var(--s-3) var(--s-4); border-radius: 16px; border: 2px solid var(--line-2); background: var(--bg-raised); color: var(--ink); text-align: left; font-size: 18px; transition: border-color var(--dur-1), background var(--dur-1), transform var(--dur-1), opacity var(--dur-2); }
+.qcard .opt { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); align-items: center; gap: var(--s-3); min-height: 72px; padding: var(--s-3) var(--s-4); border-radius: 16px; border: 1.5px solid var(--line-2); background: var(--bg-raised); color: var(--ink); text-align: left; font-size: 18px; transition: border-color var(--dur-1), background var(--dur-1), transform var(--dur-1), opacity var(--dur-2); }
 .qcard .opt:not(:disabled):hover { border-color: var(--accent-line); } .qcard .opt:not(:disabled):active { transform: scale(.99); }
 .qcard .opt .k { width: 40px; height: 40px; border-radius: 12px; background: var(--bg-sunken); display: grid; place-items: center; font-weight: 800; color: var(--ink-2); }
 .qcard .opt .tx { font-family: var(--font-read); line-height: 26px; overflow-wrap: anywhere; }
@@ -50,9 +50,14 @@
 .qcard .after .caption { display: inline-flex; align-items: center; gap: 6px; }
 .qcard .after kbd.k { background: transparent; color: inherit; border-color: currentColor; opacity: .75; }
 .done-mam { display: flex; justify-content: center; padding-bottom: var(--s-4); }
-.luyen .rail { display: flex; flex-direction: column; gap: var(--s-4); position: sticky; top: calc(var(--top-h) + var(--s-6)); }
+.luyen .rail { display: flex; flex-direction: column; gap: var(--s-8); position: sticky; top: calc(var(--top-h) + var(--s-6)); padding-left: clamp(24px, 3vw, 40px); border-left: 1px solid var(--line); }
+.luyen .rail .hd { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3); }
+.luyen .rail .hd h2 { font: 700 15px/22px var(--font-ui); }
+.lu-done { display: grid; justify-items: center; gap: var(--s-3); text-align: center; padding: var(--s-12) var(--s-4); animation: rise var(--dur-3) var(--ease-out) both; }
+.lu-done h2 { font: 600 clamp(26px, 3vw, 34px)/1.2 var(--font-read); letter-spacing: -.015em; }
+.lu-done p { color: var(--ink-3); max-width: 46ch; margin-bottom: var(--s-3); }
 .luyen .score { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; gap: 4px; }
-.luyen .score b { display: block; font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.luyen .score b { display: block; font: 600 34px/1.1 var(--font-read); letter-spacing: -.02em; font-variant-numeric: lining-nums; }
 .luyen .score span { font-size: 12px; color: var(--ink-3); }
 .mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: var(--s-3); text-align: center; font-size: 12px; color: var(--ink-3); }
 .mini-stats b { display: block; font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -63,7 +68,7 @@
 .luyen .kbd-hint { padding: 0 var(--s-2); }
 @media (max-width: 1180px) { .luyen { grid-template-columns: minmax(0, 1fr) 280px; gap: var(--s-4); } .qcard { padding: var(--s-6) !important; } .qcard .opts { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 720px) {
-  .luyen { grid-template-columns: minmax(0, 1fr); } .luyen .rail { position: static; }
+  .luyen { grid-template-columns: minmax(0, 1fr); } .luyen .rail { position: static; padding-left: 0; border-left: 0; padding-top: var(--s-6); border-top: 1px solid var(--line); }
   .qcard { padding: var(--s-5) !important; } .qcard .stem { font-size: 20px; line-height: 31px; }
   .qcard .opt { min-height: 60px; font-size: 16px; }
   .qcard .ds .r { grid-template-columns: 32px minmax(0, 1fr); } .qcard .ds .tf, .qcard .ds .kv { grid-column: 2; justify-self: start; }

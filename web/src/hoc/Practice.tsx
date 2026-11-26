@@ -7,7 +7,7 @@ import { Mascot } from "../portal/hoc/Mascot";
 import { Columns } from "../ui/charts/Columns";
 import { Button } from "../ui/components/Button";
 import { Skeleton } from "../ui/components/Skeleton";
-import { EmptyState, ErrorState } from "../ui/components/States";
+import { ErrorState } from "../ui/components/States";
 import { type StreamState, StreamingText } from "../ui/components/StreamingText";
 import { useToast } from "../ui/components/Toast";
 import { Icon } from "../ui/Icon";
@@ -215,7 +215,7 @@ export function Practice() {
             <label className="field"><span className="lbl">Lớp</span>
               <select className="select" name="lop" defaultValue={grade}>{Array.from({ length: 16 }, (_, i) => i + 1).map((g) => <option key={g} value={g}>{g <= 12 ? `Lớp ${g}` : `ĐH năm ${g - 12}`}</option>)}</select>
             </label>
-            <label className="field grow"><span className="lbl">Chủ đề (không bắt buộc)</span><input className="input" name="chu-de" defaultValue={topic} placeholder="vd Dấu tam thức bậc hai" /></label>
+            <label className="field grow"><span className="lbl">Chủ đề (không bắt buộc)</span><input className="input" name="chu-de" defaultValue={topic} placeholder="vd Quang hợp, thì quá khứ đơn" /></label>
             <div className="acts"><Button type="submit" variant="primary">Áp dụng</Button></div>
           </form>
         )}
@@ -223,18 +223,15 @@ export function Practice() {
         {gen ? (
           <QSkeleton label="AI đang soạn câu" />
         ) : error && !q ? (
-          <section className="card"><ErrorState title="Chưa lấy được thẻ" text={error} onRetry={nextQ} /></section>
+          <section><ErrorState title="Chưa lấy được thẻ" text={error} onRetry={nextQ} /></section>
         ) : loading && !q ? (
           <QSkeleton />
         ) : !q || cur?.mode === "done" ? (
-          <section className="card qcard">
-            <EmptyState
-              icon="check"
-              title={marks.length ? "Hôm nay ôn xong rồi!" : "Chưa có thẻ nào đến hạn"}
-              text={marks.length ? `${ok}/${marks.length} thẻ đúng · thẻ tiếp theo đến hạn sau.` : `Chưa có câu ${subject} lớp ${grade}${topic ? ` chủ đề ${topic}` : ""}. Nhờ AI ra câu mới nhé.`}
-              action={<Button variant="primary" icon="spark" busy={gen} onClick={generate}>Luyện thêm 3 câu</Button>}
-            />
-            {marks.length > 0 && <div className="done-mam"><Mascot mood="khen" size={72} say="Ôn đều mỗi ngày là nhớ lâu!" /></div>}
+          <section className="lu-done">
+            <Mascot mood={marks.length ? "khen" : "chao"} size={96} />
+            <h2>{marks.length ? "Hôm nay ôn xong rồi!" : "Chưa có thẻ đến hạn"}</h2>
+            <p>{marks.length ? `${ok}/${marks.length} thẻ đúng · ôn đều mỗi ngày là nhớ lâu.` : `${subject} · ${grade <= 12 ? `lớp ${grade}` : `ĐH năm ${grade - 12}`}${topic ? ` · ${topic}` : ""}. Nhờ AI ra câu mới nhé.`}</p>
+            <Button variant="primary" size="lg" icon="spark" busy={gen} onClick={generate}>Luyện thêm 3 câu</Button>
           </section>
         ) : (
           <section className={loading ? "card qcard is-stale" : "card qcard"} aria-label="Thẻ đang ôn" key={q.id} data-testid="prac-q">
@@ -330,7 +327,7 @@ export function Practice() {
       </div>
 
       <aside className="rail" aria-label="Tiến độ">
-        <section className="card">
+        <section>
           <div className="hd"><h2>Phiên này</h2><span className="grow" />{lastMark && <Mascot key={marks.length} mood={lastMark === "ok" ? "khen" : "dong-vien"} size={40} />}</div>
           <div className="score">
             <div><b style={{ color: "var(--ok)" }}>{ok}</b><span>đúng</span></div>
@@ -339,7 +336,7 @@ export function Practice() {
           </div>
           <p className="caption" style={{ marginTop: 12, textAlign: "center" }}>{due ? `Còn ${due} thẻ đến hạn` : "Không còn thẻ đến hạn"}</p>
         </section>
-        <section className="card">
+        <section>
           <div className="hd"><h2>7 ngày qua</h2><span className="grow" /><span className="caption">{s?.accuracy == null ? "" : `đúng ${s.accuracy}%`}</span></div>
           {s ? (
             <>
@@ -357,7 +354,7 @@ export function Practice() {
           )}
         </section>
         {s && s.topics.length > 0 && (
-          <section className="card">
+          <section>
             <div className="hd"><h2>Chủ đề hay sai</h2></div>
             <ul className="topics">
               {s.topics.slice(0, 5).map((t) => (
