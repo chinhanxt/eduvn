@@ -4,7 +4,9 @@ import { Karaoke, Loa } from "./bits";
 import type { ParentView } from "./data";
 import type { Speak } from "./HomNay";
 
-/** Kèm con 10 phút: mỗi màn một bước, chữ rất to, tự đọc; nút Tiếp lớn ở đáy; bước cuối là ✓ lớn. */
+const STEP_ICONS = ["chat", "play", "moon"];
+
+/** Kèm con 10 phút kiểu màn giới thiệu iOS: mỗi màn một bước, chữ to, tự đọc; nút Tiếp ở đáy; bước cuối là ✓. */
 export default function KemNgay({ v, sp, onClose }: { v: ParentView; sp: Speak; onClose: () => void }) {
   const [i, setI] = useState(0);
   const step = v.steps[i];
@@ -37,50 +39,47 @@ export default function KemNgay({ v, sp, onClose }: { v: ParentView; sp: Speak; 
     <div className="ph-run" role="dialog" aria-modal="true" aria-label="Kèm con 10 phút" ref={box} tabIndex={-1}>
       <div className="ph-run-col">
         <div className="ph-run-top">
-          <span className="ph-run-n">{done ? "Xong" : `Bước ${i + 1} / ${v.steps.length}`}</span>
-          <button type="button" className="ph-ghost" onClick={onClose}>
-            <Icon name="x" />
-            <span>Thoát</span>
+          <button type="button" className="ph-link" onClick={onClose}>
+            {done ? "Xong" : "Thoát"}
           </button>
         </div>
 
         <div className="ph-run-body" key={i}>
           {done ? (
             <>
-              <span className="ph-ok" aria-hidden="true">
-                <svg viewBox="0 0 52 52"><path d="M14 27l8 8 16-17" /></svg>
+              <span className="ph-done" aria-hidden="true">
+                <svg viewBox="0 0 52 52"><path d="M15 27l7 7 15-16" /></svg>
               </span>
               <p className="ph-run-t">{you} đã làm rất tốt</p>
               <p className="ph-run-tip">Cô Hà sẽ biết tối nay con được kèm.</p>
             </>
           ) : (
             <>
-              <span className="ph-run-num" aria-hidden="true">{i + 1}</span>
+              <span className="ph-run-ico" aria-hidden="true"><Icon name={STEP_ICONS[i] ?? "check"} /></span>
+              <p className="ph-run-n">Bước {i + 1} trên {v.steps.length}</p>
               {reading ? <Karaoke text={step.text} at={sp.word} className="ph-run-t" /> : <p className="ph-run-t">{step.text}</p>}
               {step.tip && <p className="ph-run-tip">{step.tip}</p>}
-              <button type="button" className="ph-ghost" onClick={() => sp.toggle(key, say)}>
+              <button type="button" className="ph-link icon" onClick={() => sp.toggle(key, say)}>
                 <Loa on={reading} />
-                <span>{reading ? "Dừng" : "Nghe lại"}</span>
+                <span>{reading ? "Dừng đọc" : "Nghe lại"}</span>
               </button>
             </>
           )}
         </div>
 
         <div className="ph-run-foot">
-          <div className="ph-dots" aria-hidden="true">
+          <div className={done ? "ph-pager gone" : "ph-pager"} aria-hidden="true">
             {v.steps.map((_, k) => (
-              <i key={k} className={k < i ? "done" : k === i ? "now" : undefined} />
+              <i key={k} className={k === i ? "on" : undefined} />
             ))}
           </div>
           {done ? (
-            <button type="button" className="ph-big fill wide" onClick={onClose}>
-              <Icon name="home" />
+            <button type="button" className="ph-btn fill wide" onClick={onClose}>
               <span>Về trang chính</span>
             </button>
           ) : (
-            <button type="button" className="ph-big fill wide" onClick={() => (sp.stop(), setI((x) => x + 1))}>
-              <span>Tiếp</span>
-              <Icon name="arrowr" />
+            <button type="button" className="ph-btn fill wide" onClick={() => (sp.stop(), setI((x) => x + 1))}>
+              <span>{i === v.steps.length - 1 ? "Xong" : "Tiếp"}</span>
             </button>
           )}
         </div>

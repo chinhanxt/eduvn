@@ -19,6 +19,8 @@ export type ParentView = {
   light: Light;
   /** Một dòng lý do, tối đa 6 từ. */
   reason: string;
+  /** Bài đã làm hôm nay / tổng (vòng tiến độ nhỏ). */
+  done: [number, number];
   /** Tóm tắt đọc to khi bấm Nghe. */
   read: string;
   /** Kèm con 10 phút: mỗi bước tối đa 12 từ. */
@@ -38,6 +40,7 @@ export const VIEWS: ParentView[] = [
     relation: "Ông nội",
     light: "vang",
     reason: "Toán hơi xuống · ngủ muộn",
+    done: [2, 3],
     read: "Chào bác Tư. Hôm nay Khánh Duy đi học đủ. Môn Toán đang hơi xuống. Mấy tối nay con ngủ muộn. Tối nay bác ngồi cùng con mười phút nhé.",
     steps: [
       { text: "Hỏi con: hôm nay Toán có chỗ nào khó?", tip: "Bác chỉ cần nghe con kể." },
@@ -69,6 +72,7 @@ export const VIEWS: ParentView[] = [
     relation: "Mẹ",
     light: "xanh",
     reason: `Hoá được ${HOA} điểm`,
+    done: [3, 3],
     read: "Chào chị Hồng. Hôm nay Minh Anh học tốt. Con được chín phẩy năm điểm bài kiểm tra Hoá. Môn Toán đang tiến bộ. Tối nay chị hỏi bài con mười phút nhé.",
     steps: [
       { text: "Hỏi con: nhân với số âm thì dấu đổi thế nào?", tip: "Con đúng nếu nói: đổi chiều." },
