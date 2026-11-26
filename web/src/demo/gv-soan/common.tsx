@@ -1,5 +1,5 @@
-/** Mảnh dùng chung của Gói A: đầu trang có nhãn mô phỏng, dải bước, sóng âm, hẹn giờ theo pha. */
-import { type ReactNode, useEffect, useState } from "react";
+/** Mảnh dùng chung của Gói A: đầu trang có nhãn mô phỏng, dải bước, sóng âm (nhịp chuyển động ở demo/kit/motion). */
+import type { ReactNode } from "react";
 import { usePageMeta } from "../../ui/shell/AppShell";
 import { PageHead, type Primary } from "../../ui/shell/PageHead";
 import { Icon } from "../../ui/Icon";
@@ -24,41 +24,6 @@ export function Head({ title, tabs, primary, children, crumbs }: { title: string
       {children}
     </PageHead>
   );
-}
-
-/** Chạy tuần tự các pha: trả về chỉ số pha hiện tại (0 → durations.length). Đổi `key` để chạy lại. */
-export function usePhases(durations: number[], run: boolean, key?: unknown) {
-  const [i, setI] = useState(0);
-  const sig = durations.join(",");
-  useEffect(() => {
-    setI(0);
-    if (!run) return;
-    const ts: ReturnType<typeof setTimeout>[] = [];
-    let acc = 0;
-    durations.forEach((ms, k) => {
-      acc += ms;
-      ts.push(setTimeout(() => setI(k + 1), acc));
-    });
-    return () => ts.forEach(clearTimeout);
-  }, [sig, run, key]); // eslint-disable-line react-hooks/exhaustive-deps
-  return i;
-}
-
-/** Đếm 0 → n đều đặn trong `ms` (số đếm lên, hàng hiện dần). */
-export function useCount(n: number, ms: number, run = true, key?: unknown) {
-  const [c, setC] = useState(0);
-  useEffect(() => {
-    setC(0);
-    if (!run || n <= 0) return;
-    let k = 0;
-    const t = setInterval(() => {
-      k++;
-      setC(k);
-      if (k >= n) clearInterval(t);
-    }, ms / n);
-    return () => clearInterval(t);
-  }, [n, ms, run, key]);
-  return c;
 }
 
 export type RailStep = { label: string; icon: string };

@@ -4,13 +4,16 @@ import { Button } from "../../ui/components/Button";
 import { Tabs } from "../../ui/components/Tabs";
 import { useToast } from "../../ui/components/Toast";
 import { Icon } from "../../ui/Icon";
-import { GUARDIANS, KHANH_DUY, MINH_ANH, QUANG_HUY, SCHOOL, TEACHERS, THAO_VY } from "../kit/world";
+import { GUARDIANS, KHANH_DUY, MINH_ANH, QUANG_HUY, SCHOOL, TEACHERS, THAO_VY, DUC_THINH, SCHOOL_MORE } from "../kit/world";
+import { MockBadge } from "../kit/MockBadge";
+
+const PRINCIPAL = SCHOOL.principal.replace(/^thầy /, "");
 
 /* ---------------- Người dùng ---------------- */
 type Role = "hs" | "ph" | "gv" | "bgh" | "qt";
 const ROLES: { id: Role; label: string; n: number; c: string }[] = [
   { id: "hs", label: "Học sinh, SV", n: SCHOOL.students, c: "var(--c1)" },
-  { id: "ph", label: "Phụ huynh", n: 1105, c: "var(--c3)" },
+  { id: "ph", label: "Phụ huynh", n: SCHOOL_MORE.parents, c: "var(--c3)" },
   { id: "gv", label: "Giáo viên", n: SCHOOL.teachers, c: "var(--c7)" },
   { id: "bgh", label: "Ban giám hiệu", n: 4, c: "var(--c5)" },
   { id: "qt", label: "Quản trị", n: 2, c: "var(--c4)" },
@@ -19,11 +22,11 @@ type St = "on" | "moi" | "khoa";
 type U = { id: string; name: string; role: Role; where: string; st: St; last: string };
 
 const USERS: U[] = [
-  { id: "cong", name: "Lý Thành Công", role: "bgh", where: "Hiệu trưởng", st: "on", last: "vừa xong" },
+  { id: "cong", name: PRINCIPAL, role: "bgh", where: "Hiệu trưởng", st: "on", last: "vừa xong" },
   ...TEACHERS.map((t, i): U => ({ id: t.id, name: t.name, role: "gv", where: [t.subject, t.className].filter(Boolean).join(" · "), st: "on", last: ["8 phút", "1 giờ", "hôm qua", "3 giờ", "20 phút", "2 ngày", "5 giờ"][i] ?? "hôm qua" })),
   { id: MINH_ANH.id, name: MINH_ANH.name, role: "hs", where: MINH_ANH.className!, st: "on", last: "12 phút" },
   { id: KHANH_DUY.id, name: KHANH_DUY.name, role: "hs", where: KHANH_DUY.className!, st: "on", last: "2 giờ" },
-  { id: "duc-thinh", name: "Đỗ Đức Thịnh", role: "hs", where: "10A1", st: "moi", last: "chưa vào" },
+  { id: DUC_THINH.id, name: DUC_THINH.name, role: "hs", where: DUC_THINH.className!, st: "on", last: "3 giờ" },
   { id: THAO_VY.id, name: THAO_VY.name, role: "hs", where: THAO_VY.className!, st: "on", last: "hôm qua" },
   { id: QUANG_HUY.id, name: QUANG_HUY.name, role: "hs", where: QUANG_HUY.className!, st: "on", last: "40 phút" },
   ...GUARDIANS.map((g, i): U => ({ id: g.id, name: g.name, role: "ph", where: i === 0 ? "Mẹ Minh Anh" : "Ông nội Khánh Duy", st: "on", last: i === 0 ? "1 giờ" : "hôm qua" })),
@@ -79,7 +82,7 @@ function Users() {
       setImp("dang");
       setTimeout(() => {
         setImp("xong");
-        toast({ title: "Đã đồng bộ từ VNEdu", msg: "1.240 HS · 86 GV · 1.105 phụ huynh. Không có thay đổi lạ.", kind: "ok" });
+        toast({ title: "Đã đồng bộ từ VNEdu", msg: `${SCHOOL.students.toLocaleString("vi-VN")} HS · ${SCHOOL.teachers} GV · ${SCHOOL_MORE.parents.toLocaleString("vi-VN")} phụ huynh. Không có thay đổi lạ.`, kind: "ok" });
         ok();
       }, 2600);
     });
@@ -155,7 +158,7 @@ const LOG: { t: string; who: string; what: string; k: Kind; h: string }[] = [
   { t: "20:47", who: "bác Trần Văn Tư", what: "xem “Khánh Duy hôm nay”", k: "ho-so", h: "e402" },
   { t: "19:30", who: "Hệ thống", what: "gửi 1.105 tin Zalo tối cho phụ huynh", k: "he-thong", h: "5f90" },
   { t: "16:12", who: "cô Lê Thu Hà", what: "xem hồ sơ AI lớp 10A1", k: "ho-so", h: "a3d7" },
-  { t: "15:40", who: "thầy Lý Thành Công", what: "xuất báo cáo toàn trường (chỉ số tổng hợp)", k: "xuat", h: "0b6c" },
+  { t: "15:40", who: SCHOOL.principal, what: "xuất báo cáo toàn trường (chỉ số tổng hợp)", k: "xuat", h: "0b6c" },
   { t: "14:02", who: "Phòng CNTT", what: "cấp quyền tổ trưởng Văn cho thầy Nguyễn Quốc Bảo", k: "quyen", h: "d81f" },
   { t: "10:15", who: "chị Nguyễn Thị Hồng", what: "bấm “quên điều này” trên hồ sơ của con", k: "quyen", h: "36e2" },
   { t: "09:00", who: "Hệ thống", what: "tự xoá 312 mục quá hạn 24 tháng", k: "he-thong", h: "c4a9" },
@@ -222,7 +225,10 @@ export default function QuanTri() {
     <div className="tr-page">
       <div className="tr-head">
         <p className="eyebrow">Tài khoản · nhật ký</p>
-        <h1>Quản trị</h1>
+        <h1>
+          Quản trị
+          <MockBadge />
+        </h1>
       </div>
       <div className="qt">
         <Tabs

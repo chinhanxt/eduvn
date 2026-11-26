@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router";
 import { Icon } from "../../ui/Icon";
-import { MockBadge } from "../kit/MockBadge";
 import { LIGHTS, VIEWS, type ParentView } from "./data";
 import { toggleDark, useDark } from "./theme";
 
@@ -60,7 +59,6 @@ export default function CaiDat({ v, big, onBig, onClose }: { v: ParentView; big:
           <Icon name="check" />
           <span>Xong</span>
         </button>
-        <MockBadge className="ph-badge" />
       </div>
     </div>
   );

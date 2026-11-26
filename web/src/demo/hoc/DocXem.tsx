@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router";
-import { useFakeStream } from "../kit";
+import { useFakeStream, Face, useClock } from "../kit";
 import { Segmented, StreamingText } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { DemoHead, Face, useClock } from "./parts";
+import { DemoHead } from "./parts";
 
 /** Đọc & xem: đọc tài liệu nhập vai (hỏi chính tác giả/nhân vật) và học qua video có ghi chú theo mốc. */
 type Mode = "doc" | "xem";

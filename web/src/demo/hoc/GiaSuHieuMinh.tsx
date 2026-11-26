@@ -1,8 +1,8 @@
 import { type ReactNode, useEffect, useState } from "react";
-import { KHANH_DUY, type Learner, MINH_ANH, useFakeStream } from "../kit";
+import { KHANH_DUY, type Learner, MINH_ANH, useFakeStream, Face, useClock, useSteps } from "../kit";
 import { Button, StreamingText } from "../../ui";
 import { Icon } from "../../ui/Icon";
-import { DemoHead, Face, useClock, useSteps } from "./parts";
+import { DemoHead } from "./parts";
 
 /** Cùng một câu hỏi, hai em, hai cách giảng: gia sư tác tử đọc hồ sơ từng em rồi chọn cách giảng (ví dụ đời thực ↔ video ngắn). */
 const QUESTION = "−x² + 6x − 5 > 0";

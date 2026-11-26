@@ -4,7 +4,8 @@ import { Icon } from "../../ui/Icon";
 import { useFakeStream } from "../kit/useFakeStream";
 import { NUMBERS } from "../kit/world";
 import { KPIS, ROWS, SUBJECTS, TEACHER_ROWS, avg, fmt, schoolAvg, type ClassRow } from "./data";
-import { useAfter, useCount } from "./hooks";
+import { useAfter, useCountUp } from "../kit/motion";
+import { MockBadge } from "../kit/MockBadge";
 
 const SPAN = 1.2; // ±1,2 điểm quanh TB toàn trường là màu đậm nhất
 
@@ -16,7 +17,7 @@ function cellStyle(v: number) {
 }
 
 function Kpi({ k, i }: { k: (typeof KPIS)[number]; i: number }) {
-  const n = useCount(k.value, true, 1100, 120 + i * 90);
+  const n = useCountUp(k.value, 1100, true, 120 + i * 90);
   return (
     <div className={k.alert ? "tr-kpi alert" : "tr-kpi"} style={{ ["--i" as string]: i }}>
       <b className="num">{k.dec ? fmt(n, k.dec) : Math.round(n).toLocaleString("vi-VN")}</b>
@@ -131,7 +132,7 @@ function Alerts() {
             setTimeout(() => {
               setBusy(false);
               setSent(true);
-              toast({ title: "Đã giao tổ Văn", msg: "Thầy Bảo và tổ trưởng nhận việc kèm số liệu.", kind: "ok" });
+              toast({ title: "Đã giao tổ Văn", msg: "Thầy Bảo (tổ trưởng Văn) nhận việc kèm số liệu.", kind: "ok" });
             }, 700);
           }}
         >
@@ -228,7 +229,10 @@ export default function ToanTruong() {
     <div className="tr-page">
       <div className="tr-head">
         <p className="eyebrow">Học kỳ I · tháng 11</p>
-        <h1>Toàn trường</h1>
+        <h1>
+          Toàn trường
+          <MockBadge />
+        </h1>
       </div>
       <div className="tr-kpis">
         {KPIS.map((k, i) => (

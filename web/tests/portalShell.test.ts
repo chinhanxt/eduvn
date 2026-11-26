@@ -48,6 +48,12 @@ describe("điều hướng khung cổng", () => {
     const keys = items.map((n) => n.kbd).filter(Boolean);
     expect(new Set(keys).size).toBe(keys.length);
   });
+  it("thanh bên gọn: mỗi nhóm hiện ≤ 7 mục, mục ẩn vẫn khớp breadcrumb", () => {
+    const runs: number[] = [0];
+    for (const n of gvNav()) if (!isItem(n)) runs.push(0); else if (!n.hidden) runs[runs.length - 1]!++;
+    expect(Math.max(...runs)).toBeLessThanOrEqual(7);
+    expect(matchNav(items, "/workbench")?.label).toBe("Workbench");
+  });
   it("đếm trên thanh bên lấy từ dữ liệu Hôm nay", () => {
     const n = gvNav({ classes: 4, grading: 23 }).filter(isItem);
     expect(n.find((x) => x.to === "/cham-bai")?.count).toBe(23);

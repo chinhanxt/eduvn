@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
-import { useFakeStream } from "../kit";
+import { useFakeStream, reduced, useCountUp, useTween } from "../kit";
 import { Button } from "../../ui";
 import { Icon } from "../../ui/Icon";
 import { CAST, type CastId, Portrait } from "./Cast";
-import { Head, reduced, useCountUp, useTween } from "./parts";
+import { Head } from "./parts";
 
 /** Lớp học AI đang diễn ra: GV AI · trợ giảng · bạn học AI nói lần lượt, AI vẽ bảng và điều khiển mô phỏng,
  *  HS ngắt lời bằng giọng, chuyển bàn tròn tranh luận, quiz chấm AI, thẻ kết khoá. Kịch bản: Vật lí 10 · Rơi tự do. */

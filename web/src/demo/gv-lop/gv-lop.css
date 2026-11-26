@@ -6,8 +6,7 @@
 }
 :root[data-theme="dark"][data-portal="gv"] { --gl-paper-filter: brightness(.9); }
 
-.gl-h1 { display: inline-flex; align-items: center; gap: 12px; }
-.gl-h1 .demo-badge { font-size: 10px; }
+.gl-h1 { display: inline-flex; align-items: center; flex-wrap: wrap; row-gap: 6px; }
 .gl-eyebrow { font: 600 11px/16px var(--font-ui); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--ink-3); }
 .gl-muted { color: var(--ink-3); }
 .gl-lesson { font-size: 13px; color: var(--ink-3); white-space: nowrap; }

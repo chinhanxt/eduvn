@@ -2,7 +2,8 @@
 import { useMemo, useState } from "react";
 import { Button } from "../../ui/components/Button";
 import { Icon } from "../../ui/Icon";
-import { Head, useCount, usePhases } from "./common";
+import { Head } from "./common";
+import { useCount, usePhases } from "../kit";
 
 const GROUPS: [string, string[]][] = [
   ["Nét & hình", ["Vẽ nét", "Tô dần", "Viền tay", "Mũi tên cong", "Mũi tên lượn", "Khung nhấn", "Gạch chân", "Khoanh tròn", "Lưới giấy", "Bóng đổ nhẹ", "Nét đứt chạy", "Điểm sáng"]],
