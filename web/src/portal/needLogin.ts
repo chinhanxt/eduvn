@@ -4,5 +4,5 @@ import { AFTER_LOGIN_KEY } from "../auth";
 export function goLogin(): void {
   const l = window.location;
   window.sessionStorage.setItem(AFTER_LOGIN_KEY, `${l.pathname}${l.search}${l.hash}`);
-  window.location.replace("/");
+  window.location.replace("/dang-nhap");
 }

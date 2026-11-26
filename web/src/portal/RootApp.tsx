@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import { api, ApiError, type Me } from "../api";
 import { useAuth } from "../auth";
-import { Callback, Login } from "../pages/Login";
+import { Callback, Intro, Login } from "../pages/Login";
 import { loadSession } from "../student/session";
 import { legacyRedirect, portalForRole } from "./entries";
 import { GoTo } from "./Redirect";
@@ -15,8 +15,8 @@ const SolutionPublicPage = lazy(() => import("../solution/SolutionLibrary").then
 const PhuHuynh = lazy(() => import("../demo/phu-huynh"));
 const Truong = lazy(() => import("../demo/truong"));
 
-/** "/": đăng nhập Keycloak → theo vai trò (GV/owner/admin/assistant → /gv, còn lại → /hoc); chỉ có phiên HS P9a → /hoc/hs; chưa có → Đăng nhập. */
-function Landing() {
+/** "/": đăng nhập Keycloak → theo vai trò (GV/owner/admin/assistant → /gv, còn lại → /hoc); chỉ có phiên HS P9a → /hoc/hs; chưa có → trang giới thiệu (Đăng nhập ở /dang-nhap). */
+function Landing({ anonView }: { anonView: "intro" | "login" }) {
   const { user, ready } = useAuth();
   const [to, setTo] = useState<string | null>(null);
   const [anon, setAnon] = useState(false);
@@ -43,7 +43,7 @@ function Landing() {
     };
   }, [ready, user]);
   if (to) return <GoTo here="index.html" to={to} />;
-  if (anon) return <Login />;
+  if (anon) return anonView === "intro" ? <Intro /> : <Login />;
   if (err)
     return (
       <div className="center">
@@ -71,7 +71,8 @@ export function RootApp() {
         <Route path="/loi-giai/:slug" element={<SolutionPublicPage />} />
         <Route path="/phu-huynh/*" element={<PhuHuynh />} />
         <Route path="/truong/*" element={<Truong />} />
-        <Route index element={<Landing />} />
+        <Route index element={<Landing anonView="intro" />} />
+        <Route path="/dang-nhap" element={<Landing anonView="login" />} />
         <Route path="*" element={<Fallback />} />
       </Routes>
     </Suspense>
