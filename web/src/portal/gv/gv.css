@@ -518,7 +518,8 @@
 [data-portal="gv"] .lv-gb { display: flex; align-items: center; gap: 12px; margin-top: 32px; padding: 14px 16px; border-radius: 10px; background: var(--bg-sunken); }
 [data-portal="gv"] .lv-gb > svg { color: var(--accent); } [data-portal="gv"] .lv-gb b { display: block; font-weight: 600; } [data-portal="gv"] .lv-gb small { font-size: 12px; color: var(--ink-3); }
 [data-portal="gv"] .lv-gb .select { width: auto; min-width: 96px; }
-@media (max-width: 1024px) { [data-portal="gv"] .lv-hero, [data-portal="gv"] .lv-res { grid-template-columns: minmax(0, 1fr); } [data-portal="gv"] .lv-stage { max-width: 640px; } }
+@media (max-width: 1180px) { [data-portal="gv"] .lv-hero { grid-template-columns: minmax(0, 1fr) minmax(340px, 1fr); } }
+@media (max-width: 900px) { [data-portal="gv"] .lv-hero, [data-portal="gv"] .lv-res { grid-template-columns: minmax(0, 1fr); } [data-portal="gv"] .lv-stage { max-width: 640px; } }
 @media (max-width: 720px) {
   [data-portal="gv"] .lv-src { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   [data-portal="gv"] .lv-form > .btn { justify-self: stretch; }
@@ -612,5 +613,5 @@
 [data-portal="gv"] .cn-more .rows li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 [data-portal="gv"] .cn-more .g { flex: 1; } [data-portal="gv"] .cn-more .g b { display: block; font-weight: 550; } [data-portal="gv"] .cn-more .g small { color: var(--ink-3); font-size: 12px; }
 [data-portal="gv"] .cn-more .lead { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--bg-sunken); color: var(--ink-2); }
-@media (max-width: 1024px) { [data-portal="gv"] .cn-hero { grid-template-columns: minmax(0, 1fr); } [data-portal="gv"] .cn-flow { max-width: 560px; } }
+@media (max-width: 900px) { [data-portal="gv"] .cn-hero { grid-template-columns: minmax(0, 1fr); } [data-portal="gv"] .cn-flow { max-width: 560px; } }
 @media (max-width: 720px) { [data-portal="gv"] .cn-flow { padding: 18px; } [data-portal="gv"] .cn-core { min-width: 0; padding: 12px; } [data-portal="gv"] .cn-apps span { padding: 8px 10px; font-size: 13px; } }
