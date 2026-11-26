@@ -73,12 +73,11 @@ export function Bank() {
   const reload = () => invalidate(bankKey(subject, grade));
 
   const cols: Column<BankQuestion>[] = [
-    { key: "ma", header: "Mã", hideSm: true, width: 84, cell: (r) => <span className="mono muted" data-cur={sel?.id === r.id ? "1" : undefined}>Q-{r.id.slice(0, 4).toUpperCase()}</span> },
     {
       key: "cau",
       header: "Câu hỏi",
       cell: (r) => (
-        <div className="q-cell">
+        <div className="q-cell" data-cur={sel?.id === r.id ? "1" : undefined}>
           <div className="stem"><MathText value={r.stem} /></div>
           <span className="t-sub">{r.topic}{r.figure ? " · có hình" : ""}</span>
         </div>
@@ -108,7 +107,7 @@ export function Bank() {
       <div className="split bank" style={{ marginTop: 0 }}>
         <section className="pane" aria-label="Danh sách câu hỏi">
           <FilterBar>
-            <SearchBox value={v.q} onChange={v.setQ} placeholder="Tìm nội dung, mã câu…  /" label="Tìm câu hỏi" />
+            <SearchBox value={v.q} onChange={v.setQ} placeholder="Tìm nội dung câu hỏi…  /" label="Tìm câu hỏi" />
             <Input className="sm-in" aria-label="Môn" value={subj} onChange={(e) => setSubj(e.target.value)} onBlur={() => subj.trim() && subj !== subject && setSubject(subj.trim())} onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()} data-testid="f-subject" style={{ width: 110 }} />
             <Select aria-label="Lớp" value={grade} onChange={(e) => setGrade(Number(e.target.value))} data-testid="f-grade">
               {GRADES.map((g) => <option key={g} value={g}>{gradeVi(g)}</option>)}
@@ -168,7 +167,7 @@ function Preview({ q, sol, onSolution }: { q: BankQuestion; sol?: VerifyStatus; 
   return (
     <div style={{ animation: "rise var(--dur-2) var(--ease-out) both" }}>
       <div className="dhd">
-        <span className="mono">Q-{q.id.slice(0, 4).toUpperCase()}</span> <Badge>{TYPE_LABEL[q.type]}</Badge>
+        <Badge>{TYPE_LABEL[q.type]}</Badge>
         <h2 style={{ marginTop: 6 }}>{q.topic}</h2>
       </div>
       <div className="stem-read"><MathText value={q.stem} /></div>
