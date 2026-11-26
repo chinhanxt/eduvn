@@ -31,6 +31,31 @@ function Top() {
   );
 }
 
+// Thẻ mẫu mờ khi thư viện trống (nhiều môn).
+const GHOST: [string, string, string][] = [
+  ["Vật lí", "Thả rơi tự do một vật từ độ cao 20 m. Sau bao lâu vật chạm đất? (g = 10 m/s²)", "2 s"],
+  ["Hoá học", "Cân bằng phản ứng Fe + HNO₃ loãng → Fe(NO₃)₃ + NO + H₂O", "1, 4, 1, 1, 2"],
+  ["Sinh học", "Lai Aa × Aa. Tỉ lệ kiểu hình ở F₁ là bao nhiêu?", "3 : 1"],
+  ["Toán", "Tìm khoảng cách từ A(1; 2) đến đường thẳng 3x + 4y − 1 = 0", "2"],
+];
+
+/** Hình minh hoạ đầu trang: ba bước nối nhau, bước cuối có dấu kiểm. */
+function StepArt() {
+  return (
+    <svg className="sol-art" viewBox="0 0 360 220" aria-hidden="true">
+      <path className="ln" d="M60 170 C 120 170, 120 110, 180 110 S 240 50, 300 50" />
+      {[[60, 170, "1"], [180, 110, "2"], [300, 50, "✓"]].map(([x, y, t], i) => (
+        <g key={i} className={`st s${i}`} transform={`translate(${x},${y})`}>
+          <circle r="22" />
+          <text y="6" textAnchor="middle">{t}</text>
+        </g>
+      ))}
+      <rect className="cd" x="96" y="182" width="120" height="10" rx="5" />
+      <rect className="cd" x="210" y="122" width="96" height="10" rx="5" />
+    </svg>
+  );
+}
+
 function Mini({ s }: { s: VerifyStatus }) {
   return (
     <span className={`sol-mini sol-${s}`}>
@@ -78,7 +103,7 @@ export function SolutionLibrary() {
   const [err, setErr] = useState<string | null>(null);
   const [term, setTerm] = useState(q);
   const debounce = useRef(0);
-  useMeta("Thư viện lời giải từng bước — EDUVN", "Lời giải Toán từng bước có hình minh hoạ đồng bộ và đáp số đã được phần mềm tự kiểm lại. Lọc theo chủ đề, tìm theo đề bài.");
+  useMeta("Thư viện lời giải từng bước — EDUVN", "Lời giải từng bước có hình minh hoạ đồng bộ, đáp số được phần mềm tự kiểm lại. Lọc theo chủ đề, tìm theo đề bài.");
 
   useEffect(() => {
     const ac = { stop: false };
@@ -114,14 +139,17 @@ export function SolutionLibrary() {
       <Top />
       <main className="sol-lib-main">
         <section className="sol-lib-hero">
-          <div className="sol-eyebrow">Thư viện mở</div>
+          <div>
+          <div className="sol-eyebrow">Thư viện mở · không cần đăng nhập</div>
           <h1>Lời giải từng bước</h1>
-          <p>Mỗi bài chia thành vài bước ngắn, hình minh hoạ đổi theo từng bước, và đáp số được phần mềm tự đo lại trên hình hoặc thế lại vào đề.</p>
+          <p>Vài bước ngắn, hình đổi theo từng bước, đáp số được tự kiểm.</p>
           <form className="sol-search" role="search" onSubmit={submit}>
             <SolIcon d="search" />
-            <input value={term} onChange={(e) => onTerm(e.target.value)} placeholder="Tìm theo đề bài, ví dụ: khoảng cách, tích phân, xác suất…" aria-label="Tìm lời giải theo đề" data-testid="lib-search" />
+            <input value={term} onChange={(e) => onTerm(e.target.value)} placeholder="Tìm theo đề: quang hợp, vật rơi, cân bằng phản ứng…" aria-label="Tìm lời giải theo đề" data-testid="lib-search" />
             {term && <button type="button" className="sol-icon-btn" aria-label="Xoá tìm kiếm" onClick={() => onTerm("")}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button>}
           </form>
+          </div>
+          <StepArt />
         </section>
         {data && data.topics.length > 0 && (
           <div className="sol-chips" role="group" aria-label="Lọc theo chủ đề">
@@ -141,9 +169,16 @@ export function SolutionLibrary() {
             ))}
           </ul>
         ) : items.length === 0 ? (
-          <div className="sol-empty">
-            <p>{q || topic ? "Không thấy lời giải khớp bộ lọc." : "Chưa có lời giải nào được chia sẻ."}</p>
-            {(q || topic) && <button type="button" className="sol-btn" onClick={() => (setTerm(""), setSp(new URLSearchParams(), { replace: true }))}>Bỏ lọc</button>}
+          <div className="sol-empty-w">
+            <div className="sol-empty">
+              <p>{q || topic ? "Không thấy lời giải khớp bộ lọc." : "Chưa có lời giải nào được chia sẻ."}</p>
+              {(q || topic) && <button type="button" className="sol-btn" onClick={() => (setTerm(""), setSp(new URLSearchParams(), { replace: true }))}>Bỏ lọc</button>}
+            </div>
+            <ul className="sol-cards sol-ghost" aria-hidden="true">
+              {GHOST.map(([t, p, a]) => (
+                <li key={t} className="sol-card"><div className="sol-ghost-a"><div className="sol-card-meta"><span className="t">{t}</span></div><h2>{p}</h2><div className="sol-card-foot"><span className="ans">Đáp số: {a}</span><Mini s="verified" /></div></div></li>
+              ))}
+            </ul>
           </div>
         ) : (
           <ul className={`sol-cards${loading ? " stale" : ""}`} data-testid="lib-list">

@@ -340,7 +340,7 @@ export function figureSvg(m: FigureModel, refs: string[]): { svg: string; w: num
   return { svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${Math.ceil(w)}" height="${Math.ceil(h)}" viewBox="${x} ${y} ${w} ${h}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>${body}</svg>`, w: Math.ceil(w), h: Math.ceil(h) };
 }
 
-export const ACCENT = "#d9480f";
+export const ACCENT = "#b4235a";
 const INK = "#1b2130";
 const xesc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 function elSvg(e: El, h: "hl" | "dim" | null): string {
@@ -357,7 +357,7 @@ function elSvg(e: El, h: "hl" | "dim" | null): string {
     case "circle":
       return `<circle cx="${e.cx}" cy="${e.cy}" r="${e.r}" fill="${e.fill ? stroke : "none"}" stroke="${stroke}" stroke-width="${sw(1.6)}"${op}/>`;
     case "rect":
-      return `<rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" rx="${e.rx}" fill="${h === "hl" ? "#fff1e8" : "#ffffff"}" stroke="${stroke}" stroke-width="${sw(1.4)}"${op}/>`;
+      return `<rect x="${e.x}" y="${e.y}" width="${e.w}" height="${e.h}" rx="${e.rx}" fill="${h === "hl" ? "#fdecf2" : "#ffffff"}" stroke="${stroke}" stroke-width="${sw(1.4)}"${op}/>`;
     case "text":
       return `<text x="${e.x}" y="${e.y}" font-size="${e.size}" text-anchor="${e.anchor ?? "middle"}" font-family="${e.role === "point" ? "'Times New Roman', Times, serif" : e.role === "label" || e.role === "axis" ? "'Source Serif 4', Georgia, serif" : "Inter, system-ui, sans-serif"}"${e.role === "label" || e.role === "axis" ? ' font-style="italic"' : ""} fill="${h === "hl" ? ACCENT : e.role === "axis" ? "#646c80" : INK}"${h === "hl" ? ' font-weight="700"' : ""}${op}>${xesc(e.text)}</text>`;
   }

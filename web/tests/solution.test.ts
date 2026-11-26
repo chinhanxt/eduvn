@@ -110,7 +110,7 @@ describe("tô sáng đúng refs của bước", () => {
     expect(w).toBeGreaterThan(200);
     expect(h).toBeGreaterThan(100);
     expect(svg).toContain('fill="#fff"');
-    expect(svg).toContain("#d9480f");
+    expect(svg).toContain("#b4235a");
     expect(svg).toContain('opacity="0.3"');
     const s3 = figureSvg(buildFigureModel(solid(1)), ["S-B-C"]).svg;
     expect(s3).toContain('<g opacity="0.4">');

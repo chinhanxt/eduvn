@@ -11,11 +11,12 @@
   --sol-line: #e7eaef; --sol-line-2: #d5dae2;
   --sol-accent: #3346d1; --sol-accent-bg: #eef0fd; --sol-accent-line: #c7cdf7;
   --sol-ok: #137a43; --sol-ok-bg: #e8f5ee; --sol-warn: #9a5800; --sol-warn-bg: #fdf3e3; --sol-danger: #c0302e; --sol-danger-bg: #fdeceb;
-  --fig-ink: #1b2130; --fig-soft: #8a91a1; --fig-hl: #d9480f; --fig-hl-bg: #fff1e8; --fig-curve: #2a78d6;
+  --fig-ink: #1b2130; --fig-soft: #8a91a1; --fig-hl: #b4235a; --fig-hl-bg: #fdecf2; --fig-curve: #2a78d6;
   --sol-ease: cubic-bezier(.2, .8, .2, 1);
   --sol-d2: 160ms; --sol-d3: 240ms; --sol-d4: 320ms;
 }
-.sol-hoc { --sol-accent: #0b7466; --sol-accent-bg: #e6f3f1; --sol-accent-line: #b5dcd6; }
+.sol-hoc, .sol-hoc .sol-viewer, .sol-hoc .sol-chat-card { --sol-accent: #0b7466; --sol-accent-bg: #e6f3f1; --sol-accent-line: #b5dcd6; }
+.sol-lib, .sol-lib .sol-viewer { --sol-bg: #fdfcf9; --sol-line: #ece8df; --sol-line-2: #ddd7cb; }
 @media (prefers-reduced-motion: reduce) {
   .sol-scope, .sol-viewer, .sol-sheet-wrap, .sol-dlg-wrap { --sol-d2: 1ms; --sol-d3: 1ms; --sol-d4: 1ms; }
 }
@@ -50,7 +51,7 @@
 .sol-eyebrow { font: 600 12px/16px var(--sol-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--sol-ink-3); }
 .sol-head { max-width: 72ch; margin-bottom: 12px; }
 .sol-head .sol-eyebrow { margin-bottom: 10px; }
-.sol-problem { font: 400 19px/30px var(--sol-read); color: var(--sol-ink); font-optical-sizing: auto; }
+.sol-problem { font: 400 clamp(19px, 1.8vw, 24px)/1.5 var(--sol-read); letter-spacing: -.005em; max-width: 64ch; color: var(--sol-ink); font-optical-sizing: auto; }
 .sol-problem p { margin: 0 0 8px; }
 .sol-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 0 20px; border-bottom: 1px solid var(--sol-line); margin-bottom: 28px; }
 .sol-sp { flex: 1; }
@@ -181,7 +182,7 @@ h3 .sol-skel-line { display: inline-block; width: 40%; margin: 0; vertical-align
 @keyframes sol-shimmer { to { background-position: -200% 0; } }
 
 .sol-answer { margin-top: 12px; padding: 18px 20px; border: 1px solid var(--sol-line); border-left: 3px solid var(--sol-accent); border-radius: 4px 10px 10px 4px; background: var(--sol-bg); animation: sol-rise var(--sol-d4) var(--sol-ease) both; }
-.sol-answer-v { margin-top: 6px; font: 400 22px/32px var(--sol-read); color: var(--sol-ink); }
+.sol-answer-v { margin-top: 6px; font: 600 28px/38px var(--sol-read); color: var(--sol-ink); }
 .sol-answer-v .katex { font-size: 1.1em; }
 .sol-err { margin: 12px 0 0; padding: 10px 12px; border-radius: 6px; background: var(--sol-danger-bg); color: var(--sol-danger); font: 13px/20px var(--sol-ui); white-space: pre-line; }
 
@@ -249,8 +250,23 @@ h3 .sol-skel-line { display: inline-block; width: 40%; margin: 0; vertical-align
 .sol-brand i { width: 26px; height: 26px; border-radius: 6px; background: var(--sol-accent); display: grid; place-items: center; color: #fff; font-style: normal; font-size: 13px; }
 .sol-brand span { color: var(--sol-ink-3); font-weight: 500; }
 .sol-lib-main { max-width: 1240px; margin: 0 auto; padding: 40px clamp(16px, 2.5vw, 40px) 80px; }
-.sol-lib-hero { max-width: 720px; margin-bottom: 32px; }
-.sol-lib-hero h1 { margin: 8px 0 10px; font: 600 36px/44px var(--sol-read); letter-spacing: -.01em; }
+.sol-lib-hero { display: grid; grid-template-columns: minmax(0, 640px) minmax(0, 360px); justify-content: space-between; align-items: center; gap: 32px; margin-bottom: 32px; }
+.sol-art { width: 100%; max-width: 360px; overflow: visible; }
+.sol-art .ln { fill: none; stroke: var(--sol-accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 400; animation: sol-draw 1.2s var(--sol-ease) both; }
+.sol-art .st circle { fill: var(--sol-bg); stroke: var(--sol-accent); stroke-width: 3; }
+.sol-art .st text { font: 700 16px var(--sol-ui); fill: var(--sol-accent); }
+.sol-art .s2 circle { fill: var(--sol-accent); } .sol-art .s2 text { fill: #fff; }
+.sol-art .st { animation: sol-pop 260ms var(--sol-ease) both; } .sol-art .s1 { animation-delay: 300ms; } .sol-art .s2 { animation-delay: 600ms; }
+.sol-art .cd { fill: var(--sol-line); }
+@keyframes sol-draw { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+@keyframes sol-pop { from { opacity: 0; transform: scale(.6); } }
+.sol-empty-w { position: relative; }
+.sol-ghost { opacity: .4; filter: saturate(.6); pointer-events: none; -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); }
+.sol-ghost-a { padding: 20px 0 22px; }
+.sol-empty-w .sol-empty { padding: 8px 0 24px; text-align: left; font: 600 17px/26px var(--sol-read); color: var(--sol-ink); }
+@media (max-width: 900px) { .sol-lib-hero { grid-template-columns: minmax(0, 1fr); } .sol-art { display: none; } }
+@media (prefers-reduced-motion: reduce) { .sol-art .ln, .sol-art .st { animation: none; } }
+.sol-lib-hero h1 { margin: 8px 0 10px; font: 600 clamp(32px, 4vw, 48px)/1.1 var(--sol-read); letter-spacing: -.02em; }
 .sol-lib-hero p { margin: 0; font: 17px/28px var(--sol-read); color: var(--sol-ink-2); }
 .sol-search { display: flex; align-items: center; gap: 8px; max-width: 560px; height: 44px; margin: 24px 0 16px; padding: 0 12px; border: 1px solid #8c93a3; border-radius: 6px; background: var(--sol-bg); }
 .sol-search:focus-within { outline: 3px solid var(--sol-accent-line); border-color: var(--sol-accent); }
